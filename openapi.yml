@@ -4,9 +4,413 @@ info:
   version: '0.1'
 servers:
   - url: https://api.server.test/v1
+
+###### Tags of API endpoints
+tags:
+- name: "Lectures"
+  description: "Available lectures"
+- name: "Assignments"
+  description: Assignments of a lecture
+- name: "Submissions"
+  description: Submissions of an assignment
+- name: "Validation"
+  description: Validation of exercises in an assignment
+
 paths:
-  /test:
+  /lectures:
     get:
+      summary: "Return all lectures"
+      tags:
+      - "Lectures"
+      parameters:
+        - name: semester
+          in: query
+          description: The semester for which to fetch lectures
+          required: false
+          example: "SS21"
+          schema:
+            type: string
       responses:
-        '200':
+        200:
           description: OK
+          content:
+            application/json:
+              schema:
+                type: "array"
+                items:
+                  $ref: "#/components/schemas/Lecture"
+        403:
+          description: Unautorized
+        500:
+          description: Internal server error
+          content: 
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessage"
+
+  /lectures/{lect_id}/assignments:
+    get:
+      summary: "Return the assignments of a specific lecture"
+      tags:
+        - "Lectures"
+      parameters:
+      - name: lect_id
+        in: path
+        description: ID of the lecture
+        required: true
+        example: 1
+        schema:
+          type: integer
+          format: int64
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: "array"
+                items:
+                  $ref: "#/components/schemas/Assignment"
+        403:
+          description: Unautorized
+        404:
+          description: Lecture id not found.
+          content: 
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessage"
+        500:
+          description: Internal server error
+          content: 
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessage"
+  /lectures/{lect_id}/assignments/{a_id}:
+    get:
+      summary: "Request the lecture to be fetched"
+      tags: 
+      - "Assignments"
+      parameters:
+      - name: lect_id
+        in: path
+        description: ID of the lecture
+        required: true
+        example: 1
+        schema:
+          type: integer
+          format: int64
+      - name: a_id
+        in: path
+        description: ID of the assignment in the lecture
+        required: true
+        example: 2
+        schema:
+          type: integer
+          format: int64
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Assignment"
+        403:
+          description: Unautorized
+        404:
+          description: Lecture id or assignment id not found
+          content: 
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessage"
+        500:
+          description: Internal server error
+          content: 
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessage"
+    put:
+      summary: "Request assignment to be submitted"
+      tags:
+        - "Assignments"
+      parameters:
+      - name: lect_id
+        in: path
+        description: ID of the lecture
+        required: true
+        example: 1
+        schema:
+          type: integer
+          format: int64
+      - name: a_id
+        in: path
+        description: ID of the assignment in the lecture
+        required: true
+        example: 2
+        schema:
+          type: integer
+          format: int64
+      responses:
+        200:
+          description: OK
+        403:
+          description: Unautorized
+        404:
+          description: Lecture id or assignment id not found.
+          content: 
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessage"
+        500:
+          description: Internal server error
+          content: 
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessage"
+  /lectures/{lect_id}/assignments/{a_id}/submissions:
+    get:
+      summary: Return the submissions of an assignment
+      tags:
+        - "Submissions"
+      parameters:
+      - name: lect_id
+        in: path
+        description: ID of the lecture
+        required: true
+        example: 1
+        schema:
+          type: integer
+          format: int64
+      - name: a_id
+        in: path
+        description: ID of the assignment in the lecture
+        required: true
+        example: 2
+        schema:
+          type: integer
+          format: int64
+      - name: latest
+        in: query
+        description: Only return the latest submission
+        required: false
+        schema:
+          type: boolean
+          default: false
+        # allowEmptyValue: true
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Submission"
+        403:
+          description: Unautorized
+        404:
+          description: Lecture id or assignment id not found
+          content: 
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessage"
+        500:
+          description: Internal server error
+          content: 
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessage"
+  /lectures/{lect_id}/assignments/{a_id}/feedback:
+    get:
+      summary: Return the feedback of an assignment
+      tags:
+        - "Submissions"
+      parameters:
+      - name: lect_id
+        in: path
+        description: ID of the lecture
+        required: true
+        example: 1
+        schema:
+          type: integer
+          format: int64
+      - name: a_id
+        in: path
+        description: ID of the assignment in the lecture
+        required: true
+        example: 2
+        schema:
+          type: integer
+          format: int64
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: "array"
+                items:
+                  $ref: "#/components/schemas/Feedback"
+        403:
+          description: Unautorized
+        404:
+          description: Lecture id or assignment id not found
+          content: 
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessage"
+        500:
+          description: Internal server error
+          content: 
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessage"
+  /lectures/{lect_id}/assignments/{a_id}/validate/{ex_id}:
+    get:
+      summary: "Requests the exercise in an assignment to be validated"
+      tags:
+      - "Validation"
+      parameters:
+      - name: lect_id
+        in: path
+        description: ID of the lecture
+        required: true
+        example: 1
+        schema:
+          type: integer
+          format: int64
+      - name: a_id
+        in: path
+        description: ID of the assignment in the lecture
+        required: true
+        example: 2
+        schema:
+          type: integer
+          format: int64
+      - name: ex_id
+        in: path
+        description: ID of the exercise in the assignment
+        required: true
+        example: 0
+        schema:
+          type: integer
+          format: int64
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ValidationResult"
+        403:
+          description: Unautorized
+        404:
+          description: Lecture id, assignment id or exercise id not found
+          content: 
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessage"
+        500:
+          description: Internal server error
+          content: 
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessage"
+
+
+
+###### Data type definitions
+components:
+  schemas:
+    Lecture:
+      type: "object"
+      properties:
+        id:
+          type: "integer"
+          format: "int64"
+        name:
+          type: "string"
+          example: "Informationsvisualisierung"
+        code:
+          type: "string"
+          example: "ivs21"
+        complete:
+          type: "boolean"
+          default: false
+        semester:
+          type: "string"
+          example: "SS21"
+    Assignment:
+      type: "object"
+      properties:
+        id:
+          type: "integer"
+          format: "int64"
+        exercises:
+          type: "array"
+          items:
+            $ref: "#/components/schemas/Exercise"
+        due_date:
+          type: "string"
+          format: "date-time"
+          example: "2021-07-21T23:55:00Z"
+        path:
+          type: "string"
+          example: "~/assignment_1/"
+        last_submitted:
+          nullable: true
+          type: "string"
+          format: "date-time"
+          example: "2021-07-21T11:53:07Z"
+    Exercise:
+      type: "object"
+      properties:
+        id:
+          type: "integer"
+          format: "int64"
+        a_id:
+          type: "integer"
+          format: "int64"
+        name:
+          type: string
+          example: "exercise_1.ipynb"
+    Submission:
+      type: "object"
+      properties:
+        id:
+          type: "integer"
+          format: "int64"
+        submitted_at:
+          type: "string"
+          format: "date-time"
+          example: "2021-07-21T11:53:07Z"
+        status:
+          type: string
+          enum:
+            - not_graded
+            - automatically_graded
+            - manually_graded
+    Feedback:
+      type: "object"
+      properties:
+        id:
+          type: "integer"
+          format: "int64"
+        submission_id:
+          type: "integer"
+          format: "int64"
+        path:
+          type: "string"
+          example: "~/assignment_1/feedback/..."
+    ValidationResult:
+      type: "object"
+      properties:
+        status:
+          type: string
+          enum:
+            - passed
+            - failed
+          # TODO: send failed cells and python output
+    ErrorMessage:
+      type: "object"
+      properties:
+        msg:
+          type: "string"
+          example: "Could not connect to database."
