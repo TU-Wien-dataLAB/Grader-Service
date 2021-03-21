@@ -12,9 +12,13 @@ tags:
 - name: "Assignments"
   description: Assignments of a lecture
 - name: "Submissions"
-  description: Submissions of an assignment
+  description: View submissions of an assignment
 - name: "Validation"
   description: Validation of exercises in an assignment
+- name: "Manage Assignments"
+  description: Manage the creation and distribution of assignments (Instructor)
+- name: "Grading Assignments"
+  description: Manage the grading and feedback of assignments (Instructor)
 
 paths:
   /lectures:
@@ -87,7 +91,7 @@ paths:
                 $ref: "#/components/schemas/ErrorMessage"
   /lectures/{lect_id}/assignments/{a_id}:
     get:
-      summary: "Request the lecture to be fetched"
+      summary: "Request the assignment to be fetched"
       tags: 
       - "Assignments"
       parameters:
@@ -313,7 +317,150 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorMessage"
-
+  
+  /lectures/{lect_id}/assignments/{a_id}/manage:
+    post:
+      summary: Request creation of an assignment
+      tags:
+      - Manage Assignments
+      parameters:
+      - name: lect_id
+        in: path
+        description: ID of the lecture
+        required: true
+        example: 1
+        schema:
+          type: integer
+          format: int64
+      - name: a_id
+        in: path
+        description: ID of the assignment in the lecture
+        required: true
+        example: 2
+        schema:
+          type: integer
+          format: int64
+      requestBody:
+        description: The initial state of an assignment. Every field will be empty except `due_date` and `name`.
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Assignment'
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Assignment"
+        403:
+          description: Unautorized
+        404:
+          description: Lecture id or assignment id not found.
+          content: 
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessage"
+        500:
+          description: Internal server error
+          content: 
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessage"
+    put:
+      summary: Update an existing assignment
+      tags:
+      - Manage Assignments
+      parameters:
+      - name: lect_id
+        in: path
+        description: ID of the lecture
+        required: true
+        example: 1
+        schema:
+          type: integer
+          format: int64
+      - name: a_id
+        in: path
+        description: ID of the assignment in the lecture
+        required: true
+        example: 2
+        schema:
+          type: integer
+          format: int64
+      requestBody:
+        description: Updates all the non-empty fields.
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Assignment'
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Assignment"
+        403:
+          description: Unautorized
+        404:
+          description: Lecture id or assignment id not found.
+          content: 
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessage"
+        500:
+          description: Internal server error
+          content: 
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessage"
+  
+  /lectures/{lect_id}/assignments/{a_id}/manage/release:
+    put:
+      summary: Request the release of an assignment
+      tags:
+      - Manage Assignments
+      parameters:
+      - name: lect_id
+        in: path
+        description: ID of the lecture
+        required: true
+        example: 1
+        schema:
+          type: integer
+          format: int64
+      - name: a_id
+        in: path
+        description: ID of the assignment in the lecture
+        required: true
+        example: 2
+        schema:
+          type: integer
+          format: int64  
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Assignment"
+        403:
+          description: Unautorized
+        404:
+          description: Lecture id or assignment id not found.
+          content: 
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessage"
+        500:
+          description: Internal server error
+          content: 
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessage"
 
 
 ###### Data type definitions
@@ -343,6 +490,9 @@ components:
         id:
           type: "integer"
           format: "int64"
+        name:
+          type: "string"
+          example: "assignment_1"
         exercises:
           type: "array"
           items:
@@ -359,6 +509,13 @@ components:
           type: "string"
           format: "date-time"
           example: "2021-07-21T11:53:07Z"
+        status:
+          type: string
+          enum:
+            - created # another state of an assignment (instructor only)
+            - released
+            - fetched
+            - submitted
     Exercise:
       type: "object"
       properties:
