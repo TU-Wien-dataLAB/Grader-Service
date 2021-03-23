@@ -15,15 +15,47 @@ tags:
   description: View submissions of an assignment
 - name: "Validation"
   description: Validation of exercises in an assignment
-- name: "Manage Assignments"
-  description: Manage the creation and distribution of assignments (Instructor)
-- name: "Grading Assignments"
+- name: "Grading"
   description: Manage the grading and feedback of assignments (Instructor)
 
 paths:
   /lectures:
+    post:
+      security:
+        - hub_auth:
+          - instructor
+      summary: Create new lecture
+      tags:
+      - "Lectures"
+      requestBody:
+        description: The initial state of an assignment. Every field will be empty except `due_date` and `name`.
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Lecture'
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Lecture"
+        403:
+          description: Unautorized
+        500:
+          description: Internal server error
+          content: 
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessage"  
     get:
-      summary: "Return all lectures"
+      security:
+        - hub_auth:
+          - instructor
+          - tutor
+          - student
+      summary: "Return all lectures that are available to the user"
       tags:
       - "Lectures"
       parameters:
@@ -51,12 +83,52 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorMessage"
+  
+  /lectures/{lect_id}:
+    get:
+      security:
+        - hub_auth:
+          - instructor
+          - tutor
+          - student
+      summary: Return the lecture with specified id
+      tags:
+      - "Lectures"
+      parameters:
+      - name: lect_id
+        in: path
+        description: ID of the lecture
+        required: true
+        example: 1
+        schema:
+          type: integer
+          format: int64
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Lecture"
+        403:
+          description: Unautorized
+        500:
+          description: Internal server error
+          content: 
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessage" 
 
   /lectures/{lect_id}/assignments:
     get:
+      security:
+        - hub_auth:
+          - instructor
+          - tutor
+          - student
       summary: "Return the assignments of a specific lecture"
       tags:
-        - "Lectures"
+        - "Assignments"
       parameters:
       - name: lect_id
         in: path
@@ -89,8 +161,119 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorMessage"
+    post:
+      security:
+        - hub_auth:
+          - instructor
+          - tutor
+      summary: Request creation of an assignment
+      tags:
+      - Assignments
+      parameters:
+      - name: lect_id
+        in: path
+        description: ID of the lecture
+        required: true
+        example: 1
+        schema:
+          type: integer
+          format: int64
+      - name: a_id
+        in: path
+        description: ID of the assignment in the lecture
+        required: true
+        example: 2
+        schema:
+          type: integer
+          format: int64
+      requestBody:
+        description: The initial state of an assignment. Every field will be empty except `due_date` and `name`.
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Assignment'
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Assignment"
+        403:
+          description: Unautorized
+        404:
+          description: Lecture id or assignment id not found.
+          content: 
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessage"
+        500:
+          description: Internal server error
+          content: 
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessage"
   /lectures/{lect_id}/assignments/{a_id}:
+    put:
+      security:
+        - hub_auth:
+          - instructor
+          - tutor
+      summary: Update an existing assignment (also handles release)
+      tags:
+      - Assignments
+      parameters:
+      - name: lect_id
+        in: path
+        description: ID of the lecture
+        required: true
+        example: 1
+        schema:
+          type: integer
+          format: int64
+      - name: a_id
+        in: path
+        description: ID of the assignment in the lecture
+        required: true
+        example: 2
+        schema:
+          type: integer
+          format: int64
+      requestBody:
+        description: Updates all the non-empty fields.
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Assignment'
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Assignment"
+        403:
+          description: Unautorized
+        404:
+          description: Lecture id or assignment id not found.
+          content: 
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessage"
+        500:
+          description: Internal server error
+          content: 
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessage"
     get:
+      security:
+        - hub_auth:
+          - instructor
+          - tutor
+          - student
       summary: "Request the assignment to be fetched"
       tags: 
       - "Assignments"
@@ -111,6 +294,22 @@ paths:
         schema:
           type: integer
           format: int64
+      - name: instuctor_version # TODO: Take care of auth!!! Maybe different path?
+        in: query
+        description: Fetch the instructor version of the assignment
+        required: false
+        example: false
+        schema:
+          type: boolean
+          default: false
+      - name: metadata_only
+        in: query
+        description: Only return the assignment information and don't fetch it
+        required: false
+        example: false
+        schema:
+          type: boolean
+          default: false
       responses:
         200:
           description: OK
@@ -132,10 +331,17 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorMessage"
-    put:
+    
+  /lectures/{lect_id}/assignments/{a_id}/submissions:
+    post:
+      security:
+        - hub_auth:
+          - instructor
+          - tutor
+          - student
       summary: "Request assignment to be submitted"
       tags:
-        - "Assignments"
+        - "Submissions"
       parameters:
       - name: lect_id
         in: path
@@ -170,8 +376,12 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorMessage"
-  /lectures/{lect_id}/assignments/{a_id}/submissions:
     get:
+      security:
+        - hub_auth:
+          - instructor
+          - tutor
+          - student
       summary: Return the submissions of an assignment
       tags:
         - "Submissions"
@@ -223,6 +433,11 @@ paths:
                 $ref: "#/components/schemas/ErrorMessage"
   /lectures/{lect_id}/assignments/{a_id}/feedback:
     get:
+      security:
+        - hub_auth:
+          - instructor
+          - tutor
+          - student
       summary: Return the feedback of an assignment
       tags:
         - "Submissions"
@@ -268,6 +483,11 @@ paths:
                 $ref: "#/components/schemas/ErrorMessage"
   /lectures/{lect_id}/assignments/{a_id}/validate/{ex_id}:
     get:
+      security:
+        - hub_auth:
+          - instructor
+          - tutor
+          - student
       summary: "Requests the exercise in an assignment to be validated"
       tags:
       - "Validation"
@@ -318,46 +538,60 @@ paths:
               schema:
                 $ref: "#/components/schemas/ErrorMessage"
   
-  /lectures/{lect_id}/assignments/{a_id}/manage:
-    post:
-      summary: Request creation of an assignment
+    
+  /lectures/{lect_id}/grading/:
+    get:
+      security:
+        - hub_auth:
+          - instructor
+          - tutor
+      summary: Return all student submissions of a lecture
       tags:
-      - Manage Assignments
+      - Grading
       parameters:
-      - name: lect_id
-        in: path
-        description: ID of the lecture
-        required: true
-        example: 1
-        schema:
-          type: integer
-          format: int64
-      - name: a_id
-        in: path
-        description: ID of the assignment in the lecture
-        required: true
-        example: 2
-        schema:
-          type: integer
-          format: int64
-      requestBody:
-        description: The initial state of an assignment. Every field will be empty except `due_date` and `name`.
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/Assignment'
+        - name: lect_id
+          in: path
+          description: ID of the lecture
+          required: true
+          example: 1
+          schema:
+            type: integer
+            format: int64
+        - name: metadata_only
+          in: query
+          description: Only return the metadata information of the submissions
+          required: false
+          example: false
+          schema:
+            type: boolean
+            default: false
       responses:
         200:
           description: OK
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Assignment"
+                type: "object"
+                properties:
+                  n_submissions:
+                    type: integer
+                    format: int64
+                    example: 42
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        student:
+                          $ref: "#/components/schemas/User"
+                        submissions:
+                          type: "array"
+                          items:
+                            $ref: "#/components/schemas/Submission"
         403:
           description: Unautorized
         404:
-          description: Lecture id or assignment id not found.
+          description: Lecture id not found
           content: 
             application/json:
               schema:
@@ -368,45 +602,55 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorMessage"
-    put:
-      summary: Update an existing assignment
+  /lectures/{lect_id}/grading/{student_id}:
+    get:
+      security:
+        - hub_auth:
+          - instructor
+          - tutor
+      summary: Returns all submissions of a student in a lecture
       tags:
-      - Manage Assignments
+      - Grading
       parameters:
-      - name: lect_id
-        in: path
-        description: ID of the lecture
-        required: true
-        example: 1
-        schema:
-          type: integer
-          format: int64
-      - name: a_id
-        in: path
-        description: ID of the assignment in the lecture
-        required: true
-        example: 2
-        schema:
-          type: integer
-          format: int64
-      requestBody:
-        description: Updates all the non-empty fields.
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/Assignment'
+        - name: lect_id
+          in: path
+          description: ID of the lecture
+          required: true
+          example: 1
+          schema:
+            type: integer
+            format: int64
+        - name: student_id
+          in: path
+          description: ID of the student that is enroled in the lecture
+          required: true
+          example: "12345678"
+          schema:
+            type: "string"
       responses:
         200:
           description: OK
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Assignment"
+                type: "object"
+                properties:
+                  n_submissions:
+                    type: integer
+                    format: int64
+                    example: 3
+                  data:
+                    properties:
+                      student:
+                        $ref: "#/components/schemas/User"
+                      submissions:
+                        type: "array"
+                        items:
+                          $ref: "#/components/schemas/Submission"
         403:
           description: Unautorized
         404:
-          description: Lecture id or assignment id not found.
+          description: Lecture id or student id not found
           content: 
             application/json:
               schema:
@@ -417,40 +661,54 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorMessage"
-  
-  /lectures/{lect_id}/assignments/{a_id}/manage/release:
+
+  /lectures/{lect_id}/grading/{student_id}/autograde:
     put:
-      summary: Request the release of an assignment
+      security:
+        - hub_auth:
+          - instructor
+          - tutor
+          - student
+      summary: Request the latest submission to be autograded
       tags:
-      - Manage Assignments
+      - Grading
       parameters:
-      - name: lect_id
-        in: path
-        description: ID of the lecture
-        required: true
-        example: 1
-        schema:
-          type: integer
-          format: int64
-      - name: a_id
-        in: path
-        description: ID of the assignment in the lecture
-        required: true
-        example: 2
-        schema:
-          type: integer
-          format: int64  
+        - name: lect_id
+          in: path
+          description: ID of the lecture
+          required: true
+          example: 1
+          schema:
+            type: integer
+            format: int64
+        - name: student_id
+          in: path
+          description: ID of the student that is enroled in the lecture
+          required: true
+          example: "12345678"
+          schema:
+            type: "string"
+        - name: submission_id
+          in: query
+          description: Specify the the submission that should be autograded instead of latest
+          required: false
+          example: 2
+          schema:
+            type: integer
+            format: int64
       responses:
         200:
           description: OK
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Assignment"
+                type: "array"
+                items:
+                  $ref: "#/components/schemas/Assignment"
         403:
           description: Unautorized
         404:
-          description: Lecture id or assignment id not found.
+          description: Lecture id not found.
           content: 
             application/json:
               schema:
@@ -466,6 +724,15 @@ paths:
 ###### Data type definitions
 components:
   schemas:
+    User:
+      type: "object"
+      properties:
+        id: 
+          type: "string" # tuwel id
+          example: "12345678"
+        name:
+          type: "string"
+          example: "Baz Bar"
     Lecture:
       type: "object"
       properties:
@@ -497,6 +764,10 @@ components:
           type: "array"
           items:
             $ref: "#/components/schemas/Exercise"
+        files:
+          type: "array"
+          items:
+            $ref: "#/components/schemas/File"
         due_date:
           type: "string"
           format: "date-time"
@@ -516,6 +787,7 @@ components:
             - released
             - fetched
             - submitted
+            - complete # final state -> final grade is calculated
     Exercise:
       type: "object"
       properties:
@@ -528,6 +800,13 @@ components:
         name:
           type: string
           example: "exercise_1.ipynb"
+        ex_type:
+          type: string
+          enum:
+          - nbgrader # TODO: add more exercise types
+        points:
+          type: number
+          format: float
     Submission:
       type: "object"
       properties:
@@ -564,10 +843,74 @@ components:
           enum:
             - passed
             - failed
-          # TODO: send failed cells and python output
+        # TODO: send failed cells and python output
+        validation_errors:
+          type: array
+          items:
+            type: object
+            properties:
+              error_line:
+                type: string
+                example: "assert(id(2)==2)"
+              error_output:
+                type: string
+                example: "NotImplementedError at line ..."
+    GradingResult:
+      type: "object"
+      properties:
+        id:
+          type: integer
+          format: int64
+        status:
+          type: string
+          enum:
+          - needs_auto_grading
+          - needs_manual_grading
+          - completed
+        score:
+          type: number
+          format: float
+    ManualGradingContent:
+      type: object
+      properties: # TODO: use in api
+        id:
+          type: integer
+          format: int64
+        feedback_cells:
+          type: array
+          items:
+            type: object
+            properties:
+              cell_id:
+                type: integer
+                format: int64
+                example: 0
+              feedback:
+                type: string
+    File:
+      type: object
+      properties:
+        name:
+          type: string
+          example: "dataset.csv"
     ErrorMessage:
       type: "object"
       properties:
         msg:
           type: "string"
-          example: "Could not connect to database."
+          example: "Some very detailed error message."
+
+  securitySchemes:
+    hub_auth:
+      type: oauth2
+      flows:
+        implicit:
+          authorizationUrl: http://auth.hub.something.tuwien.ac.at
+          scopes:
+            instructor: instructor of a lecture
+            tutuor: tutor of a lecture
+            student: student of a lecture
+    api_key:
+      type: apiKey
+      name: api_key
+      in: header
