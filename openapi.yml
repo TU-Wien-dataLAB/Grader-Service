@@ -18,6 +18,7 @@ tags:
 - name: "Grading"
   description: Manage the grading and feedback of assignments (Instructor)
 
+# TODO: handle "sub-assignments"
 paths:
   /lectures:
     post:
@@ -28,7 +29,7 @@ paths:
       tags:
       - "Lectures"
       requestBody:
-        description: The initial state of an assignment. Every field will be empty except `due_date` and `name`.
+        description: The parameters of the lecture that is created.
         required: true
         content:
           application/json:
@@ -85,6 +86,45 @@ paths:
                 $ref: "#/components/schemas/ErrorMessage"
   
   /lectures/{lect_id}:
+    put:
+      security:
+        - hub_auth:
+          - instructor
+          - tutor
+      summary: Update an existing lecture
+      tags:
+      - "Lectures"
+      parameters:
+      - name: lect_id
+        in: path
+        description: ID of the lecture
+        required: true
+        example: 1
+        schema:
+          type: integer
+          format: int64
+      requestBody:
+        description: The parameters of the lecture that should be updated.
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Lecture'
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Lecture"
+        403:
+          description: Unautorized
+        500:
+          description: Internal server error
+          content: 
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessage" 
     get:
       security:
         - hub_auth:
@@ -117,18 +157,15 @@ paths:
           content: 
             application/json:
               schema:
-                $ref: "#/components/schemas/ErrorMessage" 
-
-  /lectures/{lect_id}/assignments:
-    get:
+                $ref: "#/components/schemas/ErrorMessage"
+    delete:
       security:
         - hub_auth:
           - instructor
           - tutor
-          - student
-      summary: "Return the assignments of a specific lecture"
+      summary: Delete an existing lecture
       tags:
-        - "Assignments"
+      - "Lectures"
       parameters:
       - name: lect_id
         in: path
@@ -144,23 +181,17 @@ paths:
           content:
             application/json:
               schema:
-                type: "array"
-                items:
-                  $ref: "#/components/schemas/Assignment"
+                $ref: "#/components/schemas/Lecture"
         403:
           description: Unautorized
-        404:
-          description: Lecture id not found.
-          content: 
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorMessage"
         500:
           description: Internal server error
           content: 
             application/json:
               schema:
-                $ref: "#/components/schemas/ErrorMessage"
+                $ref: "#/components/schemas/ErrorMessage" 
+
+  /lectures/{lect_id}/assignments:
     post:
       security:
         - hub_auth:
@@ -214,6 +245,48 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorMessage"
+    get:
+      security:
+        - hub_auth:
+          - instructor
+          - tutor
+          - student
+      summary: "Return the assignments of a specific lecture"
+      tags:
+        - "Assignments"
+      parameters:
+      - name: lect_id
+        in: path
+        description: ID of the lecture
+        required: true
+        example: 1
+        schema:
+          type: integer
+          format: int64
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: "array"
+                items:
+                  $ref: "#/components/schemas/Assignment"
+        403:
+          description: Unautorized
+        404:
+          description: Lecture id not found.
+          content: 
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessage"
+        500:
+          description: Internal server error
+          content: 
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessage"
+
   /lectures/{lect_id}/assignments/{a_id}:
     put:
       security:
@@ -241,7 +314,7 @@ paths:
           type: integer
           format: int64
       requestBody:
-        description: Updates all the non-empty fields.
+        description: The parameters of the assignment that should be updated.
         required: true
         content:
           application/json:
@@ -321,6 +394,48 @@ paths:
           description: Unautorized
         404:
           description: Lecture id or assignment id not found
+          content: 
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessage"
+        500:
+          description: Internal server error
+          content: 
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessage"
+    delete:
+      security:
+        - hub_auth:
+          - instructor
+          - tutor
+      summary: Delete an existing assignment
+      tags:
+      - Assignments
+      parameters:
+      - name: lect_id
+        in: path
+        description: ID of the lecture
+        required: true
+        example: 1
+        schema:
+          type: integer
+          format: int64
+      - name: a_id
+        in: path
+        description: ID of the assignment in the lecture
+        required: true
+        example: 2
+        schema:
+          type: integer
+          format: int64
+      responses:
+        200:
+          description: OK
+        403:
+          description: Unautorized
+        404:
+          description: Lecture id or assignment id not found.
           content: 
             application/json:
               schema:
@@ -539,7 +654,7 @@ paths:
                 $ref: "#/components/schemas/ErrorMessage"
   
     
-  /lectures/{lect_id}/grading/:
+  /lectures/{lect_id}/assignments/{a_id}/grading:
     get:
       security:
         - hub_auth:
@@ -557,11 +672,26 @@ paths:
           schema:
             type: integer
             format: int64
+        - name: a_id
+          in: path
+          description: ID of the assignment in the lecture
+          required: true
+          example: 2
+          schema:
+            type: integer
+            format: int64
         - name: metadata_only
           in: query
           description: Only return the metadata information of the submissions
           required: false
           example: false
+          schema:
+            type: boolean
+            default: false
+        - name: latest
+          in: query
+          description: Only return the latest submission of each student
+          required: false
           schema:
             type: boolean
             default: false
@@ -591,7 +721,7 @@ paths:
         403:
           description: Unautorized
         404:
-          description: Lecture id not found
+          description: Lecture id or assignment id not found
           content: 
             application/json:
               schema:
@@ -602,7 +732,7 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorMessage"
-  /lectures/{lect_id}/grading/{student_id}:
+  /lectures/{lect_id}/assignments/{a_id}/grading/{student_id}:
     get:
       security:
         - hub_auth:
@@ -617,6 +747,14 @@ paths:
           description: ID of the lecture
           required: true
           example: 1
+          schema:
+            type: integer
+            format: int64
+        - name: a_id
+          in: path
+          description: ID of the assignment in the lecture
+          required: true
+          example: 2
           schema:
             type: integer
             format: int64
@@ -650,7 +788,7 @@ paths:
         403:
           description: Unautorized
         404:
-          description: Lecture id or student id not found
+          description: Lecture id, assignment id or student id not found
           content: 
             application/json:
               schema:
@@ -662,13 +800,12 @@ paths:
               schema:
                 $ref: "#/components/schemas/ErrorMessage"
 
-  /lectures/{lect_id}/grading/{student_id}/autograde:
-    put:
+  /lectures/{lect_id}/assignments/{a_id}/grading/{student_id}/auto:
+    post:
       security:
         - hub_auth:
           - instructor
           - tutor
-          - student
       summary: Request the latest submission to be autograded
       tags:
       - Grading
@@ -678,6 +815,14 @@ paths:
           description: ID of the lecture
           required: true
           example: 1
+          schema:
+            type: integer
+            format: int64
+        - name: a_id
+          in: path
+          description: ID of the assignment in the lecture
+          required: true
+          example: 2
           schema:
             type: integer
             format: int64
@@ -708,7 +853,319 @@ paths:
         403:
           description: Unautorized
         404:
-          description: Lecture id not found.
+          description: Lecture id, assignment id, student id or submission id not found
+          content: 
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessage"
+        500:
+          description: Internal server error
+          content: 
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessage"
+
+  /lectures/{lect_id}/assignments/{a_id}/grading/{student_id}/manual:
+    post:
+      security:
+        - hub_auth:
+          - instructor
+          - tutor
+      summary: Create new manual feedback for an assignment
+      tags:
+      - Grading
+      parameters:
+        - name: lect_id
+          in: path
+          description: ID of the lecture
+          required: true
+          example: 1
+          schema:
+            type: integer
+            format: int64
+        - name: a_id
+          in: path
+          description: ID of the assignment in the lecture
+          required: true
+          example: 2
+          schema:
+            type: integer
+            format: int64
+        - name: student_id
+          in: path
+          description: ID of the student that is enroled in the lecture
+          required: true
+          example: "12345678"
+          schema:
+            type: "string"
+        - name: submission_id
+          in: query
+          description: Specify the the submission that should be manually graded instead of latest
+          required: false
+          example: 2
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        description: The content of the manual grading.
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ManualGradingContent'
+      responses:
+        200:
+          description: OK
+          content: 
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ManualGradingContent"
+        403:
+          description: Unautorized
+        404:
+          description: Lecture id, assignment id, student id or submission id not found
+          content: 
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessage"
+        500:
+          description: Internal server error
+          content: 
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessage"
+    get:
+      security:
+        - hub_auth:
+          - instructor
+          - tutor
+      summary: Return the manual feedback of a graded assignment
+      tags:
+      - Grading
+      parameters:
+        - name: lect_id
+          in: path
+          description: ID of the lecture
+          required: true
+          example: 1
+          schema:
+            type: integer
+            format: int64
+        - name: a_id
+          in: path
+          description: ID of the assignment in the lecture
+          required: true
+          example: 2
+          schema:
+            type: integer
+            format: int64
+        - name: student_id
+          in: path
+          description: ID of the student that is enroled in the lecture
+          required: true
+          example: "12345678"
+          schema:
+            type: "string"
+        - name: submission_id
+          in: query
+          description: Specify the the submission that should be manually graded instead of latest
+          required: false
+          example: 2
+          schema:
+            type: integer
+            format: int64
+      responses:
+        200:
+          description: OK
+          content: 
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ManualGradingContent"
+        403:
+          description: Unautorized
+        404:
+          description: Lecture id, assignment id, student id or submission id not found
+          content: 
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessage"
+        500:
+          description: Internal server error
+          content: 
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessage"
+    put:
+      security:
+        - hub_auth:
+          - instructor
+          - tutor
+      summary: Update the manual feedback for an assignment
+      tags:
+      - Grading
+      parameters:
+        - name: lect_id
+          in: path
+          description: ID of the lecture
+          required: true
+          example: 1
+          schema:
+            type: integer
+            format: int64
+        - name: a_id
+          in: path
+          description: ID of the assignment in the lecture
+          required: true
+          example: 2
+          schema:
+            type: integer
+            format: int64
+        - name: student_id
+          in: path
+          description: ID of the student that is enroled in the lecture
+          required: true
+          example: "12345678"
+          schema:
+            type: "string"
+        - name: submission_id
+          in: query
+          description: Specify the the submission that should be manually graded instead of latest
+          required: false
+          example: 2
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        description: The content of the manual grading to be updated.
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ManualGradingContent'
+      responses:
+        200:
+          description: OK
+          content: 
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ManualGradingContent"
+        403:
+          description: Unautorized
+        404:
+          description: Lecture id, assignment id, student id or submission id not found
+          content: 
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessage"
+        500:
+          description: Internal server error
+          content: 
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessage"
+    delete:
+      security:
+        - hub_auth:
+          - instructor
+          - tutor
+      summary: Delete the manual feedback for an assignment
+      tags:
+      - Grading
+      parameters:
+        - name: lect_id
+          in: path
+          description: ID of the lecture
+          required: true
+          example: 1
+          schema:
+            type: integer
+            format: int64
+        - name: a_id
+          in: path
+          description: ID of the assignment in the lecture
+          required: true
+          example: 2
+          schema:
+            type: integer
+            format: int64
+        - name: student_id
+          in: path
+          description: ID of the student that is enroled in the lecture
+          required: true
+          example: "12345678"
+          schema:
+            type: "string"
+        - name: submission_id
+          in: query
+          description: Specify the the submission that should be manually graded instead of latest
+          required: false
+          example: 2
+          schema:
+            type: integer
+            format: int64
+      responses:
+        200:
+          description: OK
+        403:
+          description: Unautorized
+        404:
+          description: Lecture id, assignment id, student id or submission id not found
+          content: 
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessage"
+        500:
+          description: Internal server error
+          content: 
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessage"
+              
+  /lectures/{lect_id}/assignments/{a_id}/grading/{student_id}/score:
+    get:
+      security:
+        - hub_auth:
+          - instructor
+          - tutor
+          - student
+      summary: Return the score of an assignment
+      tags:
+      - Grading
+      parameters:
+        - name: lect_id
+          in: path
+          description: ID of the lecture
+          required: true
+          example: 1
+          schema:
+            type: integer
+            format: int64
+        - name: student_id
+          in: path
+          description: ID of the student that is enroled in the lecture
+          required: true
+          example: "12345678"
+          schema:
+            type: "string"
+        - name: submission_id
+          in: query
+          description: Specify the the submission that should be returned instead of latest
+          required: false
+          example: 2
+          schema:
+            type: integer
+            format: int64
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GradingResult"
+        403:
+          description: Unautorized
+        404:
+          description: Lecture id, assignment id, student id or submission id not found
           content: 
             application/json:
               schema:
@@ -843,7 +1300,6 @@ components:
           enum:
             - passed
             - failed
-        # TODO: send failed cells and python output
         validation_errors:
           type: array
           items:
@@ -867,7 +1323,10 @@ components:
           - needs_auto_grading
           - needs_manual_grading
           - completed
-        score:
+        autograde_score:
+          type: number
+          format: float
+        total_score:
           type: number
           format: float
     ManualGradingContent:
