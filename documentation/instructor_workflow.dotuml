@@ -1,0 +1,30 @@
+SequenceDiagram [frame=true framecolor=steelblue label="Instructor Workflow"] {
+  actor instructor
+  lifeline "Web Browser" as browser
+  lifeline "Jupyter Notebook" as nb
+  lifeline "Grader" as grader
+  
+  instructor --> browser "list assignments"
+  activate browser
+  browser --> grader "list assignments"
+  activate grader  
+  browser <-r- grader "assignments"
+  deactivate grader
+ 
+  
+  instructor --> browser "create assignment"
+  browser --> nb "create assignment"
+  activate nb
+  nb --> grader "create assignment"
+  activate grader
+  nb <-r- grader "assignment"
+  deactivate grader
+  browser <-r- nb "assignment"
+  deactivate nb
+ 
+  deactivate nb
+  deactivate browser
+  
+  instructor --> browser "work on assignment"
+  activate browser
+}

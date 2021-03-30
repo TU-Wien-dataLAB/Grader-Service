@@ -13,8 +13,6 @@ tags:
   description: Assignments of a lecture
 - name: "Submissions"
   description: View submissions of an assignment
-- name: "Validation"
-  description: Validation of exercises in an assignment
 - name: "Grading"
   description: Manage the grading and feedback of assignments (Instructor)
 
@@ -119,6 +117,12 @@ paths:
                 $ref: "#/components/schemas/Lecture"
         403:
           description: Unautorized
+        404:
+          description: Lecture id not found
+          content: 
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessage"
         500:
           description: Internal server error
           content: 
@@ -383,13 +387,28 @@ paths:
         schema:
           type: boolean
           default: false
+      - name: include_submissions
+        in: query
+        description: Include past submissions of the assignment
+        required: false
+        example: false
+        schema:
+          type: boolean
+          default: false
       responses:
         200:
           description: OK
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Assignment"
+                type: object
+                properties:
+                  assignment:
+                    $ref: "#/components/schemas/Assignment"
+                  submissions:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/Submission"
         403:
           description: Unautorized
         404:
@@ -596,63 +615,6 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorMessage"
-  /lectures/{lect_id}/assignments/{a_id}/validate/{ex_id}:
-    get:
-      security:
-        - hub_auth:
-          - instructor
-          - tutor
-          - student
-      summary: "Requests the exercise in an assignment to be validated"
-      tags:
-      - "Validation"
-      parameters:
-      - name: lect_id
-        in: path
-        description: ID of the lecture
-        required: true
-        example: 1
-        schema:
-          type: integer
-          format: int64
-      - name: a_id
-        in: path
-        description: ID of the assignment in the lecture
-        required: true
-        example: 2
-        schema:
-          type: integer
-          format: int64
-      - name: ex_id
-        in: path
-        description: ID of the exercise in the assignment
-        required: true
-        example: 0
-        schema:
-          type: integer
-          format: int64
-      responses:
-        200:
-          description: OK
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ValidationResult"
-        403:
-          description: Unautorized
-        404:
-          description: Lecture id, assignment id or exercise id not found
-          content: 
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorMessage"
-        500:
-          description: Internal server error
-          content: 
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorMessage"
-  
     
   /lectures/{lect_id}/assignments/{a_id}/grading:
     get:
@@ -660,7 +622,7 @@ paths:
         - hub_auth:
           - instructor
           - tutor
-      summary: Return all student submissions of a lecture
+      summary: List student submissions of a lecture
       tags:
       - Grading
       parameters:
@@ -695,6 +657,14 @@ paths:
           schema:
             type: boolean
             default: false
+        - name: student_id
+          in: query
+          description: Specify the student id
+          required: false
+          example: 2
+          schema:
+            type: integer
+            format: int64
       responses:
         200:
           description: OK
@@ -717,78 +687,16 @@ paths:
                         submissions:
                           type: "array"
                           items:
-                            $ref: "#/components/schemas/Submission"
+                            type: object
+                            properties:
+                              submission:
+                                $ref: "#/components/schemas/Submission"
+                              grading_result:
+                                $ref: "#/components/schemas/GradingResult"
         403:
           description: Unautorized
         404:
           description: Lecture id or assignment id not found
-          content: 
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorMessage"
-        500:
-          description: Internal server error
-          content: 
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorMessage"
-  /lectures/{lect_id}/assignments/{a_id}/grading/{student_id}:
-    get:
-      security:
-        - hub_auth:
-          - instructor
-          - tutor
-      summary: Returns all submissions of a student in a lecture
-      tags:
-      - Grading
-      parameters:
-        - name: lect_id
-          in: path
-          description: ID of the lecture
-          required: true
-          example: 1
-          schema:
-            type: integer
-            format: int64
-        - name: a_id
-          in: path
-          description: ID of the assignment in the lecture
-          required: true
-          example: 2
-          schema:
-            type: integer
-            format: int64
-        - name: student_id
-          in: path
-          description: ID of the student that is enroled in the lecture
-          required: true
-          example: "12345678"
-          schema:
-            type: "string"
-      responses:
-        200:
-          description: OK
-          content:
-            application/json:
-              schema:
-                type: "object"
-                properties:
-                  n_submissions:
-                    type: integer
-                    format: int64
-                    example: 3
-                  data:
-                    properties:
-                      student:
-                        $ref: "#/components/schemas/User"
-                      submissions:
-                        type: "array"
-                        items:
-                          $ref: "#/components/schemas/Submission"
-        403:
-          description: Unautorized
-        404:
-          description: Lecture id, assignment id or student id not found
           content: 
             application/json:
               schema:
@@ -835,7 +743,7 @@ paths:
             type: "string"
         - name: submission_id
           in: query
-          description: Specify the the submission that should be autograded instead of latest
+          description: Specify the submission that should be autograded instead of latest
           required: false
           example: 2
           schema:
@@ -1232,11 +1140,6 @@ components:
         path:
           type: "string"
           example: "~/assignment_1/"
-        last_submitted:
-          nullable: true
-          type: "string"
-          format: "date-time"
-          example: "2021-07-21T11:53:07Z"
         status:
           type: string
           enum:
