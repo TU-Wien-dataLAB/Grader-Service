@@ -1,3 +1,6 @@
+## Model generation:
+# openapi-generator-cli generate --dry-run -i ./grader-extensions/documentation/openapi.yml -g typescript-rxjs --global-property models
+
 openapi: '3.0.2'
 info:
   title: Grader Server Extension API
@@ -1048,6 +1051,14 @@ paths:
           schema:
             type: integer
             format: int64
+        - name: a_id
+          in: path
+          description: ID of the assignment in the lecture
+          required: true
+          example: 2
+          schema:
+            type: integer
+            format: int64
         - name: student_id
           in: path
           description: ID of the student that is enroled in the lecture
@@ -1132,7 +1143,7 @@ components:
         files:
           type: "array"
           items:
-            $ref: "#/components/schemas/File"
+            $ref: "#/components/schemas/AssignmentFile"
         due_date:
           type: "string"
           format: "date-time"
@@ -1249,7 +1260,7 @@ components:
                 example: 0
               feedback:
                 type: string
-    File:
+    AssignmentFile:
       type: object
       properties:
         name:
