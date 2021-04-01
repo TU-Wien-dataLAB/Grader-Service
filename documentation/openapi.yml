@@ -216,14 +216,6 @@ paths:
         schema:
           type: integer
           format: int64
-      - name: a_id
-        in: path
-        description: ID of the assignment in the lecture
-        required: true
-        example: 2
-        schema:
-          type: integer
-          format: int64
       requestBody:
         description: The initial state of an assignment. Every field will be empty except `due_date` and `name`.
         required: true
