@@ -78,6 +78,13 @@ paths:
                 type: "array"
                 items:
                   $ref: "#/components/schemas/Lecture"
+              example:
+                [
+                  $ref: "#/components/schemas/Lecture/example",
+                  $ref: "#/components/schemas/Lecture/example",
+                  $ref: "#/components/schemas/Lecture/example",
+                  $ref: "#/components/schemas/Lecture/example",
+                ]
         403:
           description: Unautorized
         500:
@@ -272,6 +279,12 @@ paths:
                 type: "array"
                 items:
                   $ref: "#/components/schemas/Assignment"
+              example:
+                [
+                  $ref: "#/components/schemas/Assignment/example",
+                  $ref: "#/components/schemas/Assignment/example",
+                  $ref: "#/components/schemas/Assignment/example",
+                ]
         403:
           description: Unautorized
         404:
@@ -1166,10 +1179,11 @@ components:
         id: 1
         name: "assignment_1"
         exercises: [
-          $ref: "#/components/schemas/Exercise"
+          $ref: "#/components/schemas/Exercise/example",
+          $ref: "#/components/schemas/Exercise/example"
         ]
         files: [
-          $ref: "#/components/schemas/AssignmentFile"
+          $ref: "#/components/schemas/AssignmentFile/example"
         ]
         due_date: "2021-07-21T23:55:00Z"
         path: "~/assignment_1/"

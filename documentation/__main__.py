@@ -2,6 +2,7 @@
 
 import connexion
 from connexion.mock import MockResolver
+from flask_cors import CORS
 
 # from swagger_server import encoder
 
@@ -24,7 +25,7 @@ def token_info(access_token) -> dict:
 
 def main():
     app = connexion.App(__name__)
-    # app.app.json_encoder = encoder.JSONEncoder
+    CORS(app.app)
     app.add_api('./openapi.yml', resolver=MockResolver(mock_all=True), base_path="/services/mock")
     app.run(port=8000)
 

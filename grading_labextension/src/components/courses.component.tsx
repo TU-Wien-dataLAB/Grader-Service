@@ -19,7 +19,6 @@ export class CoursesComponent extends React.Component<CoursesProps> {
   }
 
   public componentDidMount() {
-    console.log("Course component mounted!")
     getAllLectures().subscribe(lectures => {
       console.log(lectures)
       this.setState(this.state.lectures = lectures)
@@ -28,7 +27,7 @@ export class CoursesComponent extends React.Component<CoursesProps> {
 
   public render() {
     return <div className="course-list">
-      {this.state.lectures.map((el, index) => <AssignmentsComponent lect_id={el.id} title={el.name} open={index==0} />)}
+      {this.state.lectures.map((el, index) => <AssignmentsComponent lectureId={el.id} title={el.name} open={index==0} />)}
     </div>
   }
 }
