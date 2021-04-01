@@ -3,7 +3,7 @@ import * as React from 'react';
 import { Collapse } from '@jupyterlab/ui-components'
 
 export interface AssignmentsProps {
-  aid: number; // assignment id
+  lect_id: number; // assignment id
   title: string; // course title
   open?: boolean; // initial state of collapsable
 }

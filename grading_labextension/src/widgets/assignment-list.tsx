@@ -15,7 +15,7 @@ export class AssignmentList extends ReactWidget {
      }
 
      render() {
-       return <CoursesComponent lectures={[1,2,3]} />
+       return <CoursesComponent />
      }
 }
 

@@ -6,7 +6,8 @@ info:
   title: Grader Server Extension API
   version: '0.1'
 servers:
-  - url: https://api.server.test/v1
+    - url: /services/mock
+      description: relative path to mock
 
 ###### Tags of API endpoints
 tags:
@@ -1101,12 +1102,16 @@ components:
         name:
           type: "string"
           example: "Baz Bar"
+      example:
+        id: "12345678"
+        name: "Baz Bar"
     Lecture:
       type: "object"
       properties:
         id:
           type: "integer"
           format: "int64"
+          example: 1
         name:
           type: "string"
           example: "Informationsvisualisierung"
@@ -1119,6 +1124,12 @@ components:
         semester:
           type: "string"
           example: "SS21"
+      example:
+        id: 1
+        name: "Informationsvisualisierung"
+        code: "ivs21"
+        complete: false
+        semester: "SS21"
     Assignment:
       type: "object"
       properties:
@@ -1151,6 +1162,18 @@ components:
             - fetched
             - submitted
             - complete # final state -> final grade is calculated
+      example:
+        id: 1
+        name: "assignment_1"
+        exercises: [
+          $ref: "#/components/schemas/Exercise"
+        ]
+        files: [
+          $ref: "#/components/schemas/AssignmentFile"
+        ]
+        due_date: "2021-07-21T23:55:00Z"
+        path: "~/assignment_1/"
+        status: "created"
     Exercise:
       type: "object"
       properties:
@@ -1170,6 +1193,12 @@ components:
         points:
           type: number
           format: float
+      example:
+        id: 0
+        a_id: 1
+        name: "exercise_1.ipynb"
+        ex_type: "nbgrader"
+        points: 0.0
     Submission:
       type: "object"
       properties:
@@ -1186,6 +1215,10 @@ components:
             - not_graded
             - automatically_graded
             - manually_graded
+      example:
+        id: 2
+        submitted_at: "2021-07-21T11:53:07Z"
+        status: "not_graded"
     Feedback:
       type: "object"
       properties:
@@ -1198,6 +1231,10 @@ components:
         path:
           type: "string"
           example: "~/assignment_1/feedback/..."
+      example:
+        id: 0
+        submission_id: 2
+        path: "~/assignment_1/feedback/..."
     ValidationResult:
       type: "object"
       properties:
@@ -1217,6 +1254,14 @@ components:
               error_output:
                 type: string
                 example: "NotImplementedError at line ..."
+      example:
+        status: "passed"
+        validation_errors: [
+          {
+            error_line: "assert(id(2)==2)",
+            error_output: "NotImplementedError at line ..."
+          }
+        ]
     GradingResult:
       type: "object"
       properties:
@@ -1235,6 +1280,11 @@ components:
         total_score:
           type: number
           format: float
+      example:
+        id: 4
+        status: "needs_auto_grading"
+        autograde_score: 0.0
+        total_score: 0.0
     ManualGradingContent:
       type: object
       properties: # TODO: use in api
@@ -1252,18 +1302,30 @@ components:
                 example: 0
               feedback:
                 type: string
+      example:
+        id: 0
+        feedback_cells: [
+          {
+            cell_id: 0,
+            feedback: "Very good!"
+          }
+        ]
     AssignmentFile:
       type: object
       properties:
         name:
           type: string
           example: "dataset.csv"
+      example:
+        name: "dataset.csv"
     ErrorMessage:
       type: "object"
       properties:
         msg:
           type: "string"
           example: "Some very detailed error message."
+      example:
+        msg: "Some very detailed error message."
 
   securitySchemes:
     hub_auth:
@@ -1275,7 +1337,4 @@ components:
             instructor: instructor of a lecture
             tutuor: tutor of a lecture
             student: student of a lecture
-    api_key:
-      type: apiKey
-      name: api_key
-      in: header
+      x-tokenInfoFunc: __main__.token_info
