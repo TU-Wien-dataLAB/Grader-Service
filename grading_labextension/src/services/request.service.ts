@@ -12,7 +12,7 @@ export interface RequestOptions {
   body: object
 }
 
-export function makeRequest<T>(url: string, options: RequestInit): Observable<T> {
+export function request<T>(url: string, options: RequestInit): Observable<T> {
   return from(fetch(url, options)).pipe(
     switchMap(response => response.json())
   )
