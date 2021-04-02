@@ -17,7 +17,7 @@ export function autogradeSubmission(lecture: Lecture, assignement : Assignment, 
 
   //response is not a schema => any
   //should prob be changed
-export function getAllSubmissions(lecture: Lecture, assignement : Assignment): Observable<any> {
+export function getStudentSubmissions(lecture: Lecture, assignement : Assignment): Observable<any> {
     return request<any>(HTTPMethod.GET, `/lectures/${lecture.id}/assignements/${assignement.id}/grading`, {})
   }
 
