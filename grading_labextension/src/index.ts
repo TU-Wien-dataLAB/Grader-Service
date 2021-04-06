@@ -12,6 +12,7 @@ import { GradingView } from './widgets/grading';
 
 import { checkIcon, editIcon } from '@jupyterlab/ui-components'
 import { AssignmentList } from './widgets/assignment-list';
+import { CommandRegistry } from '@lumino/commands'
 
 // import { requestAPI } from './handler';
 
@@ -27,6 +28,10 @@ namespace GradingCommandIDs {
   export const open = 'grading:open';
 }
 
+export class GlobalObjects {
+  static commands: CommandRegistry;
+}
+
 
 /**
  * Initialization data for the grading extension.
@@ -40,8 +45,9 @@ const extension: JupyterFrontEndPlugin<void> = {
     console.log('JupyterFrontEnd:', app)
     console.log('ICommandPalette:', palette);
 
-    /* ##### Grading View Widget ##### */
+    GlobalObjects.commands = app.commands;
 
+    /* ##### Grading View Widget ##### */
     let command: string = GradingCommandIDs.create; 
     app.commands.addCommand(command, {
       execute: () => {
@@ -73,6 +79,7 @@ const extension: JupyterFrontEndPlugin<void> = {
     });
     
     // Add the command to the launcher
+    console.log("Add grading launcher");
     launcher.add({
       command: command,
       category: 'Assignments',
@@ -120,6 +127,7 @@ const extension: JupyterFrontEndPlugin<void> = {
     });
     
     // Add the command to the launcher
+    console.log("Add assignment launcher");
     launcher.add({
       command: command,
       category: 'Assignments',
