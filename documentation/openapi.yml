@@ -1,5 +1,5 @@
 ## Model generation:
-# openapi-generator-cli generate --dry-run -i ./grader-extensions/documentation/openapi.yml -g typescript-rxjs --global-property models
+# openapi-generator-cli generate -i ./grader-extensions/documentation/openapi.yml -g typescript-angular -o ./grader-extensions/grading_labextension/src --global-property models
 
 openapi: '3.0.2'
 info:
@@ -559,7 +559,9 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Submission"
+                type: "array"
+                items:
+                  $ref: "#/components/schemas/Submission"
         403:
           description: Unautorized
         404:

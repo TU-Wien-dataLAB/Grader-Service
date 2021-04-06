@@ -1,5 +1,6 @@
 @import url('components/assignment-list.css');
 @import url('components/assignment.css');
+@import url('components/courses.css');
 
 :root {
   --text-color: #2e373d;

@@ -14,7 +14,7 @@ export function updateAssignment(lectureId: number, assignment: Assignment): Obs
   return request<Assignment>(HTTPMethod.PUT, `/lectures/${lectureId}/assignments/${assignment.id}`, {}, assignment)
 }
 
-export function getAssignment(lectureId: number, assignmentId: number): Observable<Assignment> {
+export function fetchAssignment(lectureId: number, assignmentId: number): Observable<Assignment> {
   return request<Assignment>(HTTPMethod.GET, `/lectures/${lectureId}/assignments/${assignmentId}`, {})
 }
 

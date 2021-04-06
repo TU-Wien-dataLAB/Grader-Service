@@ -1,21 +1,44 @@
 
 .assignment-header {
-  padding-bottom: 4pt;
+  margin-top: 12pt;
+  margin-bottom: 4pt;
+  margin-right: 16pt;
   user-select: none;
   -webkit-user-select: none;
 }
 
+.assignment-title,
+.assignment-content {
+  margin-left: 10pt;
+}
+
+.assignment-content {
+  padding-bottom: 10pt;
+}
 
 .assignment-header:hover .flavor-icon {
   color: var(--accent-color);
 }
 
-.assignment-content:first-child {
+.assignment-header:first-child {
   margin-top: -5pt;
 }
 
+.assignment-title {
+  margin-bottom: 5pt;
+  user-select: none;
+  -webkit-user-select: none;
+}
 
-.list-element {
+.assignment-title:first-child {
+  margin-top: -5pt;
+}
+
+.assignment-title:hover .flavor-icon {
+  color: var(--accent-color);
+}
+
+.list-element, .submission-element  {
   margin-left: 16pt;
   padding-top: 3pt;
 }
@@ -38,4 +61,22 @@
 .collapse-icon-small-open {
   -webkit-transform: rotate(90deg);
   transform: rotate(90deg);
+}
+
+.button-list {
+  margin-left: 10%;
+}
+
+.assignment-button {
+  min-height: 18px;
+  margin-right: 4pt;
+}
+
+.assignment-button span {
+  font-size: 9pt;
+}
+
+.assignment-button span svg {
+  width: 9pt;
+  height: 9pt;
 }
