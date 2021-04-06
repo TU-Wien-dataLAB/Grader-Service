@@ -53,7 +53,7 @@ const extension: JupyterFrontEndPlugin<void> = {
       execute: () => {
         // Create a blank content widget inside of a MainAreaWidget
         const gradingView = new GradingView();
-        const gradingWidget = new MainAreaWidget({ content: gradingView });
+        const gradingWidget = new MainAreaWidget<GradingView>({ content: gradingView });
         gradingWidget.id = 'grading-jupyterlab';
         gradingWidget.title.label = 'Grading';
         gradingWidget.title.closable = true;
