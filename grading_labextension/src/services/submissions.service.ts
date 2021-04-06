@@ -10,7 +10,6 @@ export function submitAssignment(lecture: Lecture, assignement : Assignment): Ob
     return request<void>(HTTPMethod.POST, `/lectures/${lecture.id}/assignments/${assignement.id}/submissions`, {}, {})
   }
 
-
 export function getAllSubmissions(lecture: Lecture, assignement : Assignment): Observable<Submission[]> {
     return request<Submission[]>(HTTPMethod.GET, `/lectures/${lecture.id}/assignments/${assignement.id}/submissions`, {})
   }
