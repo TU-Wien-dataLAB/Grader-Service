@@ -46,6 +46,8 @@
     "watch:labextension": "jupyter labextension watch ."
   },
   "dependencies": {
+    "@blueprintjs/core": "^3.42.0",
+    "@blueprintjs/icons": "^3.26.0",
     "@jupyterlab/application": "^3.0.7",
     "@jupyterlab/apputils": "^3.0.5",
     "@jupyterlab/coreutils": "^5.0.0",

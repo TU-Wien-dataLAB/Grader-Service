@@ -1,0 +1,7 @@
+@import url('components/assignment-list.css');
+@import url('components/assignment.css');
+
+:root {
+  --text-color: #2e373d;
+  --accent-color: rgb(243, 114, 0);
+}
