@@ -1,10 +1,11 @@
 
 .assignment-header {
   margin-top: 12pt;
-  margin-bottom: 4pt;
+  margin-bottom: 8pt;
   margin-right: 16pt;
   user-select: none;
   -webkit-user-select: none;
+  cursor: pointer;
 }
 
 .assignment-title,
@@ -41,6 +42,7 @@
 .list-element, .submission-element  {
   margin-left: 16pt;
   padding-top: 3pt;
+  cursor: pointer;
 }
 
 .list-element:hover {
@@ -67,16 +69,20 @@
   margin-left: 10%;
 }
 
-.assignment-button {
+.assignment-button,
+.assignment-tag {
   min-height: 18px;
   margin-right: 4pt;
+  padding: 2pt;
 }
 
-.assignment-button span {
+.assignment-button span,
+.assignment-tag span {
   font-size: 9pt;
 }
 
-.assignment-button span svg {
+.assignment-button span svg,
+.assignment-tag span svg  {
   width: 9pt;
   height: 9pt;
 }

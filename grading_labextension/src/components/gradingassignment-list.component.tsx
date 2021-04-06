@@ -41,7 +41,7 @@ export class GradingAssignmentsComponent extends React.Component<AssignmentListP
     return <div className="GradingAssignmentsComponent">
       <div onClick={this.toggleOpen} className="collapse-header">
       <Icon icon="chevron-down" className={`collapse-icon ${this.state.isOpen ? "collapse-icon-open" : ""}`}></Icon> 
-        {this.title} {this.state.isOpen ? "Edit Generate Preview Release Collect Submissions": ""}
+        {this.title}
       
 </div>
       

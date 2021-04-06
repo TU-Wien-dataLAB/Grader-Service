@@ -1,7 +1,6 @@
 import * as React from 'react';
 import { Assignment } from '../model/assignment';
-import { Button } from '@jupyterlab/ui-components';
-import { Icon,Collapse } from '@blueprintjs/core'
+import { Icon, Collapse, Button, Tag } from '@blueprintjs/core'
 import { GlobalObjects } from '../index';
 import { showErrorMessage } from '@jupyterlab/apputils';
 import { getAllSubmissions } from '../services/submissions.service';
@@ -21,6 +20,7 @@ export class AssignmentGradingComponent extends React.Component<AssignmentProps>
   public lectureName: string;
   public lectureId: number;
   public index: number;
+  public iconSize: number = 14;
   public state = {
     isOpen: true,
     submissions: new Array<Submission>(),
@@ -37,11 +37,11 @@ export class AssignmentGradingComponent extends React.Component<AssignmentProps>
 
   public componentDidMount() {
     // TODO: should only get all submissions if assignment is released
-    getAllSubmissions({id:this.lectureId},{id:this.index}).subscribe(sub => {
+    getAllSubmissions({ id: this.lectureId }, { id: this.index }).subscribe(sub => {
       console.log(sub)
       this.setState(this.state.submissions = sub)
     }
-      )
+    )
   }
 
   private toggleOpen = () => {
@@ -60,37 +60,39 @@ export class AssignmentGradingComponent extends React.Component<AssignmentProps>
       showErrorMessage("Error Opening File", error)
     })
   }
-  
+
 
   public render() {
     return <li key={this.index}>
-       <div className="assignment">
+      <div className="assignment">
         <div onClick={this.toggleOpen} className="assignment-header">
-          <Icon icon="chevron-right" iconSize={12}
+          <Icon icon="chevron-right" iconSize={this.iconSize}
             className={`collapse-icon-small ${this.state.isOpen ? "collapse-icon-small-open" : ""}`}></Icon>
-          <Icon icon="inbox" iconSize={12} className="flavor-icon"></Icon>
-          {this.assignment.name} 
-          
-          <Button icon='edit' minimal></Button>
-          <Button icon='search' minimal></Button>
-          <Button icon='learning' minimal></Button>
-          <Button icon='cloud-upload' minimal></Button>
-          <Button icon='cloud-download' minimal></Button>
-          Submission count: {this.state.submissions.length}
+          <Icon icon="inbox" iconSize={this.iconSize} className="flavor-icon"></Icon>
+          {this.assignment.name}
+
+          <span className="button-list">
+            <Button icon='edit' outlined className="assignment-button">Edit</Button>
+            <Button icon='search' outlined className="assignment-button">Preview</Button>
+            <Button icon='learning' outlined className="assignment-button">Generate</Button>
+            <Button icon='cloud-upload' outlined className="assignment-button">Release</Button>
+            <Button icon='cloud-download' outlined className="assignment-button">Collect</Button>
+            <Tag className="assignment-tag" icon="link">{this.state.submissions.length} Submissions</Tag>
+          </span>
         </div>
-       
+
         <Collapse isOpen={this.state.isOpen}>
           <div className="assignment-content">
             {this.assignment.exercises.map((ex, i) =>
               <div className="list-element" onClick={() => this.openFile(`${this.lectureName}/${this.assignment.name}/${ex.name}`)}>
-                <Icon icon="edit" iconSize={12} className="flavor-icon"></Icon>
+                <Icon icon="edit" iconSize={this.iconSize} className="flavor-icon"></Icon>
                 {ex.name}
               </div>
             )}
 
             {this.assignment.files.map((file, i) =>
               <div className="list-element" onClick={() => this.openFile(`${this.lectureName}/${this.assignment.name}/${file.name}`)}>
-                <Icon icon="document" iconSize={12} className="flavor-icon"></Icon>
+                <Icon icon="document" iconSize={this.iconSize} className="flavor-icon"></Icon>
                 {file.name}
               </div>
             )}

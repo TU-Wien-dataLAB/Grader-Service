@@ -98,8 +98,8 @@ export class AssignmentComponent extends React.Component<AssignmentProps> {
           <Icon icon={IconNames.INBOX} iconSize={this.iconSize} className="flavor-icon"></Icon>
           {this.assignment.name}
           <span className="button-list">
-            <Button className="assignment-button" onClick={this.fetchAssignment} icon={IconNames.CLOUD_DOWNLOAD} active={this.assignment.status == "released"} outlined={true} intent={Intent.PRIMARY} small={true}>Fetch</Button>
-            <Button className="assignment-button" onClick={this.submitAssignment} icon={IconNames.SEND_MESSAGE} active={this.assignment.status == "fetched"} outlined={true} intent={Intent.SUCCESS} small={true}>Submit</Button>
+            <Button className="assignment-button" onClick={this.fetchAssignment} icon={IconNames.CLOUD_DOWNLOAD} active={this.assignment.status == "released"} outlined intent={Intent.PRIMARY}>Fetch</Button>
+            <Button className="assignment-button" onClick={this.submitAssignment} icon={IconNames.SEND_MESSAGE} active={this.assignment.status == "fetched"} outlined intent={Intent.SUCCESS}>Submit</Button>
           </span>
 
         </div>
