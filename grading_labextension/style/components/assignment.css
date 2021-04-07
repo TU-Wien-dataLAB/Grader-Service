@@ -68,6 +68,9 @@
 .button-list {
   margin-left: 10%;
 }
+.add-buttons {
+  margin-top: 4pt;
+}
 
 .assignment-button,
 .assignment-tag {

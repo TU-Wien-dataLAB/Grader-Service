@@ -22,7 +22,7 @@ export class CourseManageAssignmentComponent extends React.Component<AssignmentP
   public index: number;
   public iconSize: number = 14;
   public state = {
-    isOpen: true,
+    isOpen: false,
     submissions: new Array<Submission>(),
   };
 
@@ -76,7 +76,7 @@ export class CourseManageAssignmentComponent extends React.Component<AssignmentP
           <span className="button-list">
             <Button icon='edit' outlined className="assignment-button">Edit</Button>
             <Button icon='search' outlined className="assignment-button">Preview</Button>
-            <Button icon='learning' outlined className="assignment-button">Generate</Button>
+            <Button icon='build' outlined className="assignment-button">Generate</Button>
             <Button icon='cloud-upload' outlined className="assignment-button">Release</Button>
             <Button icon='cloud-download' outlined className="assignment-button">Collect</Button>
             <Tag className="assignment-tag" icon="link">{this.state.submissions.length} Submissions</Tag>
@@ -98,6 +98,10 @@ export class CourseManageAssignmentComponent extends React.Component<AssignmentP
                 {file.name}
               </div>
             )}
+            <span className="add-buttons">
+              <Button icon="add" outlined className="assignment-button">Add File</Button>
+              <Button icon="upload" outlined className="assignment-button">Upload File</Button>
+            </span>
           </div>
         </Collapse>
       </div>
