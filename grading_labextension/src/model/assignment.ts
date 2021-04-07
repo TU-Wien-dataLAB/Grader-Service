@@ -23,12 +23,11 @@ export interface Assignment {
     status?: Assignment.StatusEnum;
 }
 export namespace Assignment {
-    export type StatusEnum = 'created' | 'released' | 'fetched' | 'submitted' | 'complete';
+    export type StatusEnum = 'created' | 'released' | 'fetched' | 'complete';
     export const StatusEnum = {
         Created: 'created' as StatusEnum,
         Released: 'released' as StatusEnum,
         Fetched: 'fetched' as StatusEnum,
-        Submitted: 'submitted' as StatusEnum,
         Complete: 'complete' as StatusEnum
     };
 }

@@ -9,12 +9,11 @@
  * https://openapi-generator.tech
  * Do not edit the class manually.
  */
-import { Assignment } from './assignment';
-import { Submission } from './submission';
+import { InlineResponse200Data } from './inlineResponse200Data';
 
 
 export interface InlineResponse200 { 
-    assignment?: Assignment;
-    submissions?: Array<Submission>;
+    n_submissions?: number;
+    data?: Array<InlineResponse200Data>;
 }
 

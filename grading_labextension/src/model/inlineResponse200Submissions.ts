@@ -9,12 +9,12 @@
  * https://openapi-generator.tech
  * Do not edit the class manually.
  */
-import { InlineResponse2001Submissions } from './inlineResponse2001Submissions';
-import { User } from './user';
+import { GradingResult } from './gradingResult';
+import { Submission } from './submission';
 
 
-export interface InlineResponse2001Data { 
-    student?: User;
-    submissions?: Array<InlineResponse2001Submissions>;
+export interface InlineResponse200Submissions { 
+    submission?: Submission;
+    grading_result?: GradingResult;
 }
 
