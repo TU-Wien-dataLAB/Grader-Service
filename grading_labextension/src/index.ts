@@ -8,7 +8,7 @@ import { ICommandPalette, MainAreaWidget } from '@jupyterlab/apputils';
 import { ILauncher } from '@jupyterlab/launcher';
 import { INotebookTools } from '@jupyterlab/notebook';
 
-import { GradingView } from './widgets/grading';
+import { CourseManageView } from './widgets/coursemanage';
 
 import { checkIcon, editIcon } from '@jupyterlab/ui-components'
 import { AssignmentList } from './widgets/assignment-list';
@@ -22,10 +22,10 @@ namespace AssignmentsCommandIDs {
   export const open = 'assignments:open';
 }
 
-namespace GradingCommandIDs {
-  export const create = 'grading:create';
+namespace CourseManageCommandIDs {
+  export const create = 'coursemanage:create';
 
-  export const open = 'grading:open';
+  export const open = 'coursemanage:open';
 }
 
 export class GlobalObjects {
@@ -37,7 +37,7 @@ export class GlobalObjects {
  * Initialization data for the grading extension.
  */
 const extension: JupyterFrontEndPlugin<void> = {
-  id: 'grading:plugin',
+  id: 'coursemanage:plugin',
   autoStart: true,
   requires: [ICommandPalette, ILauncher, INotebookTools],
   activate: (app: JupyterFrontEnd, palette: ICommandPalette, launcher: ILauncher, nbtools: INotebookTools) => {
@@ -47,26 +47,26 @@ const extension: JupyterFrontEndPlugin<void> = {
 
     GlobalObjects.commands = app.commands;
 
-    /* ##### Grading View Widget ##### */
-    let command: string = GradingCommandIDs.create; 
+    /* ##### Course Manage View Widget ##### */
+    let command: string = CourseManageCommandIDs.create; 
     app.commands.addCommand(command, {
       execute: () => {
         // Create a blank content widget inside of a MainAreaWidget
-        const gradingView = new GradingView();
-        const gradingWidget = new MainAreaWidget<GradingView>({ content: gradingView });
-        gradingWidget.id = 'grading-jupyterlab';
-        gradingWidget.title.label = 'Grading';
+        const gradingView = new CourseManageView();
+        const gradingWidget = new MainAreaWidget<CourseManageView>({ content: gradingView });
+        gradingWidget.id = 'coursemanage-jupyterlab';
+        gradingWidget.title.label = 'Course Management';
         gradingWidget.title.closable = true;
 
         return gradingWidget;
       }
     })
 
-    command = GradingCommandIDs.open;
+    command = CourseManageCommandIDs.open;
     app.commands.addCommand(command, {
-      label: 'Grading',
+      label: 'Course Management',
       execute: async () => {
-        const gradingWidget = await app.commands.execute(GradingCommandIDs.create)
+        const gradingWidget = await app.commands.execute(CourseManageCommandIDs.create)
 
         if (!gradingWidget.isAttached) {
           // Attach the widget to the main work area if it's not there
@@ -79,7 +79,7 @@ const extension: JupyterFrontEndPlugin<void> = {
     });
     
     // Add the command to the launcher
-    console.log("Add grading launcher");
+    console.log("Add course management launcher");
     launcher.add({
       command: command,
       category: 'Assignments',

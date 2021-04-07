@@ -2,7 +2,7 @@ import * as React from 'react';
 import { getAllAssignments } from '../services/assignments.service'
 import { Collapse } from '@jupyterlab/ui-components'
 import { Assignment } from '../model/assignment';
-import { AssignmentGradingComponent } from './gradingassignment.component';
+import { CourseManageAssignmentComponent } from './coursemanageassignment.component';
 import { Icon } from '@blueprintjs/core';
 
 export interface AssignmentListProps {
@@ -11,7 +11,7 @@ export interface AssignmentListProps {
   open?: boolean; // initial state of collapsable
 }
 
-export class GradingAssignmentsComponent extends React.Component<AssignmentListProps> {
+export class CourseManageAssignmentsComponent extends React.Component<AssignmentListProps> {
   public lectureId: number;
   public title: string;
   public state = {
@@ -48,7 +48,7 @@ export class GradingAssignmentsComponent extends React.Component<AssignmentListP
       <Collapse isOpen={this.state.isOpen} className="collapse-body" keepChildrenMounted={true}>
         <ul>
           {this.state.assignments.map((el, index) =>
-            <AssignmentGradingComponent index={index} lectureName={this.title} lectureId={this.lectureId} assignment={el} />
+            <CourseManageAssignmentComponent index={index} lectureName={this.title} lectureId={this.lectureId} assignment={el} />
             )}
           </ul>
       </Collapse>

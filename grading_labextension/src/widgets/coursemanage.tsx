@@ -1,24 +1,24 @@
 import * as React from 'react';
 import {ReactWidget} from '@jupyterlab/apputils'
-import { GradingComponent } from '../components/grading.component';
+import { CourseManageComponent } from '../components/coursemanage.component';
 
-export class GradingView extends ReactWidget {
+export class CourseManageView extends ReactWidget {
   /**
    * Construct a new grading widget
    */
-     constructor(options: GradingView.IOptions = {}) {
+     constructor(options: CourseManageView.IOptions = {}) {
        super();
       this.id = options.id
       this.addClass('GradingWidget');
      }
      
      render() {
-       return <GradingComponent />
+       return <CourseManageComponent />
      }
 
 }
 
-export namespace GradingView {
+export namespace CourseManageView {
   /**
    * An options object for initializing a grading view widget.
    */

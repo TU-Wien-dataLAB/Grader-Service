@@ -15,7 +15,7 @@ export interface AssignmentProps {
 }
 
 
-export class AssignmentGradingComponent extends React.Component<AssignmentProps> {
+export class CourseManageAssignmentComponent extends React.Component<AssignmentProps> {
   public assignment: Assignment;
   public lectureName: string;
   public lectureId: number;
