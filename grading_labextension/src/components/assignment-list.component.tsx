@@ -32,7 +32,6 @@ export class AssignmentsComponent extends React.Component<AssignmentListProps> {
 
   public componentDidMount() {
     getAllAssignments(this.lecture.id).subscribe(assignments => {
-      console.log(assignments)
       this.setState(this.state.assignments = assignments)
     })
   }

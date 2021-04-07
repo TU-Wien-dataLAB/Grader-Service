@@ -23,7 +23,7 @@ export function request<T>(method: HTTPMethod, endPoint: string, options: Reques
       endPoint
     );
 
-    console.log("Request URL:" + requestUrl)
+    console.log("Request " + method.toString() + " URL: " + requestUrl)
     return from(ServerConnection.makeRequest(requestUrl, options, settings)).pipe(
       switchMap(async response => {
         let data: any = await response.text();
@@ -42,7 +42,7 @@ export function request<T>(method: HTTPMethod, endPoint: string, options: Reques
     options.headers = {
       "Authorization": "Bearer 123"
     }
-    console.log("Request URL:" + requestUrl)
+    console.log("Request " + method.toString() + " URL: " + requestUrl)
     return from(fetch(requestUrl, options)).pipe(
       switchMap(async response => {
         let data: any = await response.json();

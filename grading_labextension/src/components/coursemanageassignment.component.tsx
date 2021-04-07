@@ -65,11 +65,13 @@ export class CourseManageAssignmentComponent extends React.Component<AssignmentP
   public render() {
     return <li key={this.index}>
       <div className="assignment">
-        <div onClick={this.toggleOpen} className="assignment-header">
-          <Icon icon="chevron-right" iconSize={this.iconSize}
-            className={`collapse-icon-small ${this.state.isOpen ? "collapse-icon-small-open" : ""}`}></Icon>
-          <Icon icon="inbox" iconSize={this.iconSize} className="flavor-icon"></Icon>
-          {this.assignment.name}
+        <div className="assignment-header">
+          <span onClick={this.toggleOpen}>
+            <Icon icon="chevron-right" iconSize={this.iconSize}
+              className={`collapse-icon-small ${this.state.isOpen ? "collapse-icon-small-open" : ""}`}></Icon>
+            <Icon icon="inbox" iconSize={this.iconSize} className="flavor-icon"></Icon>
+            {this.assignment.name}
+          </span>
 
           <span className="button-list">
             <Button icon='edit' outlined className="assignment-button">Edit</Button>

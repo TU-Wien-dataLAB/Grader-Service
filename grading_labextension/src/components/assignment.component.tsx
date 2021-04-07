@@ -5,7 +5,7 @@ import { Icon, Collapse, Button, Intent } from "@blueprintjs/core";
 import { IconNames } from "@blueprintjs/icons";
 
 import { GlobalObjects } from '../index';
-import { showErrorMessage } from '@jupyterlab/apputils'
+import { showErrorMessage, showDialog, Dialog } from '@jupyterlab/apputils'
 import { Submission } from '../model/submission';
 import { getAllSubmissions, submitAssignment } from '../services/submissions.service'
 import { fetchAssignment } from '../services/assignments.service'
@@ -46,7 +46,6 @@ export class AssignmentComponent extends React.Component<AssignmentProps> {
   }
 
   private toggleOpen = (collapsable: string) => {
-    console.log("toggle assignment header")
     if (collapsable == "files") {
       this.setState({ filesOpen: !this.state.filesOpen });
     } else if (collapsable == "submissions") {
@@ -54,7 +53,20 @@ export class AssignmentComponent extends React.Component<AssignmentProps> {
     }
   }
 
-  private openFile(path: string) {
+  private async openFile(path: string) {
+    if (this.assignment.status == 'released') { // if not fetched
+      let result = await showDialog({
+        title: "Assignment not fetched yet!",
+        body: "Before working on assignments you need to fetch them! Do you want to fetch the assignment now?",
+        buttons: [Dialog.cancelButton(), Dialog.okButton({ label: "Fetch Now" })]
+      });
+      if (!result.button.accept) {
+        return;
+      } else {
+        await this.fetchAssignment();
+      }
+    }
+
     console.log("Opening file: " + path)
     GlobalObjects.commands.execute('docmanager:open', {
       path: path,
@@ -68,7 +80,15 @@ export class AssignmentComponent extends React.Component<AssignmentProps> {
 
   private async fetchAssignment() {
     try {
-      await fetchAssignment(this.lecture.id, this.assignment.id).toPromise();
+      let result = await showDialog({
+        title: "Fetch Assignment",
+        body: `Do you want to fetch ${this.assignment.name}?`,
+        buttons: [Dialog.cancelButton(), Dialog.okButton({ label: "Fetch" })]
+      })
+      if (result.button.accept) {
+        // update assignment
+        this.assignment = await fetchAssignment(this.lecture.id, this.assignment.id).toPromise();
+      }
     } catch (e) {
       showErrorMessage("Error Fetching Assignment", e);
     }
@@ -76,8 +96,16 @@ export class AssignmentComponent extends React.Component<AssignmentProps> {
 
   private async submitAssignment() {
     try {
-      await submitAssignment(this.lecture, this.assignment).toPromise();
-      await this.getSubmissions();
+      let result = await showDialog({
+        title: "Submit Assignment",
+        body: `Do you want to submit ${this.assignment.name}? You can always re-submit the assignment before the due date.`,
+        buttons: [Dialog.cancelButton(), Dialog.okButton({ label: "Submit" })],
+      })
+      if (result.button.accept) {
+        await submitAssignment(this.lecture, this.assignment).toPromise();
+        await this.getSubmissions();
+      }
+
     } catch (e) {
       showErrorMessage("Error Submitting Assignment", e);
     }
@@ -98,8 +126,8 @@ export class AssignmentComponent extends React.Component<AssignmentProps> {
           <Icon icon={IconNames.INBOX} iconSize={this.iconSize} className="flavor-icon"></Icon>
           {this.assignment.name}
           <span className="button-list">
-            <Button className="assignment-button" onClick={this.fetchAssignment} icon={IconNames.CLOUD_DOWNLOAD} active={this.assignment.status == "released"} outlined intent={Intent.PRIMARY}>Fetch</Button>
-            <Button className="assignment-button" onClick={this.submitAssignment} icon={IconNames.SEND_MESSAGE} active={this.assignment.status == "fetched"} outlined intent={Intent.SUCCESS}>Submit</Button>
+            <Button className="assignment-button" onClick={this.fetchAssignment} icon={IconNames.CLOUD_DOWNLOAD} disabled={this.assignment.status != "released"} outlined intent={Intent.PRIMARY}>Fetch</Button>
+            <Button className="assignment-button" onClick={this.submitAssignment} icon={IconNames.SEND_MESSAGE} disabled={this.assignment.status != "fetched"} outlined intent={Intent.SUCCESS}>Submit</Button>
           </span>
 
         </div>

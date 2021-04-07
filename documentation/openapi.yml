@@ -410,14 +410,7 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  assignment:
-                    $ref: "#/components/schemas/Assignment"
-                  submissions:
-                    type: array
-                    items:
-                      $ref: "#/components/schemas/Submission"
+                $ref: "#/components/schemas/Assignment"
         403:
           description: Unautorized
         404:
@@ -552,7 +545,13 @@ paths:
         schema:
           type: boolean
           default: false
-        # allowEmptyValue: true
+      - name: instructor
+        in: query
+        description: Whether to fetch the all submissions of students
+        required: false
+        schema:
+          type: boolean
+          default: false
       responses:
         200:
           description: OK
@@ -1175,7 +1174,6 @@ components:
             - created # another state of an assignment (instructor only)
             - released
             - fetched
-            - submitted
             - complete # final state -> final grade is calculated
       example:
         id: 1
@@ -1189,7 +1187,7 @@ components:
         ]
         due_date: "2021-07-21T23:55:00Z"
         path: "~/assignment_1/"
-        status: "created"
+        status: "released"
     Exercise:
       type: "object"
       properties:
