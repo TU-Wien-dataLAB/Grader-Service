@@ -1,9 +1,11 @@
 import * as React from 'react';
-import { getAllAssignments } from '../services/assignments.service'
+import { createAssignment, getAllAssignments } from '../services/assignments.service'
 import { Collapse } from '@jupyterlab/ui-components'
 import { Assignment } from '../model/assignment';
 import { CourseManageAssignmentComponent } from './coursemanageassignment.component';
-import { Icon } from '@blueprintjs/core';
+import { Button, Icon } from '@blueprintjs/core';
+import { showErrorMessage } from '@jupyterlab/apputils/lib/dialog';
+import { InputDialog } from '@jupyterlab/apputils/lib/inputdialog';
 
 export interface AssignmentListProps {
   lectureId: number; // assignment id
@@ -26,6 +28,18 @@ export class CourseManageAssignmentsComponent extends React.Component<Assignment
     this.state.isOpen = props.open || false
   }
 
+  private async createAssignment() {
+    try {
+      let name;
+      InputDialog.getText({title: 'Input assignment name'}).then(input => {
+        name = input;
+      })
+      createAssignment(this.lectureId, name);
+    } catch (e) {
+      showErrorMessage("Error Creating Assignment", e);
+    }
+  }
+
   private toggleOpen = () => {
     this.setState({ isOpen: !this.state.isOpen });
   }
@@ -40,17 +54,18 @@ export class CourseManageAssignmentsComponent extends React.Component<Assignment
   public render() {
     return <div className="GradingAssignmentsComponent">
       <div onClick={this.toggleOpen} className="collapse-header">
-      <Icon icon="chevron-down" className={`collapse-icon ${this.state.isOpen ? "collapse-icon-open" : ""}`}></Icon> 
+        <Icon icon="chevron-down" className={`collapse-icon ${this.state.isOpen ? "collapse-icon-open" : ""}`}></Icon>
         {this.title}
-      
-</div>
-      
+
+      </div>
+
       <Collapse isOpen={this.state.isOpen} className="collapse-body" keepChildrenMounted={true}>
         <ul>
           {this.state.assignments.map((el, index) =>
             <CourseManageAssignmentComponent index={index} lectureName={this.title} lectureId={this.lectureId} assignment={el} />
-            )}
-          </ul>
+          )}
+        </ul>
+        <Button icon="add" outlined onClick={this.createAssignment} className="assignment-button">Create new Assignment</Button>
       </Collapse>
     </div>;
   }

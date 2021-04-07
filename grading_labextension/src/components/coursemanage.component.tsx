@@ -4,17 +4,17 @@ import { getAllLectures } from '../services/lectures.service'
 import { CourseManageAssignmentsComponent } from './coursemanageassignment-list.component';
 
 
-export interface GradingProps {
+export interface CourseManageProps {
   // lectures: Array<Lecture>;
 }
 
-export class CourseManageComponent extends React.Component<GradingProps> {
+export class CourseManageComponent extends React.Component<CourseManageProps> {
   public lectures: number[];
   public state = {
     lectures: new Array<Lecture>()
   };
 
-  constructor(props: GradingProps) {
+  constructor(props: CourseManageProps) {
     super(props);
     // this.state = {"lectures": props.lectures};
   }

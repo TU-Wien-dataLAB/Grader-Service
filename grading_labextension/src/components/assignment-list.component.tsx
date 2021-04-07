@@ -49,7 +49,6 @@ export class AssignmentsComponent extends React.Component<AssignmentListProps> {
             <AssignmentComponent index={index} lecture={this.lecture} assignment={el} />
             )}
         </ul>
-        
       </Collapse>
     </div>;
   }
