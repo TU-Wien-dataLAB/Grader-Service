@@ -1,6 +1,6 @@
 import * as React from 'react';
 import {ReactWidget} from '@jupyterlab/apputils'
-import { CourseManageComponent } from '../components/coursemanage.component';
+import { CourseManageComponent } from '../components/coursemanage/coursemanage.component';
 
 export class CourseManageView extends ReactWidget {
   /**

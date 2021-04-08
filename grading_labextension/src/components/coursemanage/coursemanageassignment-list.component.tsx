@@ -1,7 +1,7 @@
 import * as React from 'react';
-import { createAssignment, getAllAssignments } from '../services/assignments.service'
+import { createAssignment, getAllAssignments } from '../../services/assignments.service'
 import { Collapse } from '@jupyterlab/ui-components'
-import { Assignment } from '../model/assignment';
+import { Assignment } from '../../model/assignment';
 import { CourseManageAssignmentComponent } from './coursemanageassignment.component';
 import { Button, Icon } from '@blueprintjs/core';
 import { showErrorMessage } from '@jupyterlab/apputils/lib/dialog';

@@ -1,12 +1,12 @@
 import * as React from 'react';
-import { getAllAssignments } from '../services/assignments.service'
+import { getAllAssignments } from '../../services/assignments.service'
 import { Collapse } from '@jupyterlab/ui-components'
-import { Assignment } from '../model/assignment';
+import { Assignment } from '../../model/assignment';
 import { AssignmentComponent } from './assignment.component';
 
 import { Icon } from "@blueprintjs/core";
 import { IconNames } from "@blueprintjs/icons";
-import { Lecture } from '../model/lecture';
+import { Lecture } from '../../model/lecture';
 
 export interface AssignmentListProps {
   lecture: Lecture;

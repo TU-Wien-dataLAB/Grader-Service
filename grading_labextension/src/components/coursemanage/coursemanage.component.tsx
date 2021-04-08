@@ -1,6 +1,6 @@
 import * as React from 'react';
-import { Lecture } from '../model/lecture';
-import { getAllLectures } from '../services/lectures.service'
+import { Lecture } from '../../model/lecture';
+import { getAllLectures } from '../../services/lectures.service'
 import { CourseManageAssignmentsComponent } from './coursemanageassignment-list.component';
 
 

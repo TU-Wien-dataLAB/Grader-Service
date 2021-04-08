@@ -1,15 +1,15 @@
 import * as React from 'react';
-import { Assignment } from '../model/assignment';
+import { Assignment } from '../../model/assignment';
 
 import { Icon, Collapse, Button, Intent } from "@blueprintjs/core";
 import { IconNames } from "@blueprintjs/icons";
 
-import { GlobalObjects } from '../index';
+import { GlobalObjects } from '../../index';
 import { showErrorMessage, showDialog, Dialog } from '@jupyterlab/apputils'
-import { Submission } from '../model/submission';
-import { getAllSubmissions, submitAssignment } from '../services/submissions.service'
-import { fetchAssignment } from '../services/assignments.service'
-import { Lecture } from '../model/lecture';
+import { Submission } from '../../model/submission';
+import { getAllSubmissions, submitAssignment } from '../../services/submissions.service'
+import { fetchAssignment } from '../../services/assignments.service'
+import { Lecture } from '../../model/lecture';
 
 export interface AssignmentProps {
   index: number;

@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { AssignmentsComponent } from './assignment-list.component';
-import { Lecture } from '../model/lecture';
-import { getAllLectures } from '../services/lectures.service'
+import { Lecture } from '../../model/lecture';
+import { getAllLectures } from '../../services/lectures.service'
 import { showErrorMessage } from '@jupyterlab/apputils'
 
 export interface CoursesProps {

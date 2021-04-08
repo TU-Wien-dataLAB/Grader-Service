@@ -1,10 +1,10 @@
-import * as React from 'react';
-import { Assignment } from '../model/assignment';
-import { Icon, Collapse, Button, Tag } from '@blueprintjs/core'
-import { GlobalObjects } from '../index';
+import { Button, Collapse, Icon, Tag } from '@blueprintjs/core';
 import { showErrorMessage } from '@jupyterlab/apputils';
-import { getAllSubmissions } from '../services/submissions.service';
-import { Submission } from '../model/submission';
+import * as React from 'react';
+import { GlobalObjects } from '../../index';
+import { Assignment } from '../../model/assignment';
+import { Submission } from '../../model/submission';
+import { getAllSubmissions } from '../../services/submissions.service';
 
 
 export interface AssignmentProps {
