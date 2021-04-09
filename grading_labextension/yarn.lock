@@ -64,6 +64,17 @@
     "classnames" "^2.2"
     "tslib" "~1.13.0"
 
+"@blueprintjs/table@^3.8.27":
+  "integrity" "sha512-AukxrmmLdJp2OygTVuocLq7GDO5aY2q2E1B/3saxM7fiqFPeYi3a5C3w/I6qgC6ua9pQJ1caU3MHlcIk1rfagg=="
+  "resolved" "https://registry.npmjs.org/@blueprintjs/table/-/table-3.8.27.tgz"
+  "version" "3.8.27"
+  dependencies:
+    "@blueprintjs/core" "^3.42.0"
+    "classnames" "^2.2"
+    "prop-types" "^15.7.2"
+    "react-lifecycles-compat" "^3.0.4"
+    "tslib" "~1.13.0"
+
 "@discoveryjs/json-ext@^0.5.0":
   "integrity" "sha512-HyYEUDeIj5rRQU2Hk5HTB2uHsbRQpF70nvMhVzi+VJR0X+xNEhjPui4/kBf3VeH/wqD28PT4sVOm8qqLjBrSZg=="
   "resolved" "https://registry.npmjs.org/@discoveryjs/json-ext/-/json-ext-0.5.2.tgz"
