@@ -27,6 +27,10 @@ export class CourseManageAssignmentsComponent extends React.Component<Assignment
     this.title = props.title
     this.lecture = props.lecture
     this.state.isOpen = props.open || false
+
+    this.getAssignments = this.getAssignments.bind(this);
+
+
   }
 
   private async createAssignment() {
@@ -47,6 +51,10 @@ export class CourseManageAssignmentsComponent extends React.Component<Assignment
   } 
 
   public componentDidMount() {
+    this.getAssignments()
+  }
+
+  private getAssignments() {
     getAllAssignments(this.lecture.id).subscribe(assignments => {
       console.log(assignments)
       this.setState(this.state.assignments = assignments)

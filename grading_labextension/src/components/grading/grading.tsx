@@ -7,6 +7,7 @@ import { fetchAssignment } from '../../services/assignments.service';
 import { getLecture } from '../../services/lectures.service';
 import { getAllSubmissions } from '../../services/submissions.service';
 import { SubmissionComponent } from './gradingsubmission';
+import { Table } from '@blueprintjs/table';
 
 
 export interface GradingProps {
@@ -21,6 +22,8 @@ export class GradingComponent extends React.Component<GradingProps> {
   public title: Title<Widget>;
 
   public submissions: Submission[];
+  public lectureId: number;
+  public assignmentId: number;
   public state = {
     assignment: {},
     lecture: {},
@@ -48,7 +51,9 @@ export class GradingComponent extends React.Component<GradingProps> {
 
   public render() {
     return <div className="course-list">
-    {this.state.submissions.map((el, index) => <SubmissionComponent />)}
+        <Table numRows={2}>
+    {this.state.submissions.map((sub, index) => <SubmissionComponent />)}
+    </Table>
     </div>
    
   }
