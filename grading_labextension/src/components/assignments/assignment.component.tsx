@@ -113,12 +113,13 @@ export class AssignmentComponent extends React.Component<AssignmentProps> {
 
   private getSubmissions() {
     getAllSubmissions(this.lecture, this.assignment).subscribe(
-      submissions => this.setState({ submissions }),
+      userSubmissions => this.setState({ submissions: userSubmissions.submissions }),
       error => showErrorMessage("Error Loading Submissions", error)
     );
   }
 
   public render() {
+    // TODO: show due date of assignment
     return <li key={this.index}>
       <div className="assignment">
         <div className="assignment-header">

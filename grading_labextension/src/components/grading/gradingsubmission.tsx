@@ -1,6 +1,5 @@
 import * as React from "react";
 import { Submission } from "../../model/submission";
-import { Table } from "@blueprintjs/table";
 
 export interface SubmissionsListProps {
     submission: Submission;
