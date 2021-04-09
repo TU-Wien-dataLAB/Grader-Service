@@ -28,7 +28,7 @@ export class CourseManageComponent extends React.Component<CourseManageProps> {
 
   public render() {
     return <div className="course-list">
-    {this.state.lectures.map((el, index) => <CourseManageAssignmentsComponent lectureId={el.id} title={el.name} open={index==0} />)}
+    {this.state.lectures.map((el, index) => <CourseManageAssignmentsComponent lecture={el} title={el.name} open={index==0} />)}
     </div>
    
   }

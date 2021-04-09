@@ -3,6 +3,7 @@ import { showErrorMessage } from '@jupyterlab/apputils';
 import * as React from 'react';
 import { GlobalObjects } from '../../index';
 import { Assignment } from '../../model/assignment';
+import { Lecture } from '../../model/lecture';
 import { Submission } from '../../model/submission';
 import { getAllSubmissions } from '../../services/submissions.service';
 
@@ -11,14 +12,14 @@ export interface AssignmentProps {
   index: number;
   lectureName: string;
   assignment: Assignment;
-  lectureId: number;
+  lecture: Lecture;
 }
 
 
 export class CourseManageAssignmentComponent extends React.Component<AssignmentProps> {
   public assignment: Assignment;
   public lectureName: string;
-  public lectureId: number;
+  public lecture: Lecture;
   public index: number;
   public iconSize: number = 14;
   public state = {
@@ -32,12 +33,12 @@ export class CourseManageAssignmentComponent extends React.Component<AssignmentP
     this.assignment = props.assignment;
     this.index = props.index;
     this.lectureName = props.lectureName;
-    this.lectureId = props.lectureId;
+    this.lecture = props.lecture;
   }
 
   public componentDidMount() {
     // TODO: should only get all submissions if assignment is released
-    getAllSubmissions({ id: this.lectureId }, { id: this.index }).subscribe(sub => {
+    getAllSubmissions(this.lecture , { id: this.index }).subscribe(sub => {
       console.log(sub)
       this.setState(this.state.submissions = sub)
     }
@@ -61,6 +62,14 @@ export class CourseManageAssignmentComponent extends React.Component<AssignmentP
     })
   }
 
+  private async openPreview(path: string) {
+    //TODO: Should open preview file, opens the first original file right now
+    this.openFile(path);
+  }
+
+
+
+
 
   public render() {
     return <li key={this.index}>
@@ -75,10 +84,10 @@ export class CourseManageAssignmentComponent extends React.Component<AssignmentP
 
           <span className="button-list">
             <Button icon='edit' outlined className="assignment-button">Edit</Button>
-            <Button icon='search' outlined className="assignment-button">Preview</Button>
             <Button icon='build' outlined className="assignment-button">Generate</Button>
-            <Button icon='cloud-upload' outlined className="assignment-button">Release</Button>
-            <Button icon='cloud-download' outlined className="assignment-button">Collect</Button>
+            <Button icon='search' outlined className="assignment-button" onClick={() => this.openPreview(`Informationsvisualisierung/${this.assignment.name}/${this.assignment.exercises.pop().name}`)} >Preview</Button>
+            <Button icon='cloud-upload' outlined className="assignment-button" disabled={this.assignment.status=="created"}>Release</Button>
+            <Button icon='cloud-download' outlined className="assignment-button" disabled={this.assignment.status=="created"}>Collect</Button>
             <Tag className="assignment-tag" icon="link">{this.state.submissions.length} Submissions</Tag>
           </span>
         </div>
