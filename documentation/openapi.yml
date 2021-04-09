@@ -380,7 +380,7 @@ paths:
         schema:
           type: integer
           format: int64
-      - name: instuctor_version # TODO: Take care of auth!!! Maybe different path?
+      - name: instuctor-version # TODO: Take care of auth!!! Maybe different path?
         in: query
         description: Fetch the instructor version of the assignment
         required: false
@@ -388,7 +388,7 @@ paths:
         schema:
           type: boolean
           default: false
-      - name: metadata_only
+      - name: metadata-only
         in: query
         description: Only return the assignment information and don't fetch it
         required: false
@@ -396,7 +396,7 @@ paths:
         schema:
           type: boolean
           default: false
-      - name: include_submissions
+      - name: include-submissions
         in: query
         description: Include past submissions of the assignment
         required: false
@@ -545,7 +545,7 @@ paths:
         schema:
           type: boolean
           default: false
-      - name: instructor
+      - name: instructor-version
         in: query
         description: Whether to fetch the all submissions of students
         required: false
@@ -558,9 +558,7 @@ paths:
           content:
             application/json:
               schema:
-                type: "array"
-                items:
-                  $ref: "#/components/schemas/Submission"
+                $ref: "#/components/schemas/UserSubmissions"
         403:
           description: Unautorized
         404:
@@ -602,15 +600,27 @@ paths:
         schema:
           type: integer
           format: int64
+      - name: latest
+        in: query
+        description: Only return the feedback of the latest submission
+        required: false
+        schema:
+          type: boolean
+          default: false
+      - name: instructor-version
+        in: query
+        description: Whether to fetch the all feedback of students
+        required: false
+        schema:
+          type: boolean
+          default: false
       responses:
         200:
           description: OK
           content:
             application/json:
               schema:
-                type: "array"
-                items:
-                  $ref: "#/components/schemas/Feedback"
+                $ref: "#/components/schemas/UserFeedback"
         403:
           description: Unautorized
         404:
@@ -1340,6 +1350,24 @@ components:
           example: "Some very detailed error message."
       example:
         msg: "Some very detailed error message."
+    UserSubmissions:
+      type: "object"
+      properties:
+        user:
+          $ref: "#/components/schemas/User"
+        submissions:
+          type: "array"
+          items:
+            $ref: "#/components/schemas/Submission"
+    UserFeedback:
+      type: "object"
+      properties:
+        user:
+          $ref: "#/components/schemas/User"
+        submissions:
+          type: "array"
+          items:
+            $ref:  "#/components/schemas/Feedback"
 
   securitySchemes:
     hub_auth:

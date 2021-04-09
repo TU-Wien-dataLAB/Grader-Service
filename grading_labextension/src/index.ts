@@ -13,6 +13,7 @@ import { CourseManageView } from './widgets/coursemanage';
 import { checkIcon, editIcon } from '@jupyterlab/ui-components'
 import { AssignmentList } from './widgets/assignment-list';
 import { CommandRegistry } from '@lumino/commands'
+import { GradingView } from './widgets/grading';
 
 // import { requestAPI } from './handler';
 
@@ -26,6 +27,12 @@ namespace CourseManageCommandIDs {
   export const create = 'coursemanage:create';
 
   export const open = 'coursemanage:open';
+}
+
+namespace GradingCommandIDs {
+  export const create = 'grading:create';
+
+  export const open = 'grading:open';
 }
 
 export class GlobalObjects {
@@ -48,7 +55,7 @@ const extension: JupyterFrontEndPlugin<void> = {
     GlobalObjects.commands = app.commands;
 
     /* ##### Course Manage View Widget ##### */
-    let command: string = CourseManageCommandIDs.create; 
+    let command: string = CourseManageCommandIDs.create;
     app.commands.addCommand(command, {
       execute: () => {
         // Create a blank content widget inside of a MainAreaWidget
@@ -77,7 +84,7 @@ const extension: JupyterFrontEndPlugin<void> = {
       },
       icon: checkIcon
     });
-    
+
     // Add the command to the launcher
     console.log("Add course management launcher");
     launcher.add({
@@ -125,7 +132,7 @@ const extension: JupyterFrontEndPlugin<void> = {
       },
       icon: editIcon
     });
-    
+
     // Add the command to the launcher
     console.log("Add assignment launcher");
     launcher.add({
@@ -133,6 +140,39 @@ const extension: JupyterFrontEndPlugin<void> = {
       category: 'Assignments',
       rank: 0
     });
+
+    command = GradingCommandIDs.create;
+    app.commands.addCommand(command, {
+      execute: (args: any) => {
+        const lectureID: number = typeof args['lectureID'] === 'undefined' ? null : (args['lectureID'] as number);
+        const assignmentID: number = typeof args['assignmentID'] === 'undefined' ? null : (args['assignmentID'] as number);
+
+        const gradingView = new GradingView({ lectureID, assignmentID });
+        const gradingWidget = new MainAreaWidget<GradingView>({ content: gradingView });
+        gradingWidget.id = 'grading-jupyterlab';
+        gradingWidget.title.label = 'Grading';
+        gradingWidget.title.closable = true;
+
+        return gradingWidget;
+      }
+    })
+
+    command = GradingCommandIDs.open;
+    app.commands.addCommand(command, {
+      label: 'Grading',
+      execute: async (args: any) => {
+        const gradingView: MainAreaWidget<GradingView> = await app.commands.execute(GradingCommandIDs.create, args);
+
+        if (!gradingView.isAttached) {
+          // Attach the widget to the main work area if it's not there
+          app.shell.add(gradingView, 'main');
+        }
+        // Activate the widget
+        app.shell.activateById(gradingView.id);
+      },
+      icon: editIcon
+    })
+
   }
 };
 
