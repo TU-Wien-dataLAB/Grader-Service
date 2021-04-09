@@ -38,9 +38,9 @@ export class CourseManageAssignmentComponent extends React.Component<AssignmentP
 
   public componentDidMount() {
     // TODO: should only get all submissions if assignment is released
-    getAllSubmissions(this.lecture , { id: this.index }).subscribe(sub => {
-      console.log(sub)
-      this.setState(this.state.submissions = sub)
+    getAllSubmissions(this.lecture , { id: this.index }).subscribe(userSubmissions => {
+      console.log(userSubmissions)
+      this.setState(this.state.submissions = userSubmissions.submissions)
     }
     )
   }
@@ -59,6 +59,15 @@ export class CourseManageAssignmentComponent extends React.Component<AssignmentP
       }
     }).catch(error => {
       showErrorMessage("Error Opening File", error)
+    })
+  }
+
+  private openGrading(lectureID: number, assignmentID: number) {
+    GlobalObjects.commands.execute('grading:open', {
+      lectureID,
+      assignmentID
+    }).catch(error => {
+      showErrorMessage("Error Opening Submission View", error)
     })
   }
 
@@ -88,7 +97,7 @@ export class CourseManageAssignmentComponent extends React.Component<AssignmentP
             <Button icon='search' outlined className="assignment-button" onClick={() => this.openPreview(`Informationsvisualisierung/${this.assignment.name}/${this.assignment.exercises.pop().name}`)} >Preview</Button>
             <Button icon='cloud-upload' outlined className="assignment-button" disabled={this.assignment.status=="created"}>Release</Button>
             <Button icon='cloud-download' outlined className="assignment-button" disabled={this.assignment.status=="created"}>Collect</Button>
-            <Tag className="assignment-tag" icon="link">{this.state.submissions.length} Submissions</Tag>
+            <Tag className="assignment-tag" icon="link" interactive onClick={() => this.openGrading(this.lecture.id, this.assignment.id)}>{this.state.submissions.length} Submissions</Tag>
           </span>
         </div>
 
