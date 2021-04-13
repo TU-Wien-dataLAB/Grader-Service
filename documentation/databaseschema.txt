@@ -1,0 +1,48 @@
+Table user as U {
+  id int [pk, increment]
+  name varchar
+  token varchar
+}
+Table lecture as L {
+  id int [pk, increment] // auto-increment
+  name varchar
+  semester varchar
+  code varchar
+  complete boolean
+}
+
+Table takepart as T {
+  userid int [ref: > U.id]
+  lectid int [ref: > L.id]
+  role enum
+}
+
+Table assignment as A {
+  id int [pk, increment]
+  name varchar
+  lectid int [ref: > L.id]
+  duedate datetime
+  path varchar
+  points int
+}
+
+Table file as F {
+  id int [pk, increment]
+  name varchar
+  assignid int [ref: > A.id]
+  path varchar
+  exercise boolean
+  points int
+}
+
+Table submission as S {
+  id int [pk, increment]
+  date datetime
+  assignid int [ref: > A.id]
+  userid int [ref: > U.id]
+}
+
+Table feedback as Fe {
+  subid int [pk,ref: - S.id]
+  score int
+}
