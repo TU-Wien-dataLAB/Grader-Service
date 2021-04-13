@@ -5,7 +5,7 @@ import { GlobalObjects } from '../../index';
 import { Assignment } from '../../model/assignment';
 import { Lecture } from '../../model/lecture';
 import { Submission } from '../../model/submission';
-import { getAllSubmissions } from '../../services/submissions.service';
+import { getSubmissions } from '../../services/submissions.service';
 
 
 export interface AssignmentProps {
@@ -38,7 +38,7 @@ export class CourseManageAssignmentComponent extends React.Component<AssignmentP
 
   public componentDidMount() {
     // TODO: should only get all submissions if assignment is released
-    getAllSubmissions(this.lecture , { id: this.index }).subscribe(userSubmissions => {
+    getSubmissions(this.lecture , { id: this.index }).subscribe(userSubmissions => {
       console.log(userSubmissions)
       this.setState(this.state.submissions = userSubmissions.submissions)
     }
