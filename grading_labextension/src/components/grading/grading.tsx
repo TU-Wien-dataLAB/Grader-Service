@@ -8,6 +8,7 @@ import { getLecture } from '../../services/lectures.service';
 import { getAllSubmissions } from '../../services/submissions.service';
 import { Table,Cell,Column } from '@blueprintjs/table';
 import { Button } from '@blueprintjs/core/lib/cjs/components/button/buttons';
+import { UserSubmissions } from '../../model/userSubmissions';
 
 
 export interface GradingProps {
@@ -27,7 +28,7 @@ export class GradingComponent extends React.Component<GradingProps> {
   public state = {
     assignment: {},
     lecture: {},
-    submissions: new Array<Submission>(),
+    submissions: new Array<UserSubmissions>(),
   };
 
 
@@ -43,9 +44,9 @@ export class GradingComponent extends React.Component<GradingProps> {
     let lecture: Lecture = await getLecture(this.lectureID).toPromise();
     this.title.label = "Grading: " + assignment.name;
     this.setState({assignment, lecture})
-    getAllSubmissions(lecture, assignment, false, true).subscribe(userSubmissions => {
+    getAllSubmissions(lecture, assignment, false).subscribe(userSubmissions => {
       console.log(userSubmissions)
-      this.setState(this.state.submissions = userSubmissions.submissions)
+      this.setState(this.state.submissions = userSubmissions)
     })
   }
 

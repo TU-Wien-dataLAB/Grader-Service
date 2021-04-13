@@ -7,7 +7,7 @@ import { IconNames } from "@blueprintjs/icons";
 import { GlobalObjects } from '../../index';
 import { showErrorMessage, showDialog, Dialog } from '@jupyterlab/apputils'
 import { Submission } from '../../model/submission';
-import { getAllSubmissions, submitAssignment } from '../../services/submissions.service'
+import { getSubmissions, submitAssignment } from '../../services/submissions.service'
 import { fetchAssignment } from '../../services/assignments.service'
 import { Lecture } from '../../model/lecture';
 
@@ -112,7 +112,7 @@ export class AssignmentComponent extends React.Component<AssignmentProps> {
   }
 
   private getSubmissions() {
-    getAllSubmissions(this.lecture, this.assignment).subscribe(
+    getSubmissions(this.lecture, this.assignment).subscribe(
       userSubmissions => this.setState({ submissions: userSubmissions.submissions }),
       error => showErrorMessage("Error Loading Submissions", error)
     );
