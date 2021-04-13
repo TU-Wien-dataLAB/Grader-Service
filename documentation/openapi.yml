@@ -1175,9 +1175,6 @@ components:
           type: "string"
           format: "date-time"
           example: "2021-07-21T23:55:00Z"
-        path:
-          type: "string"
-          example: "~/assignment_1/"
         status:
           type: string
           enum:
@@ -1196,7 +1193,6 @@ components:
           $ref: "#/components/schemas/AssignmentFile/example"
         ]
         due_date: "2021-07-21T23:55:00Z"
-        path: "~/assignment_1/"
         status: "released"
     Exercise:
       type: "object"
@@ -1259,33 +1255,6 @@ components:
         id: 0
         submission_id: 2
         path: "~/assignment_1/feedback/..."
-    ValidationResult:
-      type: "object"
-      properties:
-        status:
-          type: string
-          enum:
-            - passed
-            - failed
-        validation_errors:
-          type: array
-          items:
-            type: object
-            properties:
-              error_line:
-                type: string
-                example: "assert(id(2)==2)"
-              error_output:
-                type: string
-                example: "NotImplementedError at line ..."
-      example:
-        status: "passed"
-        validation_errors: [
-          {
-            error_line: "assert(id(2)==2)",
-            error_output: "NotImplementedError at line ..."
-          }
-        ]
     GradingResult:
       type: "object"
       properties:
@@ -1351,23 +1320,27 @@ components:
       example:
         msg: "Some very detailed error message."
     UserSubmissions:
-      type: "object"
-      properties:
-        user:
-          $ref: "#/components/schemas/User"
-        submissions:
-          type: "array"
-          items:
-            $ref: "#/components/schemas/Submission"
+      type: "array"
+      items:
+        type: "object"
+        properties:
+          user:
+            $ref: "#/components/schemas/User"
+          submissions:
+            type: "array"
+            items:
+              $ref: "#/components/schemas/Submission"
     UserFeedback:
-      type: "object"
-      properties:
-        user:
-          $ref: "#/components/schemas/User"
-        submissions:
-          type: "array"
-          items:
-            $ref:  "#/components/schemas/Feedback"
+      type: "array"
+      items:
+        type: "object"
+        properties:
+          user:
+            $ref: "#/components/schemas/User"
+          submissions:
+            type: "array"
+            items:
+              $ref:  "#/components/schemas/Feedback"
 
   securitySchemes:
     hub_auth:
