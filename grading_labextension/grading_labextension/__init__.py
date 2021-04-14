@@ -6,6 +6,11 @@ from ._version import __version__
 
 HERE = Path(__file__).parent.resolve()
 
+
+import sys
+sys.path.append("../../common")
+
+
 with (HERE / "labextension" / "package.json").open() as fid:
     data = json.load(fid)
 
