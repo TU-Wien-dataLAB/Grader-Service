@@ -1,4 +1,5 @@
 import { Observable } from "rxjs";
+import { map } from "rxjs/operators";
 import { Assignment } from "../model/assignment";
 import { Feedback } from "../model/feedback";
 import { Lecture } from "../model/lecture";
@@ -18,7 +19,7 @@ import { request, HTTPMethod } from "./request.service";
       })
       url += '?' + searchParams;
     }
-    return request<UserSubmissions>(HTTPMethod.GET, url, {})
+    return request<UserSubmissions[]>(HTTPMethod.GET, url, {}).pipe(map(array => array[0]))
   }
 
   export function getAllSubmissions(lecture: Lecture, assignment : Assignment, latest: boolean = false, instructor: boolean = true): Observable<UserSubmissions[]> {
