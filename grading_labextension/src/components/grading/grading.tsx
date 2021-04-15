@@ -8,13 +8,13 @@ import { getLecture } from '../../services/lectures.service';
 import { getAllSubmissions } from '../../services/submissions.service';
 import { UserSubmissions } from '../../model/userSubmissions';
 
-import { DataGrid, GridColDef} from '@material-ui/data-grid';
+import { DataGrid, GridColDef } from '@material-ui/data-grid';
 import { Button } from '@blueprintjs/core/lib/cjs/components/button/buttons';
 
 export interface GradingProps {
-    lectureID: number;
-    assignmentID: number;
-    title: Title<Widget>;
+  lectureID: number;
+  assignmentID: number;
+  title: Title<Widget>;
 }
 
 
@@ -42,9 +42,9 @@ export class GradingComponent extends React.Component<GradingProps> {
     this.assignmentID = props.assignmentID;
     this.title = props.title;
     this.columns = [
-      { field: 'Id', headerName: 'Id', width: 100 },
-      { field: 'User', headerName: 'User', width: 130 },
-      { field: 'Date', headerName: 'Date', width: 130 },
+      { field: 'id', headerName: 'Id', width: 100 },
+      { field: 'user', headerName: 'User', width: 130 },
+      { field: 'date', headerName: 'Date', width: 130 },
     ];
   }
 
@@ -52,30 +52,35 @@ export class GradingComponent extends React.Component<GradingProps> {
     let assignment: Assignment = await fetchAssignment(this.lectureID, this.assignmentID, false, true).toPromise();
     let lecture: Lecture = await getLecture(this.lectureID).toPromise();
     this.title.label = "Grading: " + assignment.name;
-    this.setState({assignment, lecture})
+    this.setState({ assignment, lecture })
     getAllSubmissions(lecture, assignment, false).subscribe(userSubmissions => {
       console.log(userSubmissions)
       this.setState(this.state.submissions = userSubmissions)
       //Temp rows for testing
       this.setState(this.state.rows = this.generateRows())
+      console.log("rows:")
+      console.log(this.state.rows)
     })
   }
 
-  public generateRows() : Object[] {
+  public generateRows(): Object[] {
+    // let rows = [{ id: 10, user: "hasdf", date: "asdfadfa" }]
     let rows = new Array();
     //TODO: right now reading only the first 
     this.state.submissions.forEach( sub => {rows.push({id: `${sub.user.id}`, user: `${sub.user.name}`, date: `${sub.submissions[0].submitted_at}`})});
     return rows;
   }
 
-  
+
 
   public render() {
     return (
-      <div style={{ height: 800, width: '100%' }}>
-        <DataGrid rows={this.state.rows} columns={this.columns} onRowSelected={ select => {}} checkboxSelection />
+      <div style={{ height: '100%', display: 'flex' }}>
+        <div style={{ flexGrow: 1 }}>
+          <DataGrid rows={this.state.rows} columns={this.columns} onRowSelected={select => { }} checkboxSelection />
+        </div>
       </div>
     );
-   <Button icon="highlight" className="button-list" outlined />
+    <Button icon="highlight" className="button-list" outlined />
   }
 }

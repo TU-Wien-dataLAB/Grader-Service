@@ -1,5 +1,6 @@
 ## Model generation:
 # openapi-generator-cli generate -i ./grader-extensions/documentation/openapi.yml -g typescript-angular -o ./grader-extensions/grading_labextension/src --global-property models
+# openapi-generator-cli generate -i ./grader-extensions/documentation/openapi.yml -g python-flask -o ./grader-extensions/common --additional-properties=packageName=''  --global-property models
 
 openapi: '3.0.2'
 info:
