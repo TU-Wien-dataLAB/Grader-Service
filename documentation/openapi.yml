@@ -4,7 +4,7 @@
 # openapi-generator-cli generate -i ./grader-extensions/documentation/openapi.yml -g typescript-angular -o ./grader-extensions/grading_labextension/src --global-property models
 #
 # Python:
-# java -Dmodels -DsupportingFiles=util.py,base_model_.py,typing_utils.py -jar openapi-generator-cli.jar generate -i ./grader-extensions/documentation/openapi.yml -g python-flask -o ./grader-extensions/common/ --additional-properties=packageName='api' ; rm -r ./grader-extensions/common/api/test ./grader-extensions/common/api/controllers ./grader-extensions/common/api/openapi
+# java -Dmodels -DsupportingFiles=util.py,base_model_.py,typing_utils.py,__init__.py -jar openapi-generator-cli.jar generate -i ./grader-extensions/documentation/openapi.yml -g python-flask -o ./grader-extensions/ --additional-properties=packageName='common' ; rm -r ./grader-extensions/common/test ./grader-extensions/common/controllers ./grader-extensions/common/openapi
 
 openapi: '3.0.2'
 info:

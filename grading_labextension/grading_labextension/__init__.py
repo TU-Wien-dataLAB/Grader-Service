@@ -8,7 +8,9 @@ HERE = Path(__file__).parent.resolve()
 
 
 import sys
-sys.path.append("../../common")
+import os.path as path
+common_path = path.abspath(path.join(path.dirname(__file__), "../.."))
+sys.path.append(common_path)
 
 
 with (HERE / "labextension" / "package.json").open() as fid:
@@ -20,9 +22,17 @@ def _jupyter_labextension_paths():
         "dest": data["name"]
     }]
 
+# import handlers so they get registered
+import grading_labextension.handlers
 
+from common.registry import HandlerPathRegistry
 
-from .handlers import setup_handlers
+def setup_handlers(web_app):
+    host_pattern = ".*$"
+
+    base_url = web_app.settings["base_url"]
+    handlers = HandlerPathRegistry.handler_list(base_url)
+    web_app.add_handlers(host_pattern, handlers)
 
 
 def _jupyter_server_extension_points():
@@ -40,5 +50,5 @@ def _load_jupyter_server_extension(server_app):
         JupyterLab application instance
     """
     setup_handlers(server_app.web_app)
-    server_app.log.info("Registered HelloWorld extension at URL path /grading_labextension")
+    server_app.log.info("Registered grader extension at URL path /grading_labextension")
 
