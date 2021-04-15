@@ -6,7 +6,6 @@ common/models/assignment_file.py
 common/models/base_model_.py
 common/models/error_message.py
 common/models/exercise.py
-common/models/feedback.py
 common/models/grading_result.py
 common/models/inline_response200.py
 common/models/inline_response200_data.py
@@ -14,6 +13,9 @@ common/models/inline_response200_submissions.py
 common/models/lecture.py
 common/models/manual_grading_content.py
 common/models/manual_grading_content_feedback_cells.py
+common/models/rich_assignment.py
+common/models/rich_feedback.py
+common/models/rich_submission.py
 common/models/submission.py
 common/models/user.py
 common/test/__init__.py
