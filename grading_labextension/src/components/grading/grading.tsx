@@ -8,24 +8,14 @@ import { getLecture } from '../../services/lectures.service';
 import { getAllSubmissions } from '../../services/submissions.service';
 import { UserSubmissions } from '../../model/userSubmissions';
 
-
-import { DataGrid} from '@material-ui/data-grid';
-
-
-
-const columns = [
-  { field: 'User', headerName: 'Id', width: 100 },
-  { field: 'firstName', headerName: 'First name', width: 130 },
-  { field: 'lastName', headerName: 'Last name', width: 130 },
-];
+import { DataGrid, GridColDef} from '@material-ui/data-grid';
+import { Button } from '@blueprintjs/core/lib/cjs/components/button/buttons';
 
 export interface GradingProps {
     lectureID: number;
     assignmentID: number;
     title: Title<Widget>;
 }
-
-const rows = [ {id: 123, firstname: "Florian", lastname: "Jäger"}, {id: 321, firstname: "Matthias", lastname: "Matt"}];
 
 
 export class GradingComponent extends React.Component<GradingProps> {
@@ -36,11 +26,13 @@ export class GradingComponent extends React.Component<GradingProps> {
   public submissions: Submission[];
   public lectureId: number;
   public assignmentId: number;
+  public columns: GridColDef[];
   public state = {
     assignment: {},
     lecture: {},
     submissions: new Array<UserSubmissions>(),
     isOpen: true,
+    rows: new Array(),
   };
 
 
@@ -49,6 +41,11 @@ export class GradingComponent extends React.Component<GradingProps> {
     this.lectureID = props.lectureID;
     this.assignmentID = props.assignmentID;
     this.title = props.title;
+    this.columns = [
+      { field: 'Id', headerName: 'Id', width: 100 },
+      { field: 'User', headerName: 'User', width: 130 },
+      { field: 'Date', headerName: 'Date', width: 130 },
+    ];
   }
 
   public async componentDidMount() {
@@ -59,7 +56,16 @@ export class GradingComponent extends React.Component<GradingProps> {
     getAllSubmissions(lecture, assignment, false).subscribe(userSubmissions => {
       console.log(userSubmissions)
       this.setState(this.state.submissions = userSubmissions)
+      //Temp rows for testing
+      this.setState(this.state.rows = this.generateRows())
     })
+  }
+
+  public generateRows() : Object[] {
+    let rows = new Array();
+    //TODO: right now reading only the first 
+    this.state.submissions.forEach( sub => {rows.push({id: `${sub.user.id}`, user: `${sub.user.name}`, date: `${sub.submissions[0].submitted_at}`})});
+    return rows;
   }
 
   
@@ -67,9 +73,9 @@ export class GradingComponent extends React.Component<GradingProps> {
   public render() {
     return (
       <div style={{ height: 800, width: '100%' }}>
-        <DataGrid rows={rows} columns={columns} pageSize={10} onRowSelected={ select => {}} checkboxSelection />
+        <DataGrid rows={this.state.rows} columns={this.columns} onRowSelected={ select => {}} checkboxSelection />
       </div>
     );
-   
+   <Button icon="highlight" className="button-list" outlined />
   }
 }
