@@ -1,0 +1,449 @@
+
+assignments:
+  post:
+    security:
+      - hub_auth:
+        - instructor
+        - tutor
+    summary: Request creation of an assignment
+    tags:
+    - Assignments
+    parameters:
+    - name: lect_id
+      in: path
+      description: ID of the lecture
+      required: true
+      example: 1
+      schema:
+        type: integer
+        format: int64
+    requestBody:
+      description: The initial state of an assignment. Every field will be empty except `due_date` and `name`.
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: './schemas.yaml#/components/schemas/RichAssignment'
+    responses:
+      200:
+        description: OK
+        content:
+          application/json:
+            schema:
+              $ref: "./schemas.yaml#/components/schemas/RichAssignment"
+      403:
+        description: Unautorized
+      404:
+        description: Lecture id or assignment id not found.
+        content: 
+          application/json:
+            schema:
+              $ref: "./schemas.yaml#/components/schemas/ErrorMessage"
+      500:
+        description: Internal server error
+        content: 
+          application/json:
+            schema:
+              $ref: "./schemas.yaml#/components/schemas/ErrorMessage"
+  get:
+    security:
+      - hub_auth:
+        - instructor
+        - tutor
+        - student
+    summary: "Return the assignments of a specific lecture"
+    tags:
+      - "Assignments"
+    parameters:
+    - name: lect_id
+      in: path
+      description: ID of the lecture
+      required: true
+      example: 1
+      schema:
+        type: integer
+        format: int64
+    responses:
+      200:
+        description: OK
+        content:
+          application/json:
+            schema:
+              type: "array"
+              items:
+                $ref: "./schemas.yaml#/components/schemas/RichAssignment"
+            example:
+              [
+                $ref: "./schemas.yaml#/components/schemas/RichAssignment/example",
+                $ref: "./schemas.yaml#/components/schemas/RichAssignment/example",
+                $ref: "./schemas.yaml#/components/schemas/RichAssignment/example",
+              ]
+      403:
+        description: Unautorized
+      404:
+        description: Lecture id not found.
+        content: 
+          application/json:
+            schema:
+              $ref: "./schemas.yaml#/components/schemas/ErrorMessage"
+      500:
+        description: Internal server error
+        content: 
+          application/json:
+            schema:
+              $ref: "./schemas.yaml#/components/schemas/ErrorMessage"
+
+
+
+
+
+
+
+
+
+assignmentsById:
+  put:
+    security:
+      - hub_auth:
+        - instructor
+        - tutor
+    summary: Update an existing assignment (also handles release)
+    tags:
+    - Assignments
+    parameters:
+    - name: lect_id
+      in: path
+      description: ID of the lecture
+      required: true
+      example: 1
+      schema:
+        type: integer
+        format: int64
+    - name: a_id
+      in: path
+      description: ID of the assignment in the lecture
+      required: true
+      example: 2
+      schema:
+        type: integer
+        format: int64
+    requestBody:
+      description: The parameters of the assignment that should be updated.
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: './schemas.yaml#/components/schemas/Assignment'
+    responses:
+      200:
+        description: OK
+        content:
+          application/json:
+            schema:
+              $ref: "./schemas.yaml#/components/schemas/Assignment"
+      403:
+        description: Unautorized
+      404:
+        description: Lecture id or assignment id not found.
+        content: 
+          application/json:
+            schema:
+              $ref: "./schemas.yaml#/components/schemas/ErrorMessage"
+      500:
+        description: Internal server error
+        content: 
+          application/json:
+            schema:
+              $ref: "./schemas.yaml#/components/schemas/ErrorMessage"
+  get:
+    security:
+      - hub_auth:
+        - instructor
+        - tutor
+        - student
+    summary: "Request the assignment to be fetched"
+    tags: 
+    - "Assignments"
+    parameters:
+    - name: lect_id
+      in: path
+      description: ID of the lecture
+      required: true
+      example: 1
+      schema:
+        type: integer
+        format: int64
+    - name: a_id
+      in: path
+      description: ID of the assignment in the lecture
+      required: true
+      example: 2
+      schema:
+        type: integer
+        format: int64
+    - name: instuctor-version # TODO: Take care of auth!!! Maybe different path?
+      in: query
+      description: Fetch the instructor version of the assignment
+      required: false
+      example: false
+      schema:
+        type: boolean
+        default: false
+    - name: metadata-only
+      in: query
+      description: Only return the assignment information and don't fetch it
+      required: false
+      example: false
+      schema:
+        type: boolean
+        default: false
+    - name: include-submissions
+      in: query
+      description: Include past submissions of the assignment
+      required: false
+      example: false
+      schema:
+        type: boolean
+        default: false
+    responses:
+      200:
+        description: OK
+        content:
+          application/json:
+            schema:
+              $ref: "./schemas.yaml#/components/schemas/Assignment"
+      403:
+        description: Unautorized
+      404:
+        description: Lecture id or assignment id not found
+        content: 
+          application/json:
+            schema:
+              $ref: "./schemas.yaml#/components/schemas/ErrorMessage"
+      500:
+        description: Internal server error
+        content: 
+          application/json:
+            schema:
+              $ref: "./schemas.yaml#/components/schemas/ErrorMessage"
+  delete:
+    security:
+      - hub_auth:
+        - instructor
+        - tutor
+    summary: Delete an existing assignment
+    tags:
+    - Assignments
+    parameters:
+    - name: lect_id
+      in: path
+      description: ID of the lecture
+      required: true
+      example: 1
+      schema:
+        type: integer
+        format: int64
+    - name: a_id
+      in: path
+      description: ID of the assignment in the lecture
+      required: true
+      example: 2
+      schema:
+        type: integer
+        format: int64
+    responses:
+      200:
+        description: OK
+      403:
+        description: Unautorized
+      404:
+        description: Lecture id or assignment id not found.
+        content: 
+          application/json:
+            schema:
+              $ref: "./schemas.yaml#/components/schemas/ErrorMessage"
+      500:
+        description: Internal server error
+        content: 
+          application/json:
+            schema:
+              $ref: "./schemas.yaml#/components/schemas/ErrorMessage"
+
+
+
+
+
+
+
+submissions:
+  post:
+    security:
+      - hub_auth:
+        - instructor
+        - tutor
+        - student
+    summary: "Request assignment to be submitted"
+    tags:
+      - "Submissions"
+    parameters:
+    - name: lect_id
+      in: path
+      description: ID of the lecture
+      required: true
+      example: 1
+      schema:
+        type: integer
+        format: int64
+    - name: a_id
+      in: path
+      description: ID of the assignment in the lecture
+      required: true
+      example: 2
+      schema:
+        type: integer
+        format: int64
+    responses:
+      200:
+        description: OK
+      403:
+        description: Unautorized
+      404:
+        description: Lecture id or assignment id not found.
+        content: 
+          application/json:
+            schema:
+              $ref: "./schemas.yaml#/components/schemas/ErrorMessage"
+      500:
+        description: Internal server error
+        content: 
+          application/json:
+            schema:
+              $ref: "./schemas.yaml#/components/schemas/ErrorMessage"
+  get:
+    security:
+      - hub_auth:
+        - instructor
+        - tutor
+        - student
+    summary: Return the submissions of an assignment
+    tags:
+      - "Submissions"
+    parameters:
+    - name: lect_id
+      in: path
+      description: ID of the lecture
+      required: true
+      example: 1
+      schema:
+        type: integer
+        format: int64
+    - name: a_id
+      in: path
+      description: ID of the assignment in the lecture
+      required: true
+      example: 2
+      schema:
+        type: integer
+        format: int64
+    - name: latest
+      in: query
+      description: Only return the latest submission
+      required: false
+      schema:
+        type: boolean
+        default: false
+    - name: instructor-version
+      in: query
+      description: Whether to fetch the all submissions of students
+      required: false
+      schema:
+        type: boolean
+        default: false
+    responses:
+      200:
+        description: OK
+        content:
+          application/json:
+            schema:
+              $ref: "./schemas.yaml#/components/schemas/RichUserSubmissions"
+      403:
+        description: Unautorized
+      404:
+        description: Lecture id or assignment id not found
+        content: 
+          application/json:
+            schema:
+              $ref: "./schemas.yaml#/components/schemas/ErrorMessage"
+      500:
+        description: Internal server error
+        content: 
+          application/json:
+            schema:
+              $ref: "./schemas.yaml#/components/schemas/ErrorMessage"
+
+
+
+
+
+feedback:
+  get:
+    security:
+      - hub_auth:
+        - instructor
+        - tutor
+        - student
+    summary: Return the feedback of an assignment
+    tags:
+      - "Submissions"
+    parameters:
+    - name: lect_id
+      in: path
+      description: ID of the lecture
+      required: true
+      example: 1
+      schema:
+        type: integer
+        format: int64
+    - name: a_id
+      in: path
+      description: ID of the assignment in the lecture
+      required: true
+      example: 2
+      schema:
+        type: integer
+        format: int64
+    - name: latest
+      in: query
+      description: Only return the feedback of the latest submission
+      required: false
+      schema:
+        type: boolean
+        default: false
+    - name: instructor-version
+      in: query
+      description: Whether to fetch the all feedback of students
+      required: false
+      schema:
+        type: boolean
+        default: false
+    responses:
+      200:
+        description: OK
+        content:
+          application/json:
+            schema:
+              $ref: "./schemas.yaml#/components/schemas/RichUserFeedback"
+      403:
+        description: Unautorized
+      404:
+        description: Lecture id or assignment id not found
+        content: 
+          application/json:
+            schema:
+              $ref: "./schemas.yaml#/components/schemas/ErrorMessage"
+      500:
+        description: Internal server error
+        content: 
+          application/json:
+            schema:
+              $ref: "./schemas.yaml#/components/schemas/ErrorMessage"
