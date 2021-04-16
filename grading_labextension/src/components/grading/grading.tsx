@@ -8,7 +8,7 @@ import { getLecture } from '../../services/lectures.service';
 import { getAllSubmissions } from '../../services/submissions.service';
 import { UserSubmissions } from '../../model/userSubmissions';
 
-import { DataGrid, GridColDef } from '@material-ui/data-grid';
+import { DataGrid, GridCellParams, GridColDef } from '@material-ui/data-grid';
 import { Button } from '@blueprintjs/core/lib/cjs/components/button/buttons';
 
 export interface GradingProps {
@@ -44,7 +44,18 @@ export class GradingComponent extends React.Component<GradingProps> {
     this.columns = [
       { field: 'id', headerName: 'Id', width: 100 },
       { field: 'user', headerName: 'User', width: 130 },
-      { field: 'date', headerName: 'Date', width: 130 },
+      { field: 'date', headerName: 'Date', width: 200 },
+      {
+        field: '',
+        headerName: '',
+        width: 150,
+        disableClickEventBubbling: true,
+        renderCell: (params: GridCellParams) => (
+            <Button icon="highlight" outlined>Autograde</Button>
+        ),
+      },
+      { field: 'score', headerName: 'Score', width: 130 },
+
     ];
   }
 
@@ -67,7 +78,7 @@ export class GradingComponent extends React.Component<GradingProps> {
     // let rows = [{ id: 10, user: "hasdf", date: "asdfadfa" }]
     let rows = new Array();
     //TODO: right now reading only the first 
-    this.state.submissions.forEach( sub => {rows.push({id: `${sub.user.id}`, user: `${sub.user.name}`, date: `${sub.submissions[0].submitted_at}`})});
+    this.state.submissions.forEach( sub => {rows.push({id: sub.user.id, user: sub.user.name, date: sub.submissions[0].submitted_at})});
     return rows;
   }
 
@@ -75,12 +86,12 @@ export class GradingComponent extends React.Component<GradingProps> {
 
   public render() {
     return (
-      <div style={{ height: '100%', display: 'flex' }}>
-        <div style={{ flexGrow: 1 }}>
-          <DataGrid rows={this.state.rows} columns={this.columns} onRowSelected={select => { }} checkboxSelection />
+        <div style={{ height: "100%",  display: "flex", flexDirection: "column"}}>
+            <DataGrid rows={this.state.rows} columns={this.columns} checkboxSelection  hideFooterPagination
+             />
+              <Button icon="highlight" color="primary" outlined style={{alignSelf: "flex-end", marginRight: "20px", marginBottom: "20px"}}>Autograde selected</Button>
         </div>
-      </div>
+      
     );
-    <Button icon="highlight" className="button-list" outlined />
   }
 }
