@@ -1,6 +1,7 @@
 
 from typing import List, Set, Tuple
-from tornado.web import RedirectHandler, RequestHandler
+from tornado.web import RequestHandler
+from jupyter_server.utils import url_path_join
 
 
 class Singleton(type):
@@ -13,36 +14,45 @@ class Singleton(type):
 
 
 class HandlerPathRegistry(object, metaclass=Singleton):
-  def __init__(self):
-    self.registry = {}
+  registry = {}
 
   @property
-  def path_set(self) -> Set[str]:
-    return set(self.registry.values())
+  @staticmethod
+  def path_set() -> Set[str]:
+    return set(HandlerPathRegistry.registry.values())
 
   @property
-  def path_list(self) -> List[str]:
-    return list(self.registry.values())
+  @staticmethod
+  def path_list() -> List[str]:
+    return list(HandlerPathRegistry.registry.values())
 
-  @property
-  def handler_list(self) -> List[Tuple[str, RequestHandler]]:
-    return list(zip(self.registry.values(), self.registry.keys()))
+  @staticmethod
+  def handler_list(base_url="api") -> List[Tuple[str, RequestHandler]]:
+    return list(zip(
+      [r"\/" + base_url + r"\/grader" + path for path in HandlerPathRegistry.registry.values()], 
+      HandlerPathRegistry.registry.keys()
+    ))
 
-  def has_path(self, cls) -> bool:
-    return cls in self.registry
+  @staticmethod
+  def has_path(cls) -> bool:
+    return cls in HandlerPathRegistry.registry
 
-  def get_path(self, cls):
-    return self.registry[cls]
+  @staticmethod
+  def get_path(cls):
+    return HandlerPathRegistry.registry[cls]
 
-  def add(self, cls, path: str):
+  @staticmethod
+  def add(cls, path: str):
     # check if class inherits from tornado RequestHandler
     if RequestHandler not in cls.__mro__:
         raise ValueError(
             "Incorrect base class. Class has to be extended from tornado 'RequestHandler' in order to be registered."
         )
-    self.registry[cls] = path
+    HandlerPathRegistry.registry[cls] = path
 
 
-def register_handler(cls, path: str):
-  HandlerPathRegistry().add(cls, path)
-  return cls
+def register_handler(path: str):
+  def _register_class(cls):
+    HandlerPathRegistry().add(cls, path)
+    return cls
+  return _register_class

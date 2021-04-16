@@ -1,0 +1,337 @@
+###### Data type definitions
+components:
+  schemas:
+    User:
+      type: "object"
+      properties:
+        id: 
+          type: "string" # tuwel id
+          example: "12345678"
+        name:
+          type: "string"
+          example: "Baz Bar"
+      example:
+        id: "12345678"
+        name: "Baz Bar"
+    Lecture:
+      type: "object"
+      properties:
+        id:
+          type: "integer"
+          format: "int64"
+          example: 1
+        name:
+          type: "string"
+          example: "Informationsvisualisierung"
+        code:
+          type: "string"
+          example: "ivs21"
+        complete:
+          type: "boolean"
+          default: false
+        semester:
+          type: "string"
+          example: "SS21"
+      example:
+        id: 1
+        name: "Informationsvisualisierung"
+        code: "ivs21"
+        complete: false
+        semester: "SS21"
+    Assignment:
+      type: "object"
+      properties:
+        id:
+          type: "integer"
+          format: "int64"
+        name:
+          type: "string"
+          example: "assignment_1"
+        exercises:
+          type: "array"
+          items:
+            $ref: "#/components/schemas/Exercise"
+        files:
+          type: "array"
+          items:
+            $ref: "#/components/schemas/AssignmentFile"
+        due_date:
+          type: "string"
+          format: "date-time"
+          example: "2021-07-21T23:55:00Z"
+        status:
+          type: string
+          enum:
+            - created # another state of an assignment (instructor only)
+            - released
+            - fetched
+            - complete # final state -> final grade is calculated
+      example:
+        id: 1
+        name: "assignment_1"
+        exercises: [
+          $ref: "#/components/schemas/Exercise/example",
+          $ref: "#/components/schemas/Exercise/example"
+        ]
+        files: [
+          $ref: "#/components/schemas/AssignmentFile/example"
+        ]
+        due_date: "2021-07-21T23:55:00Z"
+        status: "released"
+    RichAssignment:
+      type: "object"
+      properties:
+        id:
+          type: "integer"
+          format: "int64"
+        name:
+          type: "string"
+          example: "assignment_1"
+        exercises:
+          type: "array"
+          items:
+            $ref: "#/components/schemas/Exercise"
+        files:
+          type: "array"
+          items:
+            $ref: "#/components/schemas/AssignmentFile"
+        due_date:
+          type: "string"
+          format: "date-time"
+          example: "2021-07-21T23:55:00Z"
+        status:
+          type: string
+          enum:
+            - created # another state of an assignment (instructor only)
+            - released
+            - fetched
+            - complete # final state -> final grade is calculated
+        payload:
+          type: string
+          format: byte
+      example:
+        id: 1
+        name: "assignment_1"
+        exercises: [
+          $ref: "#/components/schemas/Exercise/example",
+          $ref: "#/components/schemas/Exercise/example"
+        ]
+        files: [
+          $ref: "#/components/schemas/AssignmentFile/example"
+        ]
+        due_date: "2021-07-21T23:55:00Z"
+        status: "released"
+        payload: "VGFrZSB0aGlzIGZvciB5b3VyIHRyb3VibGU6IDwzCg=="
+    Exercise:
+      type: "object"
+      properties:
+        id:
+          type: "integer"
+          format: "int64"
+        a_id:
+          type: "integer"
+          format: "int64"
+        name:
+          type: string
+          example: "exercise_1.ipynb"
+        ex_type:
+          type: string
+          enum:
+          - nbgrader # TODO: add more exercise types
+        points:
+          type: number
+          format: float
+      example:
+        id: 0
+        a_id: 1
+        name: "exercise_1.ipynb"
+        ex_type: "nbgrader"
+        points: 0.0
+    Submission:
+      type: "object"
+      properties:
+        id:
+          type: "integer"
+          format: "int64"
+        submitted_at:
+          type: "string"
+          format: "date-time"
+          example: "2021-07-21T11:53:07Z"
+        status:
+          type: string
+          enum:
+            - not_graded
+            - automatically_graded
+            - manually_graded
+      example:
+        id: 2
+        submitted_at: "2021-07-21T11:53:07Z"
+        status: "not_graded"
+    RichSubmission:
+      type: "object"
+      properties:
+        id:
+          type: "integer"
+          format: "int64"
+        submitted_at:
+          type: "string"
+          format: "date-time"
+          example: "2021-07-21T11:53:07Z"
+        status:
+          type: string
+          enum:
+            - not_graded
+            - automatically_graded
+            - manually_graded
+        payload:
+          type: string
+          format: byte
+      example:
+        id: 2
+        submitted_at: "2021-07-21T11:53:07Z"
+        status: "not_graded"
+        payload: "VGFrZSB0aGlzIGZvciB5b3VyIHRyb3VibGU6IDwzCg=="
+    Feedback:
+      type: "object"
+      properties:
+        id:
+          type: "integer"
+          format: "int64"
+        submission_id:
+          type: "integer"
+          format: "int64"
+        path:
+          type: "string"
+          example: "~/assignment_1/feedback/..."
+      example:
+        id: 0
+        submission_id: 2
+        path: "~/assignment_1/feedback/..."
+    RichFeedback:
+      type: "object"
+      properties:
+        id:
+          type: "integer"
+          format: "int64"
+        submission_id:
+          type: "integer"
+          format: "int64"
+        path:
+          type: "string"
+          example: "~/assignment_1/feedback/..."
+        payload:
+          type: string
+          format: byte
+      example:
+        id: 0
+        submission_id: 2
+        path: "~/assignment_1/feedback/..."
+        payload: "VGFrZSB0aGlzIGZvciB5b3VyIHRyb3VibGU6IDwzCg=="
+    GradingResult:
+      type: "object"
+      properties:
+        id:
+          type: integer
+          format: int64
+        status:
+          type: string
+          enum:
+          - needs_auto_grading
+          - needs_manual_grading
+          - completed
+        autograde_score:
+          type: number
+          format: float
+        total_score:
+          type: number
+          format: float
+      example:
+        id: 4
+        status: "needs_auto_grading"
+        autograde_score: 0.0
+        total_score: 0.0
+    ManualGradingContent:
+      type: object
+      properties: # TODO: use in api
+        id:
+          type: integer
+          format: int64
+        feedback_cells:
+          type: array
+          items:
+            type: object
+            properties:
+              cell_id:
+                type: integer
+                format: int64
+                example: 0
+              feedback:
+                type: string
+      example:
+        id: 0
+        feedback_cells: [
+          {
+            cell_id: 0,
+            feedback: "Very good!"
+          }
+        ]
+    AssignmentFile:
+      type: object
+      properties:
+        name:
+          type: string
+          example: "dataset.csv"
+      example:
+        name: "dataset.csv"
+    ErrorMessage:
+      type: "object"
+      properties:
+        msg:
+          type: "string"
+          example: "Some very detailed error message."
+      example:
+        msg: "Some very detailed error message."
+    UserSubmissions:
+      type: "array"
+      items:
+        type: "object"
+        properties:
+          user:
+            $ref: "#/components/schemas/User"
+          submissions:
+            type: "array"
+            items:
+              $ref: "#/components/schemas/Submission"
+    RichUserSubmissions:
+      type: "array"
+      items:
+        type: "object"
+        properties:
+          user:
+            $ref: "#/components/schemas/User"
+          submissions:
+            type: "array"
+            items:
+              $ref: "#/components/schemas/RichSubmission"
+    UserFeedback:
+      type: "array"
+      items:
+        type: "object"
+        properties:
+          user:
+            $ref: "#/components/schemas/User"
+          submissions:
+            type: "array"
+            items:
+              $ref:  "#/components/schemas/Feedback"
+    RichUserFeedback:
+      type: "array"
+      items:
+        type: "object"
+        properties:
+          user:
+            $ref: "#/components/schemas/User"
+          submissions:
+            type: "array"
+            items:
+              $ref:  "#/components/schemas/RichFeedback"
