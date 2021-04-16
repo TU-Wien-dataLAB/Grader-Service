@@ -6,11 +6,6 @@ from ._version import __version__
 
 HERE = Path(__file__).parent.resolve()
 
-
-import sys
-sys.path.append("../../common")
-
-
 with (HERE / "labextension" / "package.json").open() as fid:
     data = json.load(fid)
 
@@ -20,8 +15,9 @@ def _jupyter_labextension_paths():
         "dest": data["name"]
     }]
 
+from grading_labextension import handlers
 
-from common.registry import HandlerPathRegistry
+from grading_labextension.common.registry import HandlerPathRegistry
 
 def setup_handlers(web_app):
     host_pattern = ".*$"

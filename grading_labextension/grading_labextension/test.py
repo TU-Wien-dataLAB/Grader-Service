@@ -1,15 +1,9 @@
-import sys
-print("Appending common library")
-import os.path as path
-common_path = path.abspath(path.join(path.dirname(__file__), "../.."))
-sys.path.append(common_path)
-print(common_path)
-
-from common.registry import HandlerPathRegistry
+from grading_labextension.common.registry import HandlerPathRegistry
 import tornado
 
 # run __init__.py to register handlers
 import grading_labextension
+
 
 def main():
   """

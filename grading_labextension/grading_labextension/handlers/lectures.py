@@ -1,4 +1,4 @@
-from common.registry import register_handler
+from grading_labextension.common.registry import register_handler
 from jupyter_server.base.handlers import APIHandler
 from jupyter_server.utils import url_path_join
 import tornado
