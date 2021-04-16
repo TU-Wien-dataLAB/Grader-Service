@@ -133,14 +133,14 @@ assignmentsById:
       content:
         application/json:
           schema:
-            $ref: './schemas.yaml#/components/schemas/Assignment'
+            $ref: './schemas.yaml#/components/schemas/RichAssignment'
     responses:
       200:
         description: OK
         content:
           application/json:
             schema:
-              $ref: "./schemas.yaml#/components/schemas/Assignment"
+              $ref: "./schemas.yaml#/components/schemas/RichAssignment"
       403:
         description: Unautorized
       404:
@@ -211,7 +211,7 @@ assignmentsById:
         content:
           application/json:
             schema:
-              $ref: "./schemas.yaml#/components/schemas/Assignment"
+              $ref: "./schemas.yaml#/components/schemas/RichAssignment"
       403:
         description: Unautorized
       404:
