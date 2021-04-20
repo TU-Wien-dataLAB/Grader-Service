@@ -3,7 +3,7 @@ import pprint
 import six
 import typing
 
-from common import util
+from grader.common import util
 
 T = typing.TypeVar('T')
 

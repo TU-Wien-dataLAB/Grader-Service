@@ -2,7 +2,7 @@ import datetime
 
 import six
 import typing
-from common import typing_utils
+from grader.common import typing_utils
 
 
 def _deserialize(data, klass):

@@ -23,14 +23,14 @@ assignments:
       content:
         application/json:
           schema:
-            $ref: './schemas.yaml#/components/schemas/RichAssignment'
+            $ref: './schemas.yml#/components/schemas/RichAssignment'
     responses:
       200:
         description: OK
         content:
           application/json:
             schema:
-              $ref: "./schemas.yaml#/components/schemas/RichAssignment"
+              $ref: "./schemas.yml#/components/schemas/RichAssignment"
       403:
         description: Unautorized
       404:
@@ -38,13 +38,13 @@ assignments:
         content: 
           application/json:
             schema:
-              $ref: "./schemas.yaml#/components/schemas/ErrorMessage"
+              $ref: "./schemas.yml#/components/schemas/ErrorMessage"
       500:
         description: Internal server error
         content: 
           application/json:
             schema:
-              $ref: "./schemas.yaml#/components/schemas/ErrorMessage"
+              $ref: "./schemas.yml#/components/schemas/ErrorMessage"
   get:
     security:
       - hub_auth:
@@ -71,12 +71,12 @@ assignments:
             schema:
               type: "array"
               items:
-                $ref: "./schemas.yaml#/components/schemas/RichAssignment"
+                $ref: "./schemas.yml#/components/schemas/RichAssignment"
             example:
               [
-                $ref: "./schemas.yaml#/components/schemas/RichAssignment/example",
-                $ref: "./schemas.yaml#/components/schemas/RichAssignment/example",
-                $ref: "./schemas.yaml#/components/schemas/RichAssignment/example",
+                $ref: "./schemas.yml#/components/schemas/RichAssignment/example",
+                $ref: "./schemas.yml#/components/schemas/RichAssignment/example",
+                $ref: "./schemas.yml#/components/schemas/RichAssignment/example",
               ]
       403:
         description: Unautorized
@@ -85,13 +85,13 @@ assignments:
         content: 
           application/json:
             schema:
-              $ref: "./schemas.yaml#/components/schemas/ErrorMessage"
+              $ref: "./schemas.yml#/components/schemas/ErrorMessage"
       500:
         description: Internal server error
         content: 
           application/json:
             schema:
-              $ref: "./schemas.yaml#/components/schemas/ErrorMessage"
+              $ref: "./schemas.yml#/components/schemas/ErrorMessage"
 
 
 
@@ -133,14 +133,14 @@ assignmentsById:
       content:
         application/json:
           schema:
-            $ref: './schemas.yaml#/components/schemas/RichAssignment'
+            $ref: './schemas.yml#/components/schemas/RichAssignment'
     responses:
       200:
         description: OK
         content:
           application/json:
             schema:
-              $ref: "./schemas.yaml#/components/schemas/RichAssignment"
+              $ref: "./schemas.yml#/components/schemas/RichAssignment"
       403:
         description: Unautorized
       404:
@@ -148,13 +148,13 @@ assignmentsById:
         content: 
           application/json:
             schema:
-              $ref: "./schemas.yaml#/components/schemas/ErrorMessage"
+              $ref: "./schemas.yml#/components/schemas/ErrorMessage"
       500:
         description: Internal server error
         content: 
           application/json:
             schema:
-              $ref: "./schemas.yaml#/components/schemas/ErrorMessage"
+              $ref: "./schemas.yml#/components/schemas/ErrorMessage"
   get:
     security:
       - hub_auth:
@@ -211,7 +211,7 @@ assignmentsById:
         content:
           application/json:
             schema:
-              $ref: "./schemas.yaml#/components/schemas/RichAssignment"
+              $ref: "./schemas.yml#/components/schemas/RichAssignment"
       403:
         description: Unautorized
       404:
@@ -219,13 +219,13 @@ assignmentsById:
         content: 
           application/json:
             schema:
-              $ref: "./schemas.yaml#/components/schemas/ErrorMessage"
+              $ref: "./schemas.yml#/components/schemas/ErrorMessage"
       500:
         description: Internal server error
         content: 
           application/json:
             schema:
-              $ref: "./schemas.yaml#/components/schemas/ErrorMessage"
+              $ref: "./schemas.yml#/components/schemas/ErrorMessage"
   delete:
     security:
       - hub_auth:
@@ -261,13 +261,13 @@ assignmentsById:
         content: 
           application/json:
             schema:
-              $ref: "./schemas.yaml#/components/schemas/ErrorMessage"
+              $ref: "./schemas.yml#/components/schemas/ErrorMessage"
       500:
         description: Internal server error
         content: 
           application/json:
             schema:
-              $ref: "./schemas.yaml#/components/schemas/ErrorMessage"
+              $ref: "./schemas.yml#/components/schemas/ErrorMessage"
 
 
 
@@ -312,13 +312,13 @@ submissions:
         content: 
           application/json:
             schema:
-              $ref: "./schemas.yaml#/components/schemas/ErrorMessage"
+              $ref: "./schemas.yml#/components/schemas/ErrorMessage"
       500:
         description: Internal server error
         content: 
           application/json:
             schema:
-              $ref: "./schemas.yaml#/components/schemas/ErrorMessage"
+              $ref: "./schemas.yml#/components/schemas/ErrorMessage"
   get:
     security:
       - hub_auth:
@@ -365,7 +365,7 @@ submissions:
         content:
           application/json:
             schema:
-              $ref: "./schemas.yaml#/components/schemas/RichUserSubmissions"
+              $ref: "./schemas.yml#/components/schemas/RichUserSubmissions"
       403:
         description: Unautorized
       404:
@@ -373,13 +373,13 @@ submissions:
         content: 
           application/json:
             schema:
-              $ref: "./schemas.yaml#/components/schemas/ErrorMessage"
+              $ref: "./schemas.yml#/components/schemas/ErrorMessage"
       500:
         description: Internal server error
         content: 
           application/json:
             schema:
-              $ref: "./schemas.yaml#/components/schemas/ErrorMessage"
+              $ref: "./schemas.yml#/components/schemas/ErrorMessage"
 
 
 
@@ -432,7 +432,7 @@ feedback:
         content:
           application/json:
             schema:
-              $ref: "./schemas.yaml#/components/schemas/RichUserFeedback"
+              $ref: "./schemas.yml#/components/schemas/RichUserFeedback"
       403:
         description: Unautorized
       404:
@@ -440,10 +440,10 @@ feedback:
         content: 
           application/json:
             schema:
-              $ref: "./schemas.yaml#/components/schemas/ErrorMessage"
+              $ref: "./schemas.yml#/components/schemas/ErrorMessage"
       500:
         description: Internal server error
         content: 
           application/json:
             schema:
-              $ref: "./schemas.yaml#/components/schemas/ErrorMessage"
+              $ref: "./schemas.yml#/components/schemas/ErrorMessage"

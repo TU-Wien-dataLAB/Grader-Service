@@ -5,8 +5,8 @@ from datetime import date, datetime  # noqa: F401
 
 from typing import List, Dict  # noqa: F401
 
-from common.models.base_model_ import Model
-from common import util
+from grader.common.models.base_model_ import Model
+from grader.common import util
 
 
 class ErrorMessage(Model):

@@ -16,7 +16,8 @@ import setuptools
 HERE = Path(__file__).parent.resolve()
 
 # The name of the project
-name = "grading_labextension"
+# base_name = "grading_labextension"
+name = "grader." + "grading_labextension"
 
 lab_path = (HERE / name / "labextension")
 
