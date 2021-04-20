@@ -43,7 +43,6 @@ def _load_jupyter_server_extension(server_app: ServerApp):
     server_app: jupyterlab.labapp.LabApp
         JupyterLab application instance
     """
-    server_app.log.info("Register grading extension at URL path /grader.grading_labextension")
     setup_handlers(server_app.web_app)
-    server_app.log.info("Registered grading extension at URL path /grader.grading_labextension")
+    server_app.log.info("Registered grading extension at URL path /grading_labextension")
 

@@ -27,9 +27,9 @@ class HandlerPathRegistry(object, metaclass=Singleton):
     return list(HandlerPathRegistry.registry.values())
 
   @staticmethod
-  def handler_list(base_url="api") -> List[Tuple[str, RequestHandler]]:
+  def handler_list(base_url:str="/") -> List[Tuple[str, RequestHandler]]:
     return list(zip(
-      [r"\/" + base_url + r"\/grader" + path for path in HandlerPathRegistry.registry.values()], 
+      [base_url + "grader" + path for path in HandlerPathRegistry.registry.values()], 
       HandlerPathRegistry.registry.keys()
     ))
 

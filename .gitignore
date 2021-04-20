@@ -2,6 +2,11 @@
 # Created by https://www.toptal.com/developers/gitignore/api/python,node,vscode,pycharm,macos,windows,linux
 # Edit at https://www.toptal.com/developers/gitignore?templates=python,node,vscode,pycharm,macos,windows,linux
 
+
+grading_labextension/grader/grading_labextension/labextension/*
+grading_labextension/grader/grading_labextension/labextension
+grading_labextension/grader/grading_labextension/labextension/build_log.json
+
 ### Linux ###
 *~
 
@@ -455,3 +460,5 @@ $RECYCLE.BIN/
 *.lnk
 
 # End of https://www.toptal.com/developers/gitignore/api/python,node,vscode,pycharm,macos,windows,linux
+grading_labextension/grader/grading_labextension/labextension/build_log.json
+grading_labextension/grader/grading_labextension/labextension/package.json
