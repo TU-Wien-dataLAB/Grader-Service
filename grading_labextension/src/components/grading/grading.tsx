@@ -50,6 +50,7 @@ export class GradingComponent extends React.Component<GradingProps> {
         headerName: '',
         width: 150,
         disableClickEventBubbling: true,
+        disableColumnMenu: true,
         renderCell: (params: GridCellParams) => (
             <Button icon="highlight" outlined>Autograde</Button>
         ),
@@ -87,7 +88,7 @@ export class GradingComponent extends React.Component<GradingProps> {
   public render() {
     return (
         <div style={{ height: "100%",  display: "flex", flexDirection: "column"}}>
-            <DataGrid rows={this.state.rows} columns={this.columns} checkboxSelection  hideFooterPagination
+            <DataGrid rows={this.state.rows} columns={this.columns} checkboxSelection hideFooterPagination
              />
               <Button icon="highlight" color="primary" outlined style={{alignSelf: "flex-end", marginRight: "20px", marginBottom: "20px"}}>Autograde selected</Button>
         </div>
