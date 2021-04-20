@@ -1,11 +1,11 @@
-# grading_labextension
+# grader.grading_labextension
 
-![Github Actions Status](https://github.com/github_username/grading_labextension/workflows/Build/badge.svg)
+![Github Actions Status](https://github.com/github_username/grader.grading_labextension/workflows/Build/badge.svg)
 
 Extension for grading assignments
 
 
-This extension is composed of a Python package named `grading_labextension`
+This extension is composed of a Python package named `grader.grading_labextension`
 for the server extension and a NPM package named `grading`
 for the frontend extension.
 
@@ -17,7 +17,7 @@ for the frontend extension.
 ## Install
 
 ```bash
-pip install grading_labextension
+pip install grader.grading_labextension
 ```
 
 
@@ -50,7 +50,7 @@ The `jlpm` command is JupyterLab's pinned version of
 
 ```bash
 # Clone the repo to your local environment
-# Change directory to the grading_labextension directory
+# Change directory to the grader.grading_labextension directory
 # Install package in development mode
 pip install -e .
 # Link your development version of the extension with JupyterLab
@@ -79,5 +79,5 @@ jupyter lab build --minimize=False
 ### Uninstall
 
 ```bash
-pip uninstall grading_labextension
+pip uninstall grader.grading_labextension
 ```

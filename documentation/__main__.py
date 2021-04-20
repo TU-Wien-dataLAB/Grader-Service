@@ -26,7 +26,7 @@ def token_info(access_token) -> dict:
 def main():
     app = connexion.App(__name__)
     CORS(app.app)
-    app.add_api('./openapi.yml', resolver=MockResolver(mock_all=True), base_path="/services/mock")
+    app.add_api('./extension_api.yml', resolver=MockResolver(mock_all=True), base_path="/services/mock")
     app.run(port=8000)
 
 

@@ -70,7 +70,7 @@ setup_args = dict(
     long_description=long_description,
     long_description_content_type="text/markdown",
     cmdclass=cmdclass,
-    packages=setuptools.find_packages(),
+    packages=setuptools.find_namespace_packages(include=['grader.*']),
     install_requires=[
         "jupyterlab~=3.0",
     ],

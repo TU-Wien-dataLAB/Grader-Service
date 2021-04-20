@@ -1,7 +1,7 @@
 {
   "ServerApp": {
     "jpserver_extensions": {
-      "grading_labextension": true
+      "grader.grading_labextension": true
     }
   }
 }

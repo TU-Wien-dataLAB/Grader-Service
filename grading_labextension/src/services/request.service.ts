@@ -19,7 +19,7 @@ export function request<T>(method: HTTPMethod, endPoint: string, options: Reques
     // ServerConnection only allows requests to notebook baseUrl
     requestUrl = URLExt.join(
       settings.baseUrl,
-      "/grading_labextension", // API Namespace
+      "/grader.grading_labextension", // API Namespace
       endPoint
     );
 

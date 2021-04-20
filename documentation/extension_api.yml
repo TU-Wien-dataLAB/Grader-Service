@@ -1,0 +1,64 @@
+## Model generation:
+#  
+# Typescript:
+# openapi-generator-cli generate -i ./grader-extensions/documentation/extension_api.yml -g typescript-angular -o ./grader-extensions/grader.grading_labextension/src --global-property models
+#
+# Python (in common comm. between server and grader) :
+# java -Dmodels -DsupportingFiles=util.py,base_model_.py,typing_utils.py,__init__.py -jar openapi-generator-cli.jar generate -i ./grader-extensions/documentation/grader_api.yml -g python-flask -o ./grader-extensions/ --additional-properties=packageName='common' ; rm -r ./grader-extensions/common/test ./grader-extensions/common/controllers ./grader-extensions/common/openapi
+# 
+# Python (models from frontend):
+# java -Dmodels -DsupportingFiles=util.py,base_model_.py,typing_utils.py,__init__.py -jar openapi-generator-cli.jar generate -i ./grader-extensions/documentation/extension_api.yml -g python-flask -o ./grader-extensions/grader.grading_labextension --additional-properties=packageName='grader.grading_labextension' ; rm -r ./grader-extensions/grader.grading_labextension/grader.grading_labextension/test ./grader-extensions/grader.grading_labextension/grader.grading_labextension/controllers ./grader-extensions/grader.grading_labextension/grader.grading_labextension/openapi
+
+
+openapi: '3.0.2'
+info:
+  title: Grader Extension API
+  version: '0.1'
+servers:
+    - url: /services/mock
+      description: relative path to mock
+
+###### Tags of API endpoints
+tags:
+- name: "Lectures"
+  description: "Available lectures"
+- name: "Assignments"
+  description: Assignments of a lecture
+- name: "Submissions"
+  description: View submissions of an assignment
+- name: "Grading"
+  description: Manage the grading and feedback of assignments (Instructor)
+
+# TODO: handle "sub-assignments"
+paths:
+  /lectures:
+    $ref: './openapi/paths.yml#/lectures'
+
+  /lectures/{lect_id}:
+    $ref: './openapi/paths.yml#/lecturesById'
+
+  /lectures/{lect_id}/assignments:
+    $ref: './openapi/paths.yml#/assignments'
+
+  /lectures/{lect_id}/assignments/{a_id}:
+    $ref: './openapi/paths.yml#/assignmentsById'
+
+  /lectures/{lect_id}/assignments/{a_id}/submissions:
+    $ref: './openapi/paths.yml#/submissions'
+
+  /lectures/{lect_id}/assignments/{a_id}/feedback:
+    $ref: './openapi/paths.yml#/feedback'
+
+  /lectures/{lect_id}/assignments/{a_id}/grading:
+    $ref: './openapi/paths.yml#/grading'
+
+  /lectures/{lect_id}/assignments/{a_id}/grading/{user_id}/auto:
+    $ref: './openapi/paths.yml#/auto'
+
+  /lectures/{lect_id}/assignments/{a_id}/grading/{user_id}/manual:
+    $ref: './openapi/paths.yml#/manual'
+
+  /lectures/{lect_id}/assignments/{a_id}/grading/{user_id}/score:
+    $ref: './openapi/paths.yml#/score'
+
+

@@ -17,7 +17,7 @@ export async function requestAPI<T>(
   const settings = ServerConnection.makeSettings();
   const requestUrl = URLExt.join(
     settings.baseUrl,
-    'grading_labextension', // API Namespace
+    'grader.grading_labextension', // API Namespace
     endPoint
   );
 
