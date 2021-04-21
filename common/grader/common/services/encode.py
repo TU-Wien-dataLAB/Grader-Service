@@ -9,7 +9,7 @@ def encodeStrings(content: str) -> str:
     return encodedContent
 
 #for binaries
-def encodeBinary(binary) -> str:
+def encodeBinary(binary: bytes) -> str:
     encodedContent = base64.b64encode(binary)
     #make it human readable
     encodedContent = encodedContent.decode('utf-8')
@@ -21,7 +21,7 @@ def decodeStrings(encoded: str) -> str:
     content = decoded.decode('ascii')
     return content
 
-def decodeBinary(encoded: str):
+def decodeBinary(encoded: str) -> bytes:
     filebytes = encoded.encode('utf-8')
     binary = base64.decodebytes(filebytes)
     return binary
