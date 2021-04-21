@@ -15,15 +15,13 @@ from traitlets.traitlets import Int, TraitError, Unicode, validate
 
 class CompressionEngine(Configurable):
 
-  compression_dir = Unicode('', help="The absolute path to the directory where the archives should be written.")
-  compression_algo = Unicode('', help="The compression algorithm to use. Either: '', 'gz', 'bz' or 'xz'")
-  compression_level = Int(2)
+  compression_dir = Unicode('', help="The absolute path to the directory where the archives should be written.").tag(config=True)
+  compression_algo = Unicode('gz', help="The compression algorithm to use. Either: '', 'gz', 'bz' or 'xz'").tag(config=True)
+  compression_level = Int(2).tag(config=True)
   
   def __init__(self, compression_dir: str, **kwargs):
     super().__init__(**kwargs)
     self.compression_dir = compression_dir  # the directory to put the compressed files
-    self.compression_algo = "gz" # can be empty for no compression
-    self.compression_level = 2  # has to be None is using no compression
 
   def create_archive(self, name: str, dir: str) -> str:
     file_name = osp.join(self.compression_dir["value"], name + self.extension)

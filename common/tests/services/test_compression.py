@@ -3,6 +3,8 @@ from grader.common.services.compression import CompressionEngine
 import os
 from pathlib import Path
 
+from traitlets.traitlets import TraitError
+
 def test_create_archive(tmp_path):
   path: Path = tmp_path / "base"
   path.mkdir()
@@ -21,4 +23,14 @@ def test_create_archive(tmp_path):
   assert file_path.exists()
   assert file_path.is_file()
   assert file_path.name == "archive" + engine.extension
+
+def test_engine_compression_path_error():
+  with pytest.raises(TraitError):
+    CompressionEngine(compression_dir="~/hello")
+
+  with pytest.raises(TraitError):
+    CompressionEngine(compression_dir="./hello")
+  
+  with pytest.raises(TraitError):
+    CompressionEngine(compression_dir="/does/not/exist")
   
