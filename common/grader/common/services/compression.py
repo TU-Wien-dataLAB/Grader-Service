@@ -4,6 +4,7 @@
 import tarfile
 import os
 import os.path as osp
+import io
 from grader.common.models.assignment import Assignment
 from grader.common.models.lecture import Lecture
 from grader.common.models.user import User
@@ -31,13 +32,25 @@ class CompressionEngine(Configurable):
         os.makedirs(directory)
 
     dir = osp.abspath(dir)
-    with tarfile.open(file_name, 'w:'+self.compression_algo['value']) as tar:
+    with tarfile.open(file_name, 'w:'+self.compression_algo) as tar:
       tar.add(dir, arcname=osp.basename(dir))
     return file_name
   
-  def read_archive(self, path: str) -> bytes:
-    with open(path, "rb") as f:
-      return f.read()
+  def read_archive(self, src: str) -> bytes:
+    if not tarfile.is_tarfile(src):
+      raise ValueError(f"The path {src} is not a tar file.")
+    with open(src, "rb") as f:
+      data = f.read()
+    return data
+  
+  def unpack_archive(self, archive: bytes, dst: str, archive_name: str):
+    if not osp.isdir(dst):
+      raise ValueError(f"The path {dst} is not a direcotry.")
+    file_obj = io.BytesIO(archive)
+    with tarfile.open(fileobj=file_obj) as tar:
+      archive_dir = dst + "/" + archive_name
+      os.mkdir(archive_dir)
+      tar.extractall(path=archive_dir)
 
   def archive_assignment(self, lecture: Lecture, assignment: Assignment, dir: str) -> str:
     return self.create_archive("assignments/" + lecture.name + "/" + assignment.name, dir)
@@ -52,7 +65,7 @@ class CompressionEngine(Configurable):
   def extension(self):
     ext = ".tar"
     if self.compression_algo != "":
-      ext += "." + self.compression_algo["value"]
+      ext += ("." + self.compression_algo)
     return ext
 
   
