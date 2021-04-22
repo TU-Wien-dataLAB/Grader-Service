@@ -462,3 +462,5 @@ $RECYCLE.BIN/
 # End of https://www.toptal.com/developers/gitignore/api/python,node,vscode,pycharm,macos,windows,linux
 grading_labextension/grader/grading_labextension/labextension/build_log.json
 grading_labextension/grader/grading_labextension/labextension/package.json
+grading_labextension/grading_labextension/labextension/*
+grading_labextension/grading_labextension/labextension

@@ -26,7 +26,6 @@ class CompressionEngine(Configurable):
   def create_archive(self, name: str, dir: str) -> str:
     file_name = osp.join(self.compression_dir["value"], name + self.extension)
 
-    
     directory = osp.dirname(file_name)
     if not osp.exists(directory):
         os.makedirs(directory)
