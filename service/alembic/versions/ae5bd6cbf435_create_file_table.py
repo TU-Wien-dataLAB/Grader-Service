@@ -23,7 +23,7 @@ def upgrade():
         sa.Column('assignid', sa.Integer, sa.ForeignKey('assignment.id')),
         sa.Column('path', sa.String(255), nullable=False),
         sa.Column('exercise', sa.Boolean, nullable=False),                
-        sa.Column('points', sa.Integer, nullable=False),
+        sa.Column('points', sa.Integer),
         )
 
 
