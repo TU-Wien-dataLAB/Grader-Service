@@ -11,7 +11,7 @@ from traitlets.traitlets import Int, Unicode
 class RequestService(Configurable):
     scheme = Unicode('http', help="The http scheme to use. Either 'http' or 'https'").tag(config=True)
     host = Unicode('127.0.0.1', help="Host adress of the grader service").tag(config=True)
-    port = Int(8880, help="Host port of the grader service").tag(config=True)
+    port = Int(4010, help="Host port of the grader service").tag(config=True)
 
     async def request(self,method: str, endpoint: str, body: dict=None, header: Dict[str, str]=None) -> dict:
         http_client = AsyncHTTPClient()
