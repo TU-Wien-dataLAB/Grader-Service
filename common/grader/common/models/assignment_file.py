@@ -15,21 +15,31 @@ class AssignmentFile(Model):
     Do not edit the class manually.
     """
 
-    def __init__(self, name=None):  # noqa: E501
+    def __init__(self, name=None, hashcode=None, path=None):  # noqa: E501
         """AssignmentFile - a model defined in OpenAPI
 
         :param name: The name of this AssignmentFile.  # noqa: E501
         :type name: str
+        :param hashcode: The hashcode of this AssignmentFile.  # noqa: E501
+        :type hashcode: str
+        :param path: The path of this AssignmentFile.  # noqa: E501
+        :type path: str
         """
         self.openapi_types = {
-            'name': str
+            'name': str,
+            'hashcode': str,
+            'path': str
         }
 
         self.attribute_map = {
-            'name': 'name'
+            'name': 'name',
+            'hashcode': 'hashcode',
+            'path': 'path'
         }
 
         self._name = name
+        self._hashcode = hashcode
+        self._path = path
 
     @classmethod
     def from_dict(cls, dikt) -> 'AssignmentFile':
@@ -62,3 +72,45 @@ class AssignmentFile(Model):
         """
 
         self._name = name
+
+    @property
+    def hashcode(self):
+        """Gets the hashcode of this AssignmentFile.
+
+
+        :return: The hashcode of this AssignmentFile.
+        :rtype: str
+        """
+        return self._hashcode
+
+    @hashcode.setter
+    def hashcode(self, hashcode):
+        """Sets the hashcode of this AssignmentFile.
+
+
+        :param hashcode: The hashcode of this AssignmentFile.
+        :type hashcode: str
+        """
+
+        self._hashcode = hashcode
+
+    @property
+    def path(self):
+        """Gets the path of this AssignmentFile.
+
+
+        :return: The path of this AssignmentFile.
+        :rtype: str
+        """
+        return self._path
+
+    @path.setter
+    def path(self, path):
+        """Sets the path of this AssignmentFile.
+
+
+        :param path: The path of this AssignmentFile.
+        :type path: str
+        """
+
+        self._path = path

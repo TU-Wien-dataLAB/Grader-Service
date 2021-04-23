@@ -194,7 +194,7 @@ class Assignment(Model):
         :param status: The status of this Assignment.
         :type status: str
         """
-        allowed_values = ["created", "released", "fetched", "complete"]  # noqa: E501
+        allowed_values = ["created", "released", "fetching", "fetched", "complete"]  # noqa: E501
         if status not in allowed_values:
             raise ValueError(
                 "Invalid value for `status` ({0}), must be one of {1}"

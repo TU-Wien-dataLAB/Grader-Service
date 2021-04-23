@@ -1,14 +1,10 @@
 ## Model generation:
 #  
 # Typescript:
-# openapi-generator-cli generate -i ./grader-extensions/documentation/extension_api.yml -g typescript-angular -o ./grader-extensions/grader.grading_labextension/src --global-property models
+# java -jar openapi-generator-cli.jar generate -i ./grader-extensions/documentation/extension_api.yml -g typescript-angular -o ./grader-extensions/grading_labextension/src --global-property models
 #
-# Python (in common comm. between server and grader) :
+# Python:
 # java -Dmodels -DsupportingFiles=util.py,base_model_.py,typing_utils.py -jar openapi-generator-cli.jar generate -i ./grader-extensions/documentation/grader_api.yml -g python-flask -o ./grader-extensions/common --additional-properties=packageName='grader.common' ; rm -r ./grader-extensions/common/grader/common/test ./grader-extensions/common/grader/common/controllers ./grader-extensions/common/grader/common/openapi# 
-# 
-# Python (models from frontend):
-# java -Dmodels -DsupportingFiles=util.py,base_model_.py,typing_utils.py -jar openapi-generator-cli.jar generate -i ./grader-extensions/documentation/extension_api.yml -g python-flask -o ./grader-extensions/grader.grading_labextension --additional-properties=packageName='grader.grading_labextension' ; rm -r ./grader-extensions/grader.grading_labextension/grader.grading_labextension/test ./grader-extensions/grader.grading_labextension/grader.grading_labextension/controllers ./grader-extensions/grader.grading_labextension/grader.grading_labextension/openapi
-
 
 openapi: '3.0.2'
 info:

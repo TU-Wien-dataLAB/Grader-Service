@@ -15,7 +15,7 @@ class Exercise(Model):
     Do not edit the class manually.
     """
 
-    def __init__(self, id=None, a_id=None, name=None, ex_type=None, points=None):  # noqa: E501
+    def __init__(self, id=None, a_id=None, name=None, ex_type=None, points=None, hashcode=None, path=None):  # noqa: E501
         """Exercise - a model defined in OpenAPI
 
         :param id: The id of this Exercise.  # noqa: E501
@@ -28,13 +28,19 @@ class Exercise(Model):
         :type ex_type: str
         :param points: The points of this Exercise.  # noqa: E501
         :type points: float
+        :param hashcode: The hashcode of this Exercise.  # noqa: E501
+        :type hashcode: str
+        :param path: The path of this Exercise.  # noqa: E501
+        :type path: str
         """
         self.openapi_types = {
             'id': int,
             'a_id': int,
             'name': str,
             'ex_type': str,
-            'points': float
+            'points': float,
+            'hashcode': str,
+            'path': str
         }
 
         self.attribute_map = {
@@ -42,7 +48,9 @@ class Exercise(Model):
             'a_id': 'a_id',
             'name': 'name',
             'ex_type': 'ex_type',
-            'points': 'points'
+            'points': 'points',
+            'hashcode': 'hashcode',
+            'path': 'path'
         }
 
         self._id = id
@@ -50,6 +58,8 @@ class Exercise(Model):
         self._name = name
         self._ex_type = ex_type
         self._points = points
+        self._hashcode = hashcode
+        self._path = path
 
     @classmethod
     def from_dict(cls, dikt) -> 'Exercise':
@@ -172,3 +182,45 @@ class Exercise(Model):
         """
 
         self._points = points
+
+    @property
+    def hashcode(self):
+        """Gets the hashcode of this Exercise.
+
+
+        :return: The hashcode of this Exercise.
+        :rtype: str
+        """
+        return self._hashcode
+
+    @hashcode.setter
+    def hashcode(self, hashcode):
+        """Sets the hashcode of this Exercise.
+
+
+        :param hashcode: The hashcode of this Exercise.
+        :type hashcode: str
+        """
+
+        self._hashcode = hashcode
+
+    @property
+    def path(self):
+        """Gets the path of this Exercise.
+
+
+        :return: The path of this Exercise.
+        :rtype: str
+        """
+        return self._path
+
+    @path.setter
+    def path(self, path):
+        """Sets the path of this Exercise.
+
+
+        :param path: The path of this Exercise.
+        :type path: str
+        """
+
+        self._path = path

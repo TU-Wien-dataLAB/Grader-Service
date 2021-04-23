@@ -112,7 +112,7 @@ class Submission(Model):
         :param status: The status of this Submission.
         :type status: str
         """
-        allowed_values = ["not_graded", "automatically_graded", "manually_graded"]  # noqa: E501
+        allowed_values = ["submitting", "not_graded", "automatically_graded", "manually_graded"]  # noqa: E501
         if status not in allowed_values:
             raise ValueError(
                 "Invalid value for `status` ({0}), must be one of {1}"

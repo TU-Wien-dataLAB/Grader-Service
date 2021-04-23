@@ -5,8 +5,8 @@ from datetime import date, datetime  # noqa: F401
 
 from typing import List, Dict  # noqa: F401
 
-from grader.grading_labextension.models.base_model_ import Model
-from grader.grading_labextension import util
+from grader.common.models.base_model_ import Model
+from grader.common import util
 
 
 class Feedback(Model):
@@ -15,31 +15,26 @@ class Feedback(Model):
     Do not edit the class manually.
     """
 
-    def __init__(self, id=None, submission_id=None, path=None):  # noqa: E501
+    def __init__(self, id=None, submission_id=None):  # noqa: E501
         """Feedback - a model defined in OpenAPI
 
         :param id: The id of this Feedback.  # noqa: E501
         :type id: int
         :param submission_id: The submission_id of this Feedback.  # noqa: E501
         :type submission_id: int
-        :param path: The path of this Feedback.  # noqa: E501
-        :type path: str
         """
         self.openapi_types = {
             'id': int,
-            'submission_id': int,
-            'path': str
+            'submission_id': int
         }
 
         self.attribute_map = {
             'id': 'id',
-            'submission_id': 'submission_id',
-            'path': 'path'
+            'submission_id': 'submission_id'
         }
 
         self._id = id
         self._submission_id = submission_id
-        self._path = path
 
     @classmethod
     def from_dict(cls, dikt) -> 'Feedback':
@@ -93,24 +88,3 @@ class Feedback(Model):
         """
 
         self._submission_id = submission_id
-
-    @property
-    def path(self):
-        """Gets the path of this Feedback.
-
-
-        :return: The path of this Feedback.
-        :rtype: str
-        """
-        return self._path
-
-    @path.setter
-    def path(self, path):
-        """Sets the path of this Feedback.
-
-
-        :param path: The path of this Feedback.
-        :type path: str
-        """
-
-        self._path = path
