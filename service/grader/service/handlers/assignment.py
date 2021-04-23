@@ -9,11 +9,10 @@ import tornado
 class AssignmentBaseHandler(APIHandler):
   requestservice = RequestService()
   def get(self, lecture_id: int):
-    self.write(self.requestservice.request(method='GET',endpoint=self.request.path,body=''))
-
+    pass
 
   def post(self, lecture_id: int):
-    self.write(self.requestservice.request(method='POST',endpoint=self.request.path,body=''))
+    pass
 
 
 @register_handler(path=r"\/lectures\/(?P<lecture_id>\d*)\/assignments\/(?P<assignment_id>\d*)\/?")
@@ -23,8 +22,7 @@ class AssignmentObjectHandler(APIHandler):
     pass 
   
   def get(self, lecture_id: int, assignment_id: int):
-    self.write(self.requestservice.request(method='GET',endpoint=self.request.path,body=''))
-
+    pass
   
   def delete(self, lecture_id: int, assignment_id: int):
     pass
