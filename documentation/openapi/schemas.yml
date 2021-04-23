@@ -64,6 +64,7 @@ components:
           enum:
             - created # another state of an assignment (instructor only)
             - released
+            - fetching
             - fetched
             - complete # final state -> final grade is calculated
       example:
@@ -78,50 +79,6 @@ components:
         ]
         due_date: "2021-07-21T23:55:00Z"
         status: "released"
-    RichAssignment:
-      type: "object"
-      properties:
-        id:
-          type: "integer"
-          format: "int64"
-        name:
-          type: "string"
-          example: "assignment_1"
-        exercises:
-          type: "array"
-          items:
-            $ref: "#/components/schemas/Exercise"
-        files:
-          type: "array"
-          items:
-            $ref: "#/components/schemas/AssignmentFile"
-        due_date:
-          type: "string"
-          format: "date-time"
-          example: "2021-07-21T23:55:00Z"
-        status:
-          type: string
-          enum:
-            - created # another state of an assignment (instructor only)
-            - released
-            - fetched
-            - complete # final state -> final grade is calculated
-        payload:
-          type: string
-          format: byte
-      example:
-        id: 1
-        name: "assignment_1"
-        exercises: [
-          $ref: "#/components/schemas/Exercise/example",
-          $ref: "#/components/schemas/Exercise/example"
-        ]
-        files: [
-          $ref: "#/components/schemas/AssignmentFile/example"
-        ]
-        due_date: "2021-07-21T23:55:00Z"
-        status: "released"
-        payload: "VGFrZSB0aGlzIGZvciB5b3VyIHRyb3VibGU6IDwzCg=="
     Exercise:
       type: "object"
       properties:
@@ -141,12 +98,18 @@ components:
         points:
           type: number
           format: float
+        hashcode:
+          type: string
+        path:
+          type: string
       example:
         id: 0
         a_id: 1
         name: "exercise_1.ipynb"
         ex_type: "nbgrader"
         points: 0.0
+        hashcode: "fabe1215697813a0b722aea9a4b20461"
+        path: exercises/exercise_1.ipynb
     Submission:
       type: "object"
       properties:
@@ -160,6 +123,7 @@ components:
         status:
           type: string
           enum:
+            - submitting # intermediate state of submitting but the file is not yet uploaded
             - not_graded
             - automatically_graded
             - manually_graded
@@ -167,30 +131,6 @@ components:
         id: 2
         submitted_at: "2021-07-21T11:53:07Z"
         status: "not_graded"
-    RichSubmission:
-      type: "object"
-      properties:
-        id:
-          type: "integer"
-          format: "int64"
-        submitted_at:
-          type: "string"
-          format: "date-time"
-          example: "2021-07-21T11:53:07Z"
-        status:
-          type: string
-          enum:
-            - not_graded
-            - automatically_graded
-            - manually_graded
-        payload:
-          type: string
-          format: byte
-      example:
-        id: 2
-        submitted_at: "2021-07-21T11:53:07Z"
-        status: "not_graded"
-        payload: "VGFrZSB0aGlzIGZvciB5b3VyIHRyb3VibGU6IDwzCg=="
     Feedback:
       type: "object"
       properties:
@@ -200,33 +140,9 @@ components:
         submission_id:
           type: "integer"
           format: "int64"
-        path:
-          type: "string"
-          example: "~/assignment_1/feedback/..."
       example:
         id: 0
         submission_id: 2
-        path: "~/assignment_1/feedback/..."
-    RichFeedback:
-      type: "object"
-      properties:
-        id:
-          type: "integer"
-          format: "int64"
-        submission_id:
-          type: "integer"
-          format: "int64"
-        path:
-          type: "string"
-          example: "~/assignment_1/feedback/..."
-        payload:
-          type: string
-          format: byte
-      example:
-        id: 0
-        submission_id: 2
-        path: "~/assignment_1/feedback/..."
-        payload: "VGFrZSB0aGlzIGZvciB5b3VyIHRyb3VibGU6IDwzCg=="
     GradingResult:
       type: "object"
       properties:
@@ -281,8 +197,14 @@ components:
         name:
           type: string
           example: "dataset.csv"
+        hashcode:
+          type: string
+        path:
+          type: string
       example:
         name: "dataset.csv"
+        hashcode: "fabe1215697813a0b722aea9a4b20461"
+        path: "files/dataset.csv"
     ErrorMessage:
       type: "object"
       properties:
@@ -302,17 +224,6 @@ components:
             type: "array"
             items:
               $ref: "#/components/schemas/Submission"
-    RichUserSubmissions:
-      type: "array"
-      items:
-        type: "object"
-        properties:
-          user:
-            $ref: "#/components/schemas/User"
-          submissions:
-            type: "array"
-            items:
-              $ref: "#/components/schemas/RichSubmission"
     UserFeedback:
       type: "array"
       items:
@@ -324,14 +235,4 @@ components:
             type: "array"
             items:
               $ref:  "#/components/schemas/Feedback"
-    RichUserFeedback:
-      type: "array"
-      items:
-        type: "object"
-        properties:
-          user:
-            $ref: "#/components/schemas/User"
-          submissions:
-            type: "array"
-            items:
-              $ref:  "#/components/schemas/RichFeedback"
+

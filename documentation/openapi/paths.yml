@@ -615,7 +615,80 @@ feedback:
           application/json:
             schema:
               $ref: "./schemas.yml#/components/schemas/ErrorMessage"
-  
+
+
+feedbackById:
+  get:
+    security:
+      - hub_auth:
+        - instructor
+        - tutor
+        - student
+    summary: Return the feedback of an assignment as html
+    tags:
+      - "Submissions"
+    parameters:
+    - name: lect_id
+      in: path
+      description: ID of the lecture
+      required: true
+      example: 1
+      schema:
+        type: integer
+        format: int64
+    - name: a_id
+      in: path
+      description: ID of the assignment in the lecture
+      required: true
+      example: 2
+      schema:
+        type: integer
+        format: int64
+    - name: f_id
+      in: path
+      description: ID of the feedback
+      required: true
+      example: 2
+      schema:
+        type: integer
+        format: int64
+    - name: latest
+      in: query
+      description: Only return the feedback of the latest submission
+      required: false
+      schema:
+        type: boolean
+        default: false
+    - name: instructor-version
+      in: query
+      description: Whether to fetch the all feedback of students
+      required: false
+      schema:
+        type: boolean
+        default: false
+    responses:
+      200:
+        description: OK
+        content:
+          text/html:
+            schema:
+              type: string
+              example: "<html></html>"
+      403:
+        description: Unautorized
+      404:
+        description: Lecture id or assignment id not found
+        content: 
+          application/json:
+            schema:
+              $ref: "./schemas.yml#/components/schemas/ErrorMessage"
+      500:
+        description: Internal server error
+        content: 
+          application/json:
+            schema:
+              $ref: "./schemas.yml#/components/schemas/ErrorMessage"
+
 grading:
   get:
     security:

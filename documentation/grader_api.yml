@@ -38,16 +38,22 @@ paths:
     $ref: './openapi/paths.yml#/lecturesById'
 
   /lectures/{lect_id}/assignments:
-    $ref: './openapi/paths_payload.yml#/assignments'
+    $ref: './openapi/paths.yml#/assignments'
 
   /lectures/{lect_id}/assignments/{a_id}:
-    $ref: './openapi/paths_payload.yml#/assignmentsById'
+    $ref: './openapi/paths.yml#/assignmentsById'
+  
+  /lectures/{lect_id}/assignments/{a_id}/file/{file_id}:
+    $ref: './openapi/paths_grader.yml#/assignmentData'
 
   /lectures/{lect_id}/assignments/{a_id}/submissions:
-    $ref: './openapi/paths_payload.yml#/submissions'
+    $ref: './openapi/paths.yml#/submissions'
 
   /lectures/{lect_id}/assignments/{a_id}/feedback:
-    $ref: './openapi/paths_payload.yml#/feedback'
+    $ref: './openapi/paths.yml#/feedback'
+  
+  /lectures/{lect_id}/assignments/{a_id}/feedback/{f_id}:
+    $ref: './openapi/paths.yml#/feedbackById'
 
   /lectures/{lect_id}/assignments/{a_id}/grading:
     $ref: './openapi/paths.yml#/grading'
@@ -60,4 +66,7 @@ paths:
 
   /lectures/{lect_id}/assignments/{a_id}/grading/{user_id}/score:
     $ref: './openapi/paths.yml#/score'
+
+
+
 
