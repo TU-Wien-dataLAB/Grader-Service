@@ -9,12 +9,11 @@ from grader.common.models.assignment import Assignment
 from grader.common.models.lecture import Lecture
 from grader.common.models.user import User
 from grader.common.models.submission import Submission
-from grader.common.models.rich_feedback import RichFeedback
 
-from traitlets.config.configurable import Configurable
+from traitlets.config.configurable import LoggingConfigurable
 from traitlets.traitlets import Int, TraitError, Unicode, validate
 
-class CompressionEngine(Configurable):
+class CompressionEngine(LoggingConfigurable):
 
   compression_dir = Unicode('', help="The absolute path to the directory where the archives should be written.").tag(config=True)
   compression_algo = Unicode('gz', help="The compression algorithm to use. Either: '', 'gz', 'bz' or 'xz'").tag(config=True)
@@ -57,9 +56,6 @@ class CompressionEngine(Configurable):
 
   def archive_submission(self, user: User, assignment: Assignment, submission: Submission, dir: str) -> str:
     return self.create_archive("submissions/" + user.id + "/" + assignment.name + "/" + submission.id, dir)
-
-  def archive_feedback(self, user: User, assignment: Assignment, feedback: RichFeedback) -> str:
-    return self.create_archive("feedback/" + user.id + "/" + assignment.name + "/" + feedback.id, dir)
 
   @property
   def extension(self):

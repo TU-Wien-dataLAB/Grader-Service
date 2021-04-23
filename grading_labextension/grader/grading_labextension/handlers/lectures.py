@@ -1,5 +1,5 @@
 from grader.common.registry import register_handler
-from grader.grading_labextension.handlers.grader_handler import GraderHandler
+from grader.grading_labextension.handlers.base_handler import ExtensionBaseHandler
 from jupyter_server.base.handlers import APIHandler
 from jupyter_server.utils import url_path_join
 import tornado
@@ -8,7 +8,7 @@ from grader.common.services.request import RequestService
 from grader.common.services.encode import encode_binary
 
 @register_handler(path=r"\/lectures\/?")
-class LectureBaseHandler(GraderHandler):
+class LectureBaseHandler(ExtensionBaseHandler):
 
   @web.authenticated
   async def get(self):
@@ -20,7 +20,7 @@ class LectureBaseHandler(GraderHandler):
 
 
 @register_handler(path=r"\/lectures\/(?P<lecture_id>\d*)\/?")
-class LectureObjectHandler(GraderHandler):
+class LectureObjectHandler(ExtensionBaseHandler):
   
   @web.authenticated
   async def put(self, lecture_id: int):
