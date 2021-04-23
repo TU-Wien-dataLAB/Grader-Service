@@ -48,6 +48,9 @@ paths:
 
   /lectures/{lect_id}/assignments/{a_id}/feedback:
     $ref: './openapi/paths.yml#/feedback'
+  
+  /lectures/{lect_id}/assignments/{a_id}/feedback/{f_id}:
+    $ref: './openapi/paths.yml#/feedbackById'
 
   /lectures/{lect_id}/assignments/{a_id}/grading:
     $ref: './openapi/paths.yml#/grading'
