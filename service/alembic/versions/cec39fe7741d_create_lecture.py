@@ -18,7 +18,7 @@ depends_on = None
 
 def upgrade():
     op.create_table('lecture',
-        sa.Column('id', sa.Integer, primary_key=True),
+        sa.Column('id', sa.Integer, primary_key=True), autoincrement=True,
         sa.Column('name',sa.String(255), nullable=False),
         sa.Column('semester',sa.String(255), nullable=False),
         sa.Column('complete',sa.Boolean(), nullable=False))

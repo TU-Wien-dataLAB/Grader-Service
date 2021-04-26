@@ -18,7 +18,7 @@ depends_on = None
 
 def upgrade():
     op.create_table('file',
-        sa.Column('id', sa.Integer, primary_key=True),
+        sa.Column('id', sa.Integer, primary_key=True, autoincrement=True),
         sa.Column('name', sa.String(255), nullable=False),
         sa.Column('assignid', sa.Integer, sa.ForeignKey('assignment.id')),
         sa.Column('path', sa.String(255), nullable=False),

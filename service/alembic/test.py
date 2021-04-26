@@ -1,6 +1,10 @@
-from sqlalchemy.orm import sessionmaker, Session
 from sqlalchemy import create_engine
-session = sessionmaker()
-engine = create_engine('sqlite:///:mempry:', echo=True)
-session.configure(bind=engine)
-Session = Session()
+engine = create_engine('sqlite:///grader.db', echo=True)
+engine.execute('INSERT INTO "user" ("name","token") VALUES ("user1","dasdada23234ddfdfdsf")')
+engine.execute('INSERT INTO "user" ("name","token") VALUES ("user2","dasdada23234ddfdfdsf")')
+engine.execute('INSERT INTO "user" ("name","token") VALUES ("user3","dasdada23234ddfdfdsf")')
+engine.execute('INSERT INTO "user" ("name","token") VALUES ("user4","dasdada23234ddfdfdsf")')
+
+select = engine.execute('SELECT * FROM "user";')
+for r in select:
+    print(r)
