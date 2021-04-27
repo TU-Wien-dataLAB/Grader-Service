@@ -13,4 +13,4 @@ def get_assignments(lectid: int):
     session.commit()
     return res
 
-print(get_assignments(1))
+# rint(get_assignments(1))

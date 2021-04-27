@@ -12,4 +12,4 @@ def get_lectures(user: User):
     session.commit()
     return res
 
-print(get_lectures(User(1,"user1")))
+# print(get_lectures(User(1,"user1")))

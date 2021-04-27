@@ -27,13 +27,11 @@ class HandlerPathRegistry(object, metaclass=Singleton):
     return list(HandlerPathRegistry.registry.values())
 
   @staticmethod
-  def handler_list(base_url:str="/") -> List[Tuple[str, RequestHandler]]:
-    url =list(zip(
+  def handler_list(base_url:str="/hub/service/") -> List[Tuple[str, RequestHandler]]:
+    return list(zip(
       [base_url.replace('/','\/') + "grader" + path for path in HandlerPathRegistry.registry.values()], 
       HandlerPathRegistry.registry.keys()
     ))
-    print(url)
-    return url
 
   @staticmethod
   def has_path(cls) -> bool:
