@@ -4,12 +4,14 @@ from tornado import web
 from jupyter_server.utils import url_path_join
 from grader.common.models.assignment import Assignment
 from grader.common.services.request import RequestService
+from grader.service.persistence.assignment import get_assignments
 import tornado
 
 @register_handler(path=r"\/lectures\/(?P<lecture_id>\d*)\/assignments\/?")
 class AssignmentBaseHandler(GraderBaseHandler):
   def get(self, lecture_id: int):
-    pass
+    self.write(get_assignments(1))
+
 
   def post(self, lecture_id: int):
     pass

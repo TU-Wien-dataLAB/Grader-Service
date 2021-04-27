@@ -22,7 +22,7 @@ class GraderApp(Application, LoggingConfigurable):
 
 def main():
   """
-  Runs the GraderExtensionHandler tornado server locally without being attached to a jupyter_server.
+  Runs the GraderExtensionHandler tornado server locally without conbeing attached to a jupyter_server.
   """
   print("Starting Extension handler... ", end="")
   handlers = HandlerPathRegistry.handler_list()
