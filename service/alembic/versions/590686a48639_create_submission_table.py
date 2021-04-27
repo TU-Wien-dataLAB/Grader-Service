@@ -18,7 +18,7 @@ depends_on = None
 
 def upgrade():
     op.create_table('submission',
-        sa.Column('id', sa.Integer, primary_key=True, autoincrement=True,
+        sa.Column('id', sa.Integer, primary_key=True, autoincrement=True),
         sa.Column('name',sa.String(255), nullable=False),
         sa.Column('lectid', sa.Integer, sa.ForeignKey('lecture.id')),
         sa.Column('duedate', sa.DateTime, nullable=False),
@@ -30,15 +30,6 @@ def upgrade():
         #sa.Column('id', sa.Integer, primary_key=True),
         #sa.Column(),
         #sa.Column())
-
-
-def downgrade():
-    op.drop_table('assignment'), autoincrement=True),
-        sa.Column('date', sa.DateTime, nullable=False),
-        sa.Column('assignid', sa.Integer, sa.ForeignKey('assignment.id'), nullable=False),
-        sa.Column('userid', sa.Integer, sa.ForeignKey('user.id'), nullable=False)
-        )
-
 
 
 def downgrade():
