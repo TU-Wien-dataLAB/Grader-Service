@@ -19,6 +19,9 @@ engine.execute('INSERT INTO "assignment" ("name","lectid","duedate","path","poin
 engine.execute('INSERT INTO "submission" ("date","assignid","userid") VALUES ("2021-05-05",1,1)')
 engine.execute('INSERT INTO "submission" ("date","assignid","userid") VALUES ("2021-05-07",1,1)')
 
+engine.execute('INSERT INTO "file" ("name","assignid","path","exercise","points") VALUES ("exercise1.nb",1,"home/assi1",true,5)')
+engine.execute('INSERT INTO "file" ("name","assignid","path","exercise") VALUES ("dataset.csv",1,"home/assi1",false)')
+
 
 
 

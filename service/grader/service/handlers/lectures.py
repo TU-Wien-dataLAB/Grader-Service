@@ -1,11 +1,12 @@
 from grader.common.registry import register_handler
-from service.handlers.base_handler import GraderBaseHandler
+from grader.common.models.user import User
+from grader.service.handlers.base_handler import GraderBaseHandler
 from jupyter_server.utils import url_path_join
 import tornado
 from tornado import web
 from tornado_sqlalchemy import SessionMixin
 from sqlalchemy import create_engine
-from service.persistence.database import get_all
+from grader.service.persistence.lectures import get_lectures
 
 engine = create_engine('sqlite:///grader.db', echo=True)
 
@@ -14,7 +15,7 @@ class LectureBaseHandler(SessionMixin, GraderBaseHandler):
   
   @web.authenticated
   async def get(self):
-    get_all('lectures')
+    self.write(get_lectures(User(1,"user1")))
 
   @web.authenticated
   async def post(self):
