@@ -1,4 +1,4 @@
-from tornado.httpclient import AsyncHTTPClient, HTTPResponse
+from tornado.httpclient import AsyncHTTPClient, HTTPClient, HTTPResponse
 from tornado.util import import_object
 from traitlets.config.configurable import LoggingConfigurable
 from typing import Dict
@@ -13,9 +13,17 @@ class RequestService(LoggingConfigurable):
     host = Unicode('127.0.0.1', help="Host adress of the grader service").tag(config=True)
     port = Int(4010, help="Host port of the grader service").tag(config=True)
 
-    async def request(self,method: str, endpoint: str, body: dict=None, header: Dict[str, str]=None) -> dict:
-        http_client = AsyncHTTPClient()
-        response: HTTPResponse = await http_client.fetch(self.url+endpoint, method=method, headers=header, body=body)
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self.http_client = AsyncHTTPClient()
+        self.http_client_sync = HTTPClient()
+
+    async def request(self, method: str, endpoint: str, body: dict=None, header: Dict[str, str]=None) -> dict:
+        response: HTTPResponse = await self.http_client.fetch(self.url+endpoint, method=method, headers=header, body=body)
+        return json_decode(response.body)
+
+    def request_sync(self, method: str, endpoint: str, body: dict=None, header: Dict[str, str]=None) -> dict:
+        response: HTTPResponse = self.http_client_sync.fetch(self.url+endpoint, method=method, headers=header, body=body)
         return json_decode(response.body)
     
     @property

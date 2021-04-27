@@ -1,14 +1,12 @@
 from grader.common.registry import register_handler
-from service.handlers.base_handler import GraderBaseHandler
+from grader.service.handlers.base_handler import GraderBaseHandler
 from jupyter_server.utils import url_path_join
 import tornado
 from tornado import web
-from grader.common.services.request import RequestService
 from tornado_sqlalchemy import SessionMixin
 from sqlalchemy import create_engine
-from service.persistence.database import get_all
+from grader.service.persistence.database import get_all
 
-service = RequestService()
 engine = create_engine('sqlite:///grader.db', echo=True)
 
 @register_handler(path=r"\/lectures\/?")
