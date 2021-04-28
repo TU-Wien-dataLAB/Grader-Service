@@ -24,7 +24,7 @@ class CompressionEngine(LoggingConfigurable):
     self.compression_dir = compression_dir  # the directory to put the compressed files
 
   def create_archive(self, name: str, dir: str) -> str:
-    file_name = osp.join(self.compression_dir["value"], name + self.extension)
+    file_name = osp.join(self.compression_dir, name + self.extension)
 
     directory = osp.dirname(file_name)
     if not osp.exists(directory):
@@ -72,12 +72,12 @@ class CompressionEngine(LoggingConfigurable):
       raise TraitError("The path is not absolute")
     if not osp.isdir(path):
       raise TraitError("The path has to be an existing directory")
-    return proposal
+    return proposal["value"]
   
   @validate('compression_algo')
   def _validate_algo(self, proposal):
     algo: str = proposal['value']
     if algo not in {'', 'gz', 'bz', 'xz'}:
       raise TraitError("Incorrect compression algorithm")
-    return proposal
+    return proposal["value"]
 
