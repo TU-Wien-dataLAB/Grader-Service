@@ -1,13 +1,13 @@
-from jupyterhub.services.auth import HubAuthenticated
-from tornado import web
-from tornado import httputil
-from typing import Any
+import functools
+from typing import Any, Awaitable, Callable, Optional
+from urllib.parse import ParseResult, urlparse
+
 from grader.common.services.request import RequestService
 from grader.service.main import GraderApp
-from urllib.parse import ParseResult, urlparse
-import functools
-from typing import Awaitable, Callable, Optional
+from jupyterhub.services.auth import HubAuthenticated
+from tornado import httputil, web
 from tornado.web import HTTPError, RequestHandler
+
 
 class GraderBaseHandler(web.RequestHandler):
   request_service = RequestService()
@@ -21,8 +21,16 @@ class GraderBaseHandler(web.RequestHandler):
       self.hub_request_service.scheme = hub_api_parsed.scheme
       self.hub_request_service.host, self.hub_request_service.port = httputil.split_host_and_port(hub_api_parsed.netloc)
       self.hub_api_base_path: str = hub_api_parsed.path
+  
+  async def prepare(self) -> Optional[Awaitable[None]]:
+    """
+    This is a workaround for async authentication. `get_current_user` cannot be asyncronous and a request cannot be made in a blocking manner.
+    This sets the `current_user` property before each request before being checked by the `authenticated` decorator.
+    """
+    user = await self.get_current_user_async()
+    self.current_user = user
 
-  def get_current_user(self):
+  async def get_current_user_async(self):
       token = None
       for (k,v) in sorted(self.request.headers.get_all()):
         if k == "Authorization":
@@ -31,9 +39,7 @@ class GraderBaseHandler(web.RequestHandler):
         return None
       
       try:
-        print(self.application.hub_api_token)
-        user: dict = self.hub_request_service.request_sync("GET", self.hub_api_base_path + f"/authorizations/token/{token}", header={"Authorization": f"token {self.application.hub_api_token}"})
-        print("User:", user)
+        user: dict = await self.hub_request_service.request("GET", self.hub_api_base_path + f"/authorizations/token/{token}", header={"Authorization": f"token {self.application.hub_api_token}"})
       except Exception:
         return None
       return user
