@@ -13,4 +13,17 @@ def get_assignments(lectid: int):
     session.commit()
     return res
 
-# rint(get_assignments(1))
+#used for fechting specific assignment
+def get_assignment(lectid: int, assignid: int):
+    engine = create_engine('sqlite:///grader.db', echo=True)
+    session = Session(bind=engine)
+    select = "SELECT * FROM assignment WHERE lectid=%i AND id=%i" % (lectid,assignid)
+    #TODO: make it to assignment
+    res = session.execute(select)
+    res = json.dumps( [dict(ix) for ix in res] )
+    session.commit()
+    return res
+
+
+# print(get_assignments(1))
+#print(get_assignment(1,1))

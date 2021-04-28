@@ -22,7 +22,7 @@ def upgrade():
         sa.Column('name',sa.String(255), nullable=False),
         sa.Column('semester',sa.String(255), nullable=False),
         sa.Column('code', sa.String(255), nullable=False),
-        sa.Column('complete',sa.Boolean(), nullable=False))
+        sa.Column('complete',sa.Boolean(), default=False))
 
 
 def downgrade():
