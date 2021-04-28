@@ -1,7 +1,7 @@
 import functools
 from typing import Any, Awaitable, Callable, Optional
 from urllib.parse import ParseResult, urlparse
-
+import logging
 from grader.common.services.request import RequestService
 from grader.service.main import GraderApp
 from jupyterhub.services.auth import HubAuthenticated
@@ -39,8 +39,10 @@ class GraderBaseHandler(web.RequestHandler):
         return None
       
       try:
+        print(type(self.hub_api_base_path))
         user: dict = await self.hub_request_service.request("GET", self.hub_api_base_path + f"/authorizations/token/{token}", header={"Authorization": f"token {self.application.hub_api_token}"})
-      except Exception:
+      except Exception as e:
+        logging.getLogger().error(e)
         return None
       return user
 

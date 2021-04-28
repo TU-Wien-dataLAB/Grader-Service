@@ -1,11 +1,15 @@
 from sqlalchemy import create_engine
 from sqlalchemy.orm import Session
 from grader.common.models.user import User
+<<<<<<< HEAD
 from grader.common.models.lecture import Lecture
+=======
+from grader.service.persistence.database import DataBaseManager
+>>>>>>> 19c9b3d65a4fc595d85197ca1d798ef5676cdfbd
 import json
 
 def get_lectures(user: User):
-    engine = create_engine('sqlite:///grader.db', echo=True)
+    engine = create_engine(DataBaseManager.get_database_url(), echo=True)
     session = Session(bind=engine)
     select = "SELECT lecture.* FROM takepart INNER JOIN lecture ON lecture.id=takepart.lectid WHERE userid=%i" % user.id
     res = session.execute(select)

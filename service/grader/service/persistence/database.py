@@ -1,7 +1,12 @@
-from sqlalchemy import create_engine
+from traitlets.config.configurable import LoggingConfigurable
+from traitlets.traitlets import Unicode
+import os
 
-def get_all(table):
-    engine = create_engine('sqlite:///grader.db', echo=True)
-    select = 'SELECT * FROM %s;' % table
-    result = engine.execute(select)
-    return result
+
+class DataBaseManager(LoggingConfigurable):
+
+    database_url = Unicode("").tag(config=True)
+
+    @staticmethod
+    def get_database_url():
+        return  "sqlite:///" + os.path.abspath(os.path.dirname(__file__) + "../../../../grader.db")
