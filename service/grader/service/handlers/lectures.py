@@ -4,10 +4,7 @@ from grader.service.handlers.base_handler import GraderBaseHandler, authenticate
 from jupyter_server.utils import url_path_join
 import tornado
 from tornado import web
-from sqlalchemy import create_engine
 from grader.service.persistence.lectures import get_lectures
-
-engine = create_engine('sqlite:///grader.db', echo=True)
 
 @register_handler(path=r"\/lectures\/?")
 class LectureBaseHandler(GraderBaseHandler):

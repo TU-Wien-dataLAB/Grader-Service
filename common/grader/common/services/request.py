@@ -26,8 +26,5 @@ class RequestService(LoggingConfigurable):
 
     @property
     def url(self):
-        print("Scheme:",type(self.scheme))
-        print("Host:", type(self.host))
-        print("Port:", type(str(self.port)))
         return self.scheme + "://" + self.host + ":" + str(self.port)
     
