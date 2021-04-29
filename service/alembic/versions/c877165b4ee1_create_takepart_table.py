@@ -18,7 +18,7 @@ depends_on = None
 
 def upgrade():
     op.create_table('takepart',
-        sa.Column('userid', sa.Integer, sa.ForeignKey('user.id'), primary_key=True),
+        sa.Column('username', sa.Integer, sa.ForeignKey('user.name'), primary_key=True),
         sa.Column('lectid', sa.Integer, sa.ForeignKey('lecture.id'), primary_key=True),
         sa.Column('role', sa.String(255), nullable=False)
         )
