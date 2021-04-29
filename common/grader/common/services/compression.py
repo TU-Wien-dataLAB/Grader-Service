@@ -80,4 +80,11 @@ class CompressionEngine(LoggingConfigurable):
     if algo not in {'', 'gz', 'bz', 'xz'}:
       raise TraitError("Incorrect compression algorithm")
     return proposal["value"]
+  
+  @validate("compression_level")
+  def _validate_level(self, proposal):
+    level = proposal["value"]
+    if not 0 <= level <= 9:
+      raise TraitError("Compression level has to be between 0 and 9.")
+    return level
 

@@ -21,6 +21,3 @@ def get_exercises_of_assignment(user: User, assignid: int):
     res = json.dumps([dict(x) for x in res])
     session.commit()
     return res
-
-#print(get_files_of_assignment(User(1,"user1"), 1))
-#print(get_exercises_of_assignment(User(1,"user1"), 1))

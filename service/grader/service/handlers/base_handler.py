@@ -2,8 +2,9 @@ import functools
 from typing import Any, Awaitable, Callable, Optional
 from urllib.parse import ParseResult, urlparse
 import logging
+from grader.common.models.user import User
 from grader.common.services.request import RequestService
-from grader.service.main import GraderApp
+from grader.service.main import GraderService
 from jupyterhub.services.auth import HubAuthenticated
 from tornado import httputil, web
 from tornado.web import HTTPError, RequestHandler
@@ -13,10 +14,10 @@ class GraderBaseHandler(web.RequestHandler):
   request_service = RequestService()
   hub_request_service = RequestService()
 
-  def __init__(self, application: GraderApp, request: httputil.HTTPServerRequest, **kwargs: Any) -> None:
+  def __init__(self, application: GraderService, request: httputil.HTTPServerRequest, **kwargs: Any) -> None:
       super().__init__(application, request, **kwargs)
       
-      self.application: GraderApp = self.application  # add type hint for application
+      self.application: GraderService = self.application  # add type hint for application
       hub_api_parsed: ParseResult = urlparse(self.application.hub_api_url)
       self.hub_request_service.scheme = hub_api_parsed.scheme
       self.hub_request_service.host, self.hub_request_service.port = httputil.split_host_and_port(hub_api_parsed.netloc)
@@ -28,7 +29,8 @@ class GraderBaseHandler(web.RequestHandler):
     This sets the `current_user` property before each request before being checked by the `authenticated` decorator.
     """
     user = await self.get_current_user_async()
-    self.current_user = user
+    user_model = User(name=user["name"], groups=user["groups"])
+    self.current_user = user_model
 
   async def get_current_user_async(self):
       token = None
@@ -39,8 +41,9 @@ class GraderBaseHandler(web.RequestHandler):
         return None
       
       try:
-        print(type(self.hub_api_base_path))
         user: dict = await self.hub_request_service.request("GET", self.hub_api_base_path + f"/authorizations/token/{token}", header={"Authorization": f"token {self.application.hub_api_token}"})
+        if user["kind"] != "user":
+          return None
       except Exception as e:
         logging.getLogger().error(e)
         return None

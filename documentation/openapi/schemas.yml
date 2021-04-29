@@ -4,15 +4,16 @@ components:
     User:
       type: "object"
       properties:
-        id: 
-          type: "string" # tuwel id
-          example: "12345678"
         name:
           type: "string"
           example: "Baz Bar"
+        groups:
+          type: "array"
+          items:
+            type: "string"
       example:
-        id: "12345678"
         name: "Baz Bar"
+        groups: ["LVA1", "LVA2"]
     Lecture:
       type: "object"
       properties:
