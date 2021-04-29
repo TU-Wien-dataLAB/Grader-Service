@@ -23,7 +23,8 @@ def upgrade():
         sa.Column('lectid', sa.Integer, sa.ForeignKey('lecture.id')),
         sa.Column('duedate', sa.DateTime, nullable=False),
         sa.Column('path', sa.String(255), nullable=False),
-        sa.Column('points', sa.Integer, nullable=False)
+        sa.Column('points', sa.Integer, nullable=False),
+        sa.Column('status', sa.Enum('created', 'released', 'fetching', 'fetched', 'complete'), default='created')
         )
 
         # op.create_table('assignment',
