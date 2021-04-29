@@ -26,11 +26,15 @@ def get_lecture(user: User, lectid: int):
 def create_lecture(user: User, lecture: Lecture):
     engine = create_engine(DataBaseManager.get_database_url(), echo=True)
     session = Session(bind=engine)
-    select = 'INSERT INTO "lecture" ("name","semester","code") VALUES ("%s","%s","%s")' % (lecture.name,lecture.semester,lecture.code) 
-    session.execute(select)
+    insert = 'INSERT INTO "lecture" ("name","semester","code") VALUES ("%s","%s","%s")' % (lecture.name,lecture.semester,lecture.code) 
+    session.execute(insert)
 
-    select = 'INSERT INTO "takepart" ("username","lectid","role") VALUES ("%s",%i,"%s")' % (user.name, lecture.id,"admin")
-    session.execute(select)
+    select = 'SELECT id FROM lecture WHERE lecture.name="%s"' % (lecture.name)
+    select = session.execute(select)
+    id = [r[0] for r in select]
+
+    insert = 'INSERT INTO "takepart" ("username","lectid","role") VALUES ("%s",%i,"%s")' % (user.name, id[0],"instructor")
+    session.execute(insert)
 
     session.commit()
 
