@@ -15,26 +15,26 @@ class User(Model):
     Do not edit the class manually.
     """
 
-    def __init__(self, id=None, name=None):  # noqa: E501
+    def __init__(self, name=None, groups=None):  # noqa: E501
         """User - a model defined in OpenAPI
 
-        :param id: The id of this User.  # noqa: E501
-        :type id: str
         :param name: The name of this User.  # noqa: E501
         :type name: str
+        :param groups: The groups of this User.  # noqa: E501
+        :type groups: List[str]
         """
         self.openapi_types = {
-            'id': str,
-            'name': str
+            'name': str,
+            'groups': List[str]
         }
 
         self.attribute_map = {
-            'id': 'id',
-            'name': 'name'
+            'name': 'name',
+            'groups': 'groups'
         }
 
-        self._id = id
         self._name = name
+        self._groups = groups
 
     @classmethod
     def from_dict(cls, dikt) -> 'User':
@@ -46,27 +46,6 @@ class User(Model):
         :rtype: User
         """
         return util.deserialize_model(dikt, cls)
-
-    @property
-    def id(self):
-        """Gets the id of this User.
-
-
-        :return: The id of this User.
-        :rtype: str
-        """
-        return self._id
-
-    @id.setter
-    def id(self, id):
-        """Sets the id of this User.
-
-
-        :param id: The id of this User.
-        :type id: str
-        """
-
-        self._id = id
 
     @property
     def name(self):
@@ -88,3 +67,24 @@ class User(Model):
         """
 
         self._name = name
+
+    @property
+    def groups(self):
+        """Gets the groups of this User.
+
+
+        :return: The groups of this User.
+        :rtype: List[str]
+        """
+        return self._groups
+
+    @groups.setter
+    def groups(self, groups):
+        """Sets the groups of this User.
+
+
+        :param groups: The groups of this User.
+        :type groups: List[str]
+        """
+
+        self._groups = groups

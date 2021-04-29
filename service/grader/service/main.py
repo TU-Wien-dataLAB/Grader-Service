@@ -27,11 +27,6 @@ class GraderServer(web.Application, config.LoggingConfigurable):
     )
     hub_service_url = Unicode(os.environ.get("JUPYTERHUB_SERVICE_URL")).tag(config=True)
 
-    service_host = Unicode("0.0.0.0", help="The host address of the service").tag(
-        config=True
-    )
-    service_port = Int(4010, help="The port the service runs on").tag(config=True)
-
 
 class GraderService(config.Application):
 
@@ -48,6 +43,11 @@ class GraderService(config.Application):
   spawn the grader service:
       grader-service
   """
+
+    service_host = Unicode("0.0.0.0", help="The host address of the service").tag(
+        config=True
+    )
+    service_port = Int(4010, help="The port the service runs on").tag(config=True)
 
     config_file = Unicode(
         "grader_service_config.py", help="The config file to load"

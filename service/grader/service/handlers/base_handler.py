@@ -2,6 +2,7 @@ import functools
 from typing import Any, Awaitable, Callable, Optional
 from urllib.parse import ParseResult, urlparse
 import logging
+from grader.common.models.user import User
 from grader.common.services.request import RequestService
 from grader.service.main import GraderService
 from jupyterhub.services.auth import HubAuthenticated
@@ -28,7 +29,8 @@ class GraderBaseHandler(web.RequestHandler):
     This sets the `current_user` property before each request before being checked by the `authenticated` decorator.
     """
     user = await self.get_current_user_async()
-    self.current_user = user
+    user_model = User(name=user["name"], groups=user["groups"])
+    self.current_user = user_model
 
   async def get_current_user_async(self):
       token = None
@@ -40,6 +42,8 @@ class GraderBaseHandler(web.RequestHandler):
       
       try:
         user: dict = await self.hub_request_service.request("GET", self.hub_api_base_path + f"/authorizations/token/{token}", header={"Authorization": f"token {self.application.hub_api_token}"})
+        if user["kind"] != "user":
+          return None
       except Exception as e:
         logging.getLogger().error(e)
         return None
