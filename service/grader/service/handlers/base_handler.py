@@ -3,7 +3,7 @@ from typing import Any, Awaitable, Callable, Optional
 from urllib.parse import ParseResult, urlparse
 import logging
 from grader.common.services.request import RequestService
-from grader.service.main import GraderApp
+from grader.service.main import GraderService
 from jupyterhub.services.auth import HubAuthenticated
 from tornado import httputil, web
 from tornado.web import HTTPError, RequestHandler
@@ -13,10 +13,10 @@ class GraderBaseHandler(web.RequestHandler):
   request_service = RequestService()
   hub_request_service = RequestService()
 
-  def __init__(self, application: GraderApp, request: httputil.HTTPServerRequest, **kwargs: Any) -> None:
+  def __init__(self, application: GraderService, request: httputil.HTTPServerRequest, **kwargs: Any) -> None:
       super().__init__(application, request, **kwargs)
       
-      self.application: GraderApp = self.application  # add type hint for application
+      self.application: GraderService = self.application  # add type hint for application
       hub_api_parsed: ParseResult = urlparse(self.application.hub_api_url)
       self.hub_request_service.scheme = hub_api_parsed.scheme
       self.hub_request_service.host, self.hub_request_service.port = httputil.split_host_and_port(hub_api_parsed.netloc)
@@ -39,7 +39,6 @@ class GraderBaseHandler(web.RequestHandler):
         return None
       
       try:
-        print(type(self.hub_api_base_path))
         user: dict = await self.hub_request_service.request("GET", self.hub_api_base_path + f"/authorizations/token/{token}", header={"Authorization": f"token {self.application.hub_api_token}"})
       except Exception as e:
         logging.getLogger().error(e)

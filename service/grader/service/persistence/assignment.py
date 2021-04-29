@@ -25,6 +25,3 @@ def get_assignment(lectid: int, assignid: int):
     session.commit()
     return res
 
-
-# print(get_assignments(1))
-#print(get_assignment(1,1))

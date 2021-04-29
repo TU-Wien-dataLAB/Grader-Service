@@ -34,7 +34,3 @@ def create_lecture(user: User, lecture: Lecture):
 
     session.commit()
 
-
-#print(get_lecture(User(1,"user1"),2))
-#create_lecture(User(1,"user1"),Lecture(name="lecture1",code="dsdsdd",complete=False,semester="WS22"))
-print(get_lectures(User(1,"user1")))

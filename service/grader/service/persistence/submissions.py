@@ -14,4 +14,3 @@ def get_submissions(assignid: int, user: User):
     session.commit()
     return res
 
-#print(get_submissions(1,User(1,"user1")))

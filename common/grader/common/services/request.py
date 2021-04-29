@@ -3,6 +3,7 @@ from traitlets.config.configurable import LoggingConfigurable
 from typing import Dict
 from tornado.escape import json_decode
 from traitlets.traitlets import Int, TraitError, Unicode, validate
+import socket
 
 
 class RequestService(LoggingConfigurable):
@@ -23,6 +24,21 @@ class RequestService(LoggingConfigurable):
         if proposal["value"] not in {"http", "https"}:
             raise TraitError("Invalid scheme. Use either http or https")
         return proposal["value"]
+
+    @validate("host")
+    def _validate_host(self, proposal):
+        try:
+            socket.gethostbyname(proposal["value"])
+            return proposal["value"]
+        except socket.error:
+            raise TraitError("Host adress has to resolve. Invalid hostname %s" % proposal["value"])
+    
+    @validate("port")
+    def _validate_port(self, proposal):
+        value = proposal["value"]
+        if not 1 <= value <= 65535:
+            raise TraitError("Port number has to be between 1 and 65535.")
+        return value
 
     @property
     def url(self):
