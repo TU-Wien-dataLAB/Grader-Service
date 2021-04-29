@@ -7,7 +7,7 @@ import json
 def get_submissions(assignid: int, user: User):
     engine = create_engine(DataBaseManager.get_database_url(), echo=True)
     session = Session(bind=engine)
-    select = "SELECT * FROM submission WHERE assignid=%i AND userid=%i ORDER BY date DESC" % (assignid, user.id)
+    select = 'SELECT * FROM "submission" WHERE assignid=%i AND username="%s" ORDER BY date DESC' % (assignid, user.name)
     #TODO: make it to submission
     res = session.execute(select)
     res = json.dumps([dict(x) for x in res])

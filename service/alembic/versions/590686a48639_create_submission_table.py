@@ -21,7 +21,7 @@ def upgrade():
         sa.Column('id', sa.Integer, primary_key=True, autoincrement=True),
         sa.Column('date', sa.DateTime, nullable=False),
         sa.Column('assignid', sa.Integer, sa.ForeignKey('assignment.id')),
-        sa.Column('userid', sa.Integer, sa.ForeignKey('user.id'))
+        sa.Column('username', sa.Integer, sa.ForeignKey('user.name'))
         )
 
 
