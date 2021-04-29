@@ -38,3 +38,26 @@ def create_lecture(user: User, lecture: Lecture):
 
     session.commit()
 
+def takepart_as_student(user: User, lectid: int):
+    engine = create_engine(DataBaseManager.get_database_url(), echo=True)
+    session = Session(bind=engine)
+    insert = 'INSERT INTO "takepart" ("username","lectid","role") VALUES ("%s",%i,"%s")' % (user.name, lectid,"student")
+    session.execute(insert)
+
+def takepart_as_instructor(user: User, lectid: int):
+    engine = create_engine(DataBaseManager.get_database_url(), echo=True)
+    session = Session(bind=engine)
+    insert = 'INSERT INTO "takepart" ("username","lectid","role") VALUES ("%s",%i,"%s")' % (user.name, lectid,"instructor")
+    session.execute(insert)
+
+def update_lecture(lecture: Lecture):
+    engine = create_engine(DataBaseManager.get_database_url(), echo=True)
+    session = Session(bind=engine)
+    update = 'UPDATE "lecture" SET name=%s, code=%s, complete=%r, semester=%s WHERE id=%i' % (lecture.name, lecture.code, lecture.complete, lecture.semester, lecture.id)
+    session.execute(update)
+
+def delete_lecture(lectid: int):
+    engine = create_engine(DataBaseManager.get_database_url(), echo=True)
+    session = Session(bind=engine)
+    delete = 'DELETE FROM "lecture" WHERE id=%i' % lectid
+    session.execute(delete)
