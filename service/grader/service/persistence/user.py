@@ -8,6 +8,7 @@ import json
 def create_user(user: User):
     engine = create_engine(DataBaseManager.get_database_url(), echo=True)
     session = Session(bind=engine)
-    insert = 'INSERT INTO "user" ("name") VALUES ("%s")' % user.name
-    session.execute(insert)
+    insert = 'INSERT INTO "user" ("name") VALUES ("%s")'
+    data = tuple(user.name)
+    session.execute(insert,data)
     session.commit()
