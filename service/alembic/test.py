@@ -1,9 +1,10 @@
+from grader.service.persistence.database import DataBaseManager
 from sqlalchemy import create_engine
-engine = create_engine('sqlite:///grader.db', echo=True)
-engine.execute('INSERT INTO "user" ("name","token") VALUES ("user1","dasdada23234ddfdfdsf")')
-engine.execute('INSERT INTO "user" ("name","token") VALUES ("user2","dasdada23234ddfdfdsf")')
-engine.execute('INSERT INTO "user" ("name","token") VALUES ("user3","dasdada23234ddfdfdsf")')
-engine.execute('INSERT INTO "user" ("name","token") VALUES ("user4","dasdada23234ddfdfdsf")')
+engine = create_engine(DataBaseManager.get_database_url(), echo=True)
+engine.execute('INSERT INTO "user" ("name") VALUES ("user1")')
+engine.execute('INSERT INTO "user" ("name") VALUES ("user2")')
+engine.execute('INSERT INTO "user" ("name") VALUES ("user3")')
+engine.execute('INSERT INTO "user" ("name") VALUES ("user4")')
 engine.execute('INSERT INTO "lecture" ("name","semester","code", "complete") VALUES ("lecture1","WS21","AU.294",false)')
 engine.execute('INSERT INTO "lecture" ("name","semester","code", "complete") VALUES ("lecture2","WS20","AU.297",true)')
 engine.execute('INSERT INTO "lecture" ("name","semester","code", "complete") VALUES ("lecture3","SS22","AU.212",false)')

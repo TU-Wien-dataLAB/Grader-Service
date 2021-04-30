@@ -7,7 +7,8 @@ from grader.common.services.request import RequestService
 from grader.service.main import GraderService
 from jupyterhub.services.auth import HubAuthenticated
 from tornado import httputil, web
-from tornado.web import HTTPError, RequestHandler
+from tornado.web import HTTPError
+from grader.service.persistence.user import user_exists, create_user
 
 
 class GraderBaseHandler(web.RequestHandler):
@@ -30,6 +31,10 @@ class GraderBaseHandler(web.RequestHandler):
     """
     user = await self.get_current_user_async()
     user_model = User(name=user["name"], groups=user["groups"])
+    if not user_exists(user=user_model):
+      logging.getLogger("RequestHandler").info(f"User {user_model.name} does not exist and will be created.")
+      print("User does not exist")
+      create_user(user=user_model)
     self.current_user = user_model
 
   async def get_current_user_async(self):

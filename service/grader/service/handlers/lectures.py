@@ -11,7 +11,7 @@ class LectureBaseHandler(GraderBaseHandler):
   
   @authenticated
   async def get(self):
-    self.write(get_lectures(User(1,"user1")))
+    self.write(get_lectures(User("user1", [])))
 
   @authenticated
   async def post(self):

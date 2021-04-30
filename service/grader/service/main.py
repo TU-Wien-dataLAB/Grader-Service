@@ -41,7 +41,7 @@ class GraderService(config.Application):
   generate default config file:
       grader-service --generate-config -f /etc/grader/grader_service_config.py
   spawn the grader service:
-      grader-service
+      grader-service -f /etc/grader/grader_service_config.py
   """
 
     service_host = Unicode("0.0.0.0", help="The host address of the service").tag(
@@ -104,6 +104,7 @@ class GraderService(config.Application):
     ).tag(config=True)
 
     async def initialize(self, argv):
+        logging.basicConfig(format=f"%(color)s[%(levelname)1.1s %(asctime)s.%(msecs).03d %(name)s %(module)s:%")
         self.log.setLevel(self.log_level)
         self.log.info("Starting Initialization...")
         self._start_future = asyncio.Future()
