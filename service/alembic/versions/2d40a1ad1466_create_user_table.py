@@ -18,8 +18,7 @@ depends_on = None
 
 def upgrade():
     op.create_table('user',
-        sa.Column('name', sa.String(255), primary_key=True),
-        sa.Column('token', sa.String(255), nullable=False))
+        sa.Column('name', sa.String(255), primary_key=True))
 
 
 def downgrade():
