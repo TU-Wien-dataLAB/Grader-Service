@@ -6,26 +6,13 @@ import asyncio
 import signal
 import tornado
 from tornado import web
+from tornado.httpserver import HTTPServer
 from traitlets import config
 
 # run __init__.py to register handlers
 import grader.service
 from traitlets.traitlets import Enum, Int, Unicode, validate
-
-
-class GraderServer(web.Application, config.LoggingConfigurable):
-    # As an unmanage jupyter hub service, the application gets these environment variables from the hub
-    # see: https://jupyterhub.readthedocs.io/en/stable/reference/services.html#launching-a-hub-managed-service
-    hub_service_name = Unicode(os.environ.get("JUPYTERHUB_SERVICE_NAME")).tag(
-        config=True
-    )
-    hub_api_token = Unicode(os.environ.get("JUPYTERHUB_API_TOKEN")).tag(config=True)
-    hub_api_url = Unicode(os.environ.get("JUPYTERHUB_API_URL")).tag(config=True)
-    hub_base_url = Unicode(os.environ.get("JUPYTERHUB_BASE_URL")).tag(config=True)
-    hub_service_prefix = Unicode(os.environ.get("JUPYTERHUB_SERVICE_PREFIX")).tag(
-        config=True
-    )
-    hub_service_url = Unicode(os.environ.get("JUPYTERHUB_SERVICE_URL")).tag(config=True)
+from grader.service.server import GraderServer
 
 
 class GraderService(config.Application):
@@ -103,7 +90,8 @@ class GraderService(config.Application):
         "INFO",
     ).tag(config=True)
 
-    async def initialize(self, argv):
+    def initialize(self, argv, *args, **kwargs):
+        super().initialize(*args, **kwargs)
         logging.basicConfig(format=f"%(color)s[%(levelname)1.1s %(asctime)s.%(msecs).03d %(name)s %(module)s:%")
         self.log.setLevel(self.log_level)
         self.log.info("Starting Initialization...")
@@ -122,8 +110,8 @@ class GraderService(config.Application):
         handlers = HandlerPathRegistry.handler_list()
 
         # start the webserver
-        self.http_server = tornado.httpserver.HTTPServer(
-            GraderServer(handlers=handlers),
+        self.http_server: HTTPServer = HTTPServer(
+            GraderServer(handlers=handlers, config=self.config),
             # ssl_options=ssl_context,
             xheaders=True,
         )
@@ -138,6 +126,11 @@ class GraderService(config.Application):
         self.log.info(
             f"Grader service running at {self.service_host}:{self.service_port}"
         )
+
+        self.log.info(f"GraderServer: hub_service_name - { self.http_server.request_callback.hub_service_name }")
+        self.log.info(f"GraderServer: hub_api_token - {self.http_server.request_callback.hub_api_token}")
+        self.log.info(f"GraderServer: hub_api_url - {self.http_server.request_callback.hub_api_url}")
+        self.log.info(f"GraderServer: hub_base_url - {self.http_server.request_callback.hub_base_url}")
 
         # finish start
         self._start_future.set_result(None)
@@ -176,7 +169,7 @@ class GraderService(config.Application):
 
     async def launch_instance_async(self, argv=None):
         try:
-            await self.initialize(argv)
+            self.initialize(argv)
             await self.start()
         except Exception as e:
             self.log.exception("")
