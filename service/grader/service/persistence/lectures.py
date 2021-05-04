@@ -49,6 +49,8 @@ def takepart_as_student(user: User, lectid: int):
     insert = 'INSERT INTO "takepart" ("username","lectid","role") VALUES ("%s",%i,"%s")'
     data =  tuple(user.name, lectid,"student")
     session.execute(insert,data)
+    session.commit()
+
 
 def takepart_as_instructor(user: User, lectid: int):
     engine = create_engine(DataBaseManager.get_database_url(), echo=True)
@@ -56,6 +58,7 @@ def takepart_as_instructor(user: User, lectid: int):
     insert = 'INSERT INTO "takepart" ("username","lectid","role") VALUES ("%s",%i,"%s")'
     data =  tuple(user.name, lectid,"instructor")
     session.execute(insert,data)
+    session.commit()
 
 def update_lecture(lecture: Lecture):
     engine = create_engine(DataBaseManager.get_database_url(), echo=True)
@@ -63,6 +66,7 @@ def update_lecture(lecture: Lecture):
     update = 'UPDATE "lecture" SET name=%s, code=%s, complete=%r, semester=%s WHERE id=%i'
     data = tuple(lecture.name, lecture.code, lecture.complete, lecture.semester, lecture.id)
     session.execute(update,data)
+    session.commit()
 
 def delete_lecture(lectid: int):
     engine = create_engine(DataBaseManager.get_database_url(), echo=True)
@@ -70,3 +74,4 @@ def delete_lecture(lectid: int):
     delete = 'DELETE FROM "lecture" WHERE id=%i'
     data =  tuple(lectid)
     session.execute(delete,data)
+    session.commit()
