@@ -23,7 +23,7 @@ class CompressionEngine(LoggingConfigurable):
     super().__init__(**kwargs)
     self.compression_dir = compression_dir  # the directory to put the compressed files
 
-  def create_archive(self, name: str, dir: str) -> str:
+  async def create_archive(self, name: str, dir: str) -> str:
     file_name = osp.join(self.compression_dir, name + self.extension)
 
     directory = osp.dirname(file_name)
@@ -35,14 +35,14 @@ class CompressionEngine(LoggingConfigurable):
       tar.add(dir, arcname=osp.basename(dir))
     return file_name
   
-  def read_archive(self, src: str) -> bytes:
+  async def read_archive(self, src: str) -> bytes:
     if not tarfile.is_tarfile(src):
       raise ValueError(f"The path {src} is not a tar file.")
     with open(src, "rb") as f:
       data = f.read()
     return data
   
-  def unpack_archive(self, archive: bytes, dst: str, archive_name: str):
+  async def unpack_archive(self, archive: bytes, dst: str, archive_name: str):
     if not osp.isdir(dst):
       raise ValueError(f"The path {dst} is not a direcotry.")
     file_obj = io.BytesIO(archive)
@@ -51,10 +51,10 @@ class CompressionEngine(LoggingConfigurable):
       os.mkdir(archive_dir)
       tar.extractall(path=archive_dir)
 
-  def archive_assignment(self, lecture: Lecture, assignment: Assignment, dir: str) -> str:
+  async def archive_assignment(self, lecture: Lecture, assignment: Assignment, dir: str) -> str:
     return self.create_archive("assignments/" + lecture.name + "/" + assignment.name, dir)
 
-  def archive_submission(self, user: User, assignment: Assignment, submission: Submission, dir: str) -> str:
+  async def archive_submission(self, user: User, assignment: Assignment, submission: Submission, dir: str) -> str:
     return self.create_archive("submissions/" + user.id + "/" + assignment.name + "/" + submission.id, dir)
 
   @property
