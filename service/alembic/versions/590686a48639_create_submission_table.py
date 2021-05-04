@@ -20,6 +20,7 @@ def upgrade():
     op.create_table('submission',
         sa.Column('id', sa.Integer, primary_key=True, autoincrement=True),
         sa.Column('date', sa.DateTime, nullable=False),
+        sa.Column('status', sa.String(255), nullable=False),
         sa.Column('assignid', sa.Integer, sa.ForeignKey('assignment.id')),
         sa.Column('username', sa.Integer, sa.ForeignKey('user.name'))
         )

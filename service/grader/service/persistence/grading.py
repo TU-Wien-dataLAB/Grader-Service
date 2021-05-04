@@ -11,6 +11,6 @@ def get_score(subid: int):
     select = text("SELECT score FROM feedback WHERE subid=:id")
     select = select.bindparams(id=subid)
     res = session.execute(select)
-    res = json.dumps([dict(x) for x in res])
+    res = [dict(x) for x in res]
     session.commit()
     return res

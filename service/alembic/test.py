@@ -17,8 +17,8 @@ engine.execute('INSERT INTO "takepart" ("username","lectid","role") VALUES ("use
 engine.execute('INSERT INTO "assignment" ("name","lectid","duedate","path","points") VALUES ("assign1",1,"2021-06-06","home/ins/",20)')
 engine.execute('INSERT INTO "assignment" ("name","lectid","duedate","path","points") VALUES ("assign2",1,"2021-07-07","home/ssa/",10)')
 
-engine.execute('INSERT INTO "submission" ("date","assignid","username") VALUES ("2021-05-05",1,"ubuntu")')
-engine.execute('INSERT INTO "submission" ("date","assignid","username") VALUES ("2021-05-07",1,"user1")')
+engine.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-05 14:43:35.863","not_graded",1,"user1")')
+engine.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-07 14:44:35.863","manually_graded",1,"user1")')
 
 engine.execute('INSERT INTO "file" ("name","assignid","path","exercise","points") VALUES ("exercise1.nb",1,"home/assi1",true,5)')
 engine.execute('INSERT INTO "file" ("name","assignid","path","exercise") VALUES ("dataset.csv",1,"home/assi1",false)')

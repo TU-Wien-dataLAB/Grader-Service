@@ -5,7 +5,7 @@ from grader.common.models.user import User
 from grader.common.models.assignment import Assignment
 import json
 
-def create_user(user: User):
+def create_user(user: User) -> None:
     session = DataBaseManager.instance().create_session()
 
     insert = text("INSERT INTO 'user' ('name') VALUES (:name)")

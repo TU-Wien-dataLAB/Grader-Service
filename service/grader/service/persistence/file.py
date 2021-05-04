@@ -20,6 +20,6 @@ def get_exercises_of_assignment(user: User, assignid: int):
     select = text("SELECT * FROM file WHERE assignid=:id AND exercise=true")
     select = select.bindparams(id=assignid)
     res = session.execute(select)
-    res = json.dumps([dict(x) for x in res])
+    res = [dict(x) for x in res]
     session.commit()
     return res
