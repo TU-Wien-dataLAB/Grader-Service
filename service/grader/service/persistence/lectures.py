@@ -7,8 +7,7 @@ from grader.service.persistence.database import DataBaseManager
 import json
 
 def get_lectures(user: User):
-    engine = create_engine(DataBaseManager.get_database_url(), echo=True)
-    session = Session(bind=engine)
+    session = DataBaseManager.create_session()
     data =  dict(name=user.name)
     select = 'SELECT lecture.* FROM takepart INNER JOIN lecture ON lecture.id=takepart.lectid WHERE username = :name'
     res = session.execute(text(select), data)
@@ -17,8 +16,7 @@ def get_lectures(user: User):
     return res
 
 def get_lecture(user: User, lectid: int):
-    engine = create_engine(DataBaseManager.get_database_url(), echo=True)
-    session = Session(bind=engine)
+    session = DataBaseManager.create_session()
     select = 'SELECT lecture.* FROM takepart INNER JOIN lecture ON lecture.id=takepart.lectid WHERE username= :name AND lecture.id=:id'
     data = dict(name=user.name, id=lectid)
     res = session.execute(select,data)
@@ -27,8 +25,7 @@ def get_lecture(user: User, lectid: int):
     return res
 
 def create_lecture(user: User, lecture: Lecture):
-    engine = create_engine(DataBaseManager.get_database_url(), echo=True)
-    session = Session(bind=engine)
+    session = DataBaseManager.create_session()
     insert = 'INSERT INTO "lecture" ("name","semester","code") VALUES (":name",":semester",":code")'
     data = dict(name=lecture.name,semester=lecture.semester,code=lecture.code) 
     session.execute(insert,data)
@@ -41,12 +38,10 @@ def create_lecture(user: User, lecture: Lecture):
     insert = 'INSERT INTO "takepart" ("username","lectid","role") VALUES (":name",:id,":role")' 
     data = dict(name=user.name, id=id[0],role="instructor")
     session.execute(insert, data)
-
     session.commit()
 
 def takepart_as_student(user: User, lectid: int):
-    engine = create_engine(DataBaseManager.get_database_url(), echo=True)
-    session = Session(bind=engine)
+    session = DataBaseManager.create_session()
     insert = 'INSERT INTO "takepart" ("username","lectid","role") VALUES (":name",:id,":role")'
     data = dict(name=user.name, id=lectid, role="student")
     session.execute(insert,data)
@@ -54,24 +49,21 @@ def takepart_as_student(user: User, lectid: int):
 
 
 def takepart_as_instructor(user: User, lectid: int):
-    engine = create_engine(DataBaseManager.get_database_url(), echo=True)
-    session = Session(bind=engine)
+    session = DataBaseManager.create_session()
     insert = 'INSERT INTO "takepart" ("username","lectid","role") VALUES (":name", :id,":role")'
     data = dict(name=user.name, id=lectid, role="instructor")
     session.execute(insert,data)
     session.commit()
 
 def update_lecture(lecture: Lecture):
-    engine = create_engine(DataBaseManager.get_database_url(), echo=True)
-    session = Session(bind=engine)
+    session = DataBaseManager.create_session()
     update = 'UPDATE "lecture" SET name=:name, code=:code, complete=:complete, semester=:semester WHERE id=:id'
     data = dict(name=lecture.name, code=lecture.code, complete=lecture.complete, semster=lecture.semester, id=lecture.id)
     session.execute(update,data)
     session.commit()
 
 def delete_lecture(lectid: int):
-    engine = create_engine(DataBaseManager.get_database_url(), echo=True)
-    session = Session(bind=engine)
+    session = DataBaseManager.create_session()
     delete = 'DELETE FROM "lecture" WHERE id=:id'
     data = dict(id=lectid)
     session.execute(delete,data)

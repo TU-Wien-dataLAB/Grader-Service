@@ -7,8 +7,8 @@ from grader.common.models.assignment import Assignment
 import json
 
 def create_user(user: User):
-    engine = create_engine(DataBaseManager.get_database_url(), echo=True)
-    session = Session(bind=engine)
+    session = DataBaseManager.create_session()
+
     data = dict(name=user.name)
     insert = 'INSERT INTO "user" ("name") VALUES (:name)'
     session.execute(text(insert), data)
@@ -16,8 +16,8 @@ def create_user(user: User):
 
 
 def user_exists(user: User) -> bool:
-    engine = create_engine(DataBaseManager.get_database_url(), echo=True)
-    session = Session(bind=engine)
+    session = DataBaseManager.create_session()
+
     data = dict(name=user.name)
     select = 'SELECT * from "user" where name = :name'
     res = session.execute(text(select), data)

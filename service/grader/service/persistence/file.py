@@ -5,8 +5,8 @@ from grader.common.models.user import User
 import json
 
 def get_files_of_assignment(user: User, assignid: int):
-    engine = create_engine(DataBaseManager.get_database_url(), echo=True)
-    session = Session(bind=engine)
+    session = DataBaseManager.create_session()
+
     select = "SELECT * FROM file WHERE assignid=:id"
     data = dict(id=assignid)
     res = session.execute(select,data)
@@ -15,8 +15,8 @@ def get_files_of_assignment(user: User, assignid: int):
     return res
 
 def get_exercises_of_assignment(user: User, assignid: int):
-    engine = create_engine(DataBaseManager.get_database_url(), echo=True)
-    session = Session(bind=engine)
+    session = DataBaseManager.create_session()
+
     select = "SELECT * FROM file WHERE assignid=:id AND exercise=true"
     data = dict(id=assignid)
     res = session.execute(select,data)

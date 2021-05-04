@@ -6,8 +6,8 @@ import datetime
 import json
 
 def get_score(subid: int):
-    engine = create_engine(DataBaseManager.get_database_url(), echo=True)
-    session = Session(bind=engine)
+    session = DataBaseManager.create_session()
+
     select = 'SELECT score FROM feedback WHERE subid=:id'
     data = dict(id=subid)
     res = session.execute(select,data)
