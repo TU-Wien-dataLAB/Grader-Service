@@ -1,6 +1,6 @@
 from grader.service.persistence.database import DataBaseManager
 from sqlalchemy import create_engine
-engine = create_engine(DataBaseManager.get_database_url(), echo=True)
+engine = DataBaseManager.instance().create_session()
 engine.execute('INSERT INTO "user" ("name") VALUES ("user1")')
 engine.execute('INSERT INTO "user" ("name") VALUES ("user2")')
 engine.execute('INSERT INTO "user" ("name") VALUES ("user3")')
@@ -31,3 +31,5 @@ engine.execute('INSERT INTO "file" ("name","assignid","path","exercise") VALUES 
 select = engine.execute('SELECT * FROM "assignment";')
 for r in select:
     print(list(r))
+
+engine.commit()

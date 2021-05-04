@@ -1,5 +1,4 @@
 from grader.service.persistence.database import DataBaseManager
-from sqlalchemy import create_engine
 from sqlalchemy.orm import Session
 from sqlalchemy.sql import text
 from grader.common.models.user import User
@@ -7,19 +6,21 @@ from grader.common.models.assignment import Assignment
 import json
 
 def create_user(user: User):
-    session = DataBaseManager.create_session()
+    session = DataBaseManager.instance().create_session()
 
-    data = dict(name=user.name)
-    insert = 'INSERT INTO "user" ("name") VALUES (:name)'
-    session.execute(text(insert), data)
+    insert = text("INSERT INTO 'user' ('name') VALUES (:name)")
+    insert = insert.bindparams(name=user.name)
+
+    session.execute(insert)
     session.commit()
 
 
 def user_exists(user: User) -> bool:
-    session = DataBaseManager.create_session()
+    session = DataBaseManager.instance().create_session()
 
-    data = dict(name=user.name)
-    select = 'SELECT * from "user" where name = :name'
-    res = session.execute(text(select), data)
+    select = text("SELECT * from 'user' where name = :name")
+    select = select.bindparams(name=user.name)
+
+    res = session.execute(select)
     return res.first() is not None
 
