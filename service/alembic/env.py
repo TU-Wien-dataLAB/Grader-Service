@@ -13,11 +13,23 @@ config = context.config
 # This line sets up loggers basically.
 fileConfig(config.config_file_name)
 
+
+# imprt model.py
+import os
+import sys
+MODEL_PATH = os.path.join(os.path.abspath(os.path.dirname(__file__)), "../grader/service")
+sys.path.append(MODEL_PATH)
+from grader.service import orm
+
+
+# edit this line and pass metadata
+target_metadata = orm.Base.metadata
+
 # add your model's MetaData object here
 # for 'autogenerate' support
 # from myapp import mymodel
 # target_metadata = mymodel.Base.metadata
-target_metadata = None
+# target_metadata = None
 
 # other values from the config, defined by the needs of env.py,
 # can be acquired:
@@ -43,6 +55,7 @@ def run_migrations_offline():
         target_metadata=target_metadata,
         literal_binds=True,
         dialect_opts={"paramstyle": "named"},
+        render_as_batch=True
     )
 
     with context.begin_transaction():
@@ -68,7 +81,7 @@ def run_migrations_online():
 
     with connectable.connect() as connection:
         context.configure(
-            connection=connection, target_metadata=target_metadata
+            connection=connection, target_metadata=target_metadata, render_as_batch=True
         )
 
         with context.begin_transaction():
