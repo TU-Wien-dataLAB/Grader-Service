@@ -22,6 +22,7 @@ class DataBaseManager(SingletonConfigurable):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.engine = create_engine(self.get_database_url(), echo=True)
+        self.log.info(f"DataBaseManager: url - { self.get_database_url() }")
 
     def get_database_url(self):
         url: str = self.db_dialect
