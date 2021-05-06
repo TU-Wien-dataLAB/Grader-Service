@@ -4,6 +4,7 @@ from grader.common.registry import HandlerPathRegistry
 import os
 import asyncio
 import signal
+from grader.service.persistence.database import DataBaseManager
 import tornado
 from tornado import web
 from tornado.httpserver import HTTPServer
@@ -107,8 +108,10 @@ class GraderService(config.Application):
         self.log.info("Starting Grader Service...")
         self.io_loop = tornado.ioloop.IOLoop.current()
 
-        handlers = HandlerPathRegistry.handler_list()
+        # pass config to DataBaseManager
+        DataBaseManager.config = self.config
 
+        handlers = HandlerPathRegistry.handler_list()
         # start the webserver
         self.http_server: HTTPServer = HTTPServer(
             GraderServer(handlers=handlers, config=self.config),

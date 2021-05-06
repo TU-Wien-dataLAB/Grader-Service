@@ -19,8 +19,6 @@ class DataBaseManager(SingletonConfigurable):
     db_port = Int(None, allow_none=True).tag(config=True)
     db_path = Unicode("").tag(config=True)
 
-    database_url = Unicode("sqlite:///" + os.path.abspath(os.path.dirname(__file__) + "../../../../grader.db")).tag(config=True)
-
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.engine = create_engine(self.get_database_url(), echo=True)

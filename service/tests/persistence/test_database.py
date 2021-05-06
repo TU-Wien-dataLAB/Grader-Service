@@ -8,7 +8,8 @@ def test_get_url_dialect_host():
   c.DataBaseManager.db_dialect = "sqlite"
   c.DataBaseManager.db_host = "/" + os.path.abspath(os.path.dirname(__file__) + "/../../grader.db")
 
-  dbm: DataBaseManager = DataBaseManager.instance(config=c)
+  DataBaseManager.config = c
+  dbm: DataBaseManager = DataBaseManager.instance()
   assert dbm.db_dialect == c.DataBaseManager.db_dialect
   assert dbm.db_host == c.DataBaseManager.db_host
 
