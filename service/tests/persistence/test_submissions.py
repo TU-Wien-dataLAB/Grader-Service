@@ -13,3 +13,12 @@ def test_get_submissions(full_db):
 
   s = submissions.get_submissions(User("user1"), 1, latest=false)
   assert len(s) > 0
+
+def test_submit_submissions(full_db):
+  setup_db_manager_mock(full_db)
+  s = submissions.get_submissions(User("user1"), 1, latest=false)
+  before = len(s)
+  submissions.submit_assignment(User("user1"), 1)
+  after= len(submissions.get_submissions(User("user1"), 1, latest=false))
+  assert before < after
+
