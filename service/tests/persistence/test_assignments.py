@@ -27,7 +27,7 @@ def test_delete_assignment(full_db):
 
     assign = assignment.get_assignments(1)
     before = len(assign)
-    assignment.delete_assignment(1)
+    assignment.delete_assignment(Assignment(1,"assign1"))
     assign = assignment.get_assignments(1)
     after = len(assign)
     assert before > after

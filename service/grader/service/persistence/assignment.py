@@ -63,10 +63,10 @@ def update_assignment(assignment: Assignment):
     assign.status = assignment.status
     session.commit()
 
-def delete_assignment(assignid: Assignment):
+def delete_assignment(assignment: Assignment):
     session = DataBaseManager.instance().create_session()
 
-    assign = session.query(orm.Assignment).filter(orm.Assignment.id==assignid).one()
+    assign = session.query(orm.Assignment).filter(orm.Assignment.id==assignment.id).one()
     session.delete(assign)
     session.commit()
     return assign
