@@ -1,72 +1,80 @@
-from typing import List
+from typing import List, Optional, SupportsComplex
 from sqlalchemy import create_engine
 from sqlalchemy.orm import Session
 from sqlalchemy.sql import text
 from grader.common.models.user import User
 from grader.common.models.lecture import Lecture
 from grader.service.persistence.database import DataBaseManager
-import json
+from grader.service import orm
+
+
+def get_lecture_model(lecture: Optional[orm.Lecture]) -> Optional[Lecture]:
+    if lecture is None:
+        return None
+    model = Lecture()
+    model.id = lecture.id
+    model.name = lecture.name
+    model.complete = lecture.complete
+    model.code = lecture.code
+    model.semester = lecture.semester
+    return model
+
+def get_orm_from_model(lecture: Lecture) -> orm.Lecture:
+    orm_lecture = orm.Lecture()
+    orm_lecture.id = lecture.id
+    orm_lecture.name = lecture.name
+    orm_lecture.complete = lecture.complete
+    orm_lecture.code = lecture.code
+    orm_lecture.semester = lecture.semester
+    return orm_lecture
 
 def get_lectures(user: User) -> List[Lecture]:
     session = DataBaseManager.instance().create_session()
-    select = text("SELECT lecture.* FROM takepart INNER JOIN lecture ON lecture.id=takepart.lectid WHERE username = :name")
-    select =  select.bindparams(name=user.name)
-    res = session.execute(select)
-    res = [Lecture.from_dict(dict(x)) for x in res]
+    lectures: List[orm.Lecture] = session.query(orm.Lecture).filter(orm.Role.lectid == orm.Lecture.id and orm.Role.username == user.name).all()
+    res = []
+    for lecture in lectures:
+        model = get_lecture_model(lecture)
+        res.append(model)
     session.commit()
     return res
 
 def get_lecture(user: User, lectid: int) -> Lecture:
     session = DataBaseManager.instance().create_session()
-    select = text("SELECT lecture.* FROM takepart INNER JOIN lecture ON lecture.id=takepart.lectid WHERE username= :name AND lecture.id=:id")
-    select = select.bindparams(name=user.name, id=lectid)
-    res = session.execute(select)
-    try:
-        res = [Lecture.from_dict(dict(x)) for x in res][0]
-    except IndexError:
-        return None
+    lecture: orm.Lecture = session.query(orm.Lecture).filter(lectid == orm.Lecture.id and orm.Role.username == user.name).one()
+    res = get_lecture_model(lecture)
     session.commit()
     return res
 
-def create_lecture(user: User, lecture: Lecture) -> None:
+def create_lecture(lecture: Lecture) -> Lecture:
     session = DataBaseManager.instance().create_session()
-    insert = text("INSERT INTO 'lecture' ('name','semester','code') VALUES (:name,:semester,:code)")
-    insert = insert.bindparams(name=lecture.name,semester=lecture.semester,code=lecture.code) 
-    session.execute(insert)
+    lecture = get_orm_from_model(lecture)
+    session.add(lecture)
+    session.flush() # sets lecture.id
 
-    select = text("SELECT id FROM lecture WHERE lecture.name=:name")
-    select = select.bindparams(name=lecture.name)
-    select = session.execute(select)
-    id = [r[0] for r in select]
+    model = get_lecture_model(lecture)
+    session.commit()
+    return model
 
-    insert = text("INSERT INTO 'takepart' ('username','lectid','role') VALUES (:name,:id,:role)") 
-    insert = insert.bindparams(name=user.name, id=id[0],role="instructor")
-    session.execute(insert)
+def add_user_to_lecture(user: User, lecture: Lecture, role: str) -> None:
+    session = DataBaseManager.instance().create_session()
+    orm_role = orm.Role()
+    orm_role.lectid = lecture.id
+    orm_role.username = user.name
+    orm_role.role = role
+    session.add(orm_role)
     session.commit()
 
-def takepart_as_student(user: User, lectid: int) -> None:
-    takepart(user, lectid, "student")
-
-def takepart_as_instructor(user: User, lectid: int) -> None:
-    takepart(user, lectid, "instructor")
-
-def takepart(user: User, lectid: int, role: str) -> None:
-    session = DataBaseManager.instance().create_session()
-    insert = text("INSERT INTO 'takepart' ('username','lectid','role') VALUES (:name, :id, :role)")
-    insert = insert.bindparams(name=user.name, id=lectid, role=role)
-    session.execute(insert)
-    session.commit()
 
 def update_lecture(lecture: Lecture) -> None:
     session = DataBaseManager.instance().create_session()
-    update = text("UPDATE 'lecture' SET name=:name, code=:code, complete=:complete, semester=:semester WHERE id=:id")
-    update = update.bindparams(name=lecture.name, code=lecture.code, complete=lecture.complete, semster=lecture.semester, id=lecture.id)
-    session.execute(update)
+    lect = session.query(orm.Lecture).get(lecture.id) 
+    for key, value in lecture.to_dict():
+        if hasattr(orm.Lecture, key) and key != "id":
+            setattr(lect, key, value)
     session.commit()
 
 def delete_lecture(lectid: int) -> None:
     session = DataBaseManager.instance().create_session()
-    delete = text("DELETE FROM 'lecture' WHERE id=:id")
-    delete = delete.bindparams(id=lectid)
-    session.execute(delete)
+    lect = session.query(orm.Lecture).get(lectid)
+    session.delete(lect)
     session.commit()

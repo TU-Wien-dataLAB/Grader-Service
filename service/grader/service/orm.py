@@ -55,10 +55,10 @@ class Lecture(Base):
 
 
 class User(Base):
-    __tablename__ = 'user'
-    name =  Column(String(255), primary_key=True)
+  __tablename__ = 'user'
+  name =  Column(String(255), primary_key=True)
 
-    roles = relationship("Role", back_populates="user")
+  roles = relationship("Role", back_populates="user")
   
 
 class Role(Base):
