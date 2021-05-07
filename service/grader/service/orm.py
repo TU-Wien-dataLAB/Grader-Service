@@ -1,5 +1,5 @@
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy import Column, Integer, String, ForeignKey, DateTime, Enum, Boolean, Table
+from sqlalchemy import Column, Integer, String, ForeignKey, DateTime, Enum, Boolean
 from sqlalchemy.orm import relationship
 
 
@@ -41,7 +41,6 @@ class File(Base):
 
   assignment = relationship("Assignment", back_populates="files")
 
-role = Table('takepart', Base.metadata, Column('username',Integer, ForeignKey('user.name')), Column('lectid',Integer, ForeignKey('lecture.id')), Column('role',String(255), nullable=False))
 
 class Lecture(Base):
   __tablename__ = "lecture"
@@ -52,13 +51,23 @@ class Lecture(Base):
   complete = Column(Boolean(), default=False)
 
   assignments = relationship("Assignment", back_populates="lecture")
-  users = relationship("User", secondary=role, back_populates="lectures")
+  roles = relationship("Role", back_populates="lecture")
 
 
 class User(Base):
     __tablename__ = 'user'
     name =  Column(String(255), primary_key=True)
 
-    lectures = relationship("Lecture", secondary=role, back_populates="users")
+    roles = relationship("Role", back_populates="user")
   
+
+class Role(Base):
+  __tablename__ = "takepart"
+  username = Column(Integer, ForeignKey('user.name'), primary_key=True)
+  lectid = Column(Integer, ForeignKey('lecture.id'), primary_key=True)
+  role = Column(String(255), nullable=False)
+
+  lecture = relationship("Lecture", back_populates="roles")
+  user = relationship("User", back_populates="roles")
+
 
