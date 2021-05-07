@@ -48,3 +48,36 @@ def test_create_lecture(lecture_db):
   new_num_lects = len(ls)
 
   assert num_lects + 1 == new_num_lects
+
+def test_add_user_to_lecture(lecture_db):
+  setup_db_manager_mock(lecture_db)
+
+  r = lecture_db.query(orm.Role).filter(orm.Role.lectid == 3 and orm.Role.username == "user1").all()
+  assert len(r) == 0
+
+  lectures.add_user_to_lecture(User("user1"), Lecture(id=3), "student")
+  r = lecture_db.query(orm.Role).filter(orm.Role.lectid == 3 and orm.Role.username == "user1").all()
+  assert len(r) == 1
+
+
+def test_add_user_to_lecture_unknown_user(lecture_db):
+  setup_db_manager_mock(lecture_db)
+
+  r = lecture_db.query(orm.Role).filter(orm.Role.lectid == 3 and orm.Role.username == "test_user").all()
+  assert len(r) == 0
+
+  lectures.add_user_to_lecture(User("test_user"), Lecture(id=3), "student")
+  r = lecture_db.query(orm.Role).filter(orm.Role.lectid == 3 and orm.Role.username == "test_user").all()
+  assert len(r) == 1
+
+
+def test_update_lecture(lecture_db):
+  setup_db_manager_mock(lecture_db)
+
+  l: Lecture = lectures.get_lecture(User("user1"), 1)
+  l.name = "new_lecture_name"
+
+  updated_lecture = lectures.update_lecture(l)
+  assert updated_lecture.name == "new_lecture_name"
+
+  assert lectures.get_lecture(User("user1"), 1).name == "new_lecture_name"

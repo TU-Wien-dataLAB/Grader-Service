@@ -6,6 +6,7 @@ from grader.common.models.user import User
 from grader.common.models.lecture import Lecture
 from grader.service.persistence.database import DataBaseManager
 from grader.service import orm
+from grader.service.persistence.user import user_exists, create_user
 
 
 def get_lecture_model(lecture: Optional[orm.Lecture]) -> Optional[Lecture]:
@@ -56,6 +57,8 @@ def create_lecture(lecture: Lecture) -> Lecture:
     return model
 
 def add_user_to_lecture(user: User, lecture: Lecture, role: str) -> None:
+    if not user_exists(user):
+        create_user(user)
     session = DataBaseManager.instance().create_session()
     orm_role = orm.Role()
     orm_role.lectid = lecture.id

@@ -15,6 +15,6 @@ def create_user(user: User) -> None:
 
 def user_exists(user: User) -> bool:
     session = DataBaseManager.instance().create_session()
-    res = session.query(orm.User).filter(name=user.name)
+    res = session.query(orm.User).filter(orm.User.name == user.name)
     return res.first() is not None
 
