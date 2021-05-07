@@ -70,11 +70,12 @@ def add_user_to_lecture(user: User, lecture: Lecture, role: str) -> None:
 
 def update_lecture(lecture: Lecture) -> None:
     session = DataBaseManager.instance().create_session()
-    lect = session.query(orm.Lecture).get(lecture.id) 
-    for key, value in lecture.to_dict():
+    lect = session.query(orm.Lecture).get(lecture.id)
+    for key, value in lecture.to_dict().items():
         if hasattr(orm.Lecture, key) and key != "id":
             setattr(lect, key, value)
     session.commit()
+    return lect
 
 def delete_lecture(lectid: int) -> None:
     session = DataBaseManager.instance().create_session()

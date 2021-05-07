@@ -81,3 +81,10 @@ def test_update_lecture(lecture_db):
   assert updated_lecture.name == "new_lecture_name"
 
   assert lectures.get_lecture(User("user1"), 1).name == "new_lecture_name"
+
+def test_delete_lecture(lecture_db):
+  setup_db_manager_mock(lecture_db)
+
+  lectures.delete_lecture(2)
+  with pytest.raises(sqlalchemy.exc.NoResultFound):
+    lectures.get_lecture(User("user1"), 2)
