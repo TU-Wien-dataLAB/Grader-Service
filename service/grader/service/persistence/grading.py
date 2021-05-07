@@ -2,15 +2,13 @@ from grader.service.persistence.database import DataBaseManager
 from sqlalchemy import text
 from sqlalchemy.orm import Session
 from grader.common.models.user import User
+from grader.service import orm
 import datetime
 import json
 
 def get_score(subid: int):
     session = DataBaseManager.instance().create_session()
 
-    select = text("SELECT score FROM feedback WHERE subid=:id")
-    select = select.bindparams(id=subid)
-    res = session.execute(select)
-    res = [dict(x) for x in res]
+    score = session.query(orm.Submission).filter(orm.Submission.id == subid).one().score
     session.commit()
-    return res
+    return score
