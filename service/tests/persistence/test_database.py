@@ -33,6 +33,7 @@ def test_get_url_ignore_only_password():
   dbm: DataBaseManager = DataBaseManager.instance()
   dbm.db_dialect = "postgresql"
   dbm.db_driver = "pg8000"
+  dbm.db_username = None
   dbm.db_password = "kx%jj5/g"
   dbm.db_host = "pghost10"
   dbm.db_port = 2000
@@ -45,7 +46,10 @@ def test_get_url_no_port():
   dbm: DataBaseManager = DataBaseManager.instance()
   dbm.db_dialect = "postgresql"
   dbm.db_driver = "pg8000"
+  dbm.db_username = None
+  dbm.db_password = None
   dbm.db_host = "pghost10"
+  dbm.db_port = None
   dbm.db_path = "/appdb"
 
   assert dbm.get_database_url() == f'postgresql+pg8000://pghost10/appdb'
