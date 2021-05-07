@@ -13,16 +13,34 @@ def get_assignments(lectid: int) -> List[Assignment]:
     session = DataBaseManager.instance().create_session()
 
     select = session.query(orm.Assignment).filter(orm.Assignment.lectid == lectid).all()
+    res = []
+    for a in select:
+        a_model = Assignment()
+        a_model.id = a.id
+        a_model.name = a.name
+        a_model.due_date = a.duedate
+        a_model.status = a.status
+        a_model.exercises = [AssignmentFile(name=f.name, hashcode=None, path=f.path) for f in a.files if f.exercise]
+        a_model.files = [AssignmentFile(name=f.name, hashcode=None, path=f.path) for f in a.files if not f.exercise]
+        res.append(a_model)
     session.commit()
-    return select
+    return res
 
 #used for fechting specific assignment
-def get_assignment(lectid: int, assignid: int):
+def get_assignment(lectid: int, assignid: int) -> Assignment:
     session = DataBaseManager.instance().create_session()
 
-    select = session.query(orm.Assignment).filter(orm.Assignment.lectid == lectid, orm.Assignment.id == assignid).one()
+    a = session.query(orm.Assignment).filter(orm.Assignment.lectid == lectid, orm.Assignment.id == assignid).one()
+    a_model = Assignment()
+    a_model.id = a.id
+    a_model.name = a.name
+    a_model.due_date = a.duedate
+    a_model.status = a.status
+    a_model.exercises = [AssignmentFile(name=f.name, hashcode=None, path=f.path) for f in a.files if f.exercise]
+    a_model.files = [AssignmentFile(name=f.name, hashcode=None, path=f.path) for f in a.files if not f.exercise]
+    
     session.commit()
-    return select
+    return a_model
 
 def create_assignment(assignment: Assignment, lectid: int):
     session = DataBaseManager.instance().create_session()
@@ -52,24 +70,3 @@ def delete_assignment(assignid: Assignment):
     session.delete(assign)
     session.commit()
     return assign
-
-
-def get_exercises(assignment: Assignment) -> List[Exercise]:
-    session = DataBaseManager.instance().create_session()
-
-    files = session.query(orm.Assignment).filter(orm.Assignment.files.exercise == True).all()
-
-    res = [dict(ex) for ex in files]
-    res = [Exercise.from_dict({"id": d["id"], "a_id": d["assignid"], "name": d["name"], "points": d["points"], "path": d["path"]} for d in res)]
-    session.commit()
-    return res
-
-def get_files(assignment: Assignment) -> List[AssignmentFile]:
-    session = DataBaseManager.instance().create_session()
-
-    files = session.query(orm.Assignment).filter(orm.Assignment.files.exercise == False).all()
-
-    res = [dict(ex) for ex in files]
-    res = [AssignmentFile.from_dict({"id": d["id"], "a_id": d["assignid"], "name": d["name"], "path": d["path"]} for d in res)]
-    session.commit()
-    return res
