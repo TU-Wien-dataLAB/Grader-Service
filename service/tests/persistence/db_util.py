@@ -45,8 +45,8 @@ def insert_lectures(session):
 
 
 def insert_assignments(session):
-  session.execute('INSERT INTO "assignment" ("name","lectid","duedate","path","points") VALUES ("assignment_1",1,"2021-06-06 23:59:00.000","home/ins/",20)')
-  session.execute('INSERT INTO "assignment" ("name","lectid","duedate","path","points") VALUES ("assignment_2",1,"2021-07-07 23:59:00.000","home/ssa/",10)')
+  session.execute('INSERT INTO "assignment" ("name","lectid","duedate","path","points","status") VALUES ("assignment_1",1,"2021-06-06 23:59:00.000","home/ins/",20,"created")')
+  session.execute('INSERT INTO "assignment" ("name","lectid","duedate","path","points","status") VALUES ("assignment_2",1,"2021-07-07 23:59:00.000","home/ssa/",10,"created")')
 
   session.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-05 14:43:35.863","not_graded",1,"user1")')
   session.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-07 14:44:35.863","manually_graded",1,"user1")')

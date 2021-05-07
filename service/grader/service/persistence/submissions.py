@@ -20,6 +20,7 @@ def get_submissions(user: User, assignid: int,  latest: bool) -> List[Submission
         sub_model.status = sub.status
         sub_model.submitted_at = sub.date
         res.append(sub_model)
+    
     session.commit()
     return res
 
