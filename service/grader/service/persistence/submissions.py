@@ -11,9 +11,15 @@ import json
 
 def get_submissions(user: User, assignid: int,  latest: bool) -> List[Submission]:
     session = DataBaseManager.instance().create_session()
-    select = session.query(orm.Submission).filter(orm.Submission.username == user.name, orm.Submission.assignid == assignid).all()
-    res = [dict(x) for x in select]
-    res = [Submission.from_dict({"id": d["id"], "submitted_at": d["date"], "status": d["status"]} for d in res)]
+    select: List[orm.Submission] = session.query(orm.Submission).filter(orm.Submission.username == user.name, orm.Submission.assignid == assignid).all()
+    # res = [Submission.from_dict({"id": d["id"], "submitted_at": d["date"], "status": d["status"]} for d in select)]
+    res = []
+    for sub in select:
+        sub_model = Submission()
+        sub_model.id = sub.id
+        sub_model.status = sub.status
+        sub_model.submitted_at = sub.date
+        res.append(sub_model)
     session.commit()
     return res
 

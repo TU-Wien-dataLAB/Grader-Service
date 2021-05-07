@@ -73,6 +73,3 @@ def get_files(assignment: Assignment) -> List[AssignmentFile]:
     res = [AssignmentFile.from_dict({"id": d["id"], "a_id": d["assignid"], "name": d["name"], "path": d["path"]} for d in res)]
     session.commit()
     return res
-
-
-get_assignments(1)

@@ -1,16 +1,9 @@
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy import Column, Integer, String, ForeignKey, DateTime, Enum, Boolean
+from sqlalchemy import Column, Integer, String, ForeignKey, DateTime, Enum, Boolean, Table
 from sqlalchemy.orm import relationship
 
 
 Base = declarative_base()
-
-class User(Base):
-    __tablename__ = 'user'
-    name =  Column(String(255), primary_key=True)
-
-    lectures = relationship("Lecture", secondary="Role", back_populates="users")
-  
 
 class Submission(Base):
   __tablename__ = "submission"
@@ -48,11 +41,7 @@ class File(Base):
 
   assignment = relationship("Assignment", back_populates="files")
 
-class Role(Base):
-  __tablename__ = "takepart"
-  username = Column(Integer, ForeignKey('user.name'), primary_key=True)
-  lectid = Column(Integer, ForeignKey('lecture.id'), primary_key=True)
-  role = Column(String(255), nullable=False)
+role = Table('takepart', Base.metadata, Column('username',Integer, ForeignKey('user.name')), Column('lectid',Integer, ForeignKey('lecture.id')), Column('role',String(255), nullable=False))
 
 class Lecture(Base):
   __tablename__ = "lecture"
@@ -63,4 +52,13 @@ class Lecture(Base):
   complete = Column(Boolean(), default=False)
 
   assignments = relationship("Assignment", back_populates="lecture")
-  users = relationship("User", secondary="Role", back_populates="lectures")
+  users = relationship("User", secondary=role, back_populates="lectures")
+
+
+class User(Base):
+    __tablename__ = 'user'
+    name =  Column(String(255), primary_key=True)
+
+    lectures = relationship("Lecture", secondary=role, back_populates="users")
+  
+
