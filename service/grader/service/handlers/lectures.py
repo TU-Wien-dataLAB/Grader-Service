@@ -4,10 +4,11 @@ from grader.service.handlers.base_handler import GraderBaseHandler, authenticate
 from jupyter_server.utils import url_path_join
 import tornado
 from tornado import web
+from tornado_sqlalchemy import SessionMixin
 from grader.service.persistence.lectures import get_lectures
 
 @register_handler(path=r"\/lectures\/?")
-class LectureBaseHandler(GraderBaseHandler):
+class LectureBaseHandler(GraderBaseHandler, SessionMixin):
   
   @authenticated
   async def get(self):
@@ -20,7 +21,7 @@ class LectureBaseHandler(GraderBaseHandler):
 
 
 @register_handler(path=r"\/lectures\/(?P<lecture_id>\d*)\/?")
-class LectureObjectHandler(GraderBaseHandler):
+class LectureObjectHandler(GraderBaseHandler, SessionMixin):
   
   @authenticated
   async def put(self, lecture_id: int):
