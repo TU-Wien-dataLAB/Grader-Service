@@ -11,19 +11,21 @@ import datetime
 
 
 def test_get_assignments(full_db):
-    setup_db_manager_mock(full_db)
+    revert = setup_db_manager_mock(full_db)
 
     assign = assignment.get_assignments(1)
     assert len(assign) > 0
+    revert()
 
 def test_get_assignment(full_db):
-    setup_db_manager_mock(full_db)
+    revert = setup_db_manager_mock(full_db)
 
     assign = assignment.get_assignment(1,1)
     assert assign.id == 1
+    revert()
 
 def test_delete_assignment(full_db):
-    setup_db_manager_mock(full_db)
+    revert = setup_db_manager_mock(full_db)
 
     assign = assignment.get_assignments(1)
     before = len(assign)
@@ -31,13 +33,15 @@ def test_delete_assignment(full_db):
     assign = assignment.get_assignments(1)
     after = len(assign)
     assert before > after
+    revert()
 
 def test_update_assignment(full_db):
-    setup_db_manager_mock(full_db)
+    revert = setup_db_manager_mock(full_db)
 
     before = assignment.get_assignment(1,1)
     assignment.update_assignment(Assignment(id=1,name="newName",exercises=[],files=[],due_date=datetime.datetime.today(),status="created"))
     after = assignment.get_assignment(1,1)
     assert before.name != after.name
+    revert()
 
 
