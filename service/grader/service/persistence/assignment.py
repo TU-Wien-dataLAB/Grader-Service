@@ -52,7 +52,6 @@ def create_assignment(assignment: Assignment, lectid: int):
 
 def update_assignment(assignment: Assignment):
     session = DataBaseManager.instance().create_session()
-
     assign = session.query(orm.Assignment).filter(orm.Assignment.id==assignment.id).one()
     assign.name = assignment.name
     assign.duedate = assignment.due_date

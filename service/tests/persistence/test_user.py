@@ -1,4 +1,4 @@
-from grader.common.models.user import User
+from grader.service.orm.user import User
 import pytest
 from unittest.mock import MagicMock
 from sqlalchemy import create_engine
@@ -9,6 +9,7 @@ from grader.service.persistence.database import DataBaseManager
 from grader.service.persistence import user
 
 def test_create_user(full_db):
-  setup_db_manager_mock(full_db)
-  user.create_user(User("test"))
-  assert user.user_exists(User("test"))
+  revert = setup_db_manager_mock(full_db)
+  user.create_user(User(name="test"))
+  assert user.user_exists(User(name="test"))
+  revert()
