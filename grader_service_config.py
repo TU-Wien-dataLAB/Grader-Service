@@ -1,6 +1,7 @@
 import os
 
 c.GraderService.service_host = "127.0.0.1"
+c.GraderService.grader_service_dir = os.path.expanduser("~/grader_service_dir")
 
 c.GraderServer.hub_service_name = "grader"
 c.GraderServer.hub_api_token = "7572f93a2e7640999427d9289c8318c0"

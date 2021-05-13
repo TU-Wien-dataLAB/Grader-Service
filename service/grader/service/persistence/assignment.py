@@ -45,8 +45,8 @@ def get_assignment(lectid: int, assignid: int) -> Assignment:
 def create_assignment(assignment: Assignment, lectid: int):
     session = DataBaseManager.instance().create_session()
 
-    #TODO: points and path not yet set
-    assignment = orm.Assignment(name=assignment.name,lectid=lectid, duedate=assignment.due_date, path='', points=0, status=assignment.status)
+    #TODO: points not yet set
+    assignment = orm.Assignment(name=assignment.name,lectid=lectid, duedate=assignment.due_date, points=0, status=assignment.status)
     session.add(assignment)
     session.commit()
 
