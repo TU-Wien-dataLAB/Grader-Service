@@ -37,7 +37,6 @@ def upgrade():
     sa.Column('name', sa.String(length=255), nullable=False),
     sa.Column('lectid', sa.Integer(), nullable=True),
     sa.Column('duedate', sa.DateTime(), nullable=False),
-    sa.Column('path', sa.String(length=255), nullable=False),
     sa.Column('points', sa.Integer(), nullable=False),
     sa.Column('status', sa.Enum('created', 'released', 'fetching', 'fetched', 'complete'), nullable=True),
     sa.ForeignKeyConstraint(['lectid'], ['lecture.id'], ),

@@ -41,7 +41,6 @@ def test_assignment_serialization():
         name=d["name"],
         lectid=1,
         duedate=d["due_date"],
-        path="",
         points=0,
         status=d["status"],
     )

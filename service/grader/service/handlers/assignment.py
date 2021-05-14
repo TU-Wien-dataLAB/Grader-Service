@@ -50,7 +50,7 @@ class AssignmentBaseHandler(SessionMixin, GraderBaseHandler):
         assignment.lectid = lecture_id
         assignment.duedate = assignment_model.due_date
         assignment.status = assignment_model.status
-
+        self.session.add(assignment)
         self.session.commit()
         self.write(assignment)
 

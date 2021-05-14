@@ -8,13 +8,16 @@ from .db_util import *
 from grader.service.persistence.database import DataBaseManager
 from grader.service.persistence import assignment
 import datetime
+import tornado.httpclient
 
 
 def test_get_assignments(full_db):
     revert = setup_db_manager_mock(full_db)
+    httpclient = tornado.httpclient.AsyncHTTPClient()
 
-    assign = assignment.get_assignments(1)
-    assert len(assign) > 0
+    assign = httpclient.fetch('127.0.0.1/hub/api/lectures/1/assignments')
+    print(assign)
+    assert not assign == None
     revert()
 
 def test_get_assignment(full_db):
@@ -26,7 +29,7 @@ def test_get_assignment(full_db):
 
 def test_delete_assignment(full_db):
     revert = setup_db_manager_mock(full_db)
-
+        
     assign = assignment.get_assignments(1)
     before = len(assign)
     assignment.delete_assignment(Assignment(1,"assign1"))
