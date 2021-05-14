@@ -18,21 +18,21 @@ class CompressionEngine(LoggingConfigurable):
   compression_dir = Unicode('', help="The absolute path to the directory where the archives should be written.").tag(config=True)
   compression_algo = Unicode('gz', help="The compression algorithm to use. Either: '', 'gz', 'bz' or 'xz'").tag(config=True)
   compression_level = Int(2).tag(config=True)
-  
-  def __init__(self, compression_dir: str, **kwargs):
-    super().__init__(**kwargs)
-    self.compression_dir = compression_dir  # the directory to put the compressed files
 
-  async def create_archive(self, name: str, dir: str) -> str:
+  def __init__(self, compression_dir: str, **kwargs):
+      super().__init__(**kwargs)
+      self.compression_dir = compression_dir
+
+  async def create_archive(self, name: str, path: str) -> str:
     file_name = osp.join(self.compression_dir, name + self.extension)
 
     directory = osp.dirname(file_name)
     if not osp.exists(directory):
         os.makedirs(directory)
 
-    dir = osp.abspath(dir)
+    path = osp.abspath(path)
     with tarfile.open(file_name, 'w:'+self.compression_algo) as tar:
-      tar.add(dir, arcname=osp.basename(dir))
+      tar.add(path, arcname=osp.basename(path))
     return file_name
   
   async def read_archive(self, src: str) -> bytes:

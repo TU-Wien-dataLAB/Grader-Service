@@ -8,8 +8,6 @@ import urllib.parse
 
 class DataBaseManager(SingletonConfigurable):
 
-    # TODO: override instance() method to automatically use config passed in main
-
     # database URLs: dialect+driver://username:password@host:port/database
     db_dialect = Unicode("sqlite").tag(config=True)
     db_driver = Unicode(None, allow_none=True).tag(config=True)

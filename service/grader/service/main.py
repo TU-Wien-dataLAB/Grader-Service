@@ -4,6 +4,7 @@ from grader.common.registry import HandlerPathRegistry
 import os
 import asyncio
 import signal
+from grader.common.services.git import GitService
 from grader.service.persistence.database import DataBaseManager
 import tornado
 from tornado import web
@@ -12,7 +13,7 @@ from traitlets import config
 
 # run __init__.py to register handlers
 import grader.service
-from traitlets.traitlets import Enum, Int, Unicode, validate
+from traitlets.traitlets import Enum, Int, TraitError, Unicode, observe, validate
 from grader.service.server import GraderServer
 
 
@@ -36,6 +37,8 @@ class GraderService(config.Application):
         config=True
     )
     service_port = Int(4010, help="The port the service runs on").tag(config=True)
+
+    grader_service_dir = Unicode(None, allow_none=False).tag(config=True)
 
     config_file = Unicode(
         "grader_service_config.py", help="The config file to load"
@@ -111,10 +114,12 @@ class GraderService(config.Application):
         # pass config to DataBaseManager
         DataBaseManager.config = self.config
 
+        GitService.instance().git_local_root_dir = os.path.join(self.grader_service_dir, "git")
+
         handlers = HandlerPathRegistry.handler_list()
         # start the webserver
         self.http_server: HTTPServer = HTTPServer(
-            GraderServer(handlers=handlers, config=self.config),
+            GraderServer(grader_service_dir=self.grader_service_dir, handlers=handlers, config=self.config),
             # ssl_options=ssl_context,
             xheaders=True,
         )
@@ -192,6 +197,26 @@ class GraderService(config.Application):
                 # re-raise exceptions in launch_instance_async
                 task.result()
             loop.stop()
+    
+    @validate("grader_service_dir")
+    def _validate_service_dir(self, proposal):
+        path: str = proposal['value']
+        if not os.path.isabs(path):
+            raise TraitError("The path is not absolute")
+        if not os.path.isdir(path):
+            raise TraitError("The path has to be an existing directory")
+        return path
+    
+    @observe("grader_service_dir")
+    def _observe_service_dir(self, change):
+        path = change["new"]
+        git_path = os.path.join(path, "git")
+        if not os.path.isdir(git_path):
+            os.mkdir(git_path)
+        archive_path = os.path.join(path, "archive")
+        if not os.path.isdir(archive_path):
+            os.mkdir(archive_path)
+
 
 
 main = GraderService.launch_instance

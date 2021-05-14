@@ -1,15 +1,22 @@
 from grader.common.models.error_message import ErrorMessage
 from grader.common.registry import register_handler
+from grader.common.services.compression import CompressionEngine
+from grader.common.services.git import GitService
 from grader.service.handlers.base_handler import GraderBaseHandler, authenticated
+from grader.service.main import GraderService
 from grader.service.orm import lecture
 from grader.service.orm import assignment
 from grader.service.orm.assignment import Assignment
+from grader.service.orm.file import File
 from grader.service.orm.lecture import Lecture
 from grader.service.orm.takepart import Role, Scope
-from tornado import web
+import os.path as osp
+from grader.service.server import GraderServer
 from jupyter_server.utils import url_path_join
 from grader.common.models.assignment import Assignment as AssignmentModel
 from grader.service.persistence.assignment import get_assignments
+from sqlalchemy.sql.expression import join
+from tornado import httputil
 from tornado_sqlalchemy import SessionMixin
 import tornado
 
@@ -87,13 +94,35 @@ class AssignmentObjectHandler(SessionMixin, GraderBaseHandler):
 
     @authenticated
     def delete(self, lecture_id: int, assignment_id: int):
-        pass # TODO: set delete action in database
+        pass  # TODO: set delete action in database
 
 
 @register_handler(
     path=r"\/lectures\/(?P<lecture_id>\d*)\/assignments\/(?P<assignment_id>\d*)\/file\/(?P<file_id>\d*)\/?"
 )
 class AssignmentDataHandler(SessionMixin, GraderBaseHandler):
+    def __init__(
+        self, application: GraderServer, request: httputil.HTTPServerRequest, **kwargs
+    ) -> None:
+        super().__init__(application, request, **kwargs)
+        app: GraderServer = self.application
+        self.compression_engine = CompressionEngine(
+            compression_dir=osp.join(app.grader_service_dir, "archive")
+        )
+
     @authenticated
     def get(self, lecture_id: int, assignment_id: int, file_id: int):
-        pass # TODO: return binary file content
+        role = self.session.query(Role).get((self.user.name, lecture_id))
+        file = self.session.query(File).get(file_id)
+        if role is None or file is None or file.assignid != assignment_id:
+            self.write_error(404, ErrorMessage("Not Found!"))
+            return
+        assignment: Assignment = file.assignment
+        lectrue: Lecture = assignment.lecture
+        path = osp.join(lectrue.name, assignment.name, file.path)
+        full_path = osp.join(GitService.instance().git_local_root_dir, path)
+
+        archive_file = self.compression_engine.create_archive(name=f"{lectrue.name}_{assignment.name}_{file.path}", path=full_path)
+        with open(archive_file, "rb") as f:
+            data = f.read()
+            self.write(data)

@@ -18,3 +18,7 @@ class GraderServer(config.Configurable, web.Application):
     )
     hub_service_url = Unicode(os.environ.get("JUPYTERHUB_SERVICE_URL", "")).tag(config=True)
 
+    def __init__(self, grader_service_dir: str,  **kwargs):
+        super().__init__(**kwargs)
+        self.grader_service_dir = grader_service_dir
+

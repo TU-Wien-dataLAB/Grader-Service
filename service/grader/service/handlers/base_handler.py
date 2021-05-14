@@ -6,6 +6,7 @@ import logging
 from grader.service.orm.user import User
 from grader.common.services.request import RequestService
 from grader.service.main import GraderService
+from grader.service.server import GraderServer
 from jupyterhub.services.auth import HubAuthenticated
 from sqlalchemy.sql.expression import select
 from tornado import httputil, web
@@ -21,15 +22,13 @@ class GraderBaseHandler(web.RequestHandler):
 
     def __init__(
         self,
-        application: GraderService,
+        application: GraderServer,
         request: httputil.HTTPServerRequest,
         **kwargs: Any,
     ) -> None:
         super().__init__(application, request, **kwargs)
 
-        self.application: GraderService = (
-            self.application
-        )  # add type hint for application
+        self.application: GraderServer = self.application # add type hint for application
         hub_api_parsed: ParseResult = urlparse(self.application.hub_api_url)
         self.hub_request_service.scheme = hub_api_parsed.scheme
         (
