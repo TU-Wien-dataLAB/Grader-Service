@@ -5,13 +5,12 @@ from grader.service.orm.user import User
 from grader.service.orm.takepart import Role, Scope
 from grader.service.handlers.base_handler import GraderBaseHandler, authenticated
 from jupyter_server.utils import url_path_join
-from tornado_sqlalchemy import SessionMixin
 import tornado
 from grader.common.models.lecture import Lecture as LectureModel
 from grader.service.persistence.lectures import get_lectures
 
 @register_handler(path=r"\/lectures\/?")
-class LectureBaseHandler(SessionMixin, GraderBaseHandler):
+class LectureBaseHandler(GraderBaseHandler):
   
   @authenticated
   async def get(self):
@@ -24,12 +23,12 @@ class LectureBaseHandler(SessionMixin, GraderBaseHandler):
 
 
 @register_handler(path=r"\/lectures\/(?P<lecture_id>\d*)\/?")
-class LectureObjectHandler(SessionMixin, GraderBaseHandler):
+class LectureObjectHandler(GraderBaseHandler):
   
   @authenticated
   async def put(self, lecture_id: int):
-    scope = self.session.query(Role).get((self.user.name, lecture_id)).role
-    if scope < Scope.instructor:
+    role = self.session.query(Role).get((self.user.name, lecture_id))
+    if role.role < Scope.instructor:
       self.write_error(403, ErrorMessage("Unauthorized!"))
       return
     body = tornado.escape.json_decode(self.request.body)

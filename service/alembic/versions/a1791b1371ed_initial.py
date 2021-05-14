@@ -7,6 +7,7 @@ Create Date: 2021-05-05 11:42:24.126371
 """
 from alembic import op
 import sqlalchemy as sa
+from sqlalchemy.sql.schema import UniqueConstraint
 
 
 # revision identifiers, used by Alembic.
@@ -22,11 +23,10 @@ def upgrade():
     sa.Column('id', sa.Integer(), autoincrement=True, nullable=False),
     sa.Column('name', sa.String(length=255), nullable=False),
     sa.Column('semester', sa.String(length=255), nullable=False),
-    sa.Column('code', sa.String(length=255), nullable=False),
-    sa.Column('complete', sa.Boolean(), nullable=True),
+    sa.Column('code', sa.String(length=255), nullable=True),
+    sa.Column('state', sa.Enum('inactive', 'active', 'complete'), nullable=False),
     sa.PrimaryKeyConstraint('id'),
-    sa.UniqueConstraint('name'),
-    sa.UniqueConstraint('name')
+    UniqueConstraint('name', 'semester', name='u_sem_name')
     )
     op.create_table('user',
     sa.Column('name', sa.String(length=255), nullable=False),
@@ -37,14 +37,13 @@ def upgrade():
     sa.Column('name', sa.String(length=255), nullable=False),
     sa.Column('lectid', sa.Integer(), nullable=True),
     sa.Column('duedate', sa.DateTime(), nullable=False),
-    sa.Column('path', sa.String(length=255), nullable=False),
     sa.Column('points', sa.Integer(), nullable=False),
     sa.Column('status', sa.Enum('created', 'released', 'fetching', 'fetched', 'complete'), nullable=True),
     sa.ForeignKeyConstraint(['lectid'], ['lecture.id'], ),
-    sa.PrimaryKeyConstraint('id')
+    sa.PrimaryKeyConstraint('id'),
     )
     op.create_table('takepart',
-    sa.Column('username', sa.Integer(), nullable=False),
+    sa.Column('username', sa.String(length=255), nullable=False),
     sa.Column('lectid', sa.Integer(), nullable=False),
     sa.Column('role', sa.String(length=255), nullable=False),
     sa.ForeignKeyConstraint(['lectid'], ['lecture.id'], ),
@@ -65,7 +64,7 @@ def upgrade():
     sa.Column('id', sa.Integer(), autoincrement=True, nullable=False),
     sa.Column('date', sa.DateTime(), nullable=False),
     sa.Column('status', sa.Enum('submitting', 'not_graded', 'automatically_graded', 'manually_graded'), nullable=False),
-    sa.Column('score', sa.Integer(), nullable=False),
+    sa.Column('score', sa.Integer(), nullable=True),
     sa.Column('assignid', sa.Integer(), nullable=True),
     sa.Column('username', sa.String(length=255), nullable=True),
     sa.ForeignKeyConstraint(['assignid'], ['assignment.id'], ),

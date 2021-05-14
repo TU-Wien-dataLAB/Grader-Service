@@ -3,6 +3,8 @@ from typing import Any, Awaitable, Callable, Optional
 from urllib.parse import ParseResult, urlparse
 import json
 import logging
+from grader.service.orm.lecture import Lecture, LectureState
+from grader.service.orm.takepart import Role
 from grader.service.orm.user import User
 from grader.common.services.request import RequestService
 from grader.service.main import GraderService
@@ -14,9 +16,10 @@ from tornado.web import HTTPError
 from grader.service.persistence.user import user_exists, create_user
 from grader.service.orm.base import Serializable
 from grader.common.models.base_model_ import Model
+from tornado_sqlalchemy import SessionMixin
 
 
-class GraderBaseHandler(web.RequestHandler):
+class GraderBaseHandler(SessionMixin, web.RequestHandler):
     request_service = RequestService()
     hub_request_service = RequestService()
 
@@ -42,13 +45,43 @@ class GraderBaseHandler(web.RequestHandler):
         This is a workaround for async authentication. `get_current_user` cannot be asyncronous and a request cannot be made in a blocking manner.
         This sets the `current_user` property before each request before being checked by the `authenticated` decorator.
         """
+        # TODO: add sessions to user requests
         user = await self.get_current_user_async()
-        user_model = User(name=user["name"])
-        if not user_exists(user=user_model):
+        if user is None:
+            raise HTTPError(403, "Unauthorized!")
+        user_model = self.session.query(User).get(user["name"])
+        if user_model is None:
             logging.getLogger("RequestHandler").info(
-                f"User {user_model.name} does not exist and will be created."
+                f'User {user["name"]} does not exist and will be created.'
             )
-            create_user(user=user_model)
+            user_model = User(name=user["name"])
+            self.session.add(user_model)
+            self.session.commit()
+        
+        lecture_roles = {n:{"semester": s, "role": r} for n, s, r in [tuple(g.split("__", 2)) for g in  user["groups"]]}
+
+        for lecture_name, obj in lecture_roles.items():
+            lecture_models = self.session.query(Lecture).filter(Lecture.name == lecture_name).all()
+            if len(lecture_models) == 0: # create inactive lecture if no lecture with that name exists yet (code is set in create)
+                lecture = Lecture()
+                lecture.name = lecture_name
+                lecture.semester = obj["semester"]
+                lecture.state = LectureState.inactive
+                self.session.add(lecture)
+        self.session.commit()
+        
+        self.session.query(Role).filter(Role.username == user["name"]).delete()
+        for lecture_name, obj in lecture_roles.items():
+            lecture = self.session.query(Lecture).filter(Lecture.name == lecture_name, Lecture.semester == obj["semester"]).one_or_none()
+            if lecture is None:
+                raise HTTPError(500, f'Could not find lecture with name: {lecture_name} and semester {obj["semester"]}. Inconsistent database state!')
+            role = Role()
+            role.username = user["name"]
+            role.lectid = lecture.id
+            role.role = obj["role"]
+            self.session.add(role)
+        self.session.commit()
+
         self.current_user = user_model
 
     async def get_current_user_async(self):

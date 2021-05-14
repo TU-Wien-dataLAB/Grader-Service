@@ -17,17 +17,16 @@ from grader.common.models.assignment import Assignment as AssignmentModel
 from grader.service.persistence.assignment import get_assignments
 from sqlalchemy.sql.expression import join
 from tornado import httputil
-from tornado_sqlalchemy import SessionMixin
 import tornado
 
 
 @register_handler(path=r"\/lectures\/(?P<lecture_id>\d*)\/assignments\/?")
-class AssignmentBaseHandler(SessionMixin, GraderBaseHandler):
+class AssignmentBaseHandler(GraderBaseHandler):
     @authenticated
     def get(self, lecture_id: int):
         role = self.session.query(Role).get((self.user.name, lecture_id))
         if role is None:
-            self.write_error(404, ErrorMessage("Not Found!"))
+            self.write_error(403, ErrorMessage("Unautorized!"))
             return
 
         self.write(role.lecture.assignments)
@@ -35,10 +34,7 @@ class AssignmentBaseHandler(SessionMixin, GraderBaseHandler):
     @authenticated
     def post(self, lecture_id: int):
         role = self.session.query(Role).get((self.user.name, lecture_id))
-        if role is None:
-            self.write_error(404, ErrorMessage("Not Found!"))
-            return
-        if role.role < Scope.instructor:
+        if role is None or role.role < Scope.instructor:
             self.write_error(403, ErrorMessage("Unauthorized!"))
             return
 
@@ -58,14 +54,11 @@ class AssignmentBaseHandler(SessionMixin, GraderBaseHandler):
 @register_handler(
     path=r"\/lectures\/(?P<lecture_id>\d*)\/assignments\/(?P<assignment_id>\d*)\/?"
 )
-class AssignmentObjectHandler(SessionMixin, GraderBaseHandler):
+class AssignmentObjectHandler(GraderBaseHandler):
     @authenticated
     def put(self, lecture_id: int, assignment_id: int):
         role = self.session.query(Role).get((self.user.name, lecture_id))
-        if role is None:
-            self.write_error(404, ErrorMessage("Not Found!"))
-            return
-        if role.role < Scope.instructor:
+        if role is None or role.role < Scope.instructor:
             self.write_error(403, ErrorMessage("Unauthorized!"))
             return
 
@@ -84,7 +77,7 @@ class AssignmentObjectHandler(SessionMixin, GraderBaseHandler):
     def get(self, lecture_id: int, assignment_id: int):
         role = self.session.query(Role).get((self.user.name, lecture_id))
         if role is None:
-            self.write_error(404, ErrorMessage("Not Found!"))
+            self.write_error(403, ErrorMessage("Unautorized!"))
             return
         assignment = self.session.query(Assignment).get(assignment_id)
         if assignment is None:
@@ -100,7 +93,7 @@ class AssignmentObjectHandler(SessionMixin, GraderBaseHandler):
 @register_handler(
     path=r"\/lectures\/(?P<lecture_id>\d*)\/assignments\/(?P<assignment_id>\d*)\/file\/(?P<file_id>\d*)\/?"
 )
-class AssignmentDataHandler(SessionMixin, GraderBaseHandler):
+class AssignmentDataHandler(GraderBaseHandler):
     def __init__(
         self, application: GraderServer, request: httputil.HTTPServerRequest, **kwargs
     ) -> None:
@@ -113,8 +106,11 @@ class AssignmentDataHandler(SessionMixin, GraderBaseHandler):
     @authenticated
     def get(self, lecture_id: int, assignment_id: int, file_id: int):
         role = self.session.query(Role).get((self.user.name, lecture_id))
+        if role is None:
+            self.write_error(403, ErrorMessage("Unautorized!"))
+            return
         file = self.session.query(File).get(file_id)
-        if role is None or file is None or file.assignid != assignment_id:
+        if file is None or file.assignid != assignment_id:
             self.write_error(404, ErrorMessage("Not Found!"))
             return
         assignment: Assignment = file.assignment
