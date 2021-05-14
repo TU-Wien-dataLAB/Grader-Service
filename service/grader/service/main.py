@@ -9,6 +9,7 @@ from grader.service.persistence.database import DataBaseManager
 import tornado
 from tornado import web
 from tornado.httpserver import HTTPServer
+from tornado_sqlalchemy import SQLAlchemy
 from traitlets import config
 
 # run __init__.py to register handlers
@@ -119,7 +120,7 @@ class GraderService(config.Application):
         handlers = HandlerPathRegistry.handler_list()
         # start the webserver
         self.http_server: HTTPServer = HTTPServer(
-            GraderServer(grader_service_dir=self.grader_service_dir, handlers=handlers, config=self.config),
+            GraderServer(grader_service_dir=self.grader_service_dir, handlers=handlers, config=self.config, db= SQLAlchemy(DataBaseManager.instance().get_database_url())),
             # ssl_options=ssl_context,
             xheaders=True,
         )
