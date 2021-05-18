@@ -1,6 +1,7 @@
+import logging
 from tornado.httpclient import AsyncHTTPClient, HTTPResponse
 from traitlets.config.configurable import LoggingConfigurable
-from typing import Dict
+from typing import Dict, Union
 from tornado.escape import json_decode
 from traitlets.traitlets import Int, TraitError, Unicode, validate
 import socket
@@ -15,7 +16,8 @@ class RequestService(LoggingConfigurable):
         super().__init__(**kwargs)
         self.http_client = AsyncHTTPClient()
 
-    async def request(self, method: str, endpoint: str, body: dict=None, header: Dict[str, str]=None) -> dict:
+    async def request(self, method: str, endpoint: str, body: dict=None, header: Dict[str, str]=None) -> Union[dict, list]:
+        logging.getLogger().critical(self.url + endpoint)
         response: HTTPResponse = await self.http_client.fetch(self.url+endpoint, method=method, headers=header, body=body)
         return json_decode(response.body)
     

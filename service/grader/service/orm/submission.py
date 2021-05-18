@@ -13,6 +13,7 @@ class Submission(Base, Serializable):
   username = Column(String(255), ForeignKey("user.name"))
 
   assignment = relationship("Assignment", back_populates="submissions")
+  user = relationship("User", back_populates="submissions")
 
   @property
   def model(self) -> submission.Submission:

@@ -6,10 +6,10 @@ import { Submission } from '../../model/submission';
 import { fetchAssignment } from '../../services/assignments.service';
 import { getLecture } from '../../services/lectures.service';
 import { getAllSubmissions } from '../../services/submissions.service';
-import { UserSubmissions } from '../../model/userSubmissions';
 
 import { DataGrid, GridCellParams, GridColDef } from '@material-ui/data-grid';
 import { Button } from '@blueprintjs/core/lib/cjs/components/button/buttons';
+import { User } from '../../model/user';
 
 export interface GradingProps {
   lectureID: number;
@@ -30,7 +30,7 @@ export class GradingComponent extends React.Component<GradingProps> {
   public state = {
     assignment: {},
     lecture: {},
-    submissions: new Array<UserSubmissions>(),
+    submissions: new Array<{user: User, submissions: Submission[]}>(),
     isOpen: true,
     rows: new Array(),
   };
@@ -79,7 +79,7 @@ export class GradingComponent extends React.Component<GradingProps> {
     // let rows = [{ id: 10, user: "hasdf", date: "asdfadfa" }]
     let rows = new Array();
     //TODO: right now reading only the first 
-    this.state.submissions.forEach( sub => {rows.push({id: sub.user.id, user: sub.user.name, date: sub.submissions[0].submitted_at})});
+    this.state.submissions.forEach( sub => {rows.push({id: sub.user.name, user: sub.user.name, date: sub.submissions[0].submitted_at})});
     return rows;
   }
 

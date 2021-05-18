@@ -7,6 +7,7 @@ class User(Base, Serializable):
   name =  Column(String(255), primary_key=True)
 
   roles = relationship("Role", back_populates="user")
+  submissions = relationship("Submission", back_populates="user")
 
   def serialize(self):
       # TODO: reconstruct group and role information from database

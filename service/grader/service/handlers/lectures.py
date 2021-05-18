@@ -1,6 +1,6 @@
 from grader.common.models.error_message import ErrorMessage
 from grader.common.registry import register_handler
-from grader.service.orm.lecture import Lecture
+from grader.service.orm.lecture import Lecture, LectureState
 from grader.service.orm.user import User
 from grader.service.orm.takepart import Role, Scope
 from grader.service.handlers.base_handler import GraderBaseHandler, authenticated
@@ -14,7 +14,7 @@ class LectureBaseHandler(GraderBaseHandler):
   
   @authenticated
   async def get(self):
-    lectures = [role.lecture for role in self.user.roles]
+    lectures = [role.lecture for role in self.user.roles if role.lecture.state == LectureState.active]
     self.write(lectures)
 
   @authenticated

@@ -3,7 +3,8 @@ import { map } from "rxjs/operators";
 import { Assignment } from "../model/assignment";
 import { Feedback } from "../model/feedback";
 import { Lecture } from "../model/lecture";
-import { UserSubmissions } from "../model/userSubmissions";
+import { Submission } from "../model/submission";
+import { User } from "../model/user";
 import { request, HTTPMethod } from "./request.service";
 
 
@@ -11,7 +12,7 @@ import { request, HTTPMethod } from "./request.service";
     return request<void>(HTTPMethod.POST, `/lectures/${lecture.id}/assignments/${assignment.id}/submissions`, {}, {})
   }
 
-  export function getSubmissions(lecture: Lecture, assignment : Assignment, latest: boolean = false): Observable<UserSubmissions> {
+  export function getSubmissions(lecture: Lecture, assignment : Assignment, latest: boolean = false): Observable<{user: User, submissions: Submission[]}> {
     let url = `/lectures/${lecture.id}/assignments/${assignment.id}/submissions`;
     if (latest) {
       let searchParams = new URLSearchParams({
@@ -19,10 +20,10 @@ import { request, HTTPMethod } from "./request.service";
       })
       url += '?' + searchParams;
     }
-    return request<UserSubmissions[]>(HTTPMethod.GET, url, {}).pipe(map(array => array[0]))
+    return request<{user: User, submissions: Submission[]}[]>(HTTPMethod.GET, url, {}).pipe(map(array => array[0]))
   }
 
-  export function getAllSubmissions(lecture: Lecture, assignment : Assignment, latest: boolean = false, instructor: boolean = true): Observable<UserSubmissions[]> {
+  export function getAllSubmissions(lecture: Lecture, assignment : Assignment, latest: boolean = false, instructor: boolean = true): Observable<{user: User, submissions: Submission[]}[]> {
     let url = `/lectures/${lecture.id}/assignments/${assignment.id}/submissions`;
 
     if (latest || instructor) {
@@ -32,7 +33,7 @@ import { request, HTTPMethod } from "./request.service";
       })
       url += '?' + searchParams;
     }
-    return request<UserSubmissions[]>(HTTPMethod.GET, url, {})
+    return request<{user: User, submissions: Submission[]}[]>(HTTPMethod.GET, url, {})
 
   }
 

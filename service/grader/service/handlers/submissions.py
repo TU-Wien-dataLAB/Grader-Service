@@ -12,7 +12,7 @@ class SubmissionHandler(GraderBaseHandler):
 
   @authenticated
   def get(self, lecture_id: int, assignment_id: int):
-    response = json.dumps({"user": self.current_user, "submissions": get_submissions(self.current_user, assignment_id, True)})
+    response = [{"user": self.current_user, "submissions": self.current_user.submissions}]
     self.write(response)
 
   @authenticated

@@ -1,6 +1,8 @@
 
 import json
+import logging
 from pathlib import Path
+from grader.common.services.request import RequestService
 from jupyter_server.serverapp import ServerApp
 
 from ._version import __version__
@@ -20,11 +22,14 @@ from grader.grading_labextension import handlers
 
 from grader.common.registry import HandlerPathRegistry
 
-def setup_handlers(web_app):
+def setup_handlers(web_app: ServerApp):
     host_pattern = ".*$"
-
+    # RequestService.config = web_app.config
     base_url = web_app.settings["base_url"]
-    handlers = HandlerPathRegistry.handler_list(base_url=base_url)
+    log = logging.getLogger()
+    log.critical("#######################################################################")
+    log.critical("base_url: " + base_url)
+    handlers = HandlerPathRegistry.handler_list(base_url=base_url + "grading_labextension")
     web_app.add_handlers(host_pattern, handlers)
 
 

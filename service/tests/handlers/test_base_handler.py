@@ -51,6 +51,11 @@ def test_dict_serialization():
     s = GraderBaseHandler._serialize(d)
     assert d == s
 
+def test_datetime_serialization():
+    d = datetime.now()
+    s = GraderBaseHandler._serialize(d)
+    assert type(s) == str
+    assert str(d) == s
 
 def test_assignment_serialization():
     d = {

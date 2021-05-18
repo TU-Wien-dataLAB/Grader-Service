@@ -7,7 +7,7 @@ export enum HTTPMethod {
   GET="GET", POST="POST", PUT="PUT", DELETE="DELETE"
 }
 
-export function request<T>(method: HTTPMethod, endPoint: string, options: RequestInit, body: object = null,  url: string = "http://128.130.202.214:8000/services/mock"): Observable<T> {
+export function request<T>(method: HTTPMethod, endPoint: string, options: RequestInit, body: object = null,  url: string = null): Observable<T> {
   options.method = method
   if (body) {
     options.body = JSON.stringify(body)
@@ -19,7 +19,7 @@ export function request<T>(method: HTTPMethod, endPoint: string, options: Reques
     // ServerConnection only allows requests to notebook baseUrl
     requestUrl = URLExt.join(
       settings.baseUrl,
-      "/grader.grading_labextension", // API Namespace
+      "/grading_labextension", // API Namespace
       endPoint
     );
 

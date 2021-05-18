@@ -3,7 +3,9 @@ from typing import Any, Awaitable, Callable, Optional
 from urllib.parse import ParseResult, urlparse
 import json
 import logging
+from grader.common.models.error_message import ErrorMessage
 from grader.service.orm.lecture import Lecture, LectureState
+from grader.service.orm.assignment import Assignment
 from grader.service.orm.takepart import Role
 from grader.service.orm.user import User
 from grader.common.services.request import RequestService
@@ -17,6 +19,7 @@ from grader.service.persistence.user import user_exists, create_user
 from grader.service.orm.base import Serializable
 from grader.common.models.base_model_ import Model
 from tornado_sqlalchemy import SessionMixin
+import datetime
 
 
 class GraderBaseHandler(SessionMixin, web.RequestHandler):
@@ -48,7 +51,8 @@ class GraderBaseHandler(SessionMixin, web.RequestHandler):
         # TODO: add sessions to user requests
         user = await self.get_current_user_async()
         if user is None:
-            raise HTTPError(403, "Unauthorized!")
+            self.write_error(403, ErrorMessage("Unauthorized!"))
+            return
         user_model = self.session.query(User).get(user["name"])
         if user_model is None:
             logging.getLogger("RequestHandler").info(
@@ -61,7 +65,7 @@ class GraderBaseHandler(SessionMixin, web.RequestHandler):
         lecture_roles = {n:{"semester": s, "role": r} for n, s, r in [tuple(g.split("__", 2)) for g in  user["groups"]]}
 
         for lecture_name, obj in lecture_roles.items():
-            lecture_models = self.session.query(Lecture).filter(Lecture.name == lecture_name).all()
+            lecture_models = self.session.query(Lecture).filter(Lecture.name == lecture_name, Lecture.semester == obj["semester"]).all()
             if len(lecture_models) == 0: # create inactive lecture if no lecture with that name exists yet (code is set in create)
                 lecture = Lecture()
                 lecture.name = lecture_name
@@ -87,8 +91,8 @@ class GraderBaseHandler(SessionMixin, web.RequestHandler):
     async def get_current_user_async(self):
         token = None
         for (k, v) in sorted(self.request.headers.get_all()):
-            if k == "Authorization":
-                token = v.replace("token ", "")
+            if k == "Token":
+                token = v
         if not token:  # request has to have an Authorization token for JupyterHub
             return None
 
@@ -123,11 +127,13 @@ class GraderBaseHandler(SessionMixin, web.RequestHandler):
         if isinstance(obj, tuple):
             return tuple(cls._serialize(o) for o in obj)
         if isinstance(obj, Serializable):
-            return obj.serialize()
+            return cls._serialize(obj.serialize())
         if isinstance(obj, (str, int, float, complex)) or obj is None:
             return obj
+        if isinstance(obj, datetime.datetime):
+            return str(obj)
         if isinstance(obj, Model):
-            return obj.to_dict()
+            return cls._serialize(obj.to_dict())
         return None
 
     @property
