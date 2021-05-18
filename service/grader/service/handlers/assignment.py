@@ -15,7 +15,7 @@ from grader.service.server import GraderServer
 from jupyter_server.utils import url_path_join
 from grader.common.models.assignment import Assignment as AssignmentModel
 from grader.service.persistence.assignment import get_assignments
-from sqlalchemy.sql.expression import join
+from sqlalchemy.sql.expression import false, join
 from tornado import httputil
 import tornado
 
@@ -75,6 +75,9 @@ class AssignmentObjectHandler(GraderBaseHandler):
 
     @authenticated
     def get(self, lecture_id: int, assignment_id: int):
+        instructor_version = self.get_argument("instructor-version", False)
+        metadata_only = self.get_argument("metadata-only", False)
+        
         role = self.session.query(Role).get((self.user.name, lecture_id))
         if role is None:
             self.write_error(403, ErrorMessage("Unautorized!"))

@@ -47,7 +47,6 @@ class AssignmentObjectHandler(ExtensionBaseHandler):
             {
                 "instructor-version": self.get_argument("instructor-version", None),
                 "metadata-only": self.get_argument("metadata-only", None),
-                "include-submissions": self.get_argument("include-submissions", None),
             }
         )
         response = await self.request_service.request(

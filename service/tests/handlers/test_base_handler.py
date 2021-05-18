@@ -41,6 +41,8 @@ def test_number_serialization():
 def test_list_serialization():
     assert GraderBaseHandler._serialize([1, 2, 3]) == [1, 2, 3]
 
+def test_list_serialization_empty():
+    assert GraderBaseHandler._serialize([]) == []
 
 def test_tuple_serialization():
     assert GraderBaseHandler._serialize((1, 2, 3)) == (1, 2, 3)
@@ -48,6 +50,11 @@ def test_tuple_serialization():
 
 def test_dict_serialization():
     d = {"a": 1, "b": "test", 5: 6}
+    s = GraderBaseHandler._serialize(d)
+    assert d == s
+
+def test_dict_serialization_empty():
+    d = {}
     s = GraderBaseHandler._serialize(d)
     assert d == s
 
