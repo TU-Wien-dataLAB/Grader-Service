@@ -14,7 +14,6 @@ import os.path as osp
 from grader.service.server import GraderServer
 from jupyter_server.utils import url_path_join
 from grader.common.models.assignment import Assignment as AssignmentModel
-from grader.service.persistence.assignment import get_assignments
 from sqlalchemy.sql.expression import false, join
 from tornado import httputil
 import tornado

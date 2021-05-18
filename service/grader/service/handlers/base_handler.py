@@ -15,7 +15,6 @@ from jupyterhub.services.auth import HubAuthenticated
 from sqlalchemy.sql.expression import select
 from tornado import httputil, web
 from tornado.web import HTTPError
-from grader.service.persistence.user import user_exists, create_user
 from grader.service.orm.base import Serializable
 from grader.common.models.base_model_ import Model
 from tornado_sqlalchemy import SessionMixin

@@ -7,7 +7,6 @@ from grader.service.handlers.base_handler import GraderBaseHandler, authenticate
 from jupyter_server.utils import url_path_join
 import tornado
 from grader.common.models.lecture import Lecture as LectureModel
-from grader.service.persistence.lectures import get_lectures
 
 
 @register_handler(path=r"\/lectures\/?")

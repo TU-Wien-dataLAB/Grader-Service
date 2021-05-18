@@ -13,19 +13,19 @@ def async_return(result):
     return f
 
 @pytest.mark.asyncio 
-async def test_prepare(full_db):  
+async def test_prepare(session):  
     f = asyncio.Future()
     f.set_result({"name": "user99", "groups": ["lecture1__WS21__student", "lecture1__SS21__tutor", "lecture99__SS22__student"]})
     async_mock = AsyncMock(return_value={"name": "user99", "groups": ["lecture1__WS21__student", "lecture1__SS21__tutor", "lecture99__SS22__student"]})
     m = MagicMock()
     m.get_current_user_async = async_mock
-    m.session = full_db
+    m.session = session
     m.prepare = GraderBaseHandler.prepare
     mocked_handler = MagicMock(spec_set=GraderBaseHandler, return_value=m)
 
     await GraderBaseHandler.prepare(mocked_handler())
 
-    lecture99 = full_db.query(Lecture).filter(Lecture.name == "lecture99").one_or_none()
+    lecture99 = session.query(Lecture).filter(Lecture.name == "lecture99").one_or_none()
     assert lecture99 is not None
 
 
