@@ -5,6 +5,7 @@ from typing import Dict, Union
 from tornado.escape import json_decode
 from traitlets.traitlets import Int, TraitError, Unicode, validate
 import socket
+from urllib.parse import urlencode, quote_plus
 
 
 class RequestService(LoggingConfigurable):
@@ -45,4 +46,10 @@ class RequestService(LoggingConfigurable):
     @property
     def url(self):
         return self.scheme + "://" + self.host + ":" + str(self.port)
+    
+    @staticmethod
+    def get_query_string(params: dict) -> dict:
+        d = {k: v for k, v in params.items() if v is not None}
+        query_params: str = urlencode(d, quote_via=quote_plus)
+        return "?" + query_params if query_params != "" else ""
     

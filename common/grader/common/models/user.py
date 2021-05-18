@@ -15,26 +15,21 @@ class User(Model):
     Do not edit the class manually.
     """
 
-    def __init__(self, name=None, groups=None):  # noqa: E501
+    def __init__(self, name=None):  # noqa: E501
         """User - a model defined in OpenAPI
 
         :param name: The name of this User.  # noqa: E501
         :type name: str
-        :param groups: The groups of this User.  # noqa: E501
-        :type groups: List[str]
         """
         self.openapi_types = {
-            'name': str,
-            'groups': List[str]
+            'name': str
         }
 
         self.attribute_map = {
-            'name': 'name',
-            'groups': 'groups'
+            'name': 'name'
         }
 
         self._name = name
-        self._groups = groups
 
     @classmethod
     def from_dict(cls, dikt) -> 'User':
@@ -67,24 +62,3 @@ class User(Model):
         """
 
         self._name = name
-
-    @property
-    def groups(self):
-        """Gets the groups of this User.
-
-
-        :return: The groups of this User.
-        :rtype: List[str]
-        """
-        return self._groups
-
-    @groups.setter
-    def groups(self, groups):
-        """Sets the groups of this User.
-
-
-        :param groups: The groups of this User.
-        :type groups: List[str]
-        """
-
-        self._groups = groups

@@ -13,6 +13,5 @@
 
 export interface User { 
     name?: string;
-    groups?: Array<string>;
 }
 

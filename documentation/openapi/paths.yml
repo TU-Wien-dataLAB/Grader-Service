@@ -652,20 +652,6 @@ feedbackById:
       schema:
         type: integer
         format: int64
-    - name: latest
-      in: query
-      description: Only return the feedback of the latest submission
-      required: false
-      schema:
-        type: boolean
-        default: false
-    - name: instructor-version
-      in: query
-      description: Whether to fetch the all feedback of students
-      required: false
-      schema:
-        type: boolean
-        default: false
     responses:
       200:
         description: OK

@@ -7,10 +7,6 @@ components:
         name:
           type: "string"
           example: "Baz Bar"
-        groups:
-          type: "array"
-          items:
-            type: "string"
       example:
         name: "Baz Bar"
         groups: ["LVA1", "LVA2"]
