@@ -43,15 +43,25 @@ class GraderBaseHandler(SessionMixin, web.RequestHandler):
         self.hub_api_base_path: str = hub_api_parsed.path
 
     async def prepare(self) -> Optional[Awaitable[None]]:
+        await self.authenticate_user()
+
+
+    async def authenticate_user(self):
         """
         This is a workaround for async authentication. `get_current_user` cannot be asyncronous and a request cannot be made in a blocking manner.
         This sets the `current_user` property before each request before being checked by the `authenticated` decorator.
         """
-        # TODO: add sessions to user requests
-        user = await self.get_current_user_async()
+        token = self.get_request_token()
+        if token is None:
+            self.write_error(403, ErrorMessage("Unauthorized!"))
+            return
+        
+        # user = await self.get_current_user_async(token)
+        user = await self.authenticate_token_user(token)
         if user is None:
             self.write_error(403, ErrorMessage("Unauthorized!"))
             return
+
         user_model = self.session.query(User).get(user["name"])
         if user_model is None:
             logging.getLogger("RequestHandler").info(
@@ -60,6 +70,11 @@ class GraderBaseHandler(SessionMixin, web.RequestHandler):
             user_model = User(name=user["name"])
             self.session.add(user_model)
             self.session.commit()
+        
+        # user is authenticated by the cookie and the user exists in the database
+        if self.authenticate_cookie_user(user):
+            self.current_user = user_model
+            return 
         
         lecture_roles = {n:{"semester": s, "role": r} for n, s, r in [tuple(g.split("__", 2)) for g in  user["groups"]]}
 
@@ -87,7 +102,29 @@ class GraderBaseHandler(SessionMixin, web.RequestHandler):
 
         self.current_user = user_model
 
-    async def get_current_user_async(self):
+    async def authenticate_token_user(self, token: str) -> Optional[dict]:
+        max_token_age = self.application.max_token_cookie_age_days
+        token_user = self.get_secure_cookie(token, max_age_days=max_token_age)
+        if not token_user:
+            user = await self.get_current_user_async()
+            self.set_secure_cookie(token, json.dumps(user), expires_days=max_token_age)
+            return user
+        else:
+            return json.loads(token_user)
+
+    def authenticate_cookie_user(self, user: dict) -> bool:
+        max_age = self.application.max_user_cookie_age_days
+        cookie_user = self.get_secure_cookie(user["name"], max_age_days=max_age)
+        if not cookie_user:
+            self.set_secure_cookie(user["name"], json.dumps(user), expires_days=max_age)
+            return False
+        else:
+            equal = user == json.loads(cookie_user)
+            if not equal:
+                self.set_secure_cookie(user["name"], json.dumps(user), expires_days=max_age)
+            return equal
+
+    def get_request_token(self) -> Optional[str]:
         token = None
         for (k, v) in sorted(self.request.headers.get_all()):
             if k == "Token":
@@ -95,6 +132,7 @@ class GraderBaseHandler(SessionMixin, web.RequestHandler):
         if not token:  # request has to have an Authorization token for JupyterHub
             return None
 
+    async def get_current_user_async(self, token) -> Optional[dict]:
         try:
             user: dict = await self.hub_request_service.request(
                 "GET",

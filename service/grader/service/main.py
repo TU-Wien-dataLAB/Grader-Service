@@ -11,6 +11,7 @@ from tornado import web
 from tornado.httpserver import HTTPServer
 from tornado_sqlalchemy import SQLAlchemy
 from traitlets import config
+import secrets
 
 # run __init__.py to register handlers
 import grader.service
@@ -97,7 +98,9 @@ class GraderService(config.Application):
 
     def initialize(self, argv, *args, **kwargs):
         super().initialize(*args, **kwargs)
-        logging.basicConfig(format=f"%(color)s[%(levelname)1.1s %(asctime)s.%(msecs).03d %(name)s %(module)s:%")
+        logging.basicConfig(
+            format=f"%(color)s[%(levelname)1.1s %(asctime)s.%(msecs).03d %(name)s %(module)s:%"
+        )
         self.log.setLevel(self.log_level)
         self.log.info("Starting Initialization...")
         self._start_future = asyncio.Future()
@@ -115,12 +118,20 @@ class GraderService(config.Application):
         # pass config to DataBaseManager
         DataBaseManager.config = self.config
 
-        GitService.instance().git_local_root_dir = os.path.join(self.grader_service_dir, "git")
+        GitService.instance().git_local_root_dir = os.path.join(
+            self.grader_service_dir, "git"
+        )
 
         handlers = HandlerPathRegistry.handler_list()
         # start the webserver
         self.http_server: HTTPServer = HTTPServer(
-            GraderServer(grader_service_dir=self.grader_service_dir, handlers=handlers, config=self.config, db= SQLAlchemy(DataBaseManager.instance().get_database_url())),
+            GraderServer(
+                grader_service_dir=self.grader_service_dir,
+                handlers=handlers,
+                cookie_secret=secrets.token_hex(nbytes=32), # generate new cookie secret at startup
+                config=self.config,
+                db=SQLAlchemy(DataBaseManager.instance().get_database_url()),
+            ),
             # ssl_options=ssl_context,
             xheaders=True,
         )
@@ -136,10 +147,18 @@ class GraderService(config.Application):
             f"Grader service running at {self.service_host}:{self.service_port}"
         )
 
-        self.log.info(f"GraderServer: hub_service_name - { self.http_server.request_callback.hub_service_name }")
-        self.log.info(f"GraderServer: hub_api_token - {self.http_server.request_callback.hub_api_token}")
-        self.log.info(f"GraderServer: hub_api_url - {self.http_server.request_callback.hub_api_url}")
-        self.log.info(f"GraderServer: hub_base_url - {self.http_server.request_callback.hub_base_url}")
+        self.log.info(
+            f"GraderServer: hub_service_name - { self.http_server.request_callback.hub_service_name }"
+        )
+        self.log.info(
+            f"GraderServer: hub_api_token - {self.http_server.request_callback.hub_api_token}"
+        )
+        self.log.info(
+            f"GraderServer: hub_api_url - {self.http_server.request_callback.hub_api_url}"
+        )
+        self.log.info(
+            f"GraderServer: hub_base_url - {self.http_server.request_callback.hub_base_url}"
+        )
 
         # finish start
         self._start_future.set_result(None)
@@ -198,16 +217,16 @@ class GraderService(config.Application):
                 # re-raise exceptions in launch_instance_async
                 task.result()
             loop.stop()
-    
+
     @validate("grader_service_dir")
     def _validate_service_dir(self, proposal):
-        path: str = proposal['value']
+        path: str = proposal["value"]
         if not os.path.isabs(path):
             raise TraitError("The path is not absolute")
         if not os.path.isdir(path):
             raise TraitError("The path has to be an existing directory")
         return path
-    
+
     @observe("grader_service_dir")
     def _observe_service_dir(self, change):
         path = change["new"]
@@ -217,7 +236,6 @@ class GraderService(config.Application):
         archive_path = os.path.join(path, "archive")
         if not os.path.isdir(archive_path):
             os.mkdir(archive_path)
-
 
 
 main = GraderService.launch_instance
