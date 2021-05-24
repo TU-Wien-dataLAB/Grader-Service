@@ -1,23 +1,25 @@
 from grader.common.registry import register_handler
 from grader.service.handlers.git.git_base_handler import GitBaseHandler
-import tornado
+from grader.service.handlers.git.iowrapper import ProcessWrapper
 
-@register_handler(path='/.*/git-.*')
+
+@register_handler(path="/.*/git-.*")
 class GitRPCHandler(GitBaseHandler):
+    """Request handler for RPC calls
 
-    def echo(self: GitBaseHandler):
-        print(self.request.path)
-        body = self.request.body
-        if body == b'':
-            body = "{}"
-        print(tornado.escape.json_decode(body))
+    Use this handler to handle example.git/git-upload-pack and example.git/git-receive-pack URLs"""
 
-    def get(self):
+    async def post(self):
         self.echo()
-    def post(self):
-        self.echo()
-    def put(self):
-        self.echo()
-    def delete(self):
-        self.echo()
+        gitdir = self.get_gitdir()
 
+        # get RPC command
+        pathlets = self.request.path.strip("/").split("/")
+        rpc = pathlets[-1]
+        rpc = rpc[4:]
+
+        ProcessWrapper(
+            self,
+            [self.gitcommand, rpc, "--stateless-rpc", gitdir],
+            {"Content-Type": "application/x-git-%s-result" % rpc},
+        )
