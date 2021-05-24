@@ -14,8 +14,7 @@ logger = logging.getLogger(__name__)
 class GitBaseHandler(RequestHandler):
     def initialize(self, **kwargs):
         # set defaults
-        if self.gitcommand is None:
-            self.gitcommand = "git"
+        self.gitcommand = "git"
         app: GraderServer = self.application
         self.gitbase = os.path.join(app.grader_service_dir, "git")
 
@@ -56,12 +55,17 @@ class GitBaseHandler(RequestHandler):
 
     def gitlookup(self):
         pathlets = self.request.path.strip("/").split("/")
-
+        # pathlets = ['services', 'grader', 'git', 'repo_name', ...]
+        pathlets = pathlets[3:]
         path = os.path.abspath(os.path.join(self.gitbase, pathlets[0]))
         if not path.startswith(os.path.abspath(self.gitbase)):
             return None
 
         if os.path.exists(path):
+            return path
+        else:
+            os.mkdir(path)
+            # TODO: aparently this path has to be a git dir -> call git init
             return path
 
     def echo(self):
@@ -76,7 +80,7 @@ class GitBaseHandler(RequestHandler):
         if self.gitlookup is None:
             raise tornado.web.HTTPError(500, "no git lookup configured")
 
-        gitdir = self.gitlookup(self.request)
+        gitdir = self.gitlookup()
         if gitdir is None:
             raise tornado.web.HTTPError(404, "unable to find repository")
         logger.debug("Accessing git at: %s", gitdir)

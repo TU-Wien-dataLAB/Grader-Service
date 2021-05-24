@@ -33,7 +33,7 @@ class GitInfoRefsHandler(GitBaseHandler):
         prelude = str(hex(len(prelude) + 4)[2:].rjust(4, "0")) + prelude
         prelude += "0000"  # packet flush
 
-        ProcessWrapper(
+        p = ProcessWrapper(
             self,
             [self.gitcommand, rpc, "--stateless-rpc", "--advertise-refs", gitdir],
             {
@@ -44,3 +44,4 @@ class GitInfoRefsHandler(GitBaseHandler):
             },
             prelude,
         )
+        await p.finish_state

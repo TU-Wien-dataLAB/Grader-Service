@@ -18,8 +18,9 @@ class GitRPCHandler(GitBaseHandler):
         rpc = pathlets[-1]
         rpc = rpc[4:]
 
-        ProcessWrapper(
+        p = ProcessWrapper(
             self,
             [self.gitcommand, rpc, "--stateless-rpc", gitdir],
             {"Content-Type": "application/x-git-%s-result" % rpc},
         )
+        await p.finish_state

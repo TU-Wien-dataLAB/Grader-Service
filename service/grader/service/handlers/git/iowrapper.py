@@ -1,3 +1,4 @@
+import asyncio
 from typing import List, Optional
 from tornado.httputil import HTTPServerRequest
 from tornado.web import RequestHandler, HTTPError
@@ -44,7 +45,8 @@ class FileWrapper:
         if data == "":
             # EOF
             self.file.close()
-            self.request.finish()
+            # TODO: what to do here???
+            # self.request.finish()
             return
         # write data to client and continue when data has been written
         self.handler.write(data)
@@ -117,6 +119,8 @@ class ProcessWrapper:
             self._handle_stdin_event,
             self.ioloop.WRITE | self.ioloop.ERROR,
         )
+
+        self.finish_state = asyncio.get_event_loop().create_future()
 
         # is it gzipped? If yes, we initialize a zlib decompressobj
         if (
@@ -296,7 +300,7 @@ class ProcessWrapper:
 
                     self.headers_sent = True
 
-                payload = os.read(fd, 8192)
+                payload: bytes = os.read(fd, 8192)
                 if (
                     events & self.ioloop.ERROR
                 ):  # there might be data remaining in the buffer if we got HUP, get it all
@@ -306,7 +310,7 @@ class ProcessWrapper:
                         payload += remainder
 
                 data += hex(len(payload))[2:] + "\r\n"  # cut off 0x
-                data += payload + "\r\n"
+                data += payload.decode() + "\r\n"
 
             else:
                 if not self.headers_sent:
@@ -340,7 +344,7 @@ class ProcessWrapper:
                 if self.number_of_8k_chunks_sent > 0:
                     self.number_of_8k_chunks_sent = 0
 
-            self.request.write(data)
+            self.handler.write(data)
 
         # now we can also have an error. This is because tornado maps HUP onto error
         # therefore, no elif here!
@@ -373,7 +377,7 @@ class ProcessWrapper:
                 # see stdout
                 data = self.process.stderr.read()
 
-            self.request.write(data)
+            self.handler.write(data)
 
         if events & self.ioloop.ERROR:
             # ensure file is closed
@@ -403,19 +407,20 @@ class ProcessWrapper:
                 )
                 self.headers_sent = True
                 data += payload
-                self.request.write(data)
+                self.handler.write(data)
             else:
                 data = (
                     "HTTP/1.1 200 Ok\r\nDate: %s\r\nContent-Length: 0\r\n\r\n"
                     % GitBaseHandler.get_date_header()
                 )
                 self.headers_sent = True
-                self.request.write(data)
+                self.handler.write(data)
 
         # if we are in chunked mode, send end chunk with length 0
         elif self.sent_chunks:
-            self.request.write("0\r\n")
+            self.handler.write("0\r\n")
             # we could now send some more headers resp. trailers
-            self.request.write("\r\n")
+            self.handler.write("\r\n")
 
-        self.request.finish()
+        # self.request.finish()
+        self.finish_state.set_result(True)
