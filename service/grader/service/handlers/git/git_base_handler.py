@@ -2,6 +2,7 @@ import datetime
 import calendar
 import email.utils
 import re
+import subprocess
 from grader.service.server import GraderServer
 import tornado
 from tornado.web import RequestHandler
@@ -36,14 +37,33 @@ class GitBaseHandler(RequestHandler):
         ]
 
         self.file_headers = {
-            re.compile('.*(/HEAD)$'):                                   lambda: dict(self.dont_cache() + [('Content-Type', 'text/plain')]),
-            re.compile('.*(/objects/info/alternates)$'):                lambda: dict(self.dont_cache() + [('Content-Type', 'text/plain')]),
-            re.compile('.*(/objects/info/http-alternates)$'):           lambda: dict(self.dont_cache() + [('Content-Type', 'text/plain')]),
-            re.compile('.*(/objects/info/packs)$'):                     lambda: dict(self.dont_cache() + [('Content-Type', 'text/plain; charset=utf-8')]),
-            re.compile('.*(/objects/info/[^/]+)$'):                     lambda: dict(self.dont_cache() + [('Content-Type', 'text/plain')]),
-            re.compile('.*(/objects/[0-9a-f]{2}/[0-9a-f]{38})$'):       lambda: dict(self.cache_forever() + [('Content-Type', 'application/x-git-loose-object')]),
-            re.compile('.*(/objects/pack/pack-[0-9a-f]{40}\\.pack)$'):  lambda: dict(self.cache_forever() + [('Content-Type', 'application/x-git-packed-objects')]),
-            re.compile('.*(/objects/pack/pack-[0-9a-f]{40}\\.idx)$'):   lambda: dict(self.cache_forever() + [('Content-Type', 'application/x-git-packed-objects-toc')]),
+            re.compile(".*(/HEAD)$"): lambda: dict(
+                self.dont_cache() + [("Content-Type", "text/plain")]
+            ),
+            re.compile(".*(/objects/info/alternates)$"): lambda: dict(
+                self.dont_cache() + [("Content-Type", "text/plain")]
+            ),
+            re.compile(".*(/objects/info/http-alternates)$"): lambda: dict(
+                self.dont_cache() + [("Content-Type", "text/plain")]
+            ),
+            re.compile(".*(/objects/info/packs)$"): lambda: dict(
+                self.dont_cache() + [("Content-Type", "text/plain; charset=utf-8")]
+            ),
+            re.compile(".*(/objects/info/[^/]+)$"): lambda: dict(
+                self.dont_cache() + [("Content-Type", "text/plain")]
+            ),
+            re.compile(".*(/objects/[0-9a-f]{2}/[0-9a-f]{38})$"): lambda: dict(
+                self.cache_forever()
+                + [("Content-Type", "application/x-git-loose-object")]
+            ),
+            re.compile(".*(/objects/pack/pack-[0-9a-f]{40}\\.pack)$"): lambda: dict(
+                self.cache_forever()
+                + [("Content-Type", "application/x-git-packed-objects")]
+            ),
+            re.compile(".*(/objects/pack/pack-[0-9a-f]{40}\\.idx)$"): lambda: dict(
+                self.cache_forever()
+                + [("Content-Type", "application/x-git-packed-objects-toc")]
+            ),
         }
 
     @staticmethod
@@ -65,21 +85,28 @@ class GitBaseHandler(RequestHandler):
             return path
         else:
             os.mkdir(path)
-            # TODO: aparently this path has to be a git dir -> call git init
+            # this path has to be a git dir -> call git init
+            try:
+                subprocess.run([self.gitcommand, "init", "--bare", path], check=True)
+                subprocess.run(
+                    [self.gitcommand, "update-server-info"],
+                    cwd=path,
+                    check=True,
+                )
+            except subprocess.CalledProcessError:
+                return None
             return path
 
     def echo(self):
-        print(self.request.path)
+        print(self.request.path + "?" + self.request.query)
         body = self.request.body
+        print("\t" + str(dict(self.request.headers.get_all())))
         if body == b"":
             body = "{}"
-        print(tornado.escape.json_decode(body))
+        print("\t" + str(tornado.escape.json_decode(body)))
 
     def get_gitdir(self):
         """Determine the git repository for this request"""
-        if self.gitlookup is None:
-            raise tornado.web.HTTPError(500, "no git lookup configured")
-
         gitdir = self.gitlookup()
         if gitdir is None:
             raise tornado.web.HTTPError(404, "unable to find repository")

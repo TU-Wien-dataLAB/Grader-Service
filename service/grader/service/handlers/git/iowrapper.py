@@ -30,14 +30,12 @@ class FileWrapper:
             raise HTTPError(500, "Unable to open file")
 
         self.headers.update(
-            {"Date": GitBaseHandler.get_date_header(), "Content-Length": str(filesize)}
+            {
+                "Date": GitBaseHandler.get_date_header(),
+            }
         )
-        # TODO: maybe use self.set_header etc. to write the headers
-        self.handler.write(
-            "HTTP/1.1 200 OK\r\n"
-            + "\r\n".join([k + ": " + v for k, v in self.headers.items()])
-            + "\r\n\r\n"
-        )
+        for k, v in self.headers.items():
+            self.handler.set_header(k, v)
         self.write_chunk()
 
     def write_chunk(self):
@@ -50,6 +48,7 @@ class FileWrapper:
             return
         # write data to client and continue when data has been written
         self.handler.write(data)
+        self.handler.flush()
         self.write_chunk()
 
 
@@ -92,6 +91,7 @@ class ProcessWrapper:
             stdin=subprocess.PIPE,
             stderr=subprocess.PIPE,
             stdout=subprocess.PIPE,
+            env=os.environ,
         )
 
         # check return status
@@ -137,7 +137,7 @@ class ProcessWrapper:
                 and self.request.headers.get("Transfer-Encoding", None) == "chunked"
             ):
                 self.httpstream: IOStream = self.request.connection.stream
-                self.handler.write("HTTP/1.1 100 (Continue)\r\n\r\n")
+                self.handler.set_status(100)
                 self.read_chunks()
             else:
                 if self.gzip_decompressor:
@@ -285,17 +285,12 @@ class ProcessWrapper:
                     self.headers.update(
                         {
                             "Date": GitBaseHandler.get_date_header(),
-                            "Transfer-Encoding": "chunked",
                         }
                     )
-                    data = (
-                        "HTTP/1.1 200 OK\r\n"
-                        + "\r\n".join([k + ": " + v for k, v in self.headers.items()])
-                        + "\r\n\r\n"
-                    )
+                    for k, v in self.headers.items():
+                        self.handler.set_header(k, v)
 
-                    if self.output_prelude:
-                        data += hex(len(self.output_prelude))[2:] + "\r\n"  # cut off 0x
+                    if self.output_prelude and len(self.output_prelude) > 0:
                         data += self.output_prelude + "\r\n"
 
                     self.headers_sent = True
@@ -309,8 +304,8 @@ class ProcessWrapper:
                         remainder = os.read(fd, 8192)
                         payload += remainder
 
-                data += hex(len(payload))[2:] + "\r\n"  # cut off 0x
-                data += payload.decode() + "\r\n"
+                if len(payload) > 0:
+                    data += payload.decode("ascii") + "\r\n"
 
             else:
                 if not self.headers_sent:
@@ -322,14 +317,12 @@ class ProcessWrapper:
                     self.headers.update(
                         {
                             "Date": GitBaseHandler.get_date_header(),
-                            "Content-Length": str(len(payload)),
                         }
                     )
-                    data = (
-                        "HTTP/1.0 200 OK\r\n"
-                        + "\r\n".join([k + ": " + v for k, v in self.headers.items()])
-                        + "\r\n\r\n"
-                    )
+                    for k, v in self.headers.items():
+                        self.handler.set_header(k, v)
+                    # self.handler.set_header("Content-Length", None)
+
                     self.headers_sent = True
                     data += self.output_prelude + payload
                 else:
@@ -345,10 +338,11 @@ class ProcessWrapper:
                     self.number_of_8k_chunks_sent = 0
 
             self.handler.write(data)
+            self.handler.flush()
 
         # now we can also have an error. This is because tornado maps HUP onto error
         # therefore, no elif here!
-        if events & self.ioloop.ERROR:
+        if events & self.ioloop.ERROR or self.process.poll() is not None:
             # ensure file is closed
             if not self.process.stdout.closed:
                 self.process.stdout.close()
@@ -367,19 +361,18 @@ class ProcessWrapper:
             if not self.headers_sent:
                 payload = self.process.stderr.read()
 
-                data = (
-                    "HTTP/1.1 500 Internal Server Error\r\nDate: %s\r\nContent-Length: %d\r\n\r\n"
-                    % (GitBaseHandler.get_date_header(), len(payload))
-                )
+                self.handler.set_status(500)
                 self.headers_sent = True
-                data += payload
+                data = payload.decode("ascii")
             else:
                 # see stdout
                 data = self.process.stderr.read()
 
             self.handler.write(data)
+            self.handler.flush()
 
-        if events & self.ioloop.ERROR:
+        # TODO: what if there is still data on the outputs but we are closing because of process.poll()?
+        if events & self.ioloop.ERROR or self.process.poll() is not None:
             # ensure file is closed
             if not self.process.stderr.closed:
                 self.process.stderr.close()
@@ -401,26 +394,20 @@ class ProcessWrapper:
             retval = self.process.poll()
             if retval != 0:
                 payload = "Did not produce any data. Errorcode: " + str(retval)
-                data = (
-                    "HTTP/1.1 500 Internal Server Error\r\nDate: %s\r\nContent-Length: %d\r\n\r\n"
-                    % (GitBaseHandler.get_date_header(), len(payload))
-                )
+                self.handler.set_status(500)
                 self.headers_sent = True
-                data += payload
+                data = payload
                 self.handler.write(data)
+                self.handler.flush()
             else:
-                data = (
-                    "HTTP/1.1 200 Ok\r\nDate: %s\r\nContent-Length: 0\r\n\r\n"
-                    % GitBaseHandler.get_date_header()
-                )
+                self.handler.set_status(200)
                 self.headers_sent = True
-                self.handler.write(data)
 
         # if we are in chunked mode, send end chunk with length 0
-        elif self.sent_chunks:
-            self.handler.write("0\r\n")
-            # we could now send some more headers resp. trailers
-            self.handler.write("\r\n")
+        # elif self.sent_chunks:
+        # self.handler.write("0\r\n") # TODO: uncomment?
+        # we could now send some more headers resp. trailers
+        # self.handler.write("\r\n")
 
         # self.request.finish()
         self.finish_state.set_result(True)

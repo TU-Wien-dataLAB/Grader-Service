@@ -31,7 +31,8 @@ class GitInfoRefsHandler(GitBaseHandler):
         rpc = rpc[4:]  # remove 'git-'
         prelude: str = "# service=git-" + rpc
         prelude = str(hex(len(prelude) + 4)[2:].rjust(4, "0")) + prelude
-        prelude += "0000"  # packet flush
+        prelude += "\n0000"  # packet flush
+        self.flush()
 
         p = ProcessWrapper(
             self,
