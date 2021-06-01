@@ -1,12 +1,13 @@
 import functools
-from typing import Any, Awaitable, Callable, Optional
+import re
+from typing import Any, Awaitable, Callable, List, Optional
 from urllib.parse import ParseResult, urlparse
 import json
 import logging
 from grader.common.models.error_message import ErrorMessage
 from grader.service.orm.lecture import Lecture, LectureState
 from grader.service.orm.assignment import Assignment
-from grader.service.orm.takepart import Role
+from grader.service.orm.takepart import Role, Scope
 from grader.service.orm.user import User
 from grader.common.services.request import RequestService
 from grader.service.main import GraderService
@@ -14,12 +15,45 @@ from grader.service.server import GraderServer
 from jupyterhub.services.auth import HubAuthenticated
 from sqlalchemy.sql.expression import select
 from tornado import httputil, web
-from tornado.web import HTTPError
+from tornado.web import HTTPError, RequestHandler
 from grader.service.orm.base import Serializable
 from grader.common.models.base_model_ import Model
 from tornado_sqlalchemy import SessionMixin
+from tornado.escape import json_decode
+from sqlalchemy.orm.exc import MultipleResultsFound, NoResultFound
 import datetime
+import base64
 
+
+def authorize(scopes: List[Scope]):
+    if not set(scopes).issubset({Scope.student, Scope.tutor, Scope.instructor}):
+        return ValueError("Invalid scopes")
+    needs_auth = set(scopes) != {Scope.student, Scope.tutor, Scope.instructor}
+
+    def wrapper(handler_method):
+        @functools.wraps(handler_method)
+        async def request_handler_wrapper(self: 'GraderBaseHandler', *args, **kwargs):
+            if needs_auth:
+                lect_id = self.path_kwargs.get("lecture_id", None)
+                if lect_id is None:
+                    # lecture name and semester is in post body
+                    try:
+                        data = json_decode(self.request.body)
+                        lect_id = self.session.query(Lecture).filter(Lecture.name == data["name"], Lecture.semester == data["semester"]).one().id
+                    except MultipleResultsFound:
+                        self.error_message = "Unauthorized"
+                        raise HTTPError(403)
+                    except NoResultFound:
+                        self.error_message = "Not Found"
+                        raise HTTPError(404)
+
+                role = self.session.query(Role).get((self.user.name, lect_id))
+                if role is None or not role.role in scopes:
+                        self.error_message = "Unauthorized"
+                        raise HTTPError(403)
+            return await handler_method(self, *args, **kwargs)
+        return request_handler_wrapper
+    return wrapper
 
 class GraderBaseHandler(SessionMixin, web.RequestHandler):
     request_service = RequestService()
@@ -42,6 +76,9 @@ class GraderBaseHandler(SessionMixin, web.RequestHandler):
         ) = httputil.split_host_and_port(hub_api_parsed.netloc)
         self.hub_api_base_path: str = hub_api_parsed.path
 
+        self.error_message = None
+        self.has_basic_auth = False
+
     async def prepare(self) -> Optional[Awaitable[None]]:
         await self.authenticate_user()
 
@@ -53,14 +90,13 @@ class GraderBaseHandler(SessionMixin, web.RequestHandler):
         """
         token = self.get_request_token()
         if token is None:
-            self.write_error(403, ErrorMessage("Unauthorized!"))
-            return
+            self.error_message = "Unauthorized"
+            raise HTTPError(403)
         
-        # user = await self.get_current_user_async(token)
         user = await self.authenticate_token_user(token)
         if user is None:
-            self.write_error(403, ErrorMessage("Unauthorized!"))
-            return
+            self.error_message = "Unauthorized"
+            raise HTTPError(403)
 
         user_model = self.session.query(User).get(user["name"])
         if user_model is None:
@@ -106,7 +142,7 @@ class GraderBaseHandler(SessionMixin, web.RequestHandler):
         max_token_age = self.application.max_token_cookie_age_days
         token_user = self.get_secure_cookie(token, max_age_days=max_token_age)
         if not token_user:
-            user = await self.get_current_user_async()
+            user = await self.get_current_user_async(token)
             self.set_secure_cookie(token, json.dumps(user), expires_days=max_token_age)
             return user
         else:
@@ -127,10 +163,17 @@ class GraderBaseHandler(SessionMixin, web.RequestHandler):
     def get_request_token(self) -> Optional[str]:
         token = None
         for (k, v) in sorted(self.request.headers.get_all()):
-            if k == "Token":
-                token = v
-        if not token:  # request has to have an Authorization token for JupyterHub
-            return None
+            if k == "Authorization":
+                name, value = v.split(" ")
+                if name == "Token":
+                    token = value
+                elif name == "Basic":
+                    auth_decoded = base64.decodebytes(value.encode('ascii')).decode('ascii')
+                    _, token = auth_decoded.split(':', 2) # we interpret the password as the token and ignore the username
+                    self.has_basic_auth = True
+                else:
+                    token = None
+                return token
 
     async def get_current_user_async(self, token) -> Optional[dict]:
         try:
@@ -145,15 +188,16 @@ class GraderBaseHandler(SessionMixin, web.RequestHandler):
             logging.getLogger().error(e)
             return None
         return user
-
-    def write(self, obj) -> None:
-        chunk = GraderBaseHandler._serialize(obj)
-        super().write(json.dumps(chunk))
     
-    def write_error(self, status_code: int, obj) -> None:
+    def write_json(self, obj) -> None:
+        self.set_header('Content-Type', 'application/json')
+        chunk = GraderBaseHandler._serialize(obj)
+        self.write(json.dumps(chunk))
+    
+    def write_error(self, status_code: int, **kwargs) -> None:
         self.clear()
         self.set_status(status_code)
-        self.write(obj)
+        self.write_json(ErrorMessage(self.error_message))
 
     @classmethod
     def _serialize(cls, obj: object):

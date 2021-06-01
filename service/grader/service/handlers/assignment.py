@@ -2,7 +2,7 @@ from grader.common.models.error_message import ErrorMessage
 from grader.common.registry import register_handler
 from grader.common.services.compression import CompressionEngine
 from grader.common.services.git import GitService
-from grader.service.handlers.base_handler import GraderBaseHandler, authenticated
+from grader.service.handlers.base_handler import GraderBaseHandler, authorize
 from grader.service.main import GraderService
 from grader.service.orm import lecture
 from grader.service.orm import assignment
@@ -17,26 +17,18 @@ from grader.common.models.assignment import Assignment as AssignmentModel
 from sqlalchemy.sql.expression import false, join
 from tornado import httputil
 import tornado
+from tornado.web import HTTPError
 
 
 @register_handler(path=r"\/lectures\/(?P<lecture_id>\d*)\/assignments\/?")
 class AssignmentBaseHandler(GraderBaseHandler):
-    @authenticated
+    @authorize([Scope.student, Scope.tutor, Scope.instructor])
     def get(self, lecture_id: int):
         role = self.session.query(Role).get((self.user.name, lecture_id))
-        if role is None:
-            self.write_error(403, ErrorMessage("Unautorized!"))
-            return
+        self.write_json(role.lecture.assignments)
 
-        self.write(role.lecture.assignments)
-
-    @authenticated
+    @authorize([Scope.instructor])
     def post(self, lecture_id: int):
-        role = self.session.query(Role).get((self.user.name, lecture_id))
-        if role is None or role.role < Scope.instructor:
-            self.write_error(403, ErrorMessage("Unauthorized!"))
-            return
-
         body = tornado.escape.json_decode(self.request.body)
         assignment_model = AssignmentModel.from_dict(body)
         assignment = Assignment()
@@ -47,47 +39,41 @@ class AssignmentBaseHandler(GraderBaseHandler):
         assignment.status = assignment_model.status
         self.session.add(assignment)
         self.session.commit()
-        self.write(assignment)
+        self.write_json(assignment)
 
 
 @register_handler(
     path=r"\/lectures\/(?P<lecture_id>\d*)\/assignments\/(?P<assignment_id>\d*)\/?"
 )
 class AssignmentObjectHandler(GraderBaseHandler):
-    @authenticated
+    @authorize([Scope.instructor])
     def put(self, lecture_id: int, assignment_id: int):
-        role = self.session.query(Role).get((self.user.name, lecture_id))
-        if role is None or role.role < Scope.instructor:
-            self.write_error(403, ErrorMessage("Unauthorized!"))
-            return
-
         body = tornado.escape.json_decode(self.request.body)
         assignment_model = AssignmentModel.from_dict(body)
         assignment = self.session.query(Assignment).get(assignment_id)
         if assignment is None:
-            self.write_error(404, ErrorMessage("Not Found!"))
-            return
+            self.error_message = "Not Found!"
+            raise HTTPError(404)
 
         assignment.name = assignment_model.name
         assignment.duedate = assignment_model.due_date
         assignment.status = assignment_model.status
 
-    @authenticated
+    @authorize([Scope.student, Scope.tutor, Scope.instructor])
     def get(self, lecture_id: int, assignment_id: int):
         instructor_version = self.get_argument("instructor-version", False)
         metadata_only = self.get_argument("metadata-only", False)
         
         role = self.session.query(Role).get((self.user.name, lecture_id))
-        if role is None:
-            self.write_error(403, ErrorMessage("Unautorized!"))
-            return
+        if instructor_version and role.role < Scope.instructor:
+            raise HTTPError(403)
         assignment = self.session.query(Assignment).get(assignment_id)
         if assignment is None:
-            self.write_error(404, ErrorMessage("Not Found!"))
-            return
-        self.write(assignment)
+            self.error_message = "Not Found!"
+            raise HTTPError(404)
+        self.write_json(assignment)
 
-    @authenticated
+    @authorize([Scope.instructor])
     def delete(self, lecture_id: int, assignment_id: int):
         pass  # TODO: set delete action in database
 
@@ -105,16 +91,12 @@ class AssignmentDataHandler(GraderBaseHandler):
             compression_dir=osp.join(app.grader_service_dir, "archive")
         )
 
-    @authenticated
+    @authorize([Scope.student, Scope.tutor, Scope.instructor])
     def get(self, lecture_id: int, assignment_id: int, file_id: int):
-        role = self.session.query(Role).get((self.user.name, lecture_id))
-        if role is None:
-            self.write_error(403, ErrorMessage("Unautorized!"))
-            return
         file = self.session.query(File).get(file_id)
         if file is None or file.assignid != assignment_id:
-            self.write_error(404, ErrorMessage("Not Found!"))
-            return
+            self.error_message = "Not Found!"
+            raise HTTPError(404)
         assignment: Assignment = file.assignment
         lectrue: Lecture = assignment.lecture
         path = osp.join(lectrue.name, assignment.name, file.path)
@@ -123,4 +105,4 @@ class AssignmentDataHandler(GraderBaseHandler):
         archive_file = self.compression_engine.create_archive(name=f"{lectrue.name}_{assignment.name}_{file.path}", path=full_path)
         with open(archive_file, "rb") as f:
             data = f.read()
-            self.write(data)
+            self.write_json(data)

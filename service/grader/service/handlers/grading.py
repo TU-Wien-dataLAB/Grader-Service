@@ -1,46 +1,48 @@
 from grader.common.registry import register_handler
-from grader.service.handlers.base_handler import GraderBaseHandler, authenticated
+from grader.service.handlers.base_handler import GraderBaseHandler, authorize
 from jupyter_server.base.handlers import APIHandler
 from jupyter_server.utils import url_path_join
+from grader.service.orm.takepart import Role, Scope
+
 import tornado
 from tornado import web
 
 
 @register_handler(path=r"\/lectures\/(?P<lecture_id>\d*)\/assignments\/(?P<assignment_id>\d*)\/grading\/?")
 class GradingBaseHandler(GraderBaseHandler):
-  @authenticated
+  @authorize([Scope.student, Scope.tutor, Scope.instructor])
   async def get(self, lecture_id: int, assignment_id: int):
     pass
 
 
 @register_handler(path=r"\/lectures\/(?P<lecture_id>\d*)\/assignments\/(?P<assignment_id>\d*)\/grading\/(?P<user_id>\d*)\/auto\/?")
 class GradingAutoHandler(GraderBaseHandler):
-  @authenticated
+  @authorize([Scope.tutor, Scope.instructor])
   async def post(self, lecture_id: int, assignment_id: int, user_id: int):
     pass
 
 
 @register_handler(path=r"\/lectures\/(?P<lecture_id>\d*)\/assignments\/(?P<assignment_id>\d*)\/grading\/(?P<user_id>\d*)\/manual\/?")
 class GradingManualHandler(GraderBaseHandler):
-  @authenticated
+  @authorize([Scope.tutor, Scope.instructor])
   async def post(self, lecture_id: int, assignment_id: int, user_id: int):
     pass
 
-  @authenticated
+  @authorize([Scope.tutor, Scope.instructor])
   async def get(self, lecture_id: int, assignment_id: int, user_id: int):
     pass
 
-  @authenticated
+  @authorize([Scope.tutor, Scope.instructor])
   async def put(self, lecture_id: int, assignment_id: int, user_id: int):
     pass
 
-  @authenticated
+  @authorize([Scope.instructor])
   async def delete(self, lecture_id: int, assignment_id: int, user_id: int):
     pass
 
 
 @register_handler(path=r"\/lectures\/(?P<lecture_id>\d*)\/assignments\/(?P<assignment_id>\d*)\/grading\/(?P<user_id>\d*)\/score\/?")
 class GradingScoreHandler(GraderBaseHandler):
-  @authenticated
+  @authorize([Scope.student, Scope.tutor, Scope.instructor])
   async def get(self, lecture_id: int, assignment_id: int, user_id: int):
     pass
