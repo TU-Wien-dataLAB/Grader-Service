@@ -25,6 +25,8 @@ def upgrade():
     sa.Column('semester', sa.String(length=255), nullable=False),
     sa.Column('code', sa.String(length=255), nullable=True),
     sa.Column('state', sa.Enum('inactive', 'active', 'complete'), nullable=False),
+    sa.Column('deleted', sa.Enum('active', 'deleted'),server_default='active', nullable=False),
+
     sa.PrimaryKeyConstraint('id'),
     UniqueConstraint('name', 'semester', name='u_sem_name')
     )
@@ -39,6 +41,8 @@ def upgrade():
     sa.Column('duedate', sa.DateTime(), nullable=False),
     sa.Column('points', sa.Integer(), nullable=False),
     sa.Column('status', sa.Enum('created', 'released', 'fetching', 'fetched', 'complete'), nullable=True),
+    sa.Column('deleted', sa.Enum('active', 'deleted'), server_default='active', nullable=False),
+
     sa.ForeignKeyConstraint(['lectid'], ['lecture.id'], ),
     sa.PrimaryKeyConstraint('id'),
     )

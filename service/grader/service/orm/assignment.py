@@ -1,4 +1,4 @@
-from .base import Base, Serializable
+from .base import Base, DeleteState, Serializable
 from sqlalchemy import Column, Integer, String, ForeignKey, DateTime, Enum, Boolean
 from sqlalchemy.orm import relationship
 from grader.common.models import assignment
@@ -15,6 +15,8 @@ class Assignment(Base, Serializable):
         Enum("created", "released", "fetching", "fetched", "complete"),
         default="created",
     )
+    deleted = Column(Enum(DeleteState), nullable=False, unique=False)
+
 
     lecture = relationship("Lecture", back_populates="assignments")
     files = relationship("File", back_populates="assignment")
