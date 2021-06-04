@@ -7,6 +7,7 @@ from grader.service.main import GraderService
 from grader.service.orm import lecture
 from grader.service.orm import assignment
 from grader.service.orm.assignment import Assignment
+from grader.service.orm.base import DeleteState
 from grader.service.orm.file import File
 from grader.service.orm.lecture import Lecture
 from grader.service.orm.takepart import Role, Scope
@@ -26,7 +27,10 @@ class AssignmentBaseHandler(GraderBaseHandler):
     @authorize([Scope.student, Scope.tutor, Scope.instructor])
     def get(self, lecture_id: int):
         role = self.session.query(Role).get((self.user.name, lecture_id))
-        self.write_json(role.lecture.assignments)
+        assignments = [role.lecture.assignments
+                        for a in role.lecture.assignments
+                        if a.deleted == DeleteState.active]
+        self.write_json(assignments)
 
     @authorize([Scope.instructor])
     def post(self, lecture_id: int):

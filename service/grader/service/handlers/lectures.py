@@ -3,6 +3,7 @@ from grader.common.registry import register_handler
 from grader.service.orm.lecture import Lecture, LectureState
 from grader.service.orm.user import User
 from grader.service.orm.takepart import Role, Scope
+from grader.service.orm.base import DeleteState
 from grader.service.handlers.base_handler import GraderBaseHandler, authorize
 from jupyter_server.utils import url_path_join
 import tornado
@@ -26,7 +27,8 @@ class LectureBaseHandler(GraderBaseHandler):
             lectures = [
                 role.lecture
                 for role in self.user.roles
-                if role.lecture.state == LectureState.active
+                if role.lecture.state == LectureState.active 
+                and role.lecture.deleted == DeleteState.active 
                 and role.lecture.semester == semester
             ]
         self.write_json(lectures)
@@ -70,5 +72,7 @@ class LectureObjectHandler(GraderBaseHandler):
             if lecture.deleted == 1:
                 raise HTTPError(404)
             lecture.deleted = 1
+            for a in lecture.assignments:
+                a.deleted = 1
         except ObjectDeletedError:
             raise HTTPError(404)
