@@ -48,8 +48,8 @@ def upgrade():
     op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-05 14:43:35.863","not_graded",1,"user1")')
     op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-07 14:44:35.863","manually_graded",1,"user1",10.0)')
 
-    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-05 14:43:35.863","not_graded",1,"fjaeger")')
-    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-07 14:44:35.863","manually_graded",1,"fjaeger",10.0)')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-06 14:43:35.863","not_graded",1,"fjaeger")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-08 14:44:35.863","manually_graded",1,"fjaeger",10.0)')
 
     op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-05 14:43:35.863","not_graded",1,"ubuntu")')
     op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-07 14:44:35.863","manually_graded",1,"ubuntu",10.0)')

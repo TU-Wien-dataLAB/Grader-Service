@@ -25,7 +25,7 @@ from tornado.web import HTTPError
 @register_handler(path=r"\/lectures\/(?P<lecture_id>\d*)\/assignments\/?")
 class AssignmentBaseHandler(GraderBaseHandler):
     @authorize([Scope.student, Scope.tutor, Scope.instructor])
-    def get(self, lecture_id: int):
+    async def get(self, lecture_id: int):
         role = self.session.query(Role).get((self.user.name, lecture_id))
         if role.lecture.deleted == DeleteState.deleted:
             raise HTTPError(404)
