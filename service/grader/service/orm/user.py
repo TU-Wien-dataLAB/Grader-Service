@@ -10,5 +10,4 @@ class User(Base, Serializable):
   submissions = relationship("Submission", back_populates="user")
 
   def serialize(self):
-      # TODO: reconstruct group and role information from database
       return {"name": self.name}

@@ -77,7 +77,7 @@ class GraderBaseHandler(SessionMixin, web.RequestHandler):
         self.hub_api_base_path: str = hub_api_parsed.path
 
         self.error_message = None
-        self.has_basic_auth = False
+        self.has_auth = False
 
     async def prepare(self) -> Optional[Awaitable[None]]:
         await self.authenticate_user()
@@ -167,10 +167,11 @@ class GraderBaseHandler(SessionMixin, web.RequestHandler):
                 name, value = v.split(" ")
                 if name == "Token":
                     token = value
+                    self.has_auth = True
                 elif name == "Basic":
                     auth_decoded = base64.decodebytes(value.encode('ascii')).decode('ascii')
                     _, token = auth_decoded.split(':', 2) # we interpret the password as the token and ignore the username
-                    self.has_basic_auth = True
+                    self.has_auth = True
                 else:
                     token = None
                 return token

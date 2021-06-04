@@ -1,5 +1,6 @@
 import json
 from grader.common.registry import register_handler
+from grader.common.services.git import GitService
 from grader.grading_labextension.handlers.base_handler import ExtensionBaseHandler
 from jupyter_server.utils import url_path_join
 from grader.common.models.assignment import Assignment
@@ -49,12 +50,28 @@ class AssignmentObjectHandler(ExtensionBaseHandler):
                 "metadata-only": self.get_argument("metadata-only", None),
             }
         )
-        response = await self.request_service.request(
-            method="GET",
-            endpoint=f"{self.base_url}/lectures/{lecture_id}/assignments/{assignment_id}{query_params}",
-            header=self.grader_authentication_header,
-        )
-        self.write(json.dumps(response))
+        instructor_version = self.get_argument("instructor-version", None) == "true"
+        if instructor_version:
+            lecture = await self.request_service.request(
+                "GET",
+                f"{self.base_url}/lectures/{lecture_id}",
+                header=self.grader_authentication_header,
+            )
+            assignment = await self.request_service.request(
+                "GET",
+                f"{self.base_url}/lectures/{lecture_id}/assignments/{assignment_id}",
+                header=self.grader_authentication_header,
+            )
+            git_service: GitService = GitService.instance()
+            git_service.init(lecture["name"], assignment["name"])
+            git_service.pull("grader", lecture["name"], assignment["name"])
+        else:
+            response = await self.request_service.request(
+                method="GET",
+                endpoint=f"{self.base_url}/lectures/{lecture_id}/assignments/{assignment_id}{query_params}",
+                header=self.grader_authentication_header,
+            )
+            self.write(json.dumps(response))
 
     async def delete(self, lecture_id: int, assignment_id: int):
         response = await self.request_service.request(

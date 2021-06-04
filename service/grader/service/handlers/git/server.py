@@ -27,7 +27,7 @@ class GitBaseHandler(GraderBaseHandler):
 
     def write_error(self, status_code: int, **kwargs) -> None:
         self.clear()
-        if status_code == 403 and not self.has_basic_auth:
+        if status_code == 403 and not self.has_auth:
             status_code = 401
             self.set_header('WWW-Authenticate', 'Basic realm="User Visible Realm"')
         self.set_status(status_code)
@@ -52,15 +52,18 @@ class GitBaseHandler(GraderBaseHandler):
 
     def gitlookup(self):
         pathlets = self.request.path.strip("/").split("/")
-        # pathlets = ['services', 'grader', 'git', 'repo_name', ...]
+        # pathlets = ['services', 'grader', 'git', 'lecture_name', 'assignment_repo', ...]
         pathlets = pathlets[3:]
-        path = os.path.abspath(os.path.join(self.gitbase, pathlets[0]))
+        lecture_path = os.path.abspath(os.path.join(self.gitbase, pathlets[0]))
+        path = os.path.abspath(os.path.join(self.gitbase, pathlets[0], pathlets[1]))
         if not path.startswith(os.path.abspath(self.gitbase)):
             return None
 
         if os.path.exists(path):
             return path
         else:
+            if not os.path.exists(lecture_path):
+                os.mkdir(lecture_path)
             os.mkdir(path)
             # this path has to be a git dir -> call git init
             try:
