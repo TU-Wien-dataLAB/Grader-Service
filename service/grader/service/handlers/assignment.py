@@ -15,6 +15,7 @@ from grader.service.server import GraderServer
 from jupyter_server.utils import url_path_join
 from grader.common.models.assignment import Assignment as AssignmentModel
 from sqlalchemy.sql.expression import false, join
+from sqlalchemy.orm.exc import ObjectDeletedError
 from tornado import httputil
 import tornado
 from tornado.web import HTTPError
@@ -75,7 +76,15 @@ class AssignmentObjectHandler(GraderBaseHandler):
 
     @authorize([Scope.instructor])
     def delete(self, lecture_id: int, assignment_id: int):
-        pass  # TODO: set delete action in database
+        try:
+            assignment = self.session.query(Assignment).get(assignment_id)
+            if assignment is None:
+                raise HTTPError(404)
+            assignment.deleted = 1
+            if assignment.deleted == 1:
+                raise HTTPError(404)
+        except ObjectDeletedError:
+            raise HTTPError(404)
 
 
 @register_handler(

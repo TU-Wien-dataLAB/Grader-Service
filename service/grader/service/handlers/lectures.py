@@ -8,6 +8,7 @@ from jupyter_server.utils import url_path_join
 import tornado
 from grader.common.models.lecture import Lecture as LectureModel
 from tornado.httpclient import HTTPError
+from sqlalchemy.orm.exc import ObjectDeletedError
 
 
 @register_handler(path=r"\/lectures\/?")
@@ -62,4 +63,12 @@ class LectureObjectHandler(GraderBaseHandler):
 
     @authorize([Scope.instructor])
     async def delete(self, lecture_id: int):
-        pass
+        try:
+            lecture = self.session.query(Lecture).get(Lecture)
+            if lecture is None:
+                raise HTTPError(404)
+            if lecture.deleted == 1:
+                raise HTTPError(404)
+            lecture.deleted = 1
+        except ObjectDeletedError:
+            raise HTTPError(404)

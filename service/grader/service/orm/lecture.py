@@ -1,5 +1,5 @@
 from sqlalchemy.sql.schema import UniqueConstraint
-from .base import Base, Serializable
+from .base import Base, Serializable, DeleteState
 from sqlalchemy import Column, Integer, String, ForeignKey, DateTime, Enum, Boolean
 from sqlalchemy.orm import relationship
 from grader.common.models import lecture
@@ -18,6 +18,8 @@ class Lecture(Base, Serializable):
     semester = Column(String(255), nullable=False, unique=False)
     code = Column(String(255), nullable=True, unique=False)
     state = Column(Enum(LectureState), nullable=False, unique=False)
+    deleted = Column(Enum(DeleteState), nullable=False, unique=False)
+
 
     assignments = relationship("Assignment", back_populates="lecture")
     roles = relationship("Role", back_populates="lecture")
