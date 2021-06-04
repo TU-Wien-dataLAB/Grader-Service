@@ -12,6 +12,8 @@
 
 
 export interface AssignmentFile { 
+    id?: number;
+    a_id?: number;
     name?: string;
     hashcode?: string;
     path?: string;

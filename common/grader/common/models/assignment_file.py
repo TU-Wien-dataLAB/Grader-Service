@@ -15,9 +15,13 @@ class AssignmentFile(Model):
     Do not edit the class manually.
     """
 
-    def __init__(self, name=None, hashcode=None, path=None):  # noqa: E501
+    def __init__(self, id=None, a_id=None, name=None, hashcode=None, path=None):  # noqa: E501
         """AssignmentFile - a model defined in OpenAPI
 
+        :param id: The id of this AssignmentFile.  # noqa: E501
+        :type id: int
+        :param a_id: The a_id of this AssignmentFile.  # noqa: E501
+        :type a_id: int
         :param name: The name of this AssignmentFile.  # noqa: E501
         :type name: str
         :param hashcode: The hashcode of this AssignmentFile.  # noqa: E501
@@ -26,17 +30,23 @@ class AssignmentFile(Model):
         :type path: str
         """
         self.openapi_types = {
+            'id': int,
+            'a_id': int,
             'name': str,
             'hashcode': str,
             'path': str
         }
 
         self.attribute_map = {
+            'id': 'id',
+            'a_id': 'a_id',
             'name': 'name',
             'hashcode': 'hashcode',
             'path': 'path'
         }
 
+        self._id = id
+        self._a_id = a_id
         self._name = name
         self._hashcode = hashcode
         self._path = path
@@ -51,6 +61,48 @@ class AssignmentFile(Model):
         :rtype: AssignmentFile
         """
         return util.deserialize_model(dikt, cls)
+
+    @property
+    def id(self):
+        """Gets the id of this AssignmentFile.
+
+
+        :return: The id of this AssignmentFile.
+        :rtype: int
+        """
+        return self._id
+
+    @id.setter
+    def id(self, id):
+        """Sets the id of this AssignmentFile.
+
+
+        :param id: The id of this AssignmentFile.
+        :type id: int
+        """
+
+        self._id = id
+
+    @property
+    def a_id(self):
+        """Gets the a_id of this AssignmentFile.
+
+
+        :return: The a_id of this AssignmentFile.
+        :rtype: int
+        """
+        return self._a_id
+
+    @a_id.setter
+    def a_id(self, a_id):
+        """Sets the a_id of this AssignmentFile.
+
+
+        :param a_id: The a_id of this AssignmentFile.
+        :type a_id: int
+        """
+
+        self._a_id = a_id
 
     @property
     def name(self):
