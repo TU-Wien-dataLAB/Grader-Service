@@ -116,9 +116,9 @@ class AssignmentObjectHandler(GraderBaseHandler):
             assignment = self.session.query(Assignment).get(assignment_id)
             if assignment is None:
                 raise HTTPError(404)
-            assignment.deleted = 1
             if assignment.deleted == 1:
                 raise HTTPError(404)
+            assignment.deleted = 1
         except ObjectDeletedError:
             raise HTTPError(404)
 
