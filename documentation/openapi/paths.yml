@@ -374,14 +374,6 @@ assignmentsById:
       schema:
         type: boolean
         default: false
-    - name: include-submissions
-      in: query
-      description: Include past submissions of the assignment
-      required: false
-      example: false
-      schema:
-        type: boolean
-        default: false
     responses:
       200:
         description: OK

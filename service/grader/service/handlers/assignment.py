@@ -7,6 +7,7 @@ from grader.service.main import GraderService
 from grader.service.orm import lecture
 from grader.service.orm import assignment
 from grader.service.orm.assignment import Assignment
+from grader.service.orm.base import DeleteState
 from grader.service.orm.file import File
 from grader.service.orm.lecture import Lecture
 from grader.service.orm.takepart import Role, Scope
@@ -26,7 +27,11 @@ class AssignmentBaseHandler(GraderBaseHandler):
     @authorize([Scope.student, Scope.tutor, Scope.instructor])
     def get(self, lecture_id: int):
         role = self.session.query(Role).get((self.user.name, lecture_id))
-        self.write_json(role.lecture.assignments)
+        if role.lecture.deleted == DeleteState.deleted:
+            raise HTTPError(404)
+        
+        assignments = [a for a in role.lecture.assignments if a.deleted == DeleteState.active]
+        self.write_json(assignments)
 
     @authorize([Scope.instructor])
     def post(self, lecture_id: int):
@@ -52,7 +57,7 @@ class AssignmentObjectHandler(GraderBaseHandler):
         body = tornado.escape.json_decode(self.request.body)
         assignment_model = AssignmentModel.from_dict(body)
         assignment = self.session.query(Assignment).get(assignment_id)
-        if assignment is None:
+        if assignment is None or assignment.deleted == DeleteState.deleted:
             self.error_message = "Not Found!"
             raise HTTPError(404)
 
@@ -69,7 +74,7 @@ class AssignmentObjectHandler(GraderBaseHandler):
         if instructor_version and role.role < Scope.instructor:
             raise HTTPError(403)
         assignment = self.session.query(Assignment).get(assignment_id)
-        if assignment is None:
+        if assignment is None or assignment.deleted == DeleteState.deleted:
             self.error_message = "Not Found!"
             raise HTTPError(404)
         self.write_json(assignment)

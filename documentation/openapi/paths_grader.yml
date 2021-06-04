@@ -56,3 +56,150 @@ assignmentData:
           application/json:
             schema:
               $ref: "./schemas.yml#/components/schemas/ErrorMessage"
+
+
+# grader has no query params for get
+assignmentsById:
+  put:
+    security:
+      - hub_auth:
+        - instructor
+        - tutor
+    summary: Update an existing assignment (also handles release)
+    tags:
+    - Assignments
+    parameters:
+    - name: lect_id
+      in: path
+      description: ID of the lecture
+      required: true
+      example: 1
+      schema:
+        type: integer
+        format: int64
+    - name: a_id
+      in: path
+      description: ID of the assignment in the lecture
+      required: true
+      example: 2
+      schema:
+        type: integer
+        format: int64
+    requestBody:
+      description: The parameters of the assignment that should be updated.
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: './schemas.yml#/components/schemas/Assignment'
+    responses:
+      200:
+        description: OK
+        content:
+          application/json:
+            schema:
+              $ref: "./schemas.yml#/components/schemas/Assignment"
+      403:
+        description: Unautorized
+      404:
+        description: Lecture id or assignment id not found.
+        content: 
+          application/json:
+            schema:
+              $ref: "./schemas.yml#/components/schemas/ErrorMessage"
+      500:
+        description: Internal server error
+        content: 
+          application/json:
+            schema:
+              $ref: "./schemas.yml#/components/schemas/ErrorMessage"
+  get:
+    security:
+      - hub_auth:
+        - instructor
+        - tutor
+        - student
+    summary: "Request the assignment to be fetched"
+    tags: 
+    - "Assignments"
+    parameters:
+    - name: lect_id
+      in: path
+      description: ID of the lecture
+      required: true
+      example: 1
+      schema:
+        type: integer
+        format: int64
+    - name: a_id
+      in: path
+      description: ID of the assignment in the lecture
+      required: true
+      example: 2
+      schema:
+        type: integer
+        format: int64
+    responses:
+      200:
+        description: OK
+        content:
+          application/json:
+            schema:
+              $ref: "./schemas.yml#/components/schemas/Assignment"
+      403:
+        description: Unautorized
+      404:
+        description: Lecture id or assignment id not found
+        content: 
+          application/json:
+            schema:
+              $ref: "./schemas.yml#/components/schemas/ErrorMessage"
+      500:
+        description: Internal server error
+        content: 
+          application/json:
+            schema:
+              $ref: "./schemas.yml#/components/schemas/ErrorMessage"
+  delete:
+    security:
+      - hub_auth:
+        - instructor
+        - tutor
+    summary: Delete an existing assignment
+    tags:
+    - Assignments
+    parameters:
+    - name: lect_id
+      in: path
+      description: ID of the lecture
+      required: true
+      example: 1
+      schema:
+        type: integer
+        format: int64
+    - name: a_id
+      in: path
+      description: ID of the assignment in the lecture
+      required: true
+      example: 2
+      schema:
+        type: integer
+        format: int64
+    responses:
+      200:
+        description: OK
+      403:
+        description: Unautorized
+      404:
+        description: Lecture id or assignment id not found.
+        content: 
+          application/json:
+            schema:
+              $ref: "./schemas.yml#/components/schemas/ErrorMessage"
+      500:
+        description: Internal server error
+        content: 
+          application/json:
+            schema:
+              $ref: "./schemas.yml#/components/schemas/ErrorMessage"
+
