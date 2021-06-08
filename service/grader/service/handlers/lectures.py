@@ -6,10 +6,11 @@ from grader.service.orm.takepart import Role, Scope
 from grader.service.orm.base import DeleteState
 from grader.service.handlers.base_handler import GraderBaseHandler, authorize
 from jupyter_server.utils import url_path_join
+from sqlalchemy.orm import exc
 import tornado
 from grader.common.models.lecture import Lecture as LectureModel
 from tornado.httpclient import HTTPError
-from sqlalchemy.orm.exc import ObjectDeletedError
+from sqlalchemy.orm.exc import MultipleResultsFound, NoResultFound, ObjectDeletedError
 
 
 @register_handler(path=r"\/lectures\/?")
@@ -35,7 +36,25 @@ class LectureBaseHandler(GraderBaseHandler):
 
     @authorize([Scope.instructor])
     async def post(self):
-        pass  # TODO: how do we define the scope when the user does not have a scope with the lecture?
+        body = tornado.escape.json_decode(self.request.body)
+        lecture_model = LectureModel.from_dict(body)
+        try:
+            lecture = self.session.query(Lecture).filter(Lecture.code == lecture_model.code).one_or_none()
+        except NoResultFound:
+            self.error_message = "Not found"
+            raise HTTPError(404)
+        except MultipleResultsFound:
+            self.error_message = "Error"
+            raise HTTPError(400)
+        
+        lecture.name = lecture_model.name
+        lecture.code = lecture_model.code
+        lecture.state = LectureState.complete if lecture_model.complete else LectureState.active
+        lecture.semester = lecture_model.semester
+        lecture.deleted = DeleteState.active
+
+        self.session.commit()
+        self.write_json(lecture)
 
 
 @register_handler(path=r"\/lectures\/(?P<lecture_id>\d*)\/?")

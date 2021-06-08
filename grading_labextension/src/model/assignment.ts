@@ -16,12 +16,18 @@ import { Exercise } from './exercise';
 export interface Assignment { 
     id?: number;
     name?: string;
+    type?: Assignment.TypeEnum;
     exercises?: Array<Exercise>;
     files?: Array<AssignmentFile>;
     due_date?: string;
     status?: Assignment.StatusEnum;
 }
 export namespace Assignment {
+    export type TypeEnum = 'user' | 'group';
+    export const TypeEnum = {
+        User: 'user' as TypeEnum,
+        Group: 'group' as TypeEnum
+    };
     export type StatusEnum = 'created' | 'released' | 'fetching' | 'fetched' | 'complete';
     export const StatusEnum = {
         Created: 'created' as StatusEnum,

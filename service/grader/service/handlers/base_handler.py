@@ -16,7 +16,7 @@ from jupyterhub.services.auth import HubAuthenticated
 from sqlalchemy.sql.expression import select
 from tornado import httputil, web
 from tornado.web import HTTPError, RequestHandler
-from grader.service.orm.base import Serializable
+from grader.service.orm.base import DeleteState, Serializable
 from grader.common.models.base_model_ import Model
 from tornado_sqlalchemy import SessionMixin
 from tornado.escape import json_decode
@@ -34,11 +34,11 @@ def authorize(scopes: List[Scope]):
         @functools.wraps(handler_method)
         async def request_handler_wrapper(self: 'GraderBaseHandler', *args, **kwargs):
             lect_id = self.path_kwargs.get("lecture_id", None)
-            if lect_id is None and self.request.method == "POST":
+            if lect_id is None and self.request.path == "/services/grader/lectures" and self.request.method == "POST":
                 # lecture name and semester is in post body
                 try:
                     data = json_decode(self.request.body)
-                    lect_id = self.session.query(Lecture).filter(Lecture.name == data["name"], Lecture.semester == data["semester"]).one().id
+                    lect_id = self.session.query(Lecture).filter(Lecture.code == data["code"]).one().id
                 except MultipleResultsFound:
                     self.error_message = "Unauthorized"
                     raise HTTPError(403)
@@ -89,7 +89,7 @@ class GraderBaseHandler(SessionMixin, web.RequestHandler):
 
     async def authenticate_user(self):
         """
-        This is a workaround for async authentication. `get_current_user` cannot be asyncronous and a request cannot be made in a blocking manner.
+        This is a workaround for async authentication. `get_current_user` cannot be asynchronous and a request cannot be made in a blocking manner.
         This sets the `current_user` property before each request before being checked by the `authenticated` decorator.
         """
         token = self.get_request_token()
@@ -116,23 +116,23 @@ class GraderBaseHandler(SessionMixin, web.RequestHandler):
             self.current_user = user_model
             return 
         
-        lecture_roles = {n:{"semester": s, "role": r} for n, s, r in [tuple(g.split("__", 2)) for g in  user["groups"]]}
+        lecture_roles = {code:{"role": role} for code, role in [tuple(g.split("__", 1)) for g in  user["groups"]]}
 
-        for lecture_name, obj in lecture_roles.items():
-            lecture_models = self.session.query(Lecture).filter(Lecture.name == lecture_name, Lecture.semester == obj["semester"]).all()
-            if len(lecture_models) == 0: # create inactive lecture if no lecture with that name exists yet (code is set in create)
+        for lecture_code in lecture_roles.keys():
+            lecture = self.session.query(Lecture).filter(Lecture.code == lecture_code).one_or_none()
+            if lecture is None: # create inactive lecture if no lecture with that name exists yet (code is set in create)
                 lecture = Lecture()
-                lecture.name = lecture_name
-                lecture.semester = obj["semester"]
+                lecture.code = lecture_code
                 lecture.state = LectureState.inactive
+                lecture.deleted = DeleteState.active
                 self.session.add(lecture)
         self.session.commit()
         
         self.session.query(Role).filter(Role.username == user["name"]).delete()
-        for lecture_name, obj in lecture_roles.items():
-            lecture = self.session.query(Lecture).filter(Lecture.name == lecture_name, Lecture.semester == obj["semester"]).one_or_none()
+        for lecture_code, obj in lecture_roles.items():
+            lecture = self.session.query(Lecture).filter(Lecture.code == lecture_code).one_or_none()
             if lecture is None:
-                raise HTTPError(500, f'Could not find lecture with name: {lecture_name} and semester {obj["semester"]}. Inconsistent database state!')
+                raise HTTPError(500, f'Could not find lecture with code: {lecture_code}. Inconsistent database state!')
             role = Role()
             role.username = user["name"]
             role.lectid = lecture.id

@@ -26,11 +26,11 @@ def upgrade():
     op.execute('INSERT INTO "user" ("name") VALUES ("ubuntu")')
 
     ## Lectures
-    op.execute('INSERT INTO "lecture" ("name","semester","code", "state") VALUES ("lecture1","WS21","AU.294","active")')
-    op.execute('INSERT INTO "lecture" ("name","semester","code", "state") VALUES ("lecture1","SS21","AU.294","active")')
-    op.execute('INSERT INTO "lecture" ("name","semester","code", "state") VALUES ("lecture2","WS20","AU.297","active")')
-    op.execute('INSERT INTO "lecture" ("name","semester","code", "state") VALUES ("lecture3","SS22","AU.212","active")')
-    op.execute('INSERT INTO "lecture" ("name","semester","code", "state") VALUES ("lecture4","SS21","AU.194","active")')
+    op.execute('INSERT INTO "lecture" ("name","semester","code", "state", "deleted") VALUES ("lecture1","WS21","21wle1","active","active")')
+    op.execute('INSERT INTO "lecture" ("name","semester","code", "state", "deleted") VALUES ("lecture1","SS21","21sle1","active","active")')
+    op.execute('INSERT INTO "lecture" ("name","semester","code", "state", "deleted") VALUES ("lecture2","WS20","20wle2","active","active")')
+    op.execute('INSERT INTO "lecture" ("name","semester","code", "state", "deleted") VALUES ("lecture3","SS22","22sle3","active","active")')
+    op.execute('INSERT INTO "lecture" ("name","semester","code", "state", "deleted") VALUES ("lecture4","SS21","21sle4","active","active")')
     op.execute('INSERT INTO "takepart" ("username","lectid","role") VALUES ("user1",1,"student")')
     op.execute('INSERT INTO "takepart" ("username","lectid","role") VALUES ("user1",2,"student")')
     op.execute('INSERT INTO "takepart" ("username","lectid","role") VALUES ("user2",1,"student")')

@@ -19,13 +19,15 @@ class Assignment(Model):
     Do not edit the class manually.
     """
 
-    def __init__(self, id=None, name=None, exercises=None, files=None, due_date=None, status=None):  # noqa: E501
+    def __init__(self, id=None, name=None, type=None, exercises=None, files=None, due_date=None, status=None):  # noqa: E501
         """Assignment - a model defined in OpenAPI
 
         :param id: The id of this Assignment.  # noqa: E501
         :type id: int
         :param name: The name of this Assignment.  # noqa: E501
         :type name: str
+        :param type: The type of this Assignment.  # noqa: E501
+        :type type: str
         :param exercises: The exercises of this Assignment.  # noqa: E501
         :type exercises: List[Exercise]
         :param files: The files of this Assignment.  # noqa: E501
@@ -38,6 +40,7 @@ class Assignment(Model):
         self.openapi_types = {
             'id': int,
             'name': str,
+            'type': str,
             'exercises': List[Exercise],
             'files': List[AssignmentFile],
             'due_date': datetime,
@@ -47,6 +50,7 @@ class Assignment(Model):
         self.attribute_map = {
             'id': 'id',
             'name': 'name',
+            'type': 'type',
             'exercises': 'exercises',
             'files': 'files',
             'due_date': 'due_date',
@@ -55,6 +59,7 @@ class Assignment(Model):
 
         self._id = id
         self._name = name
+        self._type = type
         self._exercises = exercises
         self._files = files
         self._due_date = due_date
@@ -112,6 +117,33 @@ class Assignment(Model):
         """
 
         self._name = name
+
+    @property
+    def type(self):
+        """Gets the type of this Assignment.
+
+
+        :return: The type of this Assignment.
+        :rtype: str
+        """
+        return self._type
+
+    @type.setter
+    def type(self, type):
+        """Sets the type of this Assignment.
+
+
+        :param type: The type of this Assignment.
+        :type type: str
+        """
+        allowed_values = ["user", "group"]  # noqa: E501
+        if type not in allowed_values:
+            raise ValueError(
+                "Invalid value for `type` ({0}), must be one of {1}"
+                .format(type, allowed_values)
+            )
+
+        self._type = type
 
     @property
     def exercises(self):
