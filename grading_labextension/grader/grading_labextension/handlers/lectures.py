@@ -16,7 +16,7 @@ class LectureBaseHandler(ExtensionBaseHandler):
     @web.authenticated
     async def get(self):
         query_params = RequestService.get_query_string(
-            {"semester", self.get_argument("semester", None)}
+            {"semester": self.get_argument("semester", None)}
         )
         response = await self.request_service.request(
             "GET",

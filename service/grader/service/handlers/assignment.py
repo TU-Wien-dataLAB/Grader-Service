@@ -122,32 +122,3 @@ class AssignmentObjectHandler(GraderBaseHandler):
         except ObjectDeletedError:
             raise HTTPError(404)
 
-
-@register_handler(
-    path=r"\/lectures\/(?P<lecture_id>\d*)\/assignments\/(?P<assignment_id>\d*)\/file\/(?P<file_id>\d*)\/?"
-)
-class AssignmentDataHandler(GraderBaseHandler):
-    def __init__(
-        self, application: GraderServer, request: httputil.HTTPServerRequest, **kwargs
-    ) -> None:
-        super().__init__(application, request, **kwargs)
-        app: GraderServer = self.application
-        self.compression_engine = CompressionEngine(
-            compression_dir=osp.join(app.grader_service_dir, "archive")
-        )
-
-    @authorize([Scope.student, Scope.tutor, Scope.instructor])
-    async def get(self, lecture_id: int, assignment_id: int, file_id: int):
-        file = self.session.query(File).get(file_id)
-        if file is None or file.assignid != assignment_id:
-            self.error_message = "Not Found!"
-            raise HTTPError(404)
-        assignment: Assignment = file.assignment
-        lectrue: Lecture = assignment.lecture
-        path = osp.join(lectrue.name, assignment.name, file.path)
-        full_path = osp.join(GitService.instance().git_local_root_dir, path)
-
-        archive_file = self.compression_engine.create_archive(name=f"{lectrue.name}_{assignment.name}_{file.path}", path=full_path)
-        with open(archive_file, "rb") as f:
-            data = f.read()
-            self.write_json(data)

@@ -26,4 +26,4 @@ class ExtensionBaseHandler(APIHandler):
   @property
   def grader_authentication_header(self):
     logging.getLogger().critical(HandlerConfig.instance().hub_api_token)
-    return dict(token=HandlerConfig.instance().hub_api_token)
+    return dict(Authorization="Token " + HandlerConfig.instance().hub_api_token)

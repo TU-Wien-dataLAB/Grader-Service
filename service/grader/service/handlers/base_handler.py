@@ -34,7 +34,7 @@ def authorize(scopes: List[Scope]):
         @functools.wraps(handler_method)
         async def request_handler_wrapper(self: 'GraderBaseHandler', *args, **kwargs):
             lect_id = self.path_kwargs.get("lecture_id", None)
-            if lect_id is None:
+            if lect_id is None and self.request.method == "POST":
                 # lecture name and semester is in post body
                 try:
                     data = json_decode(self.request.body)
@@ -45,6 +45,11 @@ def authorize(scopes: List[Scope]):
                 except NoResultFound:
                     self.error_message = "Not Found"
                     raise HTTPError(404)
+                except json.decoder.JSONDecodeError:
+                    self.error_message = "Unauthorized"
+                    raise HTTPError(403)
+            elif lect_id is None and self.request.path == "/services/grader/lectures" and self.request.method == "GET":
+                return await handler_method(self, *args, **kwargs)
 
             role = self.session.query(Role).get((self.user.name, lect_id))
             if role is None or not role.role in scopes:

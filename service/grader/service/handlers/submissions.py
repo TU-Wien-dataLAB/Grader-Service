@@ -20,7 +20,7 @@ from tornado.httpclient import HTTPError
 )
 class SubmissionHandler(GraderBaseHandler):
     @authorize([Scope.student, Scope.tutor, Scope.instructor])
-    def get(self, lecture_id: int, assignment_id: int):
+    async def get(self, lecture_id: int, assignment_id: int):
         latest = self.get_argument("latest", None) == "true"
         instructor_version = instructor_version = (
             self.get_argument("instructor-version", None) == "true"
@@ -72,7 +72,7 @@ class SubmissionHandler(GraderBaseHandler):
         self.write_json(response)
 
     @authorize([Scope.student, Scope.tutor, Scope.instructor])
-    def post(self, lecture_id: int, assignment_id: int):
+    async def post(self, lecture_id: int, assignment_id: int):
         pass
 
 
@@ -81,7 +81,7 @@ class SubmissionHandler(GraderBaseHandler):
 )
 class FeedbackHandler(GraderBaseHandler):
     @authorize([Scope.student, Scope.tutor, Scope.instructor])
-    def get(self, lecture_id: int, assignment_id: int):
+    async def get(self, lecture_id: int, assignment_id: int):
         latest = self.get_argument("latest", False)
         instructor_version = self.get_argument("instructor-version", False)
         pass
