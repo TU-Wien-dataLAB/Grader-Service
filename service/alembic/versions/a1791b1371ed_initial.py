@@ -23,7 +23,7 @@ def upgrade():
     sa.Column('id', sa.Integer(), autoincrement=True, nullable=False),
     sa.Column('name', sa.String(length=255), nullable=False),
     sa.Column('semester', sa.String(length=255), nullable=False),
-    sa.Column('code', sa.String(length=255), nullable=True),
+    sa.Column('code', sa.String(length=255), nullable=True, unique=True),
     sa.Column('state', sa.Enum('inactive', 'active', 'complete'), nullable=False),
     sa.Column('deleted', sa.Enum('active', 'deleted'),server_default='active', nullable=False),
 

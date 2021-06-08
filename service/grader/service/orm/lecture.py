@@ -16,7 +16,7 @@ class Lecture(Base, Serializable):
     id = Column(Integer, primary_key=True, autoincrement=True)
     name = Column(String(255), nullable=False, unique=False)
     semester = Column(String(255), nullable=False, unique=False)
-    code = Column(String(255), nullable=True, unique=False)
+    code = Column(String(255), nullable=True, unique=True)
     state = Column(Enum(LectureState), nullable=False, unique=False)
     deleted = Column(Enum(DeleteState), nullable=False, unique=False)
 
