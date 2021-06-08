@@ -42,8 +42,8 @@ def upgrade():
     op.execute('INSERT INTO "takepart" ("username","lectid","role") VALUES ("ubuntu",3,"student")')
 
     ## Assignments
-    op.execute('INSERT INTO "assignment" ("name","lectid","duedate","points","status") VALUES ("assignment_1",1,"2021-06-06 23:59:00.000",20,"created")')
-    op.execute('INSERT INTO "assignment" ("name","lectid","duedate","points","status") VALUES ("assignment_2",1,"2021-07-07 23:59:00.000",10,"created")')
+    op.execute('INSERT INTO "assignment" ("name","lectid","duedate","points","status", "type") VALUES ("assignment_1",1,"2021-06-06 23:59:00.000",20,"created","user")')
+    op.execute('INSERT INTO "assignment" ("name","lectid","duedate","points","status", "type") VALUES ("assignment_2",1,"2021-07-07 23:59:00.000",10,"created","user")')
 
     op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-05 14:43:35.863","not_graded",1,"user1")')
     op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-07 14:44:35.863","manually_graded",1,"user1",10.0)')

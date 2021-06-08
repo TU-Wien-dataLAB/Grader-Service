@@ -63,7 +63,7 @@ class AssignmentObjectHandler(ExtensionBaseHandler):
                 header=self.grader_authentication_header,
             )
             git_service: GitService = GitService.instance()
-            git_service.init(lecture["name"], assignment["name"])
+            git_service.init(lecture["code"], assignment["name"])
             git_service.pull("grader", lecture["name"], assignment["name"])
         else:
             response = await self.request_service.request(

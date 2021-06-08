@@ -1,4 +1,9 @@
 import json
+from grader.service.orm.assignment import Assignment
+from grader.service.orm.lecture import Lecture
+from grader.service.orm.takepart import Role, Scope
+from grader.service.orm.group import Group
+from sqlalchemy.orm.exc import MultipleResultsFound, NoResultFound
 from tornado.web import RequestHandler, stream_request_body, HTTPError, Application
 from tornado.options import define, options, parse_command_line
 from tornado.process import Subprocess
@@ -52,22 +57,66 @@ class GitBaseHandler(GraderBaseHandler):
 
     def gitlookup(self):
         pathlets = self.request.path.strip("/").split("/")
-        # pathlets = ['services', 'grader', 'git', 'lecture_name', 'assignment_repo', ...]
+        # pathlets = ['services', 'grader', 'git', 'lecture_code', 'assignment_repo', ...]
         pathlets = pathlets[3:]
         lecture_path = os.path.abspath(os.path.join(self.gitbase, pathlets[0]))
-        path = os.path.abspath(os.path.join(self.gitbase, pathlets[0], pathlets[1]))
-        if not path.startswith(os.path.abspath(self.gitbase)):
+        assignment_path = os.path.abspath(os.path.join(self.gitbase, pathlets[0], pathlets[1]))
+        
+        # get lecture and assignment if they exist
+        try:
+            lecture = self.session.query(Lecture).filter(Lecture.code == pathlets[0]).one()
+        except NoResultFound:
+            self.error_message = "Not Found"
+            raise HTTPError(404)
+        except MultipleResultsFound:
+            raise HTTPError(400)
+        role = self.session.query(Role).get((self.user.name, lecture.id))
+        if role.role == Scope.instructor or role.role == Scope.tutor: # TODO: should tutors have access? probably...
+            repo_type: str = "instructor"
+        else:
+            try:
+                assignment = self.session.query(Assignment).filter(Assignment.lectid == lecture.id, Assignment.name == pathlets[1]).one()
+            except NoResultFound:
+                self.error_message = "Not Found"
+                raise HTTPError(404)
+            except MultipleResultsFound:
+                raise HTTPError(400)
+            repo_type: str = assignment.type
+        
+        # create directories once we know they exist in the database
+        if not os.path.exists(lecture_path):
+            os.mkdir(lecture_path)
+        if not os.path.exists(assignment_path):
+            os.mkdir(assignment_path)
+
+        # construct final path from repo type
+        if repo_type == "instructor":
+            path = os.path.join(assignment_path, repo_type)
+        elif repo_type == "user":
+            user_path = os.path.join(assignment_path, repo_type)
+            if not os.path.exists(user_path):
+                os.mkdir(user_path)
+            path = os.path.join(user_path, self.user.name)
+        elif repo_type == "group":
+            group = self.session.query(Group).get((self.user.name, lecture.id))
+            if group is None:
+                self.error_message = "Not Found"
+                raise HTTPError(404)
+            group_path = os.path.join(assignment_path, "group")
+            if not os.path.exists(group_path):
+                os.mkdir(group_path)
+            path = os.path.join(group_path, group.name)
+        else:
             return None
 
+        # return git repo
         if os.path.exists(path):
             return path
         else:
-            if not os.path.exists(lecture_path):
-                os.mkdir(lecture_path)
             os.mkdir(path)
             # this path has to be a git dir -> call git init
             try:
-                subprocess.run(["git", "init", "--bare", path], check=True)
+                subprocess.run(["git", "init", "--bare", assignment_path], check=True)
             except subprocess.CalledProcessError:
                 return None
             return path
