@@ -93,7 +93,7 @@
     "extension": true,
     "outputDir": "grader.grading_labextension/labextension",
     "_build": {
-      "load": "static/remoteEntry.945265210a20628fcef5.js",
+      "load": "static/remoteEntry.44dab14d132735960954.js",
       "extension": "./extension",
       "style": "./style"
     }
