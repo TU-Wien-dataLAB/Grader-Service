@@ -31,8 +31,11 @@ class File(Base, Serializable):
             )
         else:
             model = AssignmentFile(
-                name=self.name, path=self.path, hashcode=None
+                id=self.id,
+                a_id=self.assignid,
+                name=self.name,
+                path=self.path,
+                hashcode=None,
             )  # TODO: calculate hashcode
 
         return model
-

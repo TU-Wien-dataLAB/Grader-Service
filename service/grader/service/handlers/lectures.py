@@ -48,7 +48,7 @@ class LectureObjectHandler(GraderBaseHandler):
 
         lecture.name = lecture_model.name
         lecture.code = lecture_model.code
-        lecture.complete = lecture_model.complete
+        lecture.state = LectureState.complete if lecture_model.complete else LectureState.active
         lecture.semester = lecture_model.semester
 
         self.session.commit()

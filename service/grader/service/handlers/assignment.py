@@ -1,4 +1,6 @@
+from grader.common.models.assignment_file import AssignmentFile
 from grader.common.models.error_message import ErrorMessage
+from grader.common.models.exercise import Exercise
 from grader.common.registry import register_handler
 from grader.common.services.compression import CompressionEngine
 from grader.common.services.git import GitService
@@ -28,22 +30,51 @@ class AssignmentBaseHandler(GraderBaseHandler):
     async def get(self, lecture_id: int):
         role = self.session.query(Role).get((self.user.name, lecture_id))
         if role.lecture.deleted == DeleteState.deleted:
+            self.error_message = "Not Found"
             raise HTTPError(404)
         
         assignments = [a for a in role.lecture.assignments if a.deleted == DeleteState.active]
         self.write_json(assignments)
 
     @authorize([Scope.instructor])
-    def post(self, lecture_id: int):
+    async def post(self, lecture_id: int):
         body = tornado.escape.json_decode(self.request.body)
         assignment_model = AssignmentModel.from_dict(body)
         assignment = Assignment()
+
+        if len(set([e.path for e in assignment_model.exercises] + [f.path for f in assignment_model.files])) != len(assignment_model.exercises + assignment_model.files):
+            self.error_message = "Some files share the same name"
+            raise HTTPError(400)
 
         assignment.name = assignment_model.name
         assignment.lectid = lecture_id
         assignment.duedate = assignment_model.due_date
         assignment.status = assignment_model.status
+        assignment.points = sum([ex.points for ex in assignment_model.exercises])
+        assignment.deleted = DeleteState.active
         self.session.add(assignment)
+        self.session.commit()
+
+        ex: Exercise
+        for ex in assignment_model.exercises:
+            file = File()
+            file.assignid = assignment.id
+            file.exercise = True
+            file.name = ex.name
+            file.path = ex.path
+            file.points = ex.points
+            self.session.add(file)
+        
+        f: AssignmentFile
+        for f in assignment_model.files:
+            file = File()
+            file.assignid = assignment.id
+            file.exercise = False
+            file.name = f.name
+            file.path = f.path
+            file.points = None
+            self.session.add(file)
+
         self.session.commit()
         self.write_json(assignment)
 
@@ -53,7 +84,7 @@ class AssignmentBaseHandler(GraderBaseHandler):
 )
 class AssignmentObjectHandler(GraderBaseHandler):
     @authorize([Scope.instructor])
-    def put(self, lecture_id: int, assignment_id: int):
+    async def put(self, lecture_id: int, assignment_id: int):
         body = tornado.escape.json_decode(self.request.body)
         assignment_model = AssignmentModel.from_dict(body)
         assignment = self.session.query(Assignment).get(assignment_id)
@@ -80,14 +111,14 @@ class AssignmentObjectHandler(GraderBaseHandler):
         self.write_json(assignment)
 
     @authorize([Scope.instructor])
-    def delete(self, lecture_id: int, assignment_id: int):
+    async def delete(self, lecture_id: int, assignment_id: int):
         try:
             assignment = self.session.query(Assignment).get(assignment_id)
             if assignment is None:
                 raise HTTPError(404)
-            assignment.deleted = 1
             if assignment.deleted == 1:
                 raise HTTPError(404)
+            assignment.deleted = 1
         except ObjectDeletedError:
             raise HTTPError(404)
 
@@ -106,7 +137,7 @@ class AssignmentDataHandler(GraderBaseHandler):
         )
 
     @authorize([Scope.student, Scope.tutor, Scope.instructor])
-    def get(self, lecture_id: int, assignment_id: int, file_id: int):
+    async def get(self, lecture_id: int, assignment_id: int, file_id: int):
         file = self.session.query(File).get(file_id)
         if file is None or file.assignid != assignment_id:
             self.error_message = "Not Found!"

@@ -28,29 +28,28 @@ import base64
 def authorize(scopes: List[Scope]):
     if not set(scopes).issubset({Scope.student, Scope.tutor, Scope.instructor}):
         return ValueError("Invalid scopes")
-    needs_auth = set(scopes) != {Scope.student, Scope.tutor, Scope.instructor}
+    # needs_auth = set(scopes) != {Scope.student, Scope.tutor, Scope.instructor}
 
     def wrapper(handler_method):
         @functools.wraps(handler_method)
         async def request_handler_wrapper(self: 'GraderBaseHandler', *args, **kwargs):
-            if needs_auth:
-                lect_id = self.path_kwargs.get("lecture_id", None)
-                if lect_id is None:
-                    # lecture name and semester is in post body
-                    try:
-                        data = json_decode(self.request.body)
-                        lect_id = self.session.query(Lecture).filter(Lecture.name == data["name"], Lecture.semester == data["semester"]).one().id
-                    except MultipleResultsFound:
-                        self.error_message = "Unauthorized"
-                        raise HTTPError(403)
-                    except NoResultFound:
-                        self.error_message = "Not Found"
-                        raise HTTPError(404)
+            lect_id = self.path_kwargs.get("lecture_id", None)
+            if lect_id is None:
+                # lecture name and semester is in post body
+                try:
+                    data = json_decode(self.request.body)
+                    lect_id = self.session.query(Lecture).filter(Lecture.name == data["name"], Lecture.semester == data["semester"]).one().id
+                except MultipleResultsFound:
+                    self.error_message = "Unauthorized"
+                    raise HTTPError(403)
+                except NoResultFound:
+                    self.error_message = "Not Found"
+                    raise HTTPError(404)
 
-                role = self.session.query(Role).get((self.user.name, lect_id))
-                if role is None or not role.role in scopes:
-                        self.error_message = "Unauthorized"
-                        raise HTTPError(403)
+            role = self.session.query(Role).get((self.user.name, lect_id))
+            if role is None or not role.role in scopes:
+                    self.error_message = "Unauthorized"
+                    raise HTTPError(403)
             return await handler_method(self, *args, **kwargs)
         return request_handler_wrapper
     return wrapper
