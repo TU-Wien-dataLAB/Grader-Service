@@ -66,7 +66,7 @@ class AssignmentObjectHandler(GraderBaseHandler):
         assignment.status = assignment_model.status
 
     @authorize([Scope.student, Scope.tutor, Scope.instructor])
-    def get(self, lecture_id: int, assignment_id: int):
+    async def get(self, lecture_id: int, assignment_id: int):
         instructor_version = self.get_argument("instructor-version", False)
         metadata_only = self.get_argument("metadata-only", False)
         
