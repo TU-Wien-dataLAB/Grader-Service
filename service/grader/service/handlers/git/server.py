@@ -116,7 +116,7 @@ class GitBaseHandler(GraderBaseHandler):
             os.mkdir(path)
             # this path has to be a git dir -> call git init
             try:
-                subprocess.run(["git", "init", "--bare", assignment_path], check=True)
+                subprocess.run(["git", "init", "--bare", path], check=True)
             except subprocess.CalledProcessError:
                 return None
             return path
