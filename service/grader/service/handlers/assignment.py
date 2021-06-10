@@ -1,25 +1,15 @@
 from grader.common.models.assignment_file import AssignmentFile
-from grader.common.models.error_message import ErrorMessage
 from grader.common.models.exercise import Exercise
 from grader.common.registry import register_handler
 from grader.common.services.compression import CompressionEngine
-from grader.common.services.git import GitService
 from grader.service.handlers.base_handler import GraderBaseHandler, authorize
-from grader.service.main import GraderService
-from grader.service.orm import lecture
-from grader.service.orm import assignment
 from grader.service.orm.assignment import Assignment
 from grader.service.orm.base import DeleteState
 from grader.service.orm.file import File
-from grader.service.orm.lecture import Lecture
 from grader.service.orm.takepart import Role, Scope
-import os.path as osp
 from grader.service.server import GraderServer
-from jupyter_server.utils import url_path_join
 from grader.common.models.assignment import Assignment as AssignmentModel
-from sqlalchemy.sql.expression import false, join
 from sqlalchemy.orm.exc import ObjectDeletedError
-from tornado import httputil
 import tornado
 from tornado.web import HTTPError
 
@@ -32,8 +22,19 @@ class AssignmentBaseHandler(GraderBaseHandler):
         if role.lecture.deleted == DeleteState.deleted:
             self.error_message = "Not Found"
             raise HTTPError(404)
-        
-        assignments = [a for a in role.lecture.assignments if a.deleted == DeleteState.active]
+
+        if role.role == Scope.student: # students do not get assignments that are created
+            assignments = (
+                self.session.query(Assignment)
+                .filter(
+                    Assignment.lectid == role.lecture.id,
+                    Assignment.deleted == DeleteState.active,
+                    Assignment.status != "created",
+                )
+                .all()
+            )
+        else:
+            assignments = [a for a in role.lecture.assignments if a.deleted == DeleteState.active]
         self.write_json(assignments)
 
     @authorize([Scope.instructor])
@@ -42,7 +43,12 @@ class AssignmentBaseHandler(GraderBaseHandler):
         assignment_model = AssignmentModel.from_dict(body)
         assignment = Assignment()
 
-        if len(set([e.path for e in assignment_model.exercises] + [f.path for f in assignment_model.files])) != len(assignment_model.exercises + assignment_model.files):
+        if len(
+            set(
+                [e.path for e in assignment_model.exercises]
+                + [f.path for f in assignment_model.files]
+            )
+        ) != len(assignment_model.exercises + assignment_model.files):
             self.error_message = "Some files share the same name"
             raise HTTPError(400)
 
@@ -64,7 +70,7 @@ class AssignmentBaseHandler(GraderBaseHandler):
             file.path = ex.path
             file.points = ex.points
             self.session.add(file)
-        
+
         f: AssignmentFile
         for f in assignment_model.files:
             file = File()
@@ -100,7 +106,7 @@ class AssignmentObjectHandler(GraderBaseHandler):
     async def get(self, lecture_id: int, assignment_id: int):
         instructor_version = self.get_argument("instructor-version", False)
         metadata_only = self.get_argument("metadata-only", False)
-        
+
         role = self.session.query(Role).get((self.user.name, lecture_id))
         if instructor_version and role.role < Scope.instructor:
             raise HTTPError(403)
@@ -121,4 +127,3 @@ class AssignmentObjectHandler(GraderBaseHandler):
             assignment.deleted = 1
         except ObjectDeletedError:
             raise HTTPError(404)
-

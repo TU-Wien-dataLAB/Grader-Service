@@ -4,7 +4,6 @@ from grader.common.registry import HandlerPathRegistry
 import os
 import asyncio
 import signal
-from grader.common.services.git import GitService
 from grader.service.persistence.database import DataBaseManager
 import tornado
 from tornado import web
@@ -117,11 +116,6 @@ class GraderService(config.Application):
 
         # pass config to DataBaseManager
         DataBaseManager.config = self.config
-
-        GitService.instance().git_local_root_dir = os.path.join(
-            self.grader_service_dir, "git"
-        )
-
         handlers = HandlerPathRegistry.handler_list()
         # start the webserver
         self.http_server: HTTPServer = HTTPServer(
