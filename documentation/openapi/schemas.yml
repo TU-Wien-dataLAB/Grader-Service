@@ -44,6 +44,11 @@ components:
         name:
           type: "string"
           example: "assignment_1"
+        type:
+          type: "string"
+          enum:
+            - user
+            - group
         exercises:
           type: "array"
           items:
