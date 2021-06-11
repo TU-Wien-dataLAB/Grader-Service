@@ -42,17 +42,26 @@ export class GradingComponent extends React.Component<GradingProps> {
     this.assignmentID = props.assignmentID;
     this.title = props.title;
     this.columns = [
-      { field: 'id', headerName: 'Id', width: 100 },
-      { field: 'user', headerName: 'User', width: 130 },
+      { field: 'id', headerName: 'User', width: 130 },
       { field: 'date', headerName: 'Date', width: 200 },
       {
-        field: '',
+        field: 'autograde',
         headerName: '',
         width: 150,
         disableClickEventBubbling: true,
         disableColumnMenu: true,
         renderCell: (params: GridCellParams) => (
             <Button icon="highlight" outlined>Autograde</Button>
+        ),
+      },
+      {
+        field: 'manualgrade',
+        headerName: '',
+        width: 150,
+        disableClickEventBubbling: true,
+        disableColumnMenu: true,
+        renderCell: (params: GridCellParams) => (
+            <Button icon="highlight" outlined>Manualgrade</Button>
         ),
       },
       { field: 'score', headerName: 'Score', width: 130 },
@@ -79,7 +88,7 @@ export class GradingComponent extends React.Component<GradingProps> {
     //let rows = [{ id: 10, user: "hasdf", date: "asdfadfa" }]
     let rows = new Array();
     //TODO: right now reading only the first 
-    this.state.submissions.forEach( sub => {rows.push({id: sub.user.name, user: sub.user.name, date: sub.submissions[0].submitted_at})});
+    this.state.submissions.forEach( sub => {rows.push({id: sub.user.name, date: sub.submissions[0].submitted_at})});
     return rows;
   }
 
