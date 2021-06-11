@@ -75,8 +75,8 @@ export class GradingComponent extends React.Component<GradingProps> {
     })
   }
 
-  public generateRows(): Object[] {
-    // let rows = [{ id: 10, user: "hasdf", date: "asdfadfa" }]
+  public generateRows(): Object[] { 
+    //let rows = [{ id: 10, user: "hasdf", date: "asdfadfa" }]
     let rows = new Array();
     //TODO: right now reading only the first 
     this.state.submissions.forEach( sub => {rows.push({id: sub.user.name, user: sub.user.name, date: sub.submissions[0].submitted_at})});

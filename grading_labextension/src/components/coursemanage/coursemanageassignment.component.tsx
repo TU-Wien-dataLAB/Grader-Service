@@ -5,7 +5,8 @@ import { GlobalObjects } from '../../index';
 import { Assignment } from '../../model/assignment';
 import { Lecture } from '../../model/lecture';
 import { Submission } from '../../model/submission';
-import { getSubmissions } from '../../services/submissions.service';
+import { User } from '../../model/user';
+import { getAllSubmissions } from '../../services/submissions.service';
 
 
 export interface AssignmentProps {
@@ -24,24 +25,27 @@ export class CourseManageAssignmentComponent extends React.Component<AssignmentP
   public iconSize: number = 14;
   public state = {
     isOpen: false,
-    submissions: new Array<Submission>(),
+    submissions: new Array<{user: User, submissions: Submission[]}>(),
   };
 
 
   constructor(props: AssignmentProps) {
     super(props);
     this.assignment = props.assignment;
-    this.index = props.index;
+    this.index = props.assignment.id;
     this.lectureName = props.lectureName;
     this.lecture = props.lecture;
   }
 
   public componentDidMount() {
     // TODO: should only get all submissions if assignment is released
-    getSubmissions(this.lecture , { id: this.index }).subscribe(userSubmissions => {
-      console.log(userSubmissions)
-      this.setState(this.state.submissions = userSubmissions.submissions)
-    }
+    getAllSubmissions(this.lecture , this.assignment,false,true).subscribe(userSubmissions => {
+      this.setState(this.state.submissions = userSubmissions)
+      console.log(this.state.submissions)
+      console.log(this.state.submissions.length)
+
+
+    } 
     )
   }
 

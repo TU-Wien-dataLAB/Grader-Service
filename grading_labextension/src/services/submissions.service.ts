@@ -9,7 +9,7 @@ import { request, HTTPMethod } from "./request.service";
 
 
   export function submitAssignment(lecture: Lecture, assignment : Assignment): Observable<void> {
-    return request<void>(HTTPMethod.POST, `/lectures/${lecture.id}/assignments/${assignment.id}/submissions`, {}, {})
+    return request<void>(HTTPMethod.POST, `/lectures/${lecture.id}/assignments/${assignment.id}/submissions`)
   }
 
   export function getSubmissions(lecture: Lecture, assignment : Assignment, latest: boolean = false): Observable<{user: User, submissions: Submission[]}> {
@@ -20,7 +20,7 @@ import { request, HTTPMethod } from "./request.service";
       })
       url += '?' + searchParams;
     }
-    return request<{user: User, submissions: Submission[]}[]>(HTTPMethod.GET, url, {}).pipe(map(array => array[0]))
+    return request<{user: User, submissions: Submission[]}[]>(HTTPMethod.GET, url).pipe(map(array => array[0]))
   }
 
   export function getAllSubmissions(lecture: Lecture, assignment : Assignment, latest: boolean = false, instructor: boolean = true): Observable<{user: User, submissions: Submission[]}[]> {
@@ -33,7 +33,7 @@ import { request, HTTPMethod } from "./request.service";
       })
       url += '?' + searchParams;
     }
-    return request<{user: User, submissions: Submission[]}[]>(HTTPMethod.GET, url, {})
+    return request<{user: User, submissions: Submission[]}[]>(HTTPMethod.GET, url)
 
   }
 
@@ -46,5 +46,5 @@ import { request, HTTPMethod } from "./request.service";
       })
       url += '?' + searchParams;
     }
-    return request<Feedback>(HTTPMethod.GET, url, {})
+    return request<Feedback>(HTTPMethod.GET, url)
   }

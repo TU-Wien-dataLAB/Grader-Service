@@ -52,7 +52,7 @@ class FeedbackHandler(ExtensionBaseHandler):
             endpoint=f"{self.base_url}/lectures/{lecture_id}/assignments/{assignment_id}/feedback{query_params}",
             header=self.grader_authentication_header,
         )
-        self.write(json.dumps(response))
+        self.write(response)
 
 @register_handler(
     path=r"\/lectures\/(?P<lecture_id>\d*)\/assignments\/(?P<assignment_id>\d*)\/feedback\/(?P<feedback_id>\d*)\/?"

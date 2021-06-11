@@ -7,6 +7,7 @@ from grader.service.orm.takepart import Role, Scope
 from grader.common.models.error_message import ErrorMessage
 from sqlalchemy.orm import query, session
 from sqlalchemy.sql.expression import func
+from sqlalchemy.sql.functions import user
 from tornado import web
 from jupyter_server.utils import url_path_join
 import tornado
@@ -22,7 +23,7 @@ class SubmissionHandler(GraderBaseHandler):
     @authorize([Scope.student, Scope.tutor, Scope.instructor])
     async def get(self, lecture_id: int, assignment_id: int):
         latest = self.get_argument("latest", None) == "true"
-        instructor_version = instructor_version = (
+        instructor_version = (
             self.get_argument("instructor-version", None) == "true"
         )
 
@@ -36,12 +37,12 @@ class SubmissionHandler(GraderBaseHandler):
             if assignment is None or assignment.deleted == DeleteState.deleted:
                 self.error_message = "Not Found"
                 raise HTTPError(404)
+            submissions = []
             if latest:
                 submissions = (
-                    self.session.query(Submission)
+                    self.session.query(Submission.id,Submission.status,Submission.score, Submission.username,Submission.assignid,func.max(Submission.date))
                     .filter(Submission.assignid == assignment_id)
-                    .group_by(Submission.username)
-                    .having(Submission.date == func.max(Submission.date)).all()
+                    .group_by(Submission.username).all()
                 )
             else:
                 submissions = assignment.submissions
@@ -52,20 +53,21 @@ class SubmissionHandler(GraderBaseHandler):
                     user_map[sub.username]["submissions"].append(sub)
                 else:
                     user_map[sub.username] = {"user": sub.user, "submissions": [sub]}
-            response = user_map.values()
+            response = list(user_map.values())
         else:
             if latest:
-                submissions = self.session.query(Submission).filter(
-                    Submission.username == role.username,
-                    Submission.date == func.max(Submission.date),
-                ).all()
+                submissions = (
+                    self.session.query(Submission.id,Submission.status,Submission.score, Submission.username,Submission.assignid,func.max(Submission.date))
+                    .filter(Submission.assignid == assignment_id, Submission.username == role.username)
+                    .group_by(Submission.username)
+                )
             else:
                 submissions = role.user.submissions
             response = [
                 {
                     "user": role.user,
                     "submissions": [
-                        s for s in submissions if s.assignid == assignment_id
+                        s for s in submissions if s.assignid == int(assignment_id)
                     ],
                 }
             ]

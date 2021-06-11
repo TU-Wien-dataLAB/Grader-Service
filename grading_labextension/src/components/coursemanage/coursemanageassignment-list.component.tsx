@@ -18,7 +18,7 @@ export class CourseManageAssignmentsComponent extends React.Component<Assignment
   public lecture: Lecture;
   public title: string;
   public state = {
-    isOpen: false,
+    isOpen: true,
     assignments: new Array<Assignment>()
   };
 
