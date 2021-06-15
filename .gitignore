@@ -469,3 +469,4 @@ grading_labextension/grading_labextension/labextension
 #Sqlite database
 *.db
 grading_labextension/grader/grading_labextension/labextension/build_log.json
+grader_service_config.py
