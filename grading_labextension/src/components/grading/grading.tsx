@@ -126,9 +126,10 @@ export class GradingComponent extends React.Component<GradingProps> {
              />
 
             <StringSelect
+
             items={items}    
             filterable={false}
-            itemRenderer={renderSelect}
+            itemRenderer={this.renderSelect}
             noResults={<MenuItem disabled={true} text="No results." />}
             onItemSelect={this.handleValueChange} >
             
@@ -141,10 +142,31 @@ export class GradingComponent extends React.Component<GradingProps> {
     );
   }
 
+
+
   private handleValueChange = (select: string) => { 
-    this.setState({option: select})
-    this.setState(this.state.rows = this.generateRows())
-    console.log(this.state.option)    
+    this.setState({option: select}, () => {
+      // you get the new value of state immediately at this callback
+      this.setState(this.state.rows = this.generateRows())
+      console.log(this.state.option)
+   });    
+  };
+  private renderSelect: ItemRenderer<string> = (
+    option,
+    { handleClick, modifiers, query }
+  ) => {
+    if (!modifiers.matchesPredicate) {
+      return null;
+    }
+    const text = option;
+    return (
+      <MenuItem
+        active={modifiers.active}
+        disabled={modifiers.disabled}
+        onClick={handleClick}
+        text={highlightText(text, query)}
+      />
+    );
   };
 }
 
@@ -183,20 +205,3 @@ function escapeRegExpChars(text: string) {
   return text.replace(/([.*+?^=!:${}()|\[\]\/\\])/g, "\\$1");
 }
 
-const renderSelect: ItemRenderer<string> = (
-  option,
-  { handleClick, modifiers, query }
-) => {
-  if (!modifiers.matchesPredicate) {
-    return null;
-  }
-  const text = option;
-  return (
-    <MenuItem
-      active={modifiers.active}
-      disabled={modifiers.disabled}
-      onClick={handleClick}
-      text={highlightText(text, query)}
-    />
-  );
-};
