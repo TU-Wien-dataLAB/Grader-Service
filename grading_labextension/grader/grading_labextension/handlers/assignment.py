@@ -50,30 +50,37 @@ class AssignmentObjectHandler(ExtensionBaseHandler):
                 "metadata-only": self.get_argument("metadata-only", None),
             }
         )
-        
+        if self.get_argument("metadata-only", None):
+            response = await self.request_service.request(
+                method="GET",
+                endpoint=f"{self.base_url}/lectures/{lecture_id}/assignments/{assignment_id}{query_params}",
+                header=self.grader_authentication_header,
+            )
+            self.write(json.dumps(response))
+        else:
         # create git repo and push to remote
-        lecture = await self.request_service.request(
-            "GET",
-            f"{self.base_url}/lectures/{lecture_id}",
-            header=self.grader_authentication_header,
-        )
-        assignment = await self.request_service.request(
-            "GET",
-            f"{self.base_url}/lectures/{lecture_id}/assignments/{assignment_id}",
-            header=self.grader_authentication_header,
-        )
-        git_service: GitService = GitService(lecture["code"], assignment["name"])
-        git_service.init()
-        git_service.set_remote(name="grader")
-        git_service.push()
-        
-        # write response
-        response = await self.request_service.request(
-            method="GET",
-            endpoint=f"{self.base_url}/lectures/{lecture_id}/assignments/{assignment_id}{query_params}",
-            header=self.grader_authentication_header,
-        )
-        self.write(json.dumps(response))
+            lecture = await self.request_service.request(
+                "GET",
+                f"{self.base_url}/lectures/{lecture_id}",
+                header=self.grader_authentication_header,
+            )
+            assignment = await self.request_service.request(
+                "GET",
+                f"{self.base_url}/lectures/{lecture_id}/assignments/{assignment_id}",
+                header=self.grader_authentication_header,
+            )
+            git_service: GitService = GitService(lecture["code"], assignment["name"])
+            git_service.init()
+            git_service.set_remote(name="grader")
+            git_service.push()
+            
+            # write response
+            response = await self.request_service.request(
+                method="GET",
+                endpoint=f"{self.base_url}/lectures/{lecture_id}/assignments/{assignment_id}{query_params}",
+                header=self.grader_authentication_header,
+            )
+            self.write(json.dumps(response))
 
     async def delete(self, lecture_id: int, assignment_id: int):
         response = await self.request_service.request(
