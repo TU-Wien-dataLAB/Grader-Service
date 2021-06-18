@@ -62,10 +62,11 @@ class AssignmentObjectHandler(ExtensionBaseHandler):
             f"{self.base_url}/lectures/{lecture_id}/assignments/{assignment_id}",
             header=self.grader_authentication_header,
         )
-        git_service: GitService = GitService(lecture["code"], assignment["name"])
+        print("----CONFIG:",self.config)
+        git_service: GitService = GitService(lecture["code"], assignment["name"], config=self.config)
         git_service.init()
         git_service.set_remote(name="grader")
-        git_service.push()
+        git_service.pull()
         
         # write response
         response = await self.request_service.request(
