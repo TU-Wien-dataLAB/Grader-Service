@@ -42,19 +42,1456 @@ def upgrade():
     op.execute('INSERT INTO "takepart" ("username","lectid","role") VALUES ("ubuntu",3,"student")')
 
     ## Assignments
-    op.execute('INSERT INTO "assignment" ("name","lectid","duedate","points","status", "type") VALUES ("assignment_1",1,"2021-06-06 23:59:00.000",20,"released","user")')
-    op.execute('INSERT INTO "assignment" ("name","lectid","duedate","points","status", "type") VALUES ("assignment_2",1,"2021-07-07 23:59:00.000",10,"released","user")')
-    op.execute('INSERT INTO "assignment" ("name","lectid","duedate","points","status", "type") VALUES ("assignment_1",3,"2021-05-09 23:59:00.000",20,"released","user")')
-    op.execute('INSERT INTO "assignment" ("name","lectid","duedate","points","status", "type") VALUES ("assignment_2",3,"2021-05-09 23:59:00.000",10,"released","user")')
-
+    op.execute('INSERT INTO "assignment" ("name","lectid","duedate","points","status", "type") VALUES ("assignment_1",1,"2021-06-06 23:59:00.000",20,"created","user")')
+    op.execute('INSERT INTO "assignment" ("name","lectid","duedate","points","status", "type") VALUES ("assignment_2",1,"2021-07-07 23:59:00.000",10,"created","user")')
+    ## Submissions
     op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-05 14:43:35.863","not_graded",1,"user1")')
-    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-07 14:44:35.863","manually_graded",1,"user1",10.0)')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-07 14:44:35.863","manually_graded",1,"user1",10)')
 
     op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-06 14:43:35.863","not_graded",1,"fjaeger")')
-    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-08 14:44:35.863","manually_graded",1,"fjaeger",10.0)')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-08 14:44:35.863","manually_graded",1,"fjaeger",10)')
 
     op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-05 14:43:35.863","not_graded",1,"ubuntu")')
-    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-07 14:44:35.863","manually_graded",1,"ubuntu",10.0)')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-07 14:44:35.863","manually_graded",1,"ubuntu",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-05 14:43:35.863","not_graded",1,"user1")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-07 14:44:35.863","manually_graded",1,"user1",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-06 14:43:35.863","not_graded",1,"fjaeger")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-08 14:44:35.863","manually_graded",1,"fjaeger",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-05 14:43:35.863","not_graded",1,"ubuntu")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-07 14:44:35.863","manually_graded",1,"ubuntu",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-05 14:43:35.863","not_graded",1,"user1")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-07 14:44:35.863","manually_graded",1,"user1",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-06 14:43:35.863","not_graded",1,"fjaeger")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-08 14:44:35.863","manually_graded",1,"fjaeger",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-05 14:43:35.863","not_graded",1,"ubuntu")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-07 14:44:35.863","manually_graded",1,"ubuntu",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-05 14:43:35.863","not_graded",1,"user1")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-07 14:44:35.863","manually_graded",1,"user1",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-06 14:43:35.863","not_graded",1,"fjaeger")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-08 14:44:35.863","manually_graded",1,"fjaeger",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-05 14:43:35.863","not_graded",1,"ubuntu")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-07 14:44:35.863","manually_graded",1,"ubuntu",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-05 14:43:35.863","not_graded",1,"user1")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-07 14:44:35.863","manually_graded",1,"user1",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-06 14:43:35.863","not_graded",1,"fjaeger")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-08 14:44:35.863","manually_graded",1,"fjaeger",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-05 14:43:35.863","not_graded",1,"ubuntu")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-07 14:44:35.863","manually_graded",1,"ubuntu",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-05 14:43:35.863","not_graded",1,"user1")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-07 14:44:35.863","manually_graded",1,"user1",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-06 14:43:35.863","not_graded",1,"fjaeger")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-08 14:44:35.863","manually_graded",1,"fjaeger",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-05 14:43:35.863","not_graded",1,"ubuntu")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-07 14:44:35.863","manually_graded",1,"ubuntu",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-05 14:43:35.863","not_graded",1,"user1")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-07 14:44:35.863","manually_graded",1,"user1",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-06 14:43:35.863","not_graded",1,"fjaeger")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-08 14:44:35.863","manually_graded",1,"fjaeger",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-05 14:43:35.863","not_graded",1,"ubuntu")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-07 14:44:35.863","manually_graded",1,"ubuntu",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-05 14:43:35.863","not_graded",1,"user1")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-07 14:44:35.863","manually_graded",1,"user1",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-06 14:43:35.863","not_graded",1,"fjaeger")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-08 14:44:35.863","manually_graded",1,"fjaeger",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-05 14:43:35.863","not_graded",1,"ubuntu")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-07 14:44:35.863","manually_graded",1,"ubuntu",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-05 14:43:35.863","not_graded",1,"user1")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-07 14:44:35.863","manually_graded",1,"user1",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-06 14:43:35.863","not_graded",1,"fjaeger")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-08 14:44:35.863","manually_graded",1,"fjaeger",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-05 14:43:35.863","not_graded",1,"ubuntu")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-07 14:44:35.863","manually_graded",1,"ubuntu",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-05 14:43:35.863","not_graded",1,"user1")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-07 14:44:35.863","manually_graded",1,"user1",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-06 14:43:35.863","not_graded",1,"fjaeger")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-08 14:44:35.863","manually_graded",1,"fjaeger",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-05 14:43:35.863","not_graded",1,"ubuntu")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-07 14:44:35.863","manually_graded",1,"ubuntu",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-05 14:43:35.863","not_graded",1,"user1")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-07 14:44:35.863","manually_graded",1,"user1",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-06 14:43:35.863","not_graded",1,"fjaeger")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-08 14:44:35.863","manually_graded",1,"fjaeger",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-05 14:43:35.863","not_graded",1,"ubuntu")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-07 14:44:35.863","manually_graded",1,"ubuntu",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-05 14:43:35.863","not_graded",1,"user1")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-07 14:44:35.863","manually_graded",1,"user1",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-06 14:43:35.863","not_graded",1,"fjaeger")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-08 14:44:35.863","manually_graded",1,"fjaeger",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-05 14:43:35.863","not_graded",1,"ubuntu")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-07 14:44:35.863","manually_graded",1,"ubuntu",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-05 14:43:35.863","not_graded",1,"user1")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-07 14:44:35.863","manually_graded",1,"user1",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-06 14:43:35.863","not_graded",1,"fjaeger")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-08 14:44:35.863","manually_graded",1,"fjaeger",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-05 14:43:35.863","not_graded",1,"ubuntu")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-07 14:44:35.863","manually_graded",1,"ubuntu",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-05 14:43:35.863","not_graded",1,"user1")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-07 14:44:35.863","manually_graded",1,"user1",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-06 14:43:35.863","not_graded",1,"fjaeger")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-08 14:44:35.863","manually_graded",1,"fjaeger",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-05 14:43:35.863","not_graded",1,"ubuntu")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-07 14:44:35.863","manually_graded",1,"ubuntu",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-05 14:43:35.863","not_graded",1,"user1")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-07 14:44:35.863","manually_graded",1,"user1",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-06 14:43:35.863","not_graded",1,"fjaeger")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-08 14:44:35.863","manually_graded",1,"fjaeger",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-05 14:43:35.863","not_graded",1,"ubuntu")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-07 14:44:35.863","manually_graded",1,"ubuntu",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-05 14:43:35.863","not_graded",1,"user1")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-07 14:44:35.863","manually_graded",1,"user1",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-06 14:43:35.863","not_graded",1,"fjaeger")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-08 14:44:35.863","manually_graded",1,"fjaeger",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-05 14:43:35.863","not_graded",1,"ubuntu")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-07 14:44:35.863","manually_graded",1,"ubuntu",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-05 14:43:35.863","not_graded",1,"user1")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-07 14:44:35.863","manually_graded",1,"user1",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-06 14:43:35.863","not_graded",1,"fjaeger")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-08 14:44:35.863","manually_graded",1,"fjaeger",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-05 14:43:35.863","not_graded",1,"ubuntu")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-07 14:44:35.863","manually_graded",1,"ubuntu",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-05 14:43:35.863","not_graded",1,"user1")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-07 14:44:35.863","manually_graded",1,"user1",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-06 14:43:35.863","not_graded",1,"fjaeger")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-08 14:44:35.863","manually_graded",1,"fjaeger",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-05 14:43:35.863","not_graded",1,"ubuntu")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-07 14:44:35.863","manually_graded",1,"ubuntu",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-05 14:43:35.863","not_graded",1,"user1")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-07 14:44:35.863","manually_graded",1,"user1",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-06 14:43:35.863","not_graded",1,"fjaeger")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-08 14:44:35.863","manually_graded",1,"fjaeger",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-05 14:43:35.863","not_graded",1,"ubuntu")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-07 14:44:35.863","manually_graded",1,"ubuntu",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-05 14:43:35.863","not_graded",1,"user1")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-07 14:44:35.863","manually_graded",1,"user1",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-06 14:43:35.863","not_graded",1,"fjaeger")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-08 14:44:35.863","manually_graded",1,"fjaeger",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-05 14:43:35.863","not_graded",1,"ubuntu")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-07 14:44:35.863","manually_graded",1,"ubuntu",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-05 14:43:35.863","not_graded",1,"user1")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-07 14:44:35.863","manually_graded",1,"user1",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-06 14:43:35.863","not_graded",1,"fjaeger")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-08 14:44:35.863","manually_graded",1,"fjaeger",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-05 14:43:35.863","not_graded",1,"ubuntu")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-07 14:44:35.863","manually_graded",1,"ubuntu",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-05 14:43:35.863","not_graded",1,"user1")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-07 14:44:35.863","manually_graded",1,"user1",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-06 14:43:35.863","not_graded",1,"fjaeger")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-08 14:44:35.863","manually_graded",1,"fjaeger",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-05 14:43:35.863","not_graded",1,"ubuntu")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-07 14:44:35.863","manually_graded",1,"ubuntu",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-05 14:43:35.863","not_graded",1,"user1")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-07 14:44:35.863","manually_graded",1,"user1",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-06 14:43:35.863","not_graded",1,"fjaeger")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-08 14:44:35.863","manually_graded",1,"fjaeger",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-05 14:43:35.863","not_graded",1,"ubuntu")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-07 14:44:35.863","manually_graded",1,"ubuntu",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-05 14:43:35.863","not_graded",1,"user1")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-07 14:44:35.863","manually_graded",1,"user1",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-06 14:43:35.863","not_graded",1,"fjaeger")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-08 14:44:35.863","manually_graded",1,"fjaeger",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-05 14:43:35.863","not_graded",1,"ubuntu")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-07 14:44:35.863","manually_graded",1,"ubuntu",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-05 14:43:35.863","not_graded",1,"user1")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-07 14:44:35.863","manually_graded",1,"user1",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-06 14:43:35.863","not_graded",1,"fjaeger")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-08 14:44:35.863","manually_graded",1,"fjaeger",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-05 14:43:35.863","not_graded",1,"ubuntu")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-07 14:44:35.863","manually_graded",1,"ubuntu",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-05 14:43:35.863","not_graded",1,"user1")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-07 14:44:35.863","manually_graded",1,"user1",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-06 14:43:35.863","not_graded",1,"fjaeger")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-08 14:44:35.863","manually_graded",1,"fjaeger",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-05 14:43:35.863","not_graded",1,"ubuntu")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-07 14:44:35.863","manually_graded",1,"ubuntu",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-05 14:43:35.863","not_graded",1,"user1")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-07 14:44:35.863","manually_graded",1,"user1",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-06 14:43:35.863","not_graded",1,"fjaeger")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-08 14:44:35.863","manually_graded",1,"fjaeger",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-05 14:43:35.863","not_graded",1,"ubuntu")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-07 14:44:35.863","manually_graded",1,"ubuntu",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-05 14:43:35.863","not_graded",1,"user1")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-07 14:44:35.863","manually_graded",1,"user1",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-06 14:43:35.863","not_graded",1,"fjaeger")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-08 14:44:35.863","manually_graded",1,"fjaeger",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-05 14:43:35.863","not_graded",1,"ubuntu")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-07 14:44:35.863","manually_graded",1,"ubuntu",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-05 14:43:35.863","not_graded",1,"user1")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-07 14:44:35.863","manually_graded",1,"user1",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-06 14:43:35.863","not_graded",1,"fjaeger")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-08 14:44:35.863","manually_graded",1,"fjaeger",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-05 14:43:35.863","not_graded",1,"ubuntu")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-07 14:44:35.863","manually_graded",1,"ubuntu",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-05 14:43:35.863","not_graded",1,"user1")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-07 14:44:35.863","manually_graded",1,"user1",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-06 14:43:35.863","not_graded",1,"fjaeger")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-08 14:44:35.863","manually_graded",1,"fjaeger",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-05 14:43:35.863","not_graded",1,"ubuntu")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-07 14:44:35.863","manually_graded",1,"ubuntu",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-05 14:43:35.863","not_graded",1,"user1")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-07 14:44:35.863","manually_graded",1,"user1",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-06 14:43:35.863","not_graded",1,"fjaeger")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-08 14:44:35.863","manually_graded",1,"fjaeger",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-05 14:43:35.863","not_graded",1,"ubuntu")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-07 14:44:35.863","manually_graded",1,"ubuntu",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-05 14:43:35.863","not_graded",1,"user1")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-07 14:44:35.863","manually_graded",1,"user1",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-06 14:43:35.863","not_graded",1,"fjaeger")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-08 14:44:35.863","manually_graded",1,"fjaeger",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-05 14:43:35.863","not_graded",1,"ubuntu")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-07 14:44:35.863","manually_graded",1,"ubuntu",10)')
+
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-05 14:43:35.863","not_graded",1,"user1")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-07 14:44:35.863","manually_graded",1,"user1",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-06 14:43:35.863","not_graded",1,"fjaeger")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-08 14:44:35.863","manually_graded",1,"fjaeger",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-05 14:43:35.863","not_graded",1,"ubuntu")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-07 14:44:35.863","manually_graded",1,"ubuntu",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-05 14:43:35.863","not_graded",1,"user1")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-07 14:44:35.863","manually_graded",1,"user1",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-06 14:43:35.863","not_graded",1,"fjaeger")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-08 14:44:35.863","manually_graded",1,"fjaeger",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-05 14:43:35.863","not_graded",1,"ubuntu")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-07 14:44:35.863","manually_graded",1,"ubuntu",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-05 14:43:35.863","not_graded",1,"user1")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-07 14:44:35.863","manually_graded",1,"user1",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-06 14:43:35.863","not_graded",1,"fjaeger")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-08 14:44:35.863","manually_graded",1,"fjaeger",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-05 14:43:35.863","not_graded",1,"ubuntu")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-07 14:44:35.863","manually_graded",1,"ubuntu",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-05 14:43:35.863","not_graded",1,"user1")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-07 14:44:35.863","manually_graded",1,"user1",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-06 14:43:35.863","not_graded",1,"fjaeger")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-08 14:44:35.863","manually_graded",1,"fjaeger",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-05 14:43:35.863","not_graded",1,"ubuntu")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-07 14:44:35.863","manually_graded",1,"ubuntu",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-05 14:43:35.863","not_graded",1,"user1")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-07 14:44:35.863","manually_graded",1,"user1",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-06 14:43:35.863","not_graded",1,"fjaeger")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-08 14:44:35.863","manually_graded",1,"fjaeger",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-05 14:43:35.863","not_graded",1,"ubuntu")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-07 14:44:35.863","manually_graded",1,"ubuntu",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-05 14:43:35.863","not_graded",1,"user1")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-07 14:44:35.863","manually_graded",1,"user1",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-06 14:43:35.863","not_graded",1,"fjaeger")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-08 14:44:35.863","manually_graded",1,"fjaeger",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-05 14:43:35.863","not_graded",1,"ubuntu")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-07 14:44:35.863","manually_graded",1,"ubuntu",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-05 14:43:35.863","not_graded",1,"user1")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-07 14:44:35.863","manually_graded",1,"user1",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-06 14:43:35.863","not_graded",1,"fjaeger")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-08 14:44:35.863","manually_graded",1,"fjaeger",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-05 14:43:35.863","not_graded",1,"ubuntu")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-07 14:44:35.863","manually_graded",1,"ubuntu",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-05 14:43:35.863","not_graded",1,"user1")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-07 14:44:35.863","manually_graded",1,"user1",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-06 14:43:35.863","not_graded",1,"fjaeger")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-08 14:44:35.863","manually_graded",1,"fjaeger",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-05 14:43:35.863","not_graded",1,"ubuntu")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-07 14:44:35.863","manually_graded",1,"ubuntu",10)')
+
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-05 14:43:35.863","not_graded",1,"user1")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-07 14:44:35.863","manually_graded",1,"user1",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-06 14:43:35.863","not_graded",1,"fjaeger")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-08 14:44:35.863","manually_graded",1,"fjaeger",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-05 14:43:35.863","not_graded",1,"ubuntu")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-07 14:44:35.863","manually_graded",1,"ubuntu",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-05 14:43:35.863","not_graded",1,"user1")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-07 14:44:35.863","manually_graded",1,"user1",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-06 14:43:35.863","not_graded",1,"fjaeger")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-08 14:44:35.863","manually_graded",1,"fjaeger",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-05 14:43:35.863","not_graded",1,"ubuntu")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-07 14:44:35.863","manually_graded",1,"ubuntu",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-05 14:43:35.863","not_graded",1,"user1")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-07 14:44:35.863","manually_graded",1,"user1",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-06 14:43:35.863","not_graded",1,"fjaeger")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-08 14:44:35.863","manually_graded",1,"fjaeger",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-05 14:43:35.863","not_graded",1,"ubuntu")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-07 14:44:35.863","manually_graded",1,"ubuntu",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-05 14:43:35.863","not_graded",1,"user1")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-07 14:44:35.863","manually_graded",1,"user1",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-06 14:43:35.863","not_graded",1,"fjaeger")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-08 14:44:35.863","manually_graded",1,"fjaeger",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-05 14:43:35.863","not_graded",1,"ubuntu")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-07 14:44:35.863","manually_graded",1,"ubuntu",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-05 14:43:35.863","not_graded",1,"user1")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-07 14:44:35.863","manually_graded",1,"user1",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-06 14:43:35.863","not_graded",1,"fjaeger")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-08 14:44:35.863","manually_graded",1,"fjaeger",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-05 14:43:35.863","not_graded",1,"ubuntu")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-07 14:44:35.863","manually_graded",1,"ubuntu",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-05 14:43:35.863","not_graded",1,"user1")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-07 14:44:35.863","manually_graded",1,"user1",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-06 14:43:35.863","not_graded",1,"fjaeger")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-08 14:44:35.863","manually_graded",1,"fjaeger",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-05 14:43:35.863","not_graded",1,"ubuntu")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-07 14:44:35.863","manually_graded",1,"ubuntu",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-05 14:43:35.863","not_graded",1,"user1")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-07 14:44:35.863","manually_graded",1,"user1",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-06 14:43:35.863","not_graded",1,"fjaeger")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-08 14:44:35.863","manually_graded",1,"fjaeger",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-05 14:43:35.863","not_graded",1,"ubuntu")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-07 14:44:35.863","manually_graded",1,"ubuntu",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-05 14:43:35.863","not_graded",1,"user1")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-07 14:44:35.863","manually_graded",1,"user1",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-06 14:43:35.863","not_graded",1,"fjaeger")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-08 14:44:35.863","manually_graded",1,"fjaeger",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-05 14:43:35.863","not_graded",1,"ubuntu")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-07 14:44:35.863","manually_graded",1,"ubuntu",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-05 14:43:35.863","not_graded",1,"user1")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-07 14:44:35.863","manually_graded",1,"user1",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-06 14:43:35.863","not_graded",1,"fjaeger")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-08 14:44:35.863","manually_graded",1,"fjaeger",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-05 14:43:35.863","not_graded",1,"ubuntu")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-07 14:44:35.863","manually_graded",1,"ubuntu",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-05 14:43:35.863","not_graded",1,"user1")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-07 14:44:35.863","manually_graded",1,"user1",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-06 14:43:35.863","not_graded",1,"fjaeger")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-08 14:44:35.863","manually_graded",1,"fjaeger",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-05 14:43:35.863","not_graded",1,"ubuntu")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-07 14:44:35.863","manually_graded",1,"ubuntu",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-05 14:43:35.863","not_graded",1,"user1")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-07 14:44:35.863","manually_graded",1,"user1",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-06 14:43:35.863","not_graded",1,"fjaeger")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-08 14:44:35.863","manually_graded",1,"fjaeger",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-05 14:43:35.863","not_graded",1,"ubuntu")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-07 14:44:35.863","manually_graded",1,"ubuntu",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-05 14:43:35.863","not_graded",1,"user1")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-07 14:44:35.863","manually_graded",1,"user1",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-06 14:43:35.863","not_graded",1,"fjaeger")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-08 14:44:35.863","manually_graded",1,"fjaeger",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-05 14:43:35.863","not_graded",1,"ubuntu")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-07 14:44:35.863","manually_graded",1,"ubuntu",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-05 14:43:35.863","not_graded",1,"user1")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-07 14:44:35.863","manually_graded",1,"user1",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-06 14:43:35.863","not_graded",1,"fjaeger")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-08 14:44:35.863","manually_graded",1,"fjaeger",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-05 14:43:35.863","not_graded",1,"ubuntu")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-07 14:44:35.863","manually_graded",1,"ubuntu",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-05 14:43:35.863","not_graded",1,"user1")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-07 14:44:35.863","manually_graded",1,"user1",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-06 14:43:35.863","not_graded",1,"fjaeger")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-08 14:44:35.863","manually_graded",1,"fjaeger",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-05 14:43:35.863","not_graded",1,"ubuntu")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-07 14:44:35.863","manually_graded",1,"ubuntu",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-05 14:43:35.863","not_graded",1,"user1")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-07 14:44:35.863","manually_graded",1,"user1",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-06 14:43:35.863","not_graded",1,"fjaeger")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-08 14:44:35.863","manually_graded",1,"fjaeger",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-05 14:43:35.863","not_graded",1,"ubuntu")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-07 14:44:35.863","manually_graded",1,"ubuntu",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-05 14:43:35.863","not_graded",1,"user1")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-07 14:44:35.863","manually_graded",1,"user1",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-06 14:43:35.863","not_graded",1,"fjaeger")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-08 14:44:35.863","manually_graded",1,"fjaeger",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-05 14:43:35.863","not_graded",1,"ubuntu")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-07 14:44:35.863","manually_graded",1,"ubuntu",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-05 14:43:35.863","not_graded",1,"user1")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-07 14:44:35.863","manually_graded",1,"user1",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-06 14:43:35.863","not_graded",1,"fjaeger")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-08 14:44:35.863","manually_graded",1,"fjaeger",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-05 14:43:35.863","not_graded",1,"ubuntu")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-07 14:44:35.863","manually_graded",1,"ubuntu",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-05 14:43:35.863","not_graded",1,"user1")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-07 14:44:35.863","manually_graded",1,"user1",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-06 14:43:35.863","not_graded",1,"fjaeger")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-08 14:44:35.863","manually_graded",1,"fjaeger",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-05 14:43:35.863","not_graded",1,"ubuntu")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-07 14:44:35.863","manually_graded",1,"ubuntu",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-05 14:43:35.863","not_graded",1,"user1")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-07 14:44:35.863","manually_graded",1,"user1",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-06 14:43:35.863","not_graded",1,"fjaeger")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-08 14:44:35.863","manually_graded",1,"fjaeger",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-05 14:43:35.863","not_graded",1,"ubuntu")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-07 14:44:35.863","manually_graded",1,"ubuntu",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-05 14:43:35.863","not_graded",1,"user1")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-07 14:44:35.863","manually_graded",1,"user1",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-06 14:43:35.863","not_graded",1,"fjaeger")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-08 14:44:35.863","manually_graded",1,"fjaeger",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-05 14:43:35.863","not_graded",1,"ubuntu")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-07 14:44:35.863","manually_graded",1,"ubuntu",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-05 14:43:35.863","not_graded",1,"user1")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-07 14:44:35.863","manually_graded",1,"user1",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-06 14:43:35.863","not_graded",1,"fjaeger")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-08 14:44:35.863","manually_graded",1,"fjaeger",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-05 14:43:35.863","not_graded",1,"ubuntu")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-07 14:44:35.863","manually_graded",1,"ubuntu",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-05 14:43:35.863","not_graded",1,"user1")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-07 14:44:35.863","manually_graded",1,"user1",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-06 14:43:35.863","not_graded",1,"fjaeger")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-08 14:44:35.863","manually_graded",1,"fjaeger",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-05 14:43:35.863","not_graded",1,"ubuntu")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-07 14:44:35.863","manually_graded",1,"ubuntu",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-05 14:43:35.863","not_graded",1,"user1")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-07 14:44:35.863","manually_graded",1,"user1",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-06 14:43:35.863","not_graded",1,"fjaeger")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-08 14:44:35.863","manually_graded",1,"fjaeger",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-05 14:43:35.863","not_graded",1,"ubuntu")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-07 14:44:35.863","manually_graded",1,"ubuntu",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-05 14:43:35.863","not_graded",1,"user1")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-07 14:44:35.863","manually_graded",1,"user1",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-06 14:43:35.863","not_graded",1,"fjaeger")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-08 14:44:35.863","manually_graded",1,"fjaeger",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-05 14:43:35.863","not_graded",1,"ubuntu")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-07 14:44:35.863","manually_graded",1,"ubuntu",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-05 14:43:35.863","not_graded",1,"user1")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-07 14:44:35.863","manually_graded",1,"user1",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-06 14:43:35.863","not_graded",1,"fjaeger")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-08 14:44:35.863","manually_graded",1,"fjaeger",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-05 14:43:35.863","not_graded",1,"ubuntu")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-07 14:44:35.863","manually_graded",1,"ubuntu",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-05 14:43:35.863","not_graded",1,"user1")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-07 14:44:35.863","manually_graded",1,"user1",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-06 14:43:35.863","not_graded",1,"fjaeger")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-08 14:44:35.863","manually_graded",1,"fjaeger",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-05 14:43:35.863","not_graded",1,"ubuntu")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-07 14:44:35.863","manually_graded",1,"ubuntu",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-05 14:43:35.863","not_graded",1,"user1")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-07 14:44:35.863","manually_graded",1,"user1",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-06 14:43:35.863","not_graded",1,"fjaeger")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-08 14:44:35.863","manually_graded",1,"fjaeger",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-05 14:43:35.863","not_graded",1,"ubuntu")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-07 14:44:35.863","manually_graded",1,"ubuntu",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-05 14:43:35.863","not_graded",1,"user1")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-07 14:44:35.863","manually_graded",1,"user1",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-06 14:43:35.863","not_graded",1,"fjaeger")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-08 14:44:35.863","manually_graded",1,"fjaeger",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-05 14:43:35.863","not_graded",1,"ubuntu")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-07 14:44:35.863","manually_graded",1,"ubuntu",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-05 14:43:35.863","not_graded",1,"user1")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-07 14:44:35.863","manually_graded",1,"user1",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-06 14:43:35.863","not_graded",1,"fjaeger")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-08 14:44:35.863","manually_graded",1,"fjaeger",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-05 14:43:35.863","not_graded",1,"ubuntu")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-07 14:44:35.863","manually_graded",1,"ubuntu",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-05 14:43:35.863","not_graded",1,"user1")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-07 14:44:35.863","manually_graded",1,"user1",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-06 14:43:35.863","not_graded",1,"fjaeger")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-08 14:44:35.863","manually_graded",1,"fjaeger",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-05 14:43:35.863","not_graded",1,"ubuntu")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-07 14:44:35.863","manually_graded",1,"ubuntu",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-05 14:43:35.863","not_graded",1,"user1")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-07 14:44:35.863","manually_graded",1,"user1",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-06 14:43:35.863","not_graded",1,"fjaeger")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-08 14:44:35.863","manually_graded",1,"fjaeger",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-05 14:43:35.863","not_graded",1,"ubuntu")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-07 14:44:35.863","manually_graded",1,"ubuntu",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-05 14:43:35.863","not_graded",1,"user1")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-07 14:44:35.863","manually_graded",1,"user1",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-06 14:43:35.863","not_graded",1,"fjaeger")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-08 14:44:35.863","manually_graded",1,"fjaeger",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-05 14:43:35.863","not_graded",1,"ubuntu")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-07 14:44:35.863","manually_graded",1,"ubuntu",10)')
+
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-05 14:43:35.863","not_graded",1,"user1")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-07 14:44:35.863","manually_graded",1,"user1",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-06 14:43:35.863","not_graded",1,"fjaeger")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-08 14:44:35.863","manually_graded",1,"fjaeger",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-05 14:43:35.863","not_graded",1,"ubuntu")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-07 14:44:35.863","manually_graded",1,"ubuntu",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-05 14:43:35.863","not_graded",1,"user1")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-07 14:44:35.863","manually_graded",1,"user1",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-06 14:43:35.863","not_graded",1,"fjaeger")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-08 14:44:35.863","manually_graded",1,"fjaeger",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-05 14:43:35.863","not_graded",1,"ubuntu")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-07 14:44:35.863","manually_graded",1,"ubuntu",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-05 14:43:35.863","not_graded",1,"user1")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-07 14:44:35.863","manually_graded",1,"user1",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-06 14:43:35.863","not_graded",1,"fjaeger")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-08 14:44:35.863","manually_graded",1,"fjaeger",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-05 14:43:35.863","not_graded",1,"ubuntu")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-07 14:44:35.863","manually_graded",1,"ubuntu",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-05 14:43:35.863","not_graded",1,"user1")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-07 14:44:35.863","manually_graded",1,"user1",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-06 14:43:35.863","not_graded",1,"fjaeger")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-08 14:44:35.863","manually_graded",1,"fjaeger",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-05 14:43:35.863","not_graded",1,"ubuntu")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-07 14:44:35.863","manually_graded",1,"ubuntu",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-05 14:43:35.863","not_graded",1,"user1")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-07 14:44:35.863","manually_graded",1,"user1",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-06 14:43:35.863","not_graded",1,"fjaeger")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-08 14:44:35.863","manually_graded",1,"fjaeger",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-05 14:43:35.863","not_graded",1,"ubuntu")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-07 14:44:35.863","manually_graded",1,"ubuntu",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-05 14:43:35.863","not_graded",1,"user1")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-07 14:44:35.863","manually_graded",1,"user1",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-06 14:43:35.863","not_graded",1,"fjaeger")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-08 14:44:35.863","manually_graded",1,"fjaeger",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-05 14:43:35.863","not_graded",1,"ubuntu")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-07 14:44:35.863","manually_graded",1,"ubuntu",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-05 14:43:35.863","not_graded",1,"user1")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-07 14:44:35.863","manually_graded",1,"user1",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-06 14:43:35.863","not_graded",1,"fjaeger")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-08 14:44:35.863","manually_graded",1,"fjaeger",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-05 14:43:35.863","not_graded",1,"ubuntu")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-07 14:44:35.863","manually_graded",1,"ubuntu",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-05 14:43:35.863","not_graded",1,"user1")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-07 14:44:35.863","manually_graded",1,"user1",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-06 14:43:35.863","not_graded",1,"fjaeger")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-08 14:44:35.863","manually_graded",1,"fjaeger",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-05 14:43:35.863","not_graded",1,"ubuntu")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-07 14:44:35.863","manually_graded",1,"ubuntu",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-05 14:43:35.863","not_graded",1,"user1")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-07 14:44:35.863","manually_graded",1,"user1",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-06 14:43:35.863","not_graded",1,"fjaeger")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-08 14:44:35.863","manually_graded",1,"fjaeger",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-05 14:43:35.863","not_graded",1,"ubuntu")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-07 14:44:35.863","manually_graded",1,"ubuntu",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-05 14:43:35.863","not_graded",1,"user1")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-07 14:44:35.863","manually_graded",1,"user1",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-06 14:43:35.863","not_graded",1,"fjaeger")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-08 14:44:35.863","manually_graded",1,"fjaeger",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-05 14:43:35.863","not_graded",1,"ubuntu")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-07 14:44:35.863","manually_graded",1,"ubuntu",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-05 14:43:35.863","not_graded",1,"user1")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-07 14:44:35.863","manually_graded",1,"user1",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-06 14:43:35.863","not_graded",1,"fjaeger")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-08 14:44:35.863","manually_graded",1,"fjaeger",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-05 14:43:35.863","not_graded",1,"ubuntu")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-07 14:44:35.863","manually_graded",1,"ubuntu",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-05 14:43:35.863","not_graded",1,"user1")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-07 14:44:35.863","manually_graded",1,"user1",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-06 14:43:35.863","not_graded",1,"fjaeger")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-08 14:44:35.863","manually_graded",1,"fjaeger",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-05 14:43:35.863","not_graded",1,"ubuntu")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-07 14:44:35.863","manually_graded",1,"ubuntu",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-05 14:43:35.863","not_graded",1,"user1")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-07 14:44:35.863","manually_graded",1,"user1",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-06 14:43:35.863","not_graded",1,"fjaeger")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-08 14:44:35.863","manually_graded",1,"fjaeger",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-05 14:43:35.863","not_graded",1,"ubuntu")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-07 14:44:35.863","manually_graded",1,"ubuntu",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-05 14:43:35.863","not_graded",1,"user1")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-07 14:44:35.863","manually_graded",1,"user1",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-06 14:43:35.863","not_graded",1,"fjaeger")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-08 14:44:35.863","manually_graded",1,"fjaeger",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-05 14:43:35.863","not_graded",1,"ubuntu")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-07 14:44:35.863","manually_graded",1,"ubuntu",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-05 14:43:35.863","not_graded",1,"user1")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-07 14:44:35.863","manually_graded",1,"user1",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-06 14:43:35.863","not_graded",1,"fjaeger")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-08 14:44:35.863","manually_graded",1,"fjaeger",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-05 14:43:35.863","not_graded",1,"ubuntu")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-07 14:44:35.863","manually_graded",1,"ubuntu",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-05 14:43:35.863","not_graded",1,"user1")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-07 14:44:35.863","manually_graded",1,"user1",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-06 14:43:35.863","not_graded",1,"fjaeger")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-08 14:44:35.863","manually_graded",1,"fjaeger",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-05 14:43:35.863","not_graded",1,"ubuntu")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-07 14:44:35.863","manually_graded",1,"ubuntu",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-05 14:43:35.863","not_graded",1,"user1")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-07 14:44:35.863","manually_graded",1,"user1",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-06 14:43:35.863","not_graded",1,"fjaeger")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-08 14:44:35.863","manually_graded",1,"fjaeger",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-05 14:43:35.863","not_graded",1,"ubuntu")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-07 14:44:35.863","manually_graded",1,"ubuntu",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-05 14:43:35.863","not_graded",1,"user1")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-07 14:44:35.863","manually_graded",1,"user1",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-06 14:43:35.863","not_graded",1,"fjaeger")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-08 14:44:35.863","manually_graded",1,"fjaeger",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-05 14:43:35.863","not_graded",1,"ubuntu")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-07 14:44:35.863","manually_graded",1,"ubuntu",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-05 14:43:35.863","not_graded",1,"user1")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-07 14:44:35.863","manually_graded",1,"user1",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-06 14:43:35.863","not_graded",1,"fjaeger")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-08 14:44:35.863","manually_graded",1,"fjaeger",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-05 14:43:35.863","not_graded",1,"ubuntu")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-07 14:44:35.863","manually_graded",1,"ubuntu",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-05 14:43:35.863","not_graded",1,"user1")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-07 14:44:35.863","manually_graded",1,"user1",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-06 14:43:35.863","not_graded",1,"fjaeger")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-08 14:44:35.863","manually_graded",1,"fjaeger",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-05 14:43:35.863","not_graded",1,"ubuntu")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-07 14:44:35.863","manually_graded",1,"ubuntu",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-05 14:43:35.863","not_graded",1,"user1")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-07 14:44:35.863","manually_graded",1,"user1",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-06 14:43:35.863","not_graded",1,"fjaeger")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-08 14:44:35.863","manually_graded",1,"fjaeger",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-05 14:43:35.863","not_graded",1,"ubuntu")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-07 14:44:35.863","manually_graded",1,"ubuntu",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-05 14:43:35.863","not_graded",1,"user1")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-07 14:44:35.863","manually_graded",1,"user1",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-06 14:43:35.863","not_graded",1,"fjaeger")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-08 14:44:35.863","manually_graded",1,"fjaeger",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-05 14:43:35.863","not_graded",1,"ubuntu")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-07 14:44:35.863","manually_graded",1,"ubuntu",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-05 14:43:35.863","not_graded",1,"user1")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-07 14:44:35.863","manually_graded",1,"user1",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-06 14:43:35.863","not_graded",1,"fjaeger")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-08 14:44:35.863","manually_graded",1,"fjaeger",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-05 14:43:35.863","not_graded",1,"ubuntu")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-07 14:44:35.863","manually_graded",1,"ubuntu",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-05 14:43:35.863","not_graded",1,"user1")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-07 14:44:35.863","manually_graded",1,"user1",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-06 14:43:35.863","not_graded",1,"fjaeger")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-08 14:44:35.863","manually_graded",1,"fjaeger",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-05 14:43:35.863","not_graded",1,"ubuntu")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-07 14:44:35.863","manually_graded",1,"ubuntu",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-05 14:43:35.863","not_graded",1,"user1")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-07 14:44:35.863","manually_graded",1,"user1",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-06 14:43:35.863","not_graded",1,"fjaeger")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-08 14:44:35.863","manually_graded",1,"fjaeger",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-05 14:43:35.863","not_graded",1,"ubuntu")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-07 14:44:35.863","manually_graded",1,"ubuntu",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-05 14:43:35.863","not_graded",1,"user1")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-07 14:44:35.863","manually_graded",1,"user1",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-06 14:43:35.863","not_graded",1,"fjaeger")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-08 14:44:35.863","manually_graded",1,"fjaeger",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-05 14:43:35.863","not_graded",1,"ubuntu")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-07 14:44:35.863","manually_graded",1,"ubuntu",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-05 14:43:35.863","not_graded",1,"user1")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-07 14:44:35.863","manually_graded",1,"user1",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-06 14:43:35.863","not_graded",1,"fjaeger")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-08 14:44:35.863","manually_graded",1,"fjaeger",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-05 14:43:35.863","not_graded",1,"ubuntu")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-07 14:44:35.863","manually_graded",1,"ubuntu",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-05 14:43:35.863","not_graded",1,"user1")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-07 14:44:35.863","manually_graded",1,"user1",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-06 14:43:35.863","not_graded",1,"fjaeger")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-08 14:44:35.863","manually_graded",1,"fjaeger",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-05 14:43:35.863","not_graded",1,"ubuntu")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-07 14:44:35.863","manually_graded",1,"ubuntu",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-05 14:43:35.863","not_graded",1,"user1")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-07 14:44:35.863","manually_graded",1,"user1",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-06 14:43:35.863","not_graded",1,"fjaeger")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-08 14:44:35.863","manually_graded",1,"fjaeger",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-05 14:43:35.863","not_graded",1,"ubuntu")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-07 14:44:35.863","manually_graded",1,"ubuntu",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-05 14:43:35.863","not_graded",1,"user1")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-07 14:44:35.863","manually_graded",1,"user1",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-06 14:43:35.863","not_graded",1,"fjaeger")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-08 14:44:35.863","manually_graded",1,"fjaeger",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-05 14:43:35.863","not_graded",1,"ubuntu")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-07 14:44:35.863","manually_graded",1,"ubuntu",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-05 14:43:35.863","not_graded",1,"user1")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-07 14:44:35.863","manually_graded",1,"user1",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-06 14:43:35.863","not_graded",1,"fjaeger")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-08 14:44:35.863","manually_graded",1,"fjaeger",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-05 14:43:35.863","not_graded",1,"ubuntu")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-07 14:44:35.863","manually_graded",1,"ubuntu",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-05 14:43:35.863","not_graded",1,"user1")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-07 14:44:35.863","manually_graded",1,"user1",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-06 14:43:35.863","not_graded",1,"fjaeger")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-08 14:44:35.863","manually_graded",1,"fjaeger",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-05 14:43:35.863","not_graded",1,"ubuntu")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-07 14:44:35.863","manually_graded",1,"ubuntu",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-05 14:43:35.863","not_graded",1,"user1")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-07 14:44:35.863","manually_graded",1,"user1",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-06 14:43:35.863","not_graded",1,"fjaeger")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-08 14:44:35.863","manually_graded",1,"fjaeger",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-05 14:43:35.863","not_graded",1,"ubuntu")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-07 14:44:35.863","manually_graded",1,"ubuntu",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-05 14:43:35.863","not_graded",1,"user1")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-07 14:44:35.863","manually_graded",1,"user1",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-06 14:43:35.863","not_graded",1,"fjaeger")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-08 14:44:35.863","manually_graded",1,"fjaeger",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-05 14:43:35.863","not_graded",1,"ubuntu")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-07 14:44:35.863","manually_graded",1,"ubuntu",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-05 14:43:35.863","not_graded",1,"user1")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-07 14:44:35.863","manually_graded",1,"user1",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-06 14:43:35.863","not_graded",1,"fjaeger")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-08 14:44:35.863","manually_graded",1,"fjaeger",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-05 14:43:35.863","not_graded",1,"ubuntu")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-07 14:44:35.863","manually_graded",1,"ubuntu",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-05 14:43:35.863","not_graded",1,"user1")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-07 14:44:35.863","manually_graded",1,"user1",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-06 14:43:35.863","not_graded",1,"fjaeger")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-08 14:44:35.863","manually_graded",1,"fjaeger",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-05 14:43:35.863","not_graded",1,"ubuntu")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-07 14:44:35.863","manually_graded",1,"ubuntu",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-05 14:43:35.863","not_graded",1,"user1")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-07 14:44:35.863","manually_graded",1,"user1",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-06 14:43:35.863","not_graded",1,"fjaeger")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-08 14:44:35.863","manually_graded",1,"fjaeger",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-05 14:43:35.863","not_graded",1,"ubuntu")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-07 14:44:35.863","manually_graded",1,"ubuntu",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-05 14:43:35.863","not_graded",1,"user1")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-07 14:44:35.863","manually_graded",1,"user1",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-06 14:43:35.863","not_graded",1,"fjaeger")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-08 14:44:35.863","manually_graded",1,"fjaeger",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-05 14:43:35.863","not_graded",1,"ubuntu")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-07 14:44:35.863","manually_graded",1,"ubuntu",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-05 14:43:35.863","not_graded",1,"user1")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-07 14:44:35.863","manually_graded",1,"user1",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-06 14:43:35.863","not_graded",1,"fjaeger")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-08 14:44:35.863","manually_graded",1,"fjaeger",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-05 14:43:35.863","not_graded",1,"ubuntu")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-07 14:44:35.863","manually_graded",1,"ubuntu",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-05 14:43:35.863","not_graded",1,"user1")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-07 14:44:35.863","manually_graded",1,"user1",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-06 14:43:35.863","not_graded",1,"fjaeger")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-08 14:44:35.863","manually_graded",1,"fjaeger",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-05 14:43:35.863","not_graded",1,"ubuntu")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-07 14:44:35.863","manually_graded",1,"ubuntu",10)')
+
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-05 14:43:35.863","not_graded",1,"user1")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-07 14:44:35.863","manually_graded",1,"user1",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-06 14:43:35.863","not_graded",1,"fjaeger")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-08 14:44:35.863","manually_graded",1,"fjaeger",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-05 14:43:35.863","not_graded",1,"ubuntu")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-07 14:44:35.863","manually_graded",1,"ubuntu",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-05 14:43:35.863","not_graded",1,"user1")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-07 14:44:35.863","manually_graded",1,"user1",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-06 14:43:35.863","not_graded",1,"fjaeger")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-08 14:44:35.863","manually_graded",1,"fjaeger",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-05 14:43:35.863","not_graded",1,"ubuntu")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-07 14:44:35.863","manually_graded",1,"ubuntu",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-05 14:43:35.863","not_graded",1,"user1")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-07 14:44:35.863","manually_graded",1,"user1",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-06 14:43:35.863","not_graded",1,"fjaeger")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-08 14:44:35.863","manually_graded",1,"fjaeger",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-05 14:43:35.863","not_graded",1,"ubuntu")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-07 14:44:35.863","manually_graded",1,"ubuntu",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-05 14:43:35.863","not_graded",1,"user1")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-07 14:44:35.863","manually_graded",1,"user1",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-06 14:43:35.863","not_graded",1,"fjaeger")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-08 14:44:35.863","manually_graded",1,"fjaeger",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-05 14:43:35.863","not_graded",1,"ubuntu")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-07 14:44:35.863","manually_graded",1,"ubuntu",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-05 14:43:35.863","not_graded",1,"user1")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-07 14:44:35.863","manually_graded",1,"user1",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-06 14:43:35.863","not_graded",1,"fjaeger")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-08 14:44:35.863","manually_graded",1,"fjaeger",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-05 14:43:35.863","not_graded",1,"ubuntu")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-07 14:44:35.863","manually_graded",1,"ubuntu",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-05 14:43:35.863","not_graded",1,"user1")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-07 14:44:35.863","manually_graded",1,"user1",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-06 14:43:35.863","not_graded",1,"fjaeger")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-08 14:44:35.863","manually_graded",1,"fjaeger",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-05 14:43:35.863","not_graded",1,"ubuntu")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-07 14:44:35.863","manually_graded",1,"ubuntu",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-05 14:43:35.863","not_graded",1,"user1")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-07 14:44:35.863","manually_graded",1,"user1",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-06 14:43:35.863","not_graded",1,"fjaeger")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-08 14:44:35.863","manually_graded",1,"fjaeger",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-05 14:43:35.863","not_graded",1,"ubuntu")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-07 14:44:35.863","manually_graded",1,"ubuntu",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-05 14:43:35.863","not_graded",1,"user1")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-07 14:44:35.863","manually_graded",1,"user1",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-06 14:43:35.863","not_graded",1,"fjaeger")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-08 14:44:35.863","manually_graded",1,"fjaeger",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-05 14:43:35.863","not_graded",1,"ubuntu")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-07 14:44:35.863","manually_graded",1,"ubuntu",10)')
+
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-05 14:43:35.863","not_graded",1,"user1")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-07 14:44:35.863","manually_graded",1,"user1",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-06 14:43:35.863","not_graded",1,"fjaeger")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-08 14:44:35.863","manually_graded",1,"fjaeger",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-05 14:43:35.863","not_graded",1,"ubuntu")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-07 14:44:35.863","manually_graded",1,"ubuntu",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-05 14:43:35.863","not_graded",1,"user1")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-07 14:44:35.863","manually_graded",1,"user1",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-06 14:43:35.863","not_graded",1,"fjaeger")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-08 14:44:35.863","manually_graded",1,"fjaeger",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-05 14:43:35.863","not_graded",1,"ubuntu")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-07 14:44:35.863","manually_graded",1,"ubuntu",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-05 14:43:35.863","not_graded",1,"user1")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-07 14:44:35.863","manually_graded",1,"user1",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-06 14:43:35.863","not_graded",1,"fjaeger")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-08 14:44:35.863","manually_graded",1,"fjaeger",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-05 14:43:35.863","not_graded",1,"ubuntu")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-07 14:44:35.863","manually_graded",1,"ubuntu",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-05 14:43:35.863","not_graded",1,"user1")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-07 14:44:35.863","manually_graded",1,"user1",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-06 14:43:35.863","not_graded",1,"fjaeger")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-08 14:44:35.863","manually_graded",1,"fjaeger",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-05 14:43:35.863","not_graded",1,"ubuntu")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-07 14:44:35.863","manually_graded",1,"ubuntu",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-05 14:43:35.863","not_graded",1,"user1")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-07 14:44:35.863","manually_graded",1,"user1",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-06 14:43:35.863","not_graded",1,"fjaeger")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-08 14:44:35.863","manually_graded",1,"fjaeger",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-05 14:43:35.863","not_graded",1,"ubuntu")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-07 14:44:35.863","manually_graded",1,"ubuntu",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-05 14:43:35.863","not_graded",1,"user1")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-07 14:44:35.863","manually_graded",1,"user1",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-06 14:43:35.863","not_graded",1,"fjaeger")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-08 14:44:35.863","manually_graded",1,"fjaeger",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-05 14:43:35.863","not_graded",1,"ubuntu")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-07 14:44:35.863","manually_graded",1,"ubuntu",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-05 14:43:35.863","not_graded",1,"user1")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-07 14:44:35.863","manually_graded",1,"user1",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-06 14:43:35.863","not_graded",1,"fjaeger")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-08 14:44:35.863","manually_graded",1,"fjaeger",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-05 14:43:35.863","not_graded",1,"ubuntu")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-07 14:44:35.863","manually_graded",1,"ubuntu",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-05 14:43:35.863","not_graded",1,"user1")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-07 14:44:35.863","manually_graded",1,"user1",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-06 14:43:35.863","not_graded",1,"fjaeger")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-08 14:44:35.863","manually_graded",1,"fjaeger",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-05 14:43:35.863","not_graded",1,"ubuntu")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-07 14:44:35.863","manually_graded",1,"ubuntu",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-05 14:43:35.863","not_graded",1,"user1")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-07 14:44:35.863","manually_graded",1,"user1",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-06 14:43:35.863","not_graded",1,"fjaeger")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-08 14:44:35.863","manually_graded",1,"fjaeger",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-05 14:43:35.863","not_graded",1,"ubuntu")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-07 14:44:35.863","manually_graded",1,"ubuntu",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-05 14:43:35.863","not_graded",1,"user1")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-07 14:44:35.863","manually_graded",1,"user1",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-06 14:43:35.863","not_graded",1,"fjaeger")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-08 14:44:35.863","manually_graded",1,"fjaeger",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-05 14:43:35.863","not_graded",1,"ubuntu")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-07 14:44:35.863","manually_graded",1,"ubuntu",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-05 14:43:35.863","not_graded",1,"user1")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-07 14:44:35.863","manually_graded",1,"user1",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-06 14:43:35.863","not_graded",1,"fjaeger")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-08 14:44:35.863","manually_graded",1,"fjaeger",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-05 14:43:35.863","not_graded",1,"ubuntu")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-07 14:44:35.863","manually_graded",1,"ubuntu",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-05 14:43:35.863","not_graded",1,"user1")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-07 14:44:35.863","manually_graded",1,"user1",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-06 14:43:35.863","not_graded",1,"fjaeger")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-08 14:44:35.863","manually_graded",1,"fjaeger",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-05 14:43:35.863","not_graded",1,"ubuntu")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-07 14:44:35.863","manually_graded",1,"ubuntu",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-05 14:43:35.863","not_graded",1,"user1")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-07 14:44:35.863","manually_graded",1,"user1",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-06 14:43:35.863","not_graded",1,"fjaeger")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-08 14:44:35.863","manually_graded",1,"fjaeger",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-05 14:43:35.863","not_graded",1,"ubuntu")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-07 14:44:35.863","manually_graded",1,"ubuntu",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-05 14:43:35.863","not_graded",1,"user1")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-07 14:44:35.863","manually_graded",1,"user1",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-06 14:43:35.863","not_graded",1,"fjaeger")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-08 14:44:35.863","manually_graded",1,"fjaeger",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-05 14:43:35.863","not_graded",1,"ubuntu")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-07 14:44:35.863","manually_graded",1,"ubuntu",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-05 14:43:35.863","not_graded",1,"user1")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-07 14:44:35.863","manually_graded",1,"user1",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-06 14:43:35.863","not_graded",1,"fjaeger")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-08 14:44:35.863","manually_graded",1,"fjaeger",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-05 14:43:35.863","not_graded",1,"ubuntu")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-07 14:44:35.863","manually_graded",1,"ubuntu",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-05 14:43:35.863","not_graded",1,"user1")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-07 14:44:35.863","manually_graded",1,"user1",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-06 14:43:35.863","not_graded",1,"fjaeger")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-08 14:44:35.863","manually_graded",1,"fjaeger",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-05 14:43:35.863","not_graded",1,"ubuntu")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-07 14:44:35.863","manually_graded",1,"ubuntu",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-05 14:43:35.863","not_graded",1,"user1")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-07 14:44:35.863","manually_graded",1,"user1",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-06 14:43:35.863","not_graded",1,"fjaeger")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-08 14:44:35.863","manually_graded",1,"fjaeger",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-05 14:43:35.863","not_graded",1,"ubuntu")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-07 14:44:35.863","manually_graded",1,"ubuntu",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-05 14:43:35.863","not_graded",1,"user1")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-07 14:44:35.863","manually_graded",1,"user1",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-06 14:43:35.863","not_graded",1,"fjaeger")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-08 14:44:35.863","manually_graded",1,"fjaeger",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-05 14:43:35.863","not_graded",1,"ubuntu")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-07 14:44:35.863","manually_graded",1,"ubuntu",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-05 14:43:35.863","not_graded",1,"user1")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-07 14:44:35.863","manually_graded",1,"user1",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-06 14:43:35.863","not_graded",1,"fjaeger")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-08 14:44:35.863","manually_graded",1,"fjaeger",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-05 14:43:35.863","not_graded",1,"ubuntu")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-07 14:44:35.863","manually_graded",1,"ubuntu",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-05 14:43:35.863","not_graded",1,"user1")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-07 14:44:35.863","manually_graded",1,"user1",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-06 14:43:35.863","not_graded",1,"fjaeger")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-08 14:44:35.863","manually_graded",1,"fjaeger",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-05 14:43:35.863","not_graded",1,"ubuntu")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-07 14:44:35.863","manually_graded",1,"ubuntu",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-05 14:43:35.863","not_graded",1,"user1")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-07 14:44:35.863","manually_graded",1,"user1",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-06 14:43:35.863","not_graded",1,"fjaeger")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-08 14:44:35.863","manually_graded",1,"fjaeger",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-05 14:43:35.863","not_graded",1,"ubuntu")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-07 14:44:35.863","manually_graded",1,"ubuntu",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-05 14:43:35.863","not_graded",1,"user1")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-07 14:44:35.863","manually_graded",1,"user1",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-06 14:43:35.863","not_graded",1,"fjaeger")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-08 14:44:35.863","manually_graded",1,"fjaeger",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-05 14:43:35.863","not_graded",1,"ubuntu")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-07 14:44:35.863","manually_graded",1,"ubuntu",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-05 14:43:35.863","not_graded",1,"user1")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-07 14:44:35.863","manually_graded",1,"user1",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-06 14:43:35.863","not_graded",1,"fjaeger")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-08 14:44:35.863","manually_graded",1,"fjaeger",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-05 14:43:35.863","not_graded",1,"ubuntu")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-07 14:44:35.863","manually_graded",1,"ubuntu",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-05 14:43:35.863","not_graded",1,"user1")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-07 14:44:35.863","manually_graded",1,"user1",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-06 14:43:35.863","not_graded",1,"fjaeger")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-08 14:44:35.863","manually_graded",1,"fjaeger",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-05 14:43:35.863","not_graded",1,"ubuntu")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-07 14:44:35.863","manually_graded",1,"ubuntu",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-05 14:43:35.863","not_graded",1,"user1")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-07 14:44:35.863","manually_graded",1,"user1",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-06 14:43:35.863","not_graded",1,"fjaeger")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-08 14:44:35.863","manually_graded",1,"fjaeger",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-05 14:43:35.863","not_graded",1,"ubuntu")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-07 14:44:35.863","manually_graded",1,"ubuntu",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-05 14:43:35.863","not_graded",1,"user1")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-07 14:44:35.863","manually_graded",1,"user1",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-06 14:43:35.863","not_graded",1,"fjaeger")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-08 14:44:35.863","manually_graded",1,"fjaeger",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-05 14:43:35.863","not_graded",1,"ubuntu")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-07 14:44:35.863","manually_graded",1,"ubuntu",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-05 14:43:35.863","not_graded",1,"user1")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-07 14:44:35.863","manually_graded",1,"user1",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-06 14:43:35.863","not_graded",1,"fjaeger")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-08 14:44:35.863","manually_graded",1,"fjaeger",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-05 14:43:35.863","not_graded",1,"ubuntu")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-07 14:44:35.863","manually_graded",1,"ubuntu",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-05 14:43:35.863","not_graded",1,"user1")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-07 14:44:35.863","manually_graded",1,"user1",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-06 14:43:35.863","not_graded",1,"fjaeger")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-08 14:44:35.863","manually_graded",1,"fjaeger",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-05 14:43:35.863","not_graded",1,"ubuntu")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-07 14:44:35.863","manually_graded",1,"ubuntu",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-05 14:43:35.863","not_graded",1,"user1")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-07 14:44:35.863","manually_graded",1,"user1",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-06 14:43:35.863","not_graded",1,"fjaeger")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-08 14:44:35.863","manually_graded",1,"fjaeger",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-05 14:43:35.863","not_graded",1,"ubuntu")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-07 14:44:35.863","manually_graded",1,"ubuntu",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-05 14:43:35.863","not_graded",1,"user1")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-07 14:44:35.863","manually_graded",1,"user1",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-06 14:43:35.863","not_graded",1,"fjaeger")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-08 14:44:35.863","manually_graded",1,"fjaeger",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-05 14:43:35.863","not_graded",1,"ubuntu")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-07 14:44:35.863","manually_graded",1,"ubuntu",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-05 14:43:35.863","not_graded",1,"user1")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-07 14:44:35.863","manually_graded",1,"user1",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-06 14:43:35.863","not_graded",1,"fjaeger")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-08 14:44:35.863","manually_graded",1,"fjaeger",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-05 14:43:35.863","not_graded",1,"ubuntu")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-07 14:44:35.863","manually_graded",1,"ubuntu",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-05 14:43:35.863","not_graded",1,"user1")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-07 14:44:35.863","manually_graded",1,"user1",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-06 14:43:35.863","not_graded",1,"fjaeger")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-08 14:44:35.863","manually_graded",1,"fjaeger",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-05 14:43:35.863","not_graded",1,"ubuntu")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-07 14:44:35.863","manually_graded",1,"ubuntu",10)')
+
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-05 14:43:35.863","not_graded",1,"user1")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-07 14:44:35.863","manually_graded",1,"user1",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-06 14:43:35.863","not_graded",1,"fjaeger")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-08 14:44:35.863","manually_graded",1,"fjaeger",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-05 14:43:35.863","not_graded",1,"ubuntu")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-07 14:44:35.863","manually_graded",1,"ubuntu",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-05 14:43:35.863","not_graded",1,"user1")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-07 14:44:35.863","manually_graded",1,"user1",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-06 14:43:35.863","not_graded",1,"fjaeger")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-08 14:44:35.863","manually_graded",1,"fjaeger",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-05 14:43:35.863","not_graded",1,"ubuntu")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-07 14:44:35.863","manually_graded",1,"ubuntu",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-05 14:43:35.863","not_graded",1,"user1")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-07 14:44:35.863","manually_graded",1,"user1",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-06 14:43:35.863","not_graded",1,"fjaeger")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-08 14:44:35.863","manually_graded",1,"fjaeger",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-05 14:43:35.863","not_graded",1,"ubuntu")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-07 14:44:35.863","manually_graded",1,"ubuntu",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-05 14:43:35.863","not_graded",1,"user1")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-07 14:44:35.863","manually_graded",1,"user1",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-06 14:43:35.863","not_graded",1,"fjaeger")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-08 14:44:35.863","manually_graded",1,"fjaeger",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-05 14:43:35.863","not_graded",1,"ubuntu")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-07 14:44:35.863","manually_graded",1,"ubuntu",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-05 14:43:35.863","not_graded",1,"user1")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-07 14:44:35.863","manually_graded",1,"user1",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-06 14:43:35.863","not_graded",1,"fjaeger")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-08 14:44:35.863","manually_graded",1,"fjaeger",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-05 14:43:35.863","not_graded",1,"ubuntu")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-07 14:44:35.863","manually_graded",1,"ubuntu",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-05 14:43:35.863","not_graded",1,"user1")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-07 14:44:35.863","manually_graded",1,"user1",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-06 14:43:35.863","not_graded",1,"fjaeger")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-08 14:44:35.863","manually_graded",1,"fjaeger",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-05 14:43:35.863","not_graded",1,"ubuntu")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-07 14:44:35.863","manually_graded",1,"ubuntu",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-05 14:43:35.863","not_graded",1,"user1")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-07 14:44:35.863","manually_graded",1,"user1",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-06 14:43:35.863","not_graded",1,"fjaeger")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-08 14:44:35.863","manually_graded",1,"fjaeger",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-05 14:43:35.863","not_graded",1,"ubuntu")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-07 14:44:35.863","manually_graded",1,"ubuntu",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-05 14:43:35.863","not_graded",1,"user1")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-07 14:44:35.863","manually_graded",1,"user1",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-06 14:43:35.863","not_graded",1,"fjaeger")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-08 14:44:35.863","manually_graded",1,"fjaeger",10)')
+
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-05 14:43:35.863","not_graded",1,"ubuntu")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-07 14:44:35.863","manually_graded",1,"ubuntu",10)')
+
+
 
     op.execute('INSERT INTO "file" ("name","assignid","path","exercise","points") VALUES ("exercise1.ipynb",1,"./exercise1.ipynb",true,5)')
     op.execute('INSERT INTO "file" ("name","assignid","path","exercise") VALUES ("dataset.csv",1,"./dataset.csv",false)')

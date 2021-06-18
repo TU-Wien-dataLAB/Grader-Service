@@ -12,9 +12,8 @@ class LectureState(enum.IntEnum):
 
 class Lecture(Base, Serializable):
     __tablename__ = "lecture"
-    __table_args__ = tuple(UniqueConstraint('name', 'semester', name="u_sem_name"),)
     id = Column(Integer, primary_key=True, autoincrement=True)
-    name = Column(String(255), nullable=False, unique=False)
+    name = Column(String(255), nullable=True, unique=False)
     semester = Column(String(255), nullable=False, unique=False)
     code = Column(String(255), nullable=True, unique=True)
     state = Column(Enum(LectureState), nullable=False, unique=False)

@@ -27,8 +27,7 @@ def upgrade():
     sa.Column('state', sa.Enum('inactive', 'active', 'complete'), nullable=False),
     sa.Column('deleted', sa.Enum('active', 'deleted'),server_default='active', nullable=False),
 
-    sa.PrimaryKeyConstraint('id'),
-    UniqueConstraint('name', 'semester', name='u_sem_name')
+    sa.PrimaryKeyConstraint('id')
     )
     op.create_table('user',
     sa.Column('name', sa.String(length=255), nullable=False),
