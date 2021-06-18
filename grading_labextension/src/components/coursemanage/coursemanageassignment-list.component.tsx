@@ -33,13 +33,13 @@ export class CourseManageAssignmentsComponent extends React.Component<Assignment
 
   }
 
-  private async createAssignment() {
+  private async createAssignment(id: number) {
     try {
       let name;
       InputDialog.getText({title: 'Input assignment name'}).then(input => {
         name = input;
       })
-      createAssignment(this.lecture.id, name);
+      createAssignment(id, {name: name});
     } catch (e) {
       showErrorMessage("Error Creating Assignment", e);
     }
@@ -79,7 +79,7 @@ export class CourseManageAssignmentsComponent extends React.Component<Assignment
           )}
         </ul>
         <div className="assignment-create">       
-         <Button icon="add" outlined onClick={this.createAssignment} className="assignment-button">Create new Assignment</Button>
+         <Button icon="add" outlined onClick={() => this.createAssignment(this.lecture.id)} className="assignment-button">Create new Assignment</Button>
         </div>
       </Collapse>
     </div>;
