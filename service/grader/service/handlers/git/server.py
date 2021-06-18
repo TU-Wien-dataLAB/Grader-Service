@@ -55,12 +55,18 @@ class GitBaseHandler(GraderBaseHandler):
         except:
             pass
 
-    def gitlookup(self):
+    def gitlookup(self, rpc: str):
         pathlets = self.request.path.strip("/").split("/")
-        # pathlets = ['services', 'grader', 'git', 'lecture_code', 'assignment_repo', ...]
+        # pathlets = ['services', 'grader', 'git', 'lecture_code', 'assignment_name', 'repo_type', ...]
+        if len(pathlets) < 6:
+            return None
         pathlets = pathlets[3:]
         lecture_path = os.path.abspath(os.path.join(self.gitbase, pathlets[0]))
         assignment_path = os.path.abspath(os.path.join(self.gitbase, pathlets[0], pathlets[1]))
+        
+        repo_type = pathlets[2]
+        if repo_type not in {"source", "release", "assignment"}:
+            return None
         
         # get lecture and assignment if they exist
         try:
@@ -71,16 +77,23 @@ class GitBaseHandler(GraderBaseHandler):
         except MultipleResultsFound:
             raise HTTPError(400)
         role = self.session.query(Role).get((self.user.name, lecture.id))
-        if role.role == Scope.instructor or role.role == Scope.tutor: # TODO: should tutors have access? probably...
-            repo_type: str = "instructor"
-        else:
-            try:
-                assignment = self.session.query(Assignment).filter(Assignment.lectid == lecture.id, Assignment.name == pathlets[1]).one()
-            except NoResultFound:
-                self.error_message = "Not Found"
-                raise HTTPError(404)
-            except MultipleResultsFound:
-                raise HTTPError(400)
+        if repo_type == "source" and role.role == Scope.student:
+            self.error_message = "Unauthorized"
+            raise HTTPError(403)
+        
+        if repo_type == "release" and role.role == Scope.student and rpc == "send-pack":
+            self.error_message = "Unauthorized"
+            raise HTTPError(403)
+
+        try:
+            assignment = self.session.query(Assignment).filter(Assignment.lectid == lecture.id, Assignment.name == pathlets[1]).one()
+        except NoResultFound:
+            self.error_message = "Not Found"
+            raise HTTPError(404)
+        except MultipleResultsFound:
+            raise HTTPError(400)
+
+        if repo_type == "assignment":
             repo_type: str = assignment.type
         
         # create directories once we know they exist in the database
@@ -90,7 +103,7 @@ class GitBaseHandler(GraderBaseHandler):
             os.mkdir(assignment_path)
 
         # construct final path from repo type
-        if repo_type == "instructor":
+        if repo_type == "source" or repo_type == "release":
             path = os.path.join(assignment_path, repo_type)
         elif repo_type == "user":
             user_path = os.path.join(assignment_path, repo_type)
@@ -121,9 +134,9 @@ class GitBaseHandler(GraderBaseHandler):
                 return None
             return path
 
-    def get_gitdir(self):
+    def get_gitdir(self, rpc: str):
         """Determine the git repository for this request"""
-        gitdir = self.gitlookup()
+        gitdir = self.gitlookup(rpc)
         if gitdir is None:
             raise HTTPError(404, "unable to find repository")
         logger.debug("Accessing git at: %s", gitdir)
@@ -141,7 +154,7 @@ class RPCHandler(GitBaseHandler):
     async def prepare(self):
         await super().prepare()
         self.rpc = self.path_args[0]
-        self.cmd = f"git {self.rpc} --stateless-rpc {self.get_gitdir()}"
+        self.cmd = f"git {self.rpc} --stateless-rpc {self.get_gitdir(rpc=self.rpc)}"
         self.process = Subprocess(
             shlex.split(self.cmd),
             stdin=Subprocess.STREAM,

@@ -23,7 +23,9 @@ class AssignmentBaseHandler(GraderBaseHandler):
             self.error_message = "Not Found"
             raise HTTPError(404)
 
-        if role.role == Scope.student: # students do not get assignments that are created
+        if (
+            role.role == Scope.student
+        ):  # students do not get assignments that are created
             assignments = (
                 self.session.query(Assignment)
                 .filter(
@@ -34,7 +36,9 @@ class AssignmentBaseHandler(GraderBaseHandler):
                 .all()
             )
         else:
-            assignments = [a for a in role.lecture.assignments if a.deleted == DeleteState.active]
+            assignments = [
+                a for a in role.lecture.assignments if a.deleted == DeleteState.active
+            ]
         self.write_json(assignments)
 
     @authorize([Scope.instructor])
@@ -104,14 +108,18 @@ class AssignmentObjectHandler(GraderBaseHandler):
 
     @authorize([Scope.student, Scope.tutor, Scope.instructor])
     async def get(self, lecture_id: int, assignment_id: int):
-        instructor_version = self.get_argument("instructor-version", False)
-        metadata_only = self.get_argument("metadata-only", False)
+        instructor_version = self.get_argument("instructor-version", "false") == "true"
+        metadata_only = self.get_argument("metadata-only", "false") == "true"
 
         role = self.session.query(Role).get((self.user.name, lecture_id))
         if instructor_version and role.role < Scope.instructor:
             raise HTTPError(403)
         assignment = self.session.query(Assignment).get(assignment_id)
-        if assignment is None or assignment.deleted == DeleteState.deleted:
+        if (
+            assignment is None
+            or assignment.deleted == DeleteState.deleted
+            or (role.role == Scope.student and assignment.status == "created")
+        ):
             self.error_message = "Not Found!"
             raise HTTPError(404)
         self.write_json(assignment)
@@ -125,5 +133,6 @@ class AssignmentObjectHandler(GraderBaseHandler):
             if assignment.deleted == 1:
                 raise HTTPError(404)
             assignment.deleted = 1
+            self.session.commit()
         except ObjectDeletedError:
             raise HTTPError(404)

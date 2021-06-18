@@ -28,6 +28,9 @@ class GitService(Configurable):
         url = posixpath.join(self.git_remote_url, self.lecture_code, self.assignment_name)
         self._run_command(f"git remote add {name} {self.git_http_scheme}://oauth:{self.git_access_token}@{url}")
         self._run_command(f"git push --set-upstream {name} main")
+    
+    def delete_remote(self, name: str):
+        raise NotImplementedError()
 
     def pull(self, name: str, force=False):
         self._run_command(f"git pull {name} main" + (" --force" if force else ""), cwd=self.path)
@@ -35,6 +38,9 @@ class GitService(Configurable):
     def init(self, force=False):
         if not os.path.exists(os.path.join(self.path, ".git")) or force:
             self._run_command(f"git init {self.path}")
+    
+    def clone():
+        raise NotImplementedError()
     
     def _run_command(self, command, cwd=None):
         try:
