@@ -17,11 +17,10 @@ from sqlalchemy.sql.expression import select
 from tornado import httputil, web
 from tornado.web import HTTPError, RequestHandler
 from grader.service.orm.base import DeleteState, Serializable
-from grader.common.models.base_model_ import Model
 from tornado_sqlalchemy import SessionMixin
 from tornado.escape import json_decode
 from sqlalchemy.orm.exc import MultipleResultsFound, NoResultFound
-import datetime
+from grader.common.services import serialize
 import base64
 
 
@@ -196,31 +195,13 @@ class GraderBaseHandler(SessionMixin, web.RequestHandler):
     
     def write_json(self, obj) -> None:
         self.set_header('Content-Type', 'application/json')
-        chunk = GraderBaseHandler._serialize(obj)
+        chunk = serialize(obj)
         self.write(json.dumps(chunk))
     
     def write_error(self, status_code: int, **kwargs) -> None:
         self.clear()
         self.set_status(status_code)
         self.write_json(ErrorMessage(self.error_message))
-
-    @classmethod
-    def _serialize(cls, obj: object):
-        if isinstance(obj, list):
-            return [cls._serialize(o) for o in obj]
-        if isinstance(obj, dict):
-            return {k: cls._serialize(v) for k, v in obj.items()}
-        if isinstance(obj, tuple):
-            return tuple(cls._serialize(o) for o in obj)
-        if isinstance(obj, Serializable):
-            return cls._serialize(obj.serialize())
-        if isinstance(obj, (str, int, float, complex)) or obj is None:
-            return obj
-        if isinstance(obj, datetime.datetime):
-            return str(obj)
-        if isinstance(obj, Model):
-            return cls._serialize(obj.to_dict())
-        return None
 
     @property
     def user(self) -> User:

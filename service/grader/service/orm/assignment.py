@@ -26,8 +26,8 @@ class Assignment(Base, Serializable):
     @property
     def model(self) -> assignment.Assignment:
         assignment_model = assignment.Assignment(
-            id=self.id, name=self.name, due_date=self.duedate, status=self.status
+            id=self.id, name=self.name, due_date=self.duedate, status=self.status, type=self.type
         )
-        assignment_model.exercises = [ex.model for ex in self.files if ex.exercise]
-        assignment_model.files = [f.model for f in self.files if not f.exercise]
+        assignment_model.exercises = [] # [ex.model for ex in self.files if ex.exercise]
+        assignment_model.files = [] # [f.model for f in self.files if not f.exercise]
         return assignment_model
