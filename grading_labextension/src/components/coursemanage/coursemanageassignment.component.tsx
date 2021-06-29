@@ -38,15 +38,14 @@ export class CourseManageAssignmentComponent extends React.Component<AssignmentP
   }
 
   public componentDidMount() {
-    // TODO: should only get all submissions if assignment is released
-    getAllSubmissions(this.lecture , this.assignment,false,true).subscribe(userSubmissions => {
-      this.setState(this.state.submissions = userSubmissions)
-      console.log(this.state.submissions)
-      console.log(this.state.submissions.length)
-
-
-    } 
-    )
+    if(this.assignment.status=="released") {
+      getAllSubmissions(this.lecture , this.assignment,false,true).subscribe(userSubmissions => {
+        this.setState(this.state.submissions = userSubmissions)
+        console.log(this.state.submissions)
+        console.log(this.state.submissions.length)
+        } 
+      )
+    }
   }
 
   private toggleOpen = () => {
@@ -158,7 +157,7 @@ export class CourseManageAssignmentComponent extends React.Component<AssignmentP
             <Button icon='git-push' intent={"success"} outlined className="assignment-button" onClick={() => this.pushAssignment()} >Push</Button>
             <Button icon='git-pull' intent={"primary"} outlined className="assignment-button" onClick={() => this.pullAssignment()}> Pull</Button>
             <Button icon='cloud-upload' outlined className="assignment-button" disabled={this.assignment.status=="created"} onClick={() => this.releaseAssignment()} >Release</Button>
-            <Tag className="assignment-tag" icon="arrow-top-right" interactive onClick={() => this.openGrading(this.lecture.id, this.assignment.id)}>{this.state.submissions.length} {"Submission" + ((this.state.submissions.length > 1) ?  "s" : "")}</Tag>
+            <Tag className="assignment-tag" icon="arrow-top-right" active={this.assignment.status!="released"} interactive={this.assignment.status=="released"} onClick={() => {if(this.assignment.status=="released") this.openGrading(this.lecture.id, this.assignment.id)}}>{this.state.submissions.length} {"Submission" + ((this.state.submissions.length > 1) ?  "s" : "")}</Tag>
           </span>
         </div>
 
