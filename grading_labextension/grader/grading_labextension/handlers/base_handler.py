@@ -8,6 +8,8 @@ from tornado import httpclient
 from tornado.httpclient import HTTPClient
 from traitlets.config.configurable import SingletonConfigurable
 from traitlets.traitlets import Unicode
+import json
+from grader.common.services import serialize
 
 # test_token: ebce9dfa2a694fb9bb06883bd8bb6012
 
@@ -27,3 +29,8 @@ class ExtensionBaseHandler(APIHandler):
   def grader_authentication_header(self):
     logging.getLogger().critical(HandlerConfig.instance().hub_api_token)
     return dict(Authorization="Token " + HandlerConfig.instance().hub_api_token)
+  
+  def write_json(self, obj) -> None:
+    self.set_header('Content-Type', 'application/json')
+    chunk = serialize(obj)
+    self.write(json.dumps(chunk))
