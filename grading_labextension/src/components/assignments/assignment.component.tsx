@@ -10,11 +10,30 @@ import { Submission } from '../../model/submission';
 import { getSubmissions, submitAssignment } from '../../services/submissions.service'
 import { fetchAssignment } from '../../services/assignments.service'
 import { Lecture } from '../../model/lecture';
+import { DirListing } from '@jupyterlab/filebrowser/lib/listing'
+import { FilterFileBrowserModel } from '@jupyterlab/filebrowser/lib/model';
 
 export interface AssignmentProps {
   index: number;
   lecture: Lecture;
   assignment: Assignment;
+}
+
+
+class ExistingNodeRenderer extends DirListing.Renderer {
+  private node: HTMLElement;
+
+  constructor(node: HTMLElement) {
+    super();
+    this.node = node
+  }
+  
+  /**
+     * Return the existing node for the dir listing.
+     */
+   createNode(): HTMLElement {
+    return this.node;
+  }
 }
 
 export class AssignmentComponent extends React.Component<AssignmentProps> {
@@ -27,6 +46,8 @@ export class AssignmentComponent extends React.Component<AssignmentProps> {
     submissionsOpen: true,
     submissions: new Array<Submission>()
   };
+  public dirListingNode: HTMLElement;
+  public dirListing: DirListing;
 
   constructor(props: AssignmentProps) {
     super(props);
@@ -41,8 +62,35 @@ export class AssignmentComponent extends React.Component<AssignmentProps> {
     this.getSubmissions = this.getSubmissions.bind(this);
   }
 
+  // FIXME: display a directory
   public componentDidMount() {
     this.getSubmissions();
+    let renderer = new ExistingNodeRenderer(this.dirListingNode);
+    const CONTENT_CLASS = 'jp-DirListing-content';
+    const HEADER_CLASS = 'jp-DirListing-header';
+    const LISTING_CLASS = 'jp-FileBrowser-listing';
+
+    const header = document.createElement('div');
+    const content = document.createElement('ul');
+    content.className = CONTENT_CLASS;
+    header.className = HEADER_CLASS;
+
+    this.dirListingNode.innerHTML = ""
+    this.dirListingNode.appendChild(header);
+    this.dirListingNode.appendChild(content);
+    this.dirListingNode.tabIndex = 0;
+
+    console.log("Global DocManger 3:")
+    console.log(GlobalObjects.docManager)
+    let model = new FilterFileBrowserModel({auto: false, manager: GlobalObjects.docManager})
+
+    let path = GlobalObjects.docManager.services.contents.resolvePath(model.path, "~");
+    let localPath = GlobalObjects.docManager.services.contents.localPath(".");
+    console.log(path)
+    console.log(localPath)
+
+    this.dirListing = new DirListing({model, renderer})
+    this.dirListing.addClass(LISTING_CLASS);
   }
 
   private toggleOpen = (collapsable: string) => {
@@ -139,23 +187,7 @@ export class AssignmentComponent extends React.Component<AssignmentProps> {
           <Icon icon={IconNames.FOLDER_CLOSE} iconSize={this.iconSize} className="flavor-icon"></Icon>
           Exercises and Files
         </div>
-        <Collapse isOpen={this.state.filesOpen}>
-          <div className="assignment-content">
-            {this.assignment.exercises.map((ex, i) =>
-              <div className="list-element" onClick={() => this.openFile(`${this.lecture.name}/${this.assignment.name}/${ex.name}`)}>
-                <Icon icon={IconNames.EDIT} iconSize={this.iconSize} className="flavor-icon"></Icon>
-                {ex.name}
-              </div>
-            )}
-
-            {this.assignment.files.map((file, i) =>
-              <div className="list-element" onClick={() => this.openFile(`${this.lecture.name}/${this.assignment.name}/${file.name}`)}>
-                <Icon icon={IconNames.DOCUMENT} iconSize={this.iconSize} className="flavor-icon"></Icon>
-                {file.name}
-              </div>
-            )}
-          </div>
-        </Collapse>
+        <div ref={_element => this.dirListingNode = _element}></div>
 
         <div onClick={() => this.toggleOpen("submissions")} className="assignment-title">
           <Icon icon={IconNames.CHEVRON_RIGHT} iconSize={this.iconSize}

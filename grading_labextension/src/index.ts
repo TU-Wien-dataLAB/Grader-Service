@@ -14,6 +14,9 @@ import { checkIcon, editIcon } from '@jupyterlab/ui-components'
 import { AssignmentList } from './widgets/assignment-list';
 import { CommandRegistry } from '@lumino/commands'
 import { GradingView } from './widgets/grading';
+import { DocumentRegistry } from '@jupyterlab/docregistry';
+import { ServiceManager } from '@jupyterlab/services';
+import { IDocumentManager } from '@jupyterlab/docmanager';
 
 // import { requestAPI } from './handler';
 
@@ -37,6 +40,9 @@ namespace GradingCommandIDs {
 
 export class GlobalObjects {
   static commands: CommandRegistry;
+  static docRegistry: DocumentRegistry;
+  static serviceManager: ServiceManager;
+  static docManager: IDocumentManager;
 }
 
 
@@ -46,16 +52,20 @@ export class GlobalObjects {
 const extension: JupyterFrontEndPlugin<void> = {
   id: 'coursemanage:plugin',
   autoStart: true,
-  requires: [ICommandPalette, ILauncher, INotebookTools],
-  activate: (app: JupyterFrontEnd, palette: ICommandPalette, launcher: ILauncher, nbtools: INotebookTools) => {
+  requires: [ICommandPalette, ILauncher, INotebookTools, IDocumentManager],
+  activate: (app: JupyterFrontEnd, palette: ICommandPalette, launcher: ILauncher, nbtools: INotebookTools, docManager: IDocumentManager) => {
     console.log('JupyterLab extension grading is activated!');
     console.log('JupyterFrontEnd:', app)
     console.log('ICommandPalette:', palette);
 
     GlobalObjects.commands = app.commands;
+    GlobalObjects.docRegistry = app.docRegistry;
+    GlobalObjects.serviceManager = app.serviceManager;
+    GlobalObjects.docManager = docManager;
 
     /* ##### Course Manage View Widget ##### */
     let command: string = CourseManageCommandIDs.create;
+
     app.commands.addCommand(command, {
       execute: () => {
         // Create a blank content widget inside of a MainAreaWidget
