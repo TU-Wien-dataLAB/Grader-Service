@@ -10,6 +10,8 @@ import { Submission } from '../../model/submission';
 import { getSubmissions, submitAssignment } from '../../services/submissions.service'
 import { fetchAssignment } from '../../services/assignments.service'
 import { Lecture } from '../../model/lecture';
+//TODO: does not find fs
+//import * as fs from '@types/node';
 
 export interface AssignmentProps {
   index: number;
@@ -119,7 +121,6 @@ export class AssignmentComponent extends React.Component<AssignmentProps> {
   }
 
   public render() {
-    // TODO: show due date of assignment
     return <li key={this.index}>
       <div className="assignment">
         <div className="assignment-header">

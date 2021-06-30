@@ -109,6 +109,7 @@ export class CourseManageAssignmentComponent extends React.Component<AssignmentP
     if (!result.button.accept) return;
 
     // TODO: push assignment
+
   }
 
   private async pullAssignment() {
@@ -176,10 +177,6 @@ export class CourseManageAssignmentComponent extends React.Component<AssignmentP
                 {file.name}
               </div>
             )}
-            <span className="add-buttons">
-              <Button icon="add" outlined className="assignment-button">Add File</Button>
-              <Button icon="upload" outlined className="assignment-button">Upload File</Button>
-            </span>
           </div>
         </Collapse>
       </div>
