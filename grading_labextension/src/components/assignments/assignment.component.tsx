@@ -44,7 +44,6 @@ export class AssignmentComponent extends React.Component<AssignmentProps> {
   public index: number;
   public iconSize: number = 14;
   public state = {
-    filesOpen: false,
     submissionsOpen: true,
     submissions: new Array<Submission>()
   };
@@ -84,21 +83,18 @@ export class AssignmentComponent extends React.Component<AssignmentProps> {
 
     console.log("Global DocManger 3:")
     console.log(GlobalObjects.docManager)
-    let model = new FilterFileBrowserModel({auto: false, manager: GlobalObjects.docManager})
+    let model = new FilterFileBrowserModel({auto: true, manager: GlobalObjects.docManager})
 
-    let path = GlobalObjects.docManager.services.contents.resolvePath(model.path, "~");
-    let localPath = GlobalObjects.docManager.services.contents.localPath(".");
-    console.log(path)
-    console.log(localPath)
+    //model.cd("/"); //path default "."
+    console.log(model.path)
 
     this.dirListing = new DirListing({model, renderer})
     this.dirListing.addClass(LISTING_CLASS);
+    this.dirListing.contentNode();
   }
 
   private toggleOpen = (collapsable: string) => {
-    if (collapsable == "files") {
-      this.setState({ filesOpen: !this.state.filesOpen });
-    } else if (collapsable == "submissions") {
+    if (collapsable == "submissions") {
       this.setState({ submissionsOpen: !this.state.submissionsOpen })
     }
   }
@@ -182,9 +178,7 @@ export class AssignmentComponent extends React.Component<AssignmentProps> {
           </span>
 
         </div>
-        <div onClick={() => this.toggleOpen("files")} className="assignment-title">
-          <Icon icon={IconNames.CHEVRON_RIGHT} iconSize={this.iconSize}
-            className={`collapse-icon-small ${this.state.filesOpen ? "collapse-icon-small-open" : ""}`}></Icon>
+        <div className="assignment-title">
           <Icon icon={IconNames.FOLDER_CLOSE} iconSize={this.iconSize} className="flavor-icon"></Icon>
           Exercises and Files
         </div>
