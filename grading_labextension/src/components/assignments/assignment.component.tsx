@@ -90,7 +90,7 @@ export class AssignmentComponent extends React.Component<AssignmentProps> {
 
     this.dirListing = new DirListing({model, renderer})
     this.dirListing.addClass(LISTING_CLASS);
-    this.dirListing.contentNode();
+    //this.dirListing.contentNode();
   }
 
   private toggleOpen = (collapsable: string) => {

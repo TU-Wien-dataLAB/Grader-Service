@@ -35,11 +35,11 @@ export class CourseManageAssignmentsComponent extends React.Component<Assignment
 
   private async createAssignment(id: number) {
     try {
-      let name;
+      let assignname;
       InputDialog.getText({title: 'Input assignment name'}).then(input => {
-        name = input;
+        assignname = input;
+        createAssignment(id, {"name": assignname.value ,"due_date": "2020-11-15 200050", "status": "created"});
       })
-      createAssignment(id, {name: name});
     } catch (e) {
       showErrorMessage("Error Creating Assignment", e);
     }
