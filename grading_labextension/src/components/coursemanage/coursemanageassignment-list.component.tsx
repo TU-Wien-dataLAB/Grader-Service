@@ -38,7 +38,12 @@ export class CourseManageAssignmentsComponent extends React.Component<Assignment
       let assignname;
       InputDialog.getText({title: 'Input assignment name'}).then(input => {
         assignname = input;
-        createAssignment(id, {"name": assignname.value ,"due_date": "2020-11-15 200050", "status": "created"});
+        createAssignment(id, {"name": assignname.value ,"due_date": "2020-11-15 200050", "status": "created"}).subscribe( 
+          assignment => {
+            console.log(assignment)
+            this.setState({assignment: [...this.state.assignments, assignment]});
+          })
+
       })
     } catch (e) {
       showErrorMessage("Error Creating Assignment", e);
@@ -53,6 +58,8 @@ export class CourseManageAssignmentsComponent extends React.Component<Assignment
   public componentDidMount() {
     this.getAssignments()
   }
+
+  
 
   private getAssignments() {
     getAllAssignments(this.lecture.id).subscribe(assignments => {

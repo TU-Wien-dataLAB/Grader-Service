@@ -44,7 +44,7 @@ export class AssignmentComponent extends React.Component<AssignmentProps> {
   public index: number;
   public iconSize: number = 14;
   public state = {
-    submissionsOpen: true,
+    submissionsOpen: false,
     submissions: new Array<Submission>()
   };
   public dirListingNode: HTMLElement;
