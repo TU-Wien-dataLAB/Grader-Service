@@ -41,7 +41,9 @@ export class CourseManageAssignmentsComponent extends React.Component<Assignment
         createAssignment(id, {"name": assignname.value ,"due_date": "2020-11-15 200050", "status": "created"}).subscribe( 
           assignment => {
             console.log(assignment)
-            this.setState({assignment: [...this.state.assignments, assignment]});
+            this.setState({assignments: [...this.state.assignments, assignment]}, () => {
+              console.log("New State:" + JSON.stringify(this.state.assignments))
+            });
           })
 
       })
