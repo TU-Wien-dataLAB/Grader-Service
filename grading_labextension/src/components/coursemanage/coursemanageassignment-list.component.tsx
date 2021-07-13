@@ -4,7 +4,7 @@ import { Collapse } from '@jupyterlab/ui-components'
 import { Assignment } from '../../model/assignment';
 import { CourseManageAssignmentComponent } from './coursemanageassignment.component';
 import { Button, Icon } from '@blueprintjs/core';
-import { showErrorMessage } from '@jupyterlab/apputils/lib/dialog';
+import { Dialog, showErrorMessage } from '@jupyterlab/apputils/lib/dialog';
 import { InputDialog } from '@jupyterlab/apputils/lib/inputdialog';
 import { Lecture } from '../../model/lecture';
 
@@ -35,16 +35,20 @@ export class CourseManageAssignmentsComponent extends React.Component<Assignment
 
   private async createAssignment(id: number) {
     try {
-      let assignname;
+      let assignname: Dialog.IResult<string>;
       InputDialog.getText({title: 'Input assignment name'}).then(input => {
         assignname = input;
-        createAssignment(id, {"name": assignname.value ,"due_date": "2020-11-15 200050", "status": "created"}).subscribe( 
-          assignment => {
-            console.log(assignment)
-            this.setState({assignments: [...this.state.assignments, assignment]}, () => {
-              console.log("New State:" + JSON.stringify(this.state.assignments))
-            });
-          })
+        //TODO: Implement own InputDialog to set Date correct
+        InputDialog.getDate({title: 'Input Deadline'}).then(date => {
+          createAssignment(id, {"name": assignname.value ,"due_date": date.value, "status": "created"}).subscribe( 
+            assignment => {
+              console.log(assignment)
+              this.setState({assignments: [...this.state.assignments, assignment]}, () => {
+                console.log("New State:" + JSON.stringify(this.state.assignments))
+              });
+            })
+        })
+        
 
       })
     } catch (e) {

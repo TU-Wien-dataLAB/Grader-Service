@@ -30,12 +30,12 @@
   dependencies:
     "regenerator-runtime" "^0.13.4"
 
-"@blueprintjs/core@^3.36.0", "@blueprintjs/core@^3.42.0":
-  "integrity" "sha512-ln+4SNqVUnAGKy8r39l+3u/ycI9YEdPUT7bWUI4lFTyckX+eQzj4Jznqvy8UljXXzJwjCNABFs83OjG70QdAQw=="
-  "resolved" "https://registry.npmjs.org/@blueprintjs/core/-/core-3.42.0.tgz"
-  "version" "3.42.0"
+"@blueprintjs/core@^3.36.0", "@blueprintjs/core@^3.42.0", "@blueprintjs/core@^3.46.0":
+  "integrity" "sha512-kcYrisJMz7jPIuTc9AwFAbHMmmP/BxM2CC3e8vLaLk5h+xtXVzRipx19GA6ysSdguYXOnCPETwM6421QLehCCw=="
+  "resolved" "https://registry.npmjs.org/@blueprintjs/core/-/core-3.46.0.tgz"
+  "version" "3.46.0"
   dependencies:
-    "@blueprintjs/icons" "^3.26.0"
+    "@blueprintjs/icons" "^3.27.0"
     "@types/dom4" "^2.0.1"
     "classnames" "^2.2"
     "dom4" "^2.1.5"
@@ -47,10 +47,21 @@
     "resize-observer-polyfill" "^1.5.1"
     "tslib" "~1.13.0"
 
-"@blueprintjs/icons@^3.26.0":
-  "integrity" "sha512-1+yhYH1Fjj5qGx8drZUL2L1R42MiN0WVHTTKYqGEV9TAzhvFHCSZgALD7WNQa+FEibw/8B4U+79IRgUPJNEjow=="
-  "resolved" "https://registry.npmjs.org/@blueprintjs/icons/-/icons-3.26.0.tgz"
-  "version" "3.26.0"
+"@blueprintjs/datetime@^3.23.5":
+  "integrity" "sha512-akSG8xzF3rk4tuLav5woqMK7hwmINiwRCCzG9hZfUtLLBhhcKXHRPKIore2a83YJSNyjNG4DmRtTgy8W5XnUuQ=="
+  "resolved" "https://registry.npmjs.org/@blueprintjs/datetime/-/datetime-3.23.5.tgz"
+  "version" "3.23.5"
+  dependencies:
+    "@blueprintjs/core" "^3.46.0"
+    "classnames" "^2.2"
+    "react-day-picker" "7.4.9"
+    "react-lifecycles-compat" "^3.0.4"
+    "tslib" "~1.13.0"
+
+"@blueprintjs/icons@^3.26.0", "@blueprintjs/icons@^3.27.0":
+  "integrity" "sha512-ItRioyrr2s70chclj5q38HS9omKOa15b3JZXv9JcMIFz+6w6rAcoAH7DA+5xIs27bFjax/SdAZp/eYXSw0+QpA=="
+  "resolved" "https://registry.npmjs.org/@blueprintjs/icons/-/icons-3.27.0.tgz"
+  "version" "3.27.0"
   dependencies:
     "classnames" "^2.2"
     "tslib" "~1.13.0"
@@ -3378,7 +3389,14 @@
     "minimist" "^1.2.0"
     "strip-json-comments" "~2.0.1"
 
-"react-dom@^17.0.1":
+"react-day-picker@7.4.9":
+  "integrity" "sha512-CcXf0p7p6gTYnG0+n/4wNGljZuQDXl4HhgcxsXB0nX+8D4LnRho9EclPA/aLz4WlvvVpfY+AEgj2ylgPj4nm/g=="
+  "resolved" "https://registry.npmjs.org/react-day-picker/-/react-day-picker-7.4.9.tgz"
+  "version" "7.4.9"
+  dependencies:
+    "prop-types" "^15.6.2"
+
+"react-dom@^15.3.0 || 16 || 17", "react-dom@^17.0.1":
   "integrity" "sha512-s4h96KtLDUQlsENhMn1ar8t2bEa+q/YAtj8pPPdIjPDGBDIVNsrD9aXNWqspUe6AzKCIG0C1HZZLqLV7qpOBGA=="
   "resolved" "https://registry.npmjs.org/react-dom/-/react-dom-17.0.2.tgz"
   "version" "17.0.2"
@@ -3435,7 +3453,7 @@
     "loose-envify" "^1.4.0"
     "prop-types" "^15.6.2"
 
-"react@^17.0.1", "react@^17.0.2":
+"react@^15.3.0 || 16 || 17", "react@^17.0.1", "react@^17.0.2", "react@~0.13.x || ~0.14.x || ^15.0.0 || ^16.0.0 || ^17.0.0":
   "integrity" "sha512-gnhPt75i/dq/z3/6q/0asP78D0u592D5L1pd7M8P+dck6Fu/jJeL6iVVK23fptSUZj8Vjf++7wXA8UNclGQcbA=="
   "resolved" "https://registry.npmjs.org/react/-/react-17.0.2.tgz"
   "version" "17.0.2"

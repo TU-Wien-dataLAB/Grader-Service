@@ -47,6 +47,7 @@
   },
   "dependencies": {
     "@blueprintjs/core": "^3.42.0",
+    "@blueprintjs/datetime": "^3.23.5",
     "@blueprintjs/icons": "^3.26.0",
     "@blueprintjs/table": "^3.8.27",
     "@jupyterlab/application": "^3.0.7",

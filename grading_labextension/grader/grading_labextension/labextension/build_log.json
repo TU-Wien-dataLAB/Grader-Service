@@ -571,6 +571,7 @@
               "singleton": true
             },
             "@blueprintjs/core": {},
+            "@blueprintjs/datetime": {},
             "@blueprintjs/icons": {},
             "@blueprintjs/table": {},
             "@material-ui/core": {},
