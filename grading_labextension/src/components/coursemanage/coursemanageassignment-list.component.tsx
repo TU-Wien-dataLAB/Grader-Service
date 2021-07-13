@@ -36,20 +36,22 @@ export class CourseManageAssignmentsComponent extends React.Component<Assignment
   private async createAssignment(id: number) {
     try {
       let assignname: Dialog.IResult<string>;
-      InputDialog.getText({title: 'Input assignment name'}).then(input => {
+      InputDialog.getText({ title: 'Input assignment name' }).then(input => {
         assignname = input;
         //TODO: Implement own InputDialog to set Date correct
-        InputDialog.getDate({title: 'Input Deadline'}).then(date => {
-          createAssignment(id, {"name": assignname.value ,"due_date": date.value, "status": "created"}).subscribe( 
-            assignment => {
-              console.log(assignment)
-              this.setState({assignments: [...this.state.assignments, assignment]}, () => {
-                console.log("New State:" + JSON.stringify(this.state.assignments))
-              });
-            })
-        })
-        
-
+        if (input.button.accept) {
+          InputDialog.getDate({ title: 'Input Deadline' }).then(date => {
+            if (date.button.accept) {
+              createAssignment(id, { "name": assignname.value, "due_date": date.value, "status": "created" }).subscribe(
+                assignment => {
+                  console.log(assignment)
+                  this.setState({ assignments: [...this.state.assignments, assignment] }, () => {
+                    console.log("New State:" + JSON.stringify(this.state.assignments))
+                  });
+                })
+            }
+          })
+        }
       })
     } catch (e) {
       showErrorMessage("Error Creating Assignment", e);
@@ -59,13 +61,13 @@ export class CourseManageAssignmentsComponent extends React.Component<Assignment
 
   private toggleOpen = () => {
     this.setState({ isOpen: !this.state.isOpen });
-  } 
+  }
 
   public componentDidMount() {
     this.getAssignments()
   }
 
-  
+
 
   private getAssignments() {
     getAllAssignments(this.lecture.id).subscribe(assignments => {
@@ -79,7 +81,7 @@ export class CourseManageAssignmentsComponent extends React.Component<Assignment
   public render() {
     return <div className="CourseManageAssignmentsComponent">
       <div onClick={this.toggleOpen} className="collapse-header">
-      <Icon icon="learning" className="flavor-icon"></Icon>
+        <Icon icon="learning" className="flavor-icon"></Icon>
         <Icon icon="chevron-down" className={`collapse-icon ${this.state.isOpen ? "collapse-icon-open" : ""}`}></Icon>
         {this.title}
 
@@ -91,8 +93,8 @@ export class CourseManageAssignmentsComponent extends React.Component<Assignment
             <CourseManageAssignmentComponent index={index} lectureName={this.title} lecture={this.lecture} assignment={el} />
           )}
         </ul>
-        <div className="assignment-create">       
-         <Button icon="add" outlined onClick={() => this.createAssignment(this.lecture.id)} className="assignment-button">Create new Assignment</Button>
+        <div className="assignment-create">
+          <Button icon="add" outlined onClick={() => this.createAssignment(this.lecture.id)} className="assignment-button">Create new Assignment</Button>
         </div>
       </Collapse>
     </div>;
