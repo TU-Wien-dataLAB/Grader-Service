@@ -4,9 +4,120 @@ import { Collapse } from '@jupyterlab/ui-components'
 import { Assignment } from '../../model/assignment';
 import { CourseManageAssignmentComponent } from './coursemanageassignment.component';
 import { Button, Icon } from '@blueprintjs/core';
-import { Dialog, showErrorMessage } from '@jupyterlab/apputils/lib/dialog';
-import { InputDialog } from '@jupyterlab/apputils/lib/inputdialog';
+import { Dialog, showDialog,showErrorMessage } from '@jupyterlab/apputils/lib/dialog';
+//import { InputDialog } from '@jupyterlab/apputils/lib/inputdialog';
+import { Widget } from '@lumino/widgets';
 import { Lecture } from '../../model/lecture';
+
+const INPUT_DIALOG_CLASS = 'jp-Input-Dialog';
+/**
+ * Namespace for input dialogs
+ */
+export var InputDialog: any;
+(function (InputDialog) {
+    /**
+     * Create and show a input dialog for a text.
+     *
+     * @param options - The dialog setup options.
+     *
+     * @returns A promise that resolves with whether the dialog was accepted
+     */
+    function getText(options: any) {
+        return showDialog(Object.assign(Object.assign({}, options), { body: new InputTextDialog(options), buttons: [
+                Dialog.cancelButton({ label: options.cancelLabel }),
+                Dialog.okButton({ label: options.okLabel })
+            ], focusNodeSelector: 'input' }));
+    }
+    InputDialog.getText = getText;
+
+
+    function getDate(options: any) {
+        return showDialog(Object.assign(Object.assign({}, options), { body: new InputDateDialog(options), buttons: [
+                Dialog.cancelButton({ label: options.cancelLabel }),
+                Dialog.okButton({ label: options.okLabel })
+            ], focusNodeSelector: 'input' }));
+    }
+    InputDialog.getDate = getDate;
+    
+})(InputDialog || (InputDialog = {}));
+/**
+ * Base widget for input dialog body
+ */
+class InputDialogBase extends Widget {
+    /**
+     * InputDialog constructor
+     *
+     * @param label Input field label
+     */
+    constructor(label: string) {
+        super();
+        this.addClass(INPUT_DIALOG_CLASS);
+        if (label !== undefined) {
+            const labelElement = document.createElement('label');
+            labelElement.textContent = label;
+            // Initialize the node
+            this.node.appendChild(labelElement);
+        }
+    }
+}
+
+class InputDateDialog extends InputDialogBase {
+    private _input: any;
+    /**
+     * constructor
+     *
+     * @param options Constructor options
+     */
+    constructor(options: { label: any; text: any; placeholder: any; }) {
+        super(options.label);
+        this._input = document.createElement('input');
+        this._input.classList.add('jp-mod-styled');
+        this._input.type = 'datetime-local';
+        this._input.value = options.text ? options.text : '';
+        if (options.placeholder) {
+            this._input.placeholder = options.placeholder;
+        }
+        // Initialize the node
+        this.node.appendChild(this._input);
+    }
+    /**
+     * Get the text specified by the user
+     */
+    getValue() {
+        return this._input.value;
+    }
+}
+
+/**
+ * Widget body for input text dialog
+ */
+class InputTextDialog extends InputDialogBase {
+    private _input: any;
+    /**
+     * InputTextDialog constructor
+     *
+     * @param options Constructor options
+     */
+    constructor(options: { label: any; text: any; placeholder: any; }) {
+        super(options.label);
+        this._input = document.createElement('input', {});
+        this._input.classList.add('jp-mod-styled');
+        this._input.type = 'text';
+        this._input.value = options.text ? options.text : '';
+        if (options.placeholder) {
+            this._input.placeholder = options.placeholder;
+        }
+        // Initialize the node
+        this.node.appendChild(this._input);
+    }
+    /**
+     * Get the text specified by the user
+     */
+    getValue() {
+        return this._input.value;
+    }
+}
+
 
 export interface AssignmentListProps {
   lecture: Lecture; // assignment id
@@ -37,11 +148,11 @@ export class CourseManageAssignmentsComponent extends React.Component<Assignment
   private async createAssignment(id: number) {
     try {
       let assignname: Dialog.IResult<string>;
-      InputDialog.getText({ title: 'Input assignment name' }).then(input => {
+      InputDialog.getText({ title: 'Input assignment name' }).then((input: Dialog.IResult<string>) => {
         assignname = input;
         //TODO: Implement own InputDialog to set Date correct
         if (input.button.accept) {
-          InputDialog.getText({ title: 'Input Deadline' }).then(date => {
+          InputDialog.getDate({ title: 'Input Deadline' }).then((date: { button: { accept: any; }; value: any; }) => {
             if (date.button.accept) {
               createAssignment(id, { "name": assignname.value, "due_date": date.value, "status": "created" }).subscribe(
                 assignment => {
