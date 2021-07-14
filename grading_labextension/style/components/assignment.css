@@ -8,6 +8,11 @@
   cursor: pointer;
 }
 
+.assignment-dir-listing {
+  margin-bottom: 20px;
+  margin-left: 25px;
+}
+
 .assignment-title,
 .assignment-content,
 .assignment-create {

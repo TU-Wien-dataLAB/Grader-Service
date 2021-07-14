@@ -33,6 +33,7 @@ export class CourseManageAssignmentsComponent extends React.Component<Assignment
 
   }
 
+  
   private async createAssignment(id: number) {
     try {
       let assignname: Dialog.IResult<string>;
@@ -40,7 +41,7 @@ export class CourseManageAssignmentsComponent extends React.Component<Assignment
         assignname = input;
         //TODO: Implement own InputDialog to set Date correct
         if (input.button.accept) {
-          InputDialog.getDate({ title: 'Input Deadline' }).then(date => {
+          InputDialog.getText({ title: 'Input Deadline' }).then(date => {
             if (date.button.accept) {
               createAssignment(id, { "name": assignname.value, "due_date": date.value, "status": "created" }).subscribe(
                 assignment => {
@@ -57,6 +58,7 @@ export class CourseManageAssignmentsComponent extends React.Component<Assignment
       showErrorMessage("Error Creating Assignment", e);
     }
   }
+  
 
 
   private toggleOpen = () => {

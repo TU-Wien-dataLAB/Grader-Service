@@ -76,22 +76,30 @@ export class AssignmentComponent extends React.Component<AssignmentProps> {
   public async componentDidMount() {
     this.getSubmissions();
     let renderer = new ExistingNodeRenderer(this.dirListingNode);
-    let model = new FilterFileBrowserModel({auto: false, manager: GlobalObjects.docManager})
-
-    let path = GlobalObjects.browserFactory.defaultBrowser.model.path;
-    console.log("paths")
-    console.log(path)
-    console.log(model.path)
+    let model = new FilterFileBrowserModel({auto: true, manager: GlobalObjects.docManager});
 
     const LISTING_CLASS = 'jp-FileBrowser-listing';
     this.dirListing = new DirListing({model, renderer})
     this.dirListing.addClass(LISTING_CLASS);
-    let value = await model.cd(this.lecture.name);
-    value = await model.cd(this.assignment.name);
-    console.log(value)
-
-    // let fb = new FileBrowser({id: "fb_1", model, renderer});
-    // let fb: FileBrowser =  GlobalObjects.browserFactory.createFileBrowser("filebrowser_1", {})
+    await model.cd(this.lecture.name);
+    await model.cd(this.assignment.name);
+    console.log("Model path:");
+    console.log(model.path);
+    this.dirListingNode.onclick = async (ev) => {
+      let model = this.dirListing.modelForClick(ev);
+      console.log(model);
+      if (!this.dirListing.isSelected(model.name)) {
+        this.dirListing.selectItemByName(model.name);
+      } else {
+        this.dirListing.clearSelectedItems();
+        this.dirListing.update();
+      }
+    }
+    this.dirListingNode.ondblclick = (ev) => {
+      let model = this.dirListing.modelForClick(ev);
+      console.log(model);
+      this.openFile(model.path);
+    }
   }
 
   private toggleOpen = (collapsable: string) => {
@@ -101,19 +109,6 @@ export class AssignmentComponent extends React.Component<AssignmentProps> {
   }
 
   private async openFile(path: string) {
-    if (this.assignment.status == 'released') { // if not fetched
-      let result = await showDialog({
-        title: "Assignment not fetched yet!",
-        body: "Before working on assignments you need to fetch them! Do you want to fetch the assignment now?",
-        buttons: [Dialog.cancelButton(), Dialog.okButton({ label: "Fetch Now" })]
-      });
-      if (!result.button.accept) {
-        return;
-      } else {
-        await this.fetchAssignment();
-      }
-    }
-
     console.log("Opening file: " + path)
     GlobalObjects.commands.execute('docmanager:open', {
       path: path,
@@ -183,7 +178,7 @@ export class AssignmentComponent extends React.Component<AssignmentProps> {
           <Icon icon={IconNames.FOLDER_CLOSE} iconSize={this.iconSize} className="flavor-icon"></Icon>
           Exercises and Files
         </div>
-        <div ref={_element => this.dirListingNode = _element}></div>
+        <div className="assignment-dir-listing" ref={_element => this.dirListingNode = _element}></div>
 
         <div onClick={() => this.toggleOpen("submissions")} className="assignment-title">
           <Icon icon={IconNames.CHEVRON_RIGHT} iconSize={this.iconSize}
