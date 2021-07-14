@@ -73,6 +73,7 @@ export class AssignmentComponent extends React.Component<AssignmentProps> {
   }
 
   public async componentDidMount() {
+    console.log("Assignments didMount 1")
     this.getSubmissions();
     let renderer = new ExistingNodeRenderer(this.dirListingNode);
     let model = new FilterFileBrowserModel({auto: true, manager: GlobalObjects.docManager});
@@ -86,7 +87,10 @@ export class AssignmentComponent extends React.Component<AssignmentProps> {
     console.log(model.path);
     this.dirListingNode.onclick = async (ev) => {
       let model = this.dirListing.modelForClick(ev);
-      console.log(model);
+      if (model == undefined) {
+        this.dirListing.handleEvent(ev);
+        return;
+      }
       if (!this.dirListing.isSelected(model.name)) {
         this.dirListing.selectItemByName(model.name);
       } else {
@@ -96,7 +100,6 @@ export class AssignmentComponent extends React.Component<AssignmentProps> {
     }
     this.dirListingNode.ondblclick = (ev) => {
       let model = this.dirListing.modelForClick(ev);
-      console.log(model);
       this.openFile(model.path);
     }
   }
