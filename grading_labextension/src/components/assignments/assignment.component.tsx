@@ -72,7 +72,6 @@ export class AssignmentComponent extends React.Component<AssignmentProps> {
     this.getSubmissions = this.getSubmissions.bind(this);
   }
 
-  // FIXME: display a directory
   public async componentDidMount() {
     this.getSubmissions();
     let renderer = new ExistingNodeRenderer(this.dirListingNode);
