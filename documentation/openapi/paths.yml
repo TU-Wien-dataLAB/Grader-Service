@@ -1143,3 +1143,44 @@ score:
           application/json:
             schema:
               $ref: "./schemas.yml#/components/schemas/ErrorMessage"
+
+
+permissions:
+  get:
+    security:
+      - hub_auth:
+        - instructor
+        - tutor
+        - student
+    summary: Return the scopes of the authenticated user
+    tags:
+    - Permissions
+    responses:
+      200:
+        description: Returns the lecture-permission map
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                type: object
+                properties:
+                  lecture_code:
+                    type: string
+                  scope:
+                    type: int64
+            example:
+              [{"lecture_code": "iv21s", "scope": 1}, {"lecture_code": "ab21s", "scope": 0}]
+      403:
+        description: Unautorized
+        content: 
+          application/json:
+            schema:
+              $ref: "./schemas.yml#/components/schemas/ErrorMessage"
+      500:
+        description: Internal server error
+        content: 
+          application/json:
+            schema:
+              $ref: "./schemas.yml#/components/schemas/ErrorMessage"
+

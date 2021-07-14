@@ -17,8 +17,8 @@ import { GradingView } from './widgets/grading';
 import { DocumentRegistry } from '@jupyterlab/docregistry';
 import { ServiceManager } from '@jupyterlab/services';
 import { IDocumentManager } from '@jupyterlab/docmanager';
+import { IFileBrowserFactory } from '@jupyterlab/filebrowser';
 
-// import { requestAPI } from './handler';
 
 namespace AssignmentsCommandIDs {
   export const create = 'assignments:create';
@@ -43,6 +43,7 @@ export class GlobalObjects {
   static docRegistry: DocumentRegistry;
   static serviceManager: ServiceManager;
   static docManager: IDocumentManager;
+  static browserFactory: IFileBrowserFactory
 }
 
 
@@ -52,8 +53,8 @@ export class GlobalObjects {
 const extension: JupyterFrontEndPlugin<void> = {
   id: 'coursemanage:plugin',
   autoStart: true,
-  requires: [ICommandPalette, ILauncher, INotebookTools, IDocumentManager],
-  activate: (app: JupyterFrontEnd, palette: ICommandPalette, launcher: ILauncher, nbtools: INotebookTools, docManager: IDocumentManager) => {
+  requires: [ICommandPalette, ILauncher, INotebookTools, IDocumentManager, IFileBrowserFactory],
+  activate: (app: JupyterFrontEnd, palette: ICommandPalette, launcher: ILauncher, nbtools: INotebookTools, docManager: IDocumentManager, browserFactory: IFileBrowserFactory,) => {
     console.log('JupyterLab extension grading is activated!');
     console.log('JupyterFrontEnd:', app)
     console.log('ICommandPalette:', palette);
@@ -61,8 +62,9 @@ const extension: JupyterFrontEndPlugin<void> = {
     GlobalObjects.commands = app.commands;
     GlobalObjects.docRegistry = app.docRegistry;
     GlobalObjects.serviceManager = app.serviceManager;
-    GlobalObjects.docManager = docManager;
-
+    GlobalObjects.docManager = docManager;  
+    GlobalObjects.browserFactory = browserFactory;
+    
     /* ##### Course Manage View Widget ##### */
     let command: string = CourseManageCommandIDs.create;
 

@@ -25,6 +25,8 @@ tags:
   description: View submissions of an assignment
 - name: "Grading"
   description: Manage the grading and feedback of assignments (Instructor)
+- name: "Permissions"
+  description: Endpoint for security scopes of user
 
 # TODO: handle "sub-assignments"
 paths:
@@ -60,5 +62,8 @@ paths:
 
   /lectures/{lect_id}/assignments/{a_id}/grading/{user_id}/score:
     $ref: './openapi/paths.yml#/score'
+  
+  /permissions:
+    $ref: './openapi/paths.yml#/permissions'
 
 

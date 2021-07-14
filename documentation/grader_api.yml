@@ -60,6 +60,9 @@ paths:
 
   /lectures/{lect_id}/assignments/{a_id}/grading/{user_id}/score:
     $ref: './openapi/paths.yml#/score'
+  
+  /permissions:
+    $ref: './openapi/paths.yml#/permissions'
 
 
 

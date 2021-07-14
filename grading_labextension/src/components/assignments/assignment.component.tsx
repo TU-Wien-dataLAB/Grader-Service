@@ -10,7 +10,7 @@ import { Submission } from '../../model/submission';
 import { getSubmissions, submitAssignment } from '../../services/submissions.service'
 import { fetchAssignment } from '../../services/assignments.service'
 import { Lecture } from '../../model/lecture';
-import { DirListing } from '@jupyterlab/filebrowser/lib/listing'
+import { DirListing } from '@jupyterlab/filebrowser/lib/listing';
 import { FilterFileBrowserModel } from '@jupyterlab/filebrowser/lib/model';
 
 export interface AssignmentProps {
@@ -28,13 +28,24 @@ class ExistingNodeRenderer extends DirListing.Renderer {
     this.node = node
   }
   
-  /**
-     * Return the existing node for the dir listing.
-     */
    createNode(): HTMLElement {
+    const CONTENT_CLASS = 'jp-DirListing-content';
+    const HEADER_CLASS = 'jp-DirListing-header';
+
+    const header = document.createElement('div');
+    const content = document.createElement('ul');
+    content.className = CONTENT_CLASS;
+    header.className = HEADER_CLASS;
+
+    this.node.innerHTML = ""
+    this.node.appendChild(header);
+    this.node.appendChild(content);
+    this.node.tabIndex = 0;
+
     return this.node;
   }
 }
+
 
 export class AssignmentComponent extends React.Component<AssignmentProps> {
   public assignment: Assignment;
@@ -63,34 +74,25 @@ export class AssignmentComponent extends React.Component<AssignmentProps> {
   }
 
   // FIXME: display a directory
-  public componentDidMount() {
+  public async componentDidMount() {
     this.getSubmissions();
     let renderer = new ExistingNodeRenderer(this.dirListingNode);
-    const CONTENT_CLASS = 'jp-DirListing-content';
-    const HEADER_CLASS = 'jp-DirListing-header';
-    const LISTING_CLASS = 'jp-FileBrowser-listing';
-
-    const header = document.createElement('div');
-    const content = document.createElement('ul');
-    content.className = CONTENT_CLASS;
-    header.className = HEADER_CLASS;
-
-    this.dirListingNode.innerHTML = ""
-    this.dirListingNode.appendChild(header);
-    this.dirListingNode.appendChild(content);
-    this.dirListingNode.tabIndex = 0;
-
-    console.log("Global DocManger 3:")
-    console.log(GlobalObjects.docManager)
     let model = new FilterFileBrowserModel({auto: false, manager: GlobalObjects.docManager})
 
-    let path = GlobalObjects.docManager.services.contents.resolvePath(model.path, "~");
-    let localPath = GlobalObjects.docManager.services.contents.localPath(".");
+    let path = GlobalObjects.browserFactory.defaultBrowser.model.path;
+    console.log("paths")
     console.log(path)
-    console.log(localPath)
+    console.log(model.path)
 
+    const LISTING_CLASS = 'jp-FileBrowser-listing';
     this.dirListing = new DirListing({model, renderer})
     this.dirListing.addClass(LISTING_CLASS);
+    let value = await model.cd(this.lecture.name);
+    value = await model.cd(this.assignment.name);
+    console.log(value)
+
+    // let fb = new FileBrowser({id: "fb_1", model, renderer});
+    // let fb: FileBrowser =  GlobalObjects.browserFactory.createFileBrowser("filebrowser_1", {})
   }
 
   private toggleOpen = (collapsable: string) => {
