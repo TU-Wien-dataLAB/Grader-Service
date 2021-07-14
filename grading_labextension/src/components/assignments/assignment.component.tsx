@@ -10,7 +10,7 @@ import { Submission } from '../../model/submission';
 import { getSubmissions, submitAssignment } from '../../services/submissions.service'
 import { fetchAssignment } from '../../services/assignments.service'
 import { Lecture } from '../../model/lecture';
-import { DirListing } from '@jupyterlab/filebrowser/lib/listing';
+import { DirListing } from '@jupyterlab/filebrowser/lib/listing'
 import { FilterFileBrowserModel } from '@jupyterlab/filebrowser/lib/model';
 
 export interface AssignmentProps {
@@ -53,8 +53,7 @@ export class AssignmentComponent extends React.Component<AssignmentProps> {
   public index: number;
   public iconSize: number = 14;
   public state = {
-    filesOpen: false,
-    submissionsOpen: true,
+    submissionsOpen: false,
     submissions: new Array<Submission>()
   };
   public dirListingNode: HTMLElement;
@@ -96,9 +95,7 @@ export class AssignmentComponent extends React.Component<AssignmentProps> {
   }
 
   private toggleOpen = (collapsable: string) => {
-    if (collapsable == "files") {
-      this.setState({ filesOpen: !this.state.filesOpen });
-    } else if (collapsable == "submissions") {
+    if (collapsable == "submissions") {
       this.setState({ submissionsOpen: !this.state.submissionsOpen })
     }
   }
@@ -169,7 +166,6 @@ export class AssignmentComponent extends React.Component<AssignmentProps> {
   }
 
   public render() {
-    // TODO: show due date of assignment
     return <li key={this.index}>
       <div className="assignment">
         <div className="assignment-header">
@@ -183,9 +179,7 @@ export class AssignmentComponent extends React.Component<AssignmentProps> {
           </span>
 
         </div>
-        <div onClick={() => this.toggleOpen("files")} className="assignment-title">
-          <Icon icon={IconNames.CHEVRON_RIGHT} iconSize={this.iconSize}
-            className={`collapse-icon-small ${this.state.filesOpen ? "collapse-icon-small-open" : ""}`}></Icon>
+        <div className="assignment-title">
           <Icon icon={IconNames.FOLDER_CLOSE} iconSize={this.iconSize} className="flavor-icon"></Icon>
           Exercises and Files
         </div>

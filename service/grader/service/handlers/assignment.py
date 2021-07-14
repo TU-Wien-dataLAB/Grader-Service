@@ -47,44 +47,13 @@ class AssignmentBaseHandler(GraderBaseHandler):
         assignment_model = AssignmentModel.from_dict(body)
         assignment = Assignment()
 
-        if len(
-            set(
-                [e.path for e in assignment_model.exercises]
-                + [f.path for f in assignment_model.files]
-            )
-        ) != len(assignment_model.exercises + assignment_model.files):
-            self.error_message = "Some files share the same name"
-            raise HTTPError(400)
-
         assignment.name = assignment_model.name
         assignment.lectid = lecture_id
         assignment.duedate = assignment_model.due_date
         assignment.status = assignment_model.status
-        assignment.points = sum([ex.points for ex in assignment_model.exercises])
+        assignment.points = 0
         assignment.deleted = DeleteState.active
         self.session.add(assignment)
-        self.session.commit()
-
-        ex: Exercise
-        for ex in assignment_model.exercises:
-            file = File()
-            file.assignid = assignment.id
-            file.exercise = True
-            file.name = ex.name
-            file.path = ex.path
-            file.points = ex.points
-            self.session.add(file)
-
-        f: AssignmentFile
-        for f in assignment_model.files:
-            file = File()
-            file.assignid = assignment.id
-            file.exercise = False
-            file.name = f.name
-            file.path = f.path
-            file.points = None
-            self.session.add(file)
-
         self.session.commit()
         self.write_json(assignment)
 

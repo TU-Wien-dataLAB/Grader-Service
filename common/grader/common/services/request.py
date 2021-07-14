@@ -1,4 +1,4 @@
-import logging
+import logging,json
 from tornado.httpclient import AsyncHTTPClient, HTTPResponse
 from traitlets.config.configurable import LoggingConfigurable
 from typing import Dict, Union
@@ -19,7 +19,10 @@ class RequestService(LoggingConfigurable):
 
     async def request(self, method: str, endpoint: str, body: dict=None, header: Dict[str, str]=None) -> Union[dict, list]:
         logging.getLogger().critical(self.url + endpoint)
-        response: HTTPResponse = await self.http_client.fetch(self.url+endpoint, method=method, headers=header, body=body)
+        if body:
+            response: HTTPResponse = await self.http_client.fetch(self.url+endpoint, method=method, headers=header, body=json.dumps(body))
+        else:
+            response: HTTPResponse = await self.http_client.fetch(self.url+endpoint, method=method, headers=header, body=body)
         return json_decode(response.body)
     
     @validate("scheme")

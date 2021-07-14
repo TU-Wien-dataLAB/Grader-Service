@@ -47,6 +47,7 @@
   },
   "dependencies": {
     "@blueprintjs/core": "^3.42.0",
+    "@blueprintjs/datetime": "^3.23.5",
     "@blueprintjs/icons": "^3.26.0",
     "@blueprintjs/table": "^3.8.27",
     "@jupyterlab/application": "^3.0.7",
@@ -63,6 +64,7 @@
   },
   "devDependencies": {
     "@jupyterlab/builder": "^3.0.0",
+    "@types/node": "^15.12.5",
     "@typescript-eslint/eslint-plugin": "^4.8.1",
     "@typescript-eslint/parser": "^4.8.1",
     "eslint": "^7.14.0",
