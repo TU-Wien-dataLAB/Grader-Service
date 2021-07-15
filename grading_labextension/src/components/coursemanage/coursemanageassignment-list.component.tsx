@@ -130,7 +130,7 @@ export class CourseManageAssignmentsComponent extends React.Component<Assignment
   public title: string;
   public state = {
     isOpen: true,
-    assignments: new Array<Assignment>()
+    assignments: new Array<Assignment>()  
   };
 
   constructor(props: AssignmentListProps) {
@@ -203,7 +203,7 @@ export class CourseManageAssignmentsComponent extends React.Component<Assignment
       <Collapse isOpen={this.state.isOpen} className="collapse-body" keepChildrenMounted={true}>
         <ul>
           {this.state.assignments.map((el, index) =>
-            <CourseManageAssignmentComponent index={index} lectureName={this.title} lecture={this.lecture} assignment={el} />
+            <CourseManageAssignmentComponent index={index} lectureName={this.title} lecture={this.lecture} assignment={el} assignments={this.state.assignments}/>
           )}
         </ul>
         <div className="assignment-create">
