@@ -3,6 +3,7 @@ import { AssignmentsComponent } from './assignment-list.component';
 import { Lecture } from '../../model/lecture';
 import { getAllLectures } from '../../services/lectures.service'
 import { showErrorMessage } from '@jupyterlab/apputils'
+import { UserPermissions } from '../../services/permission.service'
 
 export interface CoursesProps {
   // lectures: Array<Lecture>;
@@ -19,10 +20,13 @@ export class CoursesComponent extends React.Component<CoursesProps> {
     // this.state = {"lectures": props.lectures};
   }
 
-  public componentDidMount() {
+  public async componentDidMount() {
     getAllLectures().subscribe(
       lectures => this.setState(this.state.lectures = lectures),
       error => showErrorMessage("Error Fetching Lectures", error))
+    await UserPermissions.loadPermissions();
+    console.log("User permissions:");
+    console.log(UserPermissions.getPermissions());
   }
 
   public render() {
