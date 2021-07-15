@@ -34,6 +34,8 @@ def authorize(scopes: List[Scope]):
         @functools.wraps(handler_method)
         async def request_handler_wrapper(self: 'GraderBaseHandler', *args, **kwargs):
             lect_id = self.path_kwargs.get("lecture_id", None)
+            if self.request.path == "/services/grader/permissions":
+                return await handler_method(self, *args, **kwargs)
             if lect_id is None and self.request.path == "/services/grader/lectures" and self.request.method == "POST":
                 # lecture name and semester is in post body
                 try:

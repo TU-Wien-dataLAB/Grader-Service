@@ -1,2 +1,2 @@
 # import handlers
-from . import assignment, grading, lectures, submissions, git
+from . import assignment, grading, lectures, submissions, git, permission

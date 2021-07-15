@@ -82,8 +82,6 @@ export class AssignmentComponent extends React.Component<AssignmentProps> {
     this.dirListing.addClass(LISTING_CLASS);
     await model.cd(this.lecture.name);
     await model.cd(this.assignment.name);
-    console.log("Model path:");
-    console.log(model.path);
     this.dirListingNode.onclick = async (ev) => {
       let model = this.dirListing.modelForClick(ev);
       if (model == undefined) {
