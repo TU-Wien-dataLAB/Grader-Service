@@ -22,7 +22,7 @@ class PullHandler(ExtensionBaseHandler):
         if repo not in {"user", "group", "source", "release"}:
             self.write_error(404)
         
-        git_service = GitService(lecture_code=lecture["code"], assignment_name=assignment["name"], config=self.config)
+        git_service = GitService(lecture_code=lecture["code"], assignment_name=assignment["name"],repo_type=repo, config=self.config)
         if not git_service.is_git():
             git_service.init()
             git_service.set_remote("grader")
@@ -51,9 +51,9 @@ class PushHandler(ExtensionBaseHandler):
         )
 
         if repo not in {"user", "group", "source", "release"}:
-            self.write_error(404)
+            self.write_error(401)
         
-        git_service = GitService(lecture_code=lecture["code"], assignment_name=assignment["name"], config=self.config)
+        git_service = GitService(lecture_code=lecture["code"], assignment_name=assignment["name"], repo_type=repo, config=self.config)
         if not git_service.is_git():
             git_service.init()
             git_service.set_remote("grader")

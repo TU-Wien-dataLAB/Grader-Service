@@ -80,7 +80,7 @@ export class AssignmentComponent extends React.Component<AssignmentProps> {
     const LISTING_CLASS = 'jp-FileBrowser-listing';
     this.dirListing = new DirListing({model, renderer})
     this.dirListing.addClass(LISTING_CLASS);
-    await model.cd(this.lecture.name);
+    await model.cd(this.lecture.code);
     await model.cd(this.assignment.name);
     this.dirListingNode.onclick = async (ev) => {
       let model = this.dirListing.modelForClick(ev);
