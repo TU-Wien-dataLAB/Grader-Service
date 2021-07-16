@@ -37,7 +37,7 @@ export class AssignmentsComponent extends React.Component<AssignmentListProps> {
   }
 
   public render() {
-    return <div className="AssignmentsComponent">
+    return <div>
       <div onClick={this.toggleOpen} className="collapse-header">
         <Icon icon={IconNames.LEARNING} className="flavor-icon"></Icon>
         {this.lecture.name} 
@@ -48,6 +48,7 @@ export class AssignmentsComponent extends React.Component<AssignmentListProps> {
           {this.state.assignments.map((el, index) =>
             <AssignmentComponent index={index} lecture={this.lecture} assignment={el} />
             )}
+
         </ul>
       </Collapse>
     </div>;

@@ -1,4 +1,6 @@
-
+.assignment {
+  margin-top: 25px;
+}
 .assignment-header {
   margin-top: 12pt;
   margin-bottom: 8pt;
@@ -21,6 +23,10 @@
 
 .assignment-content {
   padding-bottom: 10pt;
+}
+
+.assignment-list {
+  margin: 25px
 }
 
 .assignment-header:hover .flavor-icon {
@@ -72,7 +78,8 @@
 }
 
 .button-list {
-  margin-left: 10%;
+  float: right;
+  margin-right: 10%;
 }
 .add-buttons {
   margin-top: 4pt;
@@ -95,3 +102,9 @@
   width: 9pt;
   height: 9pt;
 }
+
+.sub-button {
+  font-size: 9pt;
+}
+
+

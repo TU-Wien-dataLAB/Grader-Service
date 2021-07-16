@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { Assignment } from '../../model/assignment';
 
-import { Icon, Collapse, Button, Intent } from "@blueprintjs/core";
+import { Icon, Collapse, Button, Intent, Tag } from "@blueprintjs/core";
 import { IconNames } from "@blueprintjs/icons";
 
 import { GlobalObjects } from '../../index';
@@ -170,6 +170,7 @@ export class AssignmentComponent extends React.Component<AssignmentProps> {
 
           <Icon icon={IconNames.INBOX} iconSize={this.iconSize} className="flavor-icon"></Icon>
           {this.assignment.name}
+          { this.assignment.status != "released" ? <Tag icon="warning-sign" intent="danger" style={{marginLeft: "10px"}} >Not released for students</Tag> : <p/>}
           <span className="button-list">
             <Button className="assignment-button" onClick={this.fetchAssignment} icon={IconNames.CLOUD_DOWNLOAD} disabled={this.assignment.status != "released"} outlined intent={Intent.PRIMARY}>Fetch</Button>
             <Button className="assignment-button" onClick={this.submitAssignment} icon={IconNames.SEND_MESSAGE} disabled={this.assignment.status != "fetched"} outlined intent={Intent.SUCCESS}>Submit</Button>
