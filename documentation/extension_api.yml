@@ -27,6 +27,8 @@ tags:
   description: Manage the grading and feedback of assignments (Instructor)
 - name: "Permissions"
   description: Endpoint for security scopes of user
+- name: "Version Control"
+  description: Pulling and pushing assignments
 
 # TODO: handle "sub-assignments"
 paths:
@@ -65,5 +67,13 @@ paths:
   
   /permissions:
     $ref: './openapi/paths.yml#/permissions'
+  
+  /lectures/{lect_id}/assignments/{a_id}/pull/{repo}:
+    $ref: './openapi/paths.yml#/versionControlPull'
+  
+  /lectures/{lect_id}/assignments/{a_id}/push/{repo}:
+    $ref: './openapi/paths.yml#/versionControlPush'
+
+
 
 

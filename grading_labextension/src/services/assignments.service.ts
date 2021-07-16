@@ -30,3 +30,11 @@ export function fetchAssignment(lectureId: number, assignmentId: number, instruc
 export function deleteAssignment(lectureId: number, assignmentId: number): void {
   request<void>(HTTPMethod.DELETE, `/lectures/${lectureId}/assignments/${assignmentId}`)
 }
+
+export function pushAssignment(lectureId: number, assignmentId: number, repoType: string): void {
+  request<void>(HTTPMethod.PUT, `/lectures/${lectureId}/assignments/${assignmentId}/push/${repoType}`)
+}
+
+export function pullAssignment(lectureId: number, assignmentId: number, repoType: string): void {
+  request<void>(HTTPMethod.GET, `/lectures/${lectureId}/assignments/${assignmentId}/pull/${repoType}`)
+}

@@ -7,7 +7,7 @@ import { Lecture } from '../../model/lecture';
 import { Submission } from '../../model/submission';
 import { User } from '../../model/user';
 import { getAllSubmissions } from '../../services/submissions.service';
-import { deleteAssignment } from '../../services/assignments.service';
+import { deleteAssignment, pullAssignment, pushAssignment } from '../../services/assignments.service';
 
 
 export interface AssignmentProps {
@@ -84,7 +84,10 @@ export class CourseManageAssignmentComponent extends React.Component<AssignmentP
     });
     if (!result.button.accept) return;
 
-    // TODO: push assignment
+    pushAssignment(this.lecture.id, this.assignment.id, "source");
+
+    // TODO: remove push to release, only for test purposes before nbconvert works
+    pushAssignment(this.lecture.id, this.assignment.id, "release");
 
   }
 
@@ -96,7 +99,7 @@ export class CourseManageAssignmentComponent extends React.Component<AssignmentP
     });
     if (!result.button.accept) return;
 
-    // TODO: pull assignment
+    pullAssignment(this.lecture.id, this.assignment.id, "source");
   }
 
   private async releaseAssignment() {
