@@ -7,7 +7,23 @@ from jupyter_server.serverapp import ServerApp
 
 from ._version import __version__
 
-HERE = Path(__file__).parent.resolve()
+import sys
+import importlib
+from jupyterlab import federated_labextensions
+from jupyterlab.labextensions import LabExtensionApp
+
+HERE = Path(__file__).parent
+ROOT = HERE.parent
+NODE_MODULES = ROOT / "node_modules"
+BUILDER = NODE_MODULES / "@jupyterlab" / "builder" / "lib" / "build-labextension.js"
+
+
+def _get_labextension_metadata(module):
+    m = importlib.import_module(module)
+    return m, m._jupyter_labextension_paths()
+
+
+federated_labextensions._get_labextension_metadata = _get_labextension_metadata
 
 with (HERE / "labextension" / "package.json").open() as fid:
     data = json.load(fid)
@@ -51,4 +67,10 @@ def _load_jupyter_server_extension(server_app: ServerApp):
     """
     setup_handlers(server_app.web_app)
     server_app.log.info("Registered grading extension at URL path /grading_labextension")
+
+
+main = LabExtensionApp.launch_instance
+
+if __name__ == "__main__":
+    sys.exit(main())
 
