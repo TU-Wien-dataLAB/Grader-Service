@@ -192,7 +192,7 @@ export class CourseManageAssignmentsComponent extends React.Component<Assignment
 
 
   public render() {
-    return <div className="CourseManageAssignmentsComponent">
+    return <div className="assignment-list">
       <div onClick={this.toggleOpen} className="collapse-header">
         <Icon icon="learning" className="flavor-icon"></Icon>
         <Icon icon="chevron-down" className={`collapse-icon ${this.state.isOpen ? "collapse-icon-open" : ""}`}></Icon>
