@@ -1,11 +1,10 @@
-from grader.service.orm.assignment import Assignment
-from grader.service.orm.group import Group
-from grader.grading_labextension.handlers import assignment
-from grader.service.orm.takepart import Role, Scope
+from orm.assignment import Assignment
+from orm.group import Group
+from orm.takepart import Role
 import pytest
 from unittest.mock import Mock
-from grader.service.handlers.git.server import GitBaseHandler
-from grader.service.orm.lecture import Lecture
+from handlers.git.server import GitBaseHandler
+from orm.lecture import Lecture
 from tornado.web import HTTPError
 from .db_util import *
 import os

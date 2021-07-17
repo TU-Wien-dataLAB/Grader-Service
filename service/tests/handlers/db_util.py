@@ -7,7 +7,7 @@ from sqlalchemy.orm import Session
 from alembic.config import Config
 from alembic.command import downgrade, upgrade, autogen
 from unittest.mock import MagicMock
-from grader.service.persistence.database import DataBaseManager
+from persistence.database import DataBaseManager
 
 
 

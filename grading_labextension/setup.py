@@ -16,8 +16,7 @@ import setuptools
 HERE = Path(__file__).parent.resolve()
 
 # The name of the project
-# base_name = "grading_labextension"
-name = "grader." + "grading_labextension"
+name = "grading_labextension"
 
 lab_path = (HERE / name / "labextension")
 
@@ -71,7 +70,7 @@ setup_args = dict(
     long_description=long_description,
     long_description_content_type="text/markdown",
     cmdclass=cmdclass,
-    packages=setuptools.find_namespace_packages(include=['grader.*']),
+    packages=setuptools.find_packages(),
     install_requires=[
         "jupyterlab~=3.0",
     ],

@@ -7,9 +7,9 @@
     "jupyterlab",
     "jupyterlab-extension"
   ],
-  "homepage": "https://github.com/github_username/grader.grading_labextension",
+  "homepage": "https://github.com/github_username/grading_labextension",
   "bugs": {
-    "url": "https://github.com/github_username/grader.grading_labextension/issues"
+    "url": "https://github.com/github_username/grading_labextension/issues"
   },
   "license": "BSD-3-Clause",
   "author": {
@@ -25,17 +25,17 @@
   "style": "style/index.css",
   "repository": {
     "type": "git",
-    "url": "https://github.com/github_username/grader.grading_labextension.git"
+    "url": "https://github.com/github_username/grading_labextension.git"
   },
   "scripts": {
     "build": "jlpm run build:lib && jlpm run build:labextension:dev",
     "build:prod": "jlpm run build:lib && jlpm run build:labextension",
     "build:labextension": "jupyter labextension build .",
     "build:labextension:dev": "jupyter labextension build --development True .",
-    "build:lib": "tsc --listEmittedFiles",
+    "build:lib": "tsc",
     "clean": "jlpm run clean:lib",
     "clean:lib": "rimraf lib tsconfig.tsbuildinfo",
-    "clean:labextension": "rimraf grader.grading_labextension/labextension",
+    "clean:labextension": "rimraf grading_labextension/labextension",
     "clean:all": "jlpm run clean:lib && jlpm run clean:labextension",
     "eslint": "eslint . --ext .ts,.tsx --fix",
     "eslint:check": "eslint . --ext .ts,.tsx",
@@ -88,11 +88,11 @@
           "pip"
         ],
         "base": {
-          "name": "grader.grading_labextension"
+          "name": "grading_labextension"
         }
       }
     },
     "extension": true,
-    "outputDir": "grader.grading_labextension/labextension"
+    "outputDir": "grading_labextension/labextension"
   }
 }

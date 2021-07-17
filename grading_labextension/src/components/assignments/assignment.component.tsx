@@ -73,6 +73,7 @@ export class AssignmentComponent extends React.Component<AssignmentProps> {
   }
 
   public async componentDidMount() {
+    console.log("componentDidMount")
     this.getSubmissions();
     let renderer = new ExistingNodeRenderer(this.dirListingNode);
     let model = new FilterFileBrowserModel({auto: true, manager: GlobalObjects.docManager});

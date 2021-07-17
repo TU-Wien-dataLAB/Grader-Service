@@ -1,9 +1,9 @@
 import json
-from grader.service.handlers.base_handler import GraderBaseHandler
-from grader.service.orm.assignment import Assignment
+from handlers.base_handler import GraderBaseHandler
+from orm.assignment import Assignment
 from datetime import datetime
-from grader.common.models.error_message import ErrorMessage
-from grader.service.orm.lecture import Lecture
+from models.error_message import ErrorMessage
+from orm.lecture import Lecture
 from .db_util import *
 from unittest.mock import AsyncMock, MagicMock, Mock
 import asyncio
