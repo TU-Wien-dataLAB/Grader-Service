@@ -80,6 +80,7 @@
 .button-list {
   float: right;
   margin-right: 10%;
+  width: 500px;
 }
 .add-buttons {
   margin-top: 4pt;

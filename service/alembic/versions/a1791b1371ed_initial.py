@@ -38,14 +38,14 @@ def upgrade():
     sa.Column('name', sa.String(length=255), nullable=False),
     sa.Column('type', sa.Enum("user", "group"), nullable=False, default="user"),
     sa.Column('lectid', sa.Integer(), nullable=True),
-    sa.Column('duedate', sa.DateTime(), nullable=False),
+    sa.Column('duedate', sa.DateTime(), nullable=True),
     sa.Column('points', sa.Integer(), nullable=False),
     sa.Column('status', sa.Enum('created', 'released', 'fetching', 'fetched', 'complete'), nullable=True),
     sa.Column('deleted', sa.Enum('active', 'deleted'), server_default='active', nullable=False),
 
     sa.ForeignKeyConstraint(['lectid'], ['lecture.id'], ),
     sa.PrimaryKeyConstraint('id'),
-    UniqueConstraint('name', 'lectid', name='u_name_in_lect')
+    UniqueConstraint('name', 'lectid', 'deleted', name='u_name_in_lect')
     )
     op.create_table('takepart',
     sa.Column('username', sa.String(length=255), nullable=False),
