@@ -2,8 +2,8 @@ from typing import Union
 from .base import Base, Serializable
 from sqlalchemy import Column, Integer, String, ForeignKey, DateTime, Enum, Boolean
 from sqlalchemy.orm import relationship
-from models.exercise import Exercise
-from models.assignment_file import AssignmentFile
+from api.models.exercise import Exercise
+from api.models.assignment_file import AssignmentFile
 
 
 class File(Base, Serializable):

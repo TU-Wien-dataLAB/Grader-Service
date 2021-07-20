@@ -1,0 +1,14 @@
+api/models/assignment.py
+api/models/assignment_file.py
+api/models/base_model_.py
+api/models/error_message.py
+api/models/exercise.py
+api/models/feedback.py
+api/models/grading_result.py
+api/models/lecture.py
+api/models/manual_grading_content.py
+api/models/manual_grading_content_feedback_cells.py
+api/models/submission.py
+api/models/user.py
+api/typing_utils.py
+api/util.py

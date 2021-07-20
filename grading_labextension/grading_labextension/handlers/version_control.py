@@ -1,3 +1,4 @@
+import logging
 from grading_labextension.registry import register_handler
 from grading_labextension.handlers.base_handler import ExtensionBaseHandler
 from grading_labextension.services.git import GitError, GitService
@@ -22,12 +23,12 @@ class PullHandler(ExtensionBaseHandler):
         if repo not in {"user", "group", "source", "release"}:
             self.write_error(404)
         
-        git_service = GitService(lecture_code=lecture["code"], assignment_name=assignment["name"],repo_type=repo, config=self.config)
+        git_service = GitService(lecture_code=lecture["code"], assignment_name=assignment["name"], repo_type=repo, config=self.config)
         if not git_service.is_git():
             git_service.init()
             git_service.set_remote("grader")
         try:
-            git_service.pull(force=True)
+            git_service.pull("grader", force=True)
             self.write("OK")
         except GitError:
             self.write_error(400)
@@ -53,12 +54,13 @@ class PushHandler(ExtensionBaseHandler):
         if repo not in {"user", "group", "source", "release"}:
             self.write_error(401)
         
+        logging.getLogger("PullHandler").critical(str(self.config))
         git_service = GitService(lecture_code=lecture["code"], assignment_name=assignment["name"], repo_type=repo, config=self.config)
         if not git_service.is_git():
             git_service.init()
             git_service.set_remote("grader")
         try:
-            git_service.push(force=True)
+            git_service.push("grader", force=True)
             self.write("OK")
         except GitError:
             self.write_error(400)

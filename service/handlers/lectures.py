@@ -1,4 +1,4 @@
-from models.error_message import ErrorMessage
+from api.models.error_message import ErrorMessage
 from registry import register_handler
 from orm.lecture import Lecture, LectureState
 from orm.user import User
@@ -8,7 +8,7 @@ from handlers.base_handler import GraderBaseHandler, authorize
 from jupyter_server.utils import url_path_join
 from sqlalchemy.orm import exc
 import tornado
-from models.lecture import Lecture as LectureModel
+from api.models.lecture import Lecture as LectureModel
 from tornado.httpclient import HTTPError
 from sqlalchemy.orm.exc import MultipleResultsFound, NoResultFound, ObjectDeletedError
 

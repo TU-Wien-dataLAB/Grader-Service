@@ -1,6 +1,7 @@
 import * as React from 'react';
 import { Lecture } from '../../model/lecture';
 import { getAllLectures } from '../../services/lectures.service'
+import { UserPermissions } from '../../services/permission.service';
 import { CourseManageAssignmentsComponent } from './coursemanageassignment-list.component';
 
 
@@ -19,11 +20,12 @@ export class CourseManageComponent extends React.Component<CourseManageProps> {
     // this.state = {"lectures": props.lectures};
   }
 
-  public componentDidMount() {
+  public async componentDidMount() {
     getAllLectures().subscribe(lectures => {
       console.log(lectures)
       this.setState(this.state.lectures = lectures)
     })
+    await UserPermissions.loadPermissions();
   }
 
   public render() {

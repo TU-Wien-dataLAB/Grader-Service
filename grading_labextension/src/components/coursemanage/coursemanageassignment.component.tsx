@@ -1,5 +1,5 @@
 import { Button, Collapse, Icon } from '@blueprintjs/core';
-import { Dialog, showDialog, showErrorMessage } from '@jupyterlab/apputils';
+import { Dialog, InputDialog, showDialog, showErrorMessage } from '@jupyterlab/apputils';
 import * as React from 'react';
 import { GlobalObjects } from '../../index';
 import { Assignment } from '../../model/assignment';
@@ -27,7 +27,7 @@ export class CourseManageAssignmentComponent extends React.Component<AssignmentP
   public iconSize: number = 14;
   public state = {
     isOpen: false,
-    submissions: new Array<{user: User, submissions: Submission[]}>(),
+    submissions: new Array<{ user: User, submissions: Submission[] }>(),
   };
 
 
@@ -40,12 +40,12 @@ export class CourseManageAssignmentComponent extends React.Component<AssignmentP
   }
 
   public componentDidMount() {
-    if(this.assignment.status=="released") {
-      getAllSubmissions(this.lecture , this.assignment,false,true).subscribe(userSubmissions => {
+    if (this.assignment.status == "released") {
+      getAllSubmissions(this.lecture, this.assignment, false, true).subscribe(userSubmissions => {
         this.setState(this.state.submissions = userSubmissions)
         console.log(this.state.submissions)
         console.log(this.state.submissions.length)
-        } 
+      }
       )
     }
   }
@@ -120,6 +120,16 @@ export class CourseManageAssignmentComponent extends React.Component<AssignmentP
     // TODO: release assignment
   }
 
+  private async createFile(notebook: boolean = true) {
+    let result: Dialog.IResult<string>
+    if (notebook) {
+      result = await InputDialog.getText({ title: 'Notebook name' });
+    } else {
+      result = await InputDialog.getText({ title: 'Filename with extension' });
+    }
+    console.log(result);
+  }
+
   private async delete() {
     let result = await showDialog({
       title: "Release Assignment",
@@ -129,8 +139,8 @@ export class CourseManageAssignmentComponent extends React.Component<AssignmentP
     if (!result.button.accept) return;
 
     //TODO: delete assignment
-    deleteAssignment(this.lecture.id,this.assignment.id)
-    this.props.assignments.filter(a => a.id !=this.assignment.id);
+    deleteAssignment(this.lecture.id, this.assignment.id)
+    this.props.assignments.filter(a => a.id != this.assignment.id);
   }
 
   public render() {
@@ -148,9 +158,9 @@ export class CourseManageAssignmentComponent extends React.Component<AssignmentP
             <Button icon='edit' outlined className="assignment-button">Edit</Button>
             <Button icon='git-push' intent={"success"} outlined className="assignment-button" onClick={() => this.pushAssignment()} >Push</Button>
             <Button icon='git-pull' intent={"primary"} outlined className="assignment-button" onClick={() => this.pullAssignment()}> Pull</Button>
-            <Button icon='cloud-upload' outlined className="assignment-button" disabled={this.assignment.status=="created"} onClick={() => this.releaseAssignment()} >Release</Button>
+            <Button icon='cloud-upload' outlined className="assignment-button" disabled={this.assignment.status == "created"} onClick={() => this.releaseAssignment()} >Release</Button>
             <Button icon='delete' intent="danger" outlined className="assignment-button" onClick={() => this.delete()}>Delete</Button>
-            <Button icon="arrow-top-right" intent="primary" outlined className="assignment-button" onClick={() => { this.openGrading(this.lecture.id, this.assignment.id)}}>{this.state.submissions.length} {"Submission" + ((this.state.submissions.length > 1) ?  "s" : "")}</Button>
+            <Button icon="arrow-top-right" intent="primary" outlined className="assignment-button" onClick={() => { this.openGrading(this.lecture.id, this.assignment.id) }}>{this.state.submissions.length} {"Submission" + ((this.state.submissions.length > 1) ? "s" : "")}</Button>
           </span>
         </div>
 
@@ -170,7 +180,8 @@ export class CourseManageAssignmentComponent extends React.Component<AssignmentP
               </div>
             )}
           </div>
-          <Button icon='add' outlined className="assignment-button">Add File</Button>
+          <Button icon="add" outlined onClick={() => this.createFile(true)} className="assignment-button">Add Notebook</Button>
+          <Button icon="add" outlined onClick={() => this.createFile(false)} className="assignment-button">Add File</Button>
         </Collapse>
       </div>
     </li>
