@@ -40,7 +40,7 @@ def setup_handlers(web_app: ServerApp):
 
 def _jupyter_server_extension_points():
     return [{
-        "module": "grader.grading_labextension"
+        "module": "grading_labextension"
     }]
 
 

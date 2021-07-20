@@ -150,8 +150,7 @@ export class CourseManageAssignmentComponent extends React.Component<AssignmentP
             <Button icon='git-pull' intent={"primary"} outlined className="assignment-button" onClick={() => this.pullAssignment()}> Pull</Button>
             <Button icon='cloud-upload' outlined className="assignment-button" disabled={this.assignment.status=="created"} onClick={() => this.releaseAssignment()} >Release</Button>
             <Button icon='delete' intent="danger" outlined className="assignment-button" onClick={() => this.delete()}>Delete</Button>
-
-            <Button icon="arrow-top-right" intent="primary" outlined className="sub-button" onClick={() => { this.openGrading(this.lecture.id, this.assignment.id)}}>{this.state.submissions.length} {"Submission" + ((this.state.submissions.length > 1) ?  "s" : "")}</Button>
+            <Button style={{width:'130px'}} icon="arrow-top-right" intent="primary" fill outlined className="assignment-button" onClick={() => { this.openGrading(this.lecture.id, this.assignment.id)}}>{this.state.submissions.length} {"Submission" + ((this.state.submissions.length > 1) ?  "s" : "")}</Button>
           </span>
         </div>
 
