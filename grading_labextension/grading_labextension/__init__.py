@@ -33,14 +33,14 @@ def setup_handlers(web_app: ServerApp):
     log.critical("base_url: " + base_url)
     print("base_url: ", base_url)
     handlers = HandlerPathRegistry.handler_list(base_url=base_url + "grading_labextension")
-    log.critical([str(h[1].__class__) for h in handlers])
+    log.critical([str(h[0]) for h in handlers])
     web_app.add_handlers(host_pattern, handlers)
 
 
 
 def _jupyter_server_extension_points():
     return [{
-        "module": "grader.grading_labextension"
+        "module": "grading_labextension"
     }]
 
 

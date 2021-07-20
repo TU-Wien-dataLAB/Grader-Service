@@ -191,7 +191,7 @@ class GraderBaseHandler(SessionMixin, web.RequestHandler):
             )
             if user["kind"] != "user":
                 return None
-        except Exception as e:
+        except HTTPError as e:
             logging.getLogger().error(e)
             return None
         return user
