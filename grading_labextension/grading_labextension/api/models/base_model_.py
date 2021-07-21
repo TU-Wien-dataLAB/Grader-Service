@@ -3,7 +3,7 @@ import pprint
 import six
 import typing
 
-from grading_labextension import util
+from api import util
 
 T = typing.TypeVar('T')
 

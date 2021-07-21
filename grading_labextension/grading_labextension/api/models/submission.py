@@ -5,8 +5,8 @@ from datetime import date, datetime  # noqa: F401
 
 from typing import List, Dict  # noqa: F401
 
-from grading_labextension.models.base_model_ import Model
-from grading_labextension import util
+from api.models.base_model_ import Model
+from api import util
 
 
 class Submission(Model):
@@ -15,7 +15,7 @@ class Submission(Model):
     Do not edit the class manually.
     """
 
-    def __init__(self, id=None, submitted_at=None, status=None):  # noqa: E501
+    def __init__(self, id=None, submitted_at=None, status=None, score=None):  # noqa: E501
         """Submission - a model defined in OpenAPI
 
         :param id: The id of this Submission.  # noqa: E501
@@ -24,22 +24,27 @@ class Submission(Model):
         :type submitted_at: datetime
         :param status: The status of this Submission.  # noqa: E501
         :type status: str
+        :param score: The score of this Submission.  # noqa: E501
+        :type score: float
         """
         self.openapi_types = {
             'id': int,
             'submitted_at': datetime,
-            'status': str
+            'status': str,
+            'score': float
         }
 
         self.attribute_map = {
             'id': 'id',
             'submitted_at': 'submitted_at',
-            'status': 'status'
+            'status': 'status',
+            'score': 'score'
         }
 
         self._id = id
         self._submitted_at = submitted_at
         self._status = status
+        self._score = score
 
     @classmethod
     def from_dict(cls, dikt) -> 'Submission':
@@ -120,3 +125,24 @@ class Submission(Model):
             )
 
         self._status = status
+
+    @property
+    def score(self):
+        """Gets the score of this Submission.
+
+
+        :return: The score of this Submission.
+        :rtype: float
+        """
+        return self._score
+
+    @score.setter
+    def score(self, score):
+        """Sets the score of this Submission.
+
+
+        :param score: The score of this Submission.
+        :type score: float
+        """
+
+        self._score = score

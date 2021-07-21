@@ -7,7 +7,7 @@
 # java -Dmodels -DsupportingFiles=util.py,base_model_.py,typing_utils.py -jar ../openapi-generator-cli.jar generate -i documentation/openapi/schemas.yml -g python-flask -o service/ --additional-properties=packageName='api' ; rm -r service/api/test service/api/controllers service/api/openapi
 # 
 # Python (labextension)
-# java -Dmodels -DsupportingFiles=util.py,base_model_.py,typing_utils.py -jar ../openapi-generator-cli.jar generate -i documentation/openapi/schemas.yml -g python-flask -o grading_labextension/grading_labextension --additional-properties=packageName='api' ; rm -r grading_labextension/grading_labextension/api/test grading_labextension/grading_labextension/api/controllers grading_labextension/grading_labextension/api/openapi
+# java -Dmodels -DsupportingFiles=util.py,base_model_.py,typing_utils.py -jar ../openapi-generator-cli.jar generate -i documentation/openapi/schemas.yml -g python-flask -o grading_labextension/grading_labextension --additional-properties=packageName='api' ; rm -r grading_labextension/grading_labextension/api/test grading_labextension/grading_labextension/api/controllers grading_labextension/grading_labextension/api/openapi grading_labextension/grading_labextension/.openapi-generator ; touch grading_labextension/grading_labextension/api/__init__.py ; touch grading_labextension/grading_labextension/api/models/__init__.py
 
 openapi: '3.0.2'
 info:
