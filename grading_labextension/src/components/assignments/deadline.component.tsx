@@ -23,7 +23,7 @@ export class DeadlineComponent extends React.Component<DeadlineProps> {
     constructor(props: DeadlineProps) {
         super(props);
         let [y, M, d, h, m, s] = props.due_date.split(/[- :]/);
-        this.date = new Date(parseInt(y), parseInt(M) - 1, parseInt(d), parseInt(h), parseInt(m) + 30, parseInt(s));
+        this.date = new Date(parseInt(y), parseInt(M) - 1, parseInt(d), parseInt(h), parseInt(m), parseInt(s));
         // this.date = new Date(+new Date() + 100000);
         this.state = { display_date: this.getDisplayDate() };
     }
@@ -70,6 +70,6 @@ export class DeadlineComponent extends React.Component<DeadlineProps> {
     }
 
     public render() {
-        return <Tag intent="warning" style={{ marginLeft: "10px" }} >{this.state.display_date}</Tag>
+        return <Tag intent="warning" htmlTitle={"Date: " + this.date.toLocaleDateString() + " " + this.date.toLocaleTimeString()} style={{ marginLeft: "10px" }} >{this.state.display_date}</Tag>
     }
 }
