@@ -4,7 +4,7 @@ from typing import Any, Awaitable, Callable, List, Optional
 from urllib.parse import ParseResult, urlparse
 import json
 import logging
-from models.error_message import ErrorMessage
+from api.models.error_message import ErrorMessage
 from orm.lecture import Lecture, LectureState
 from orm.assignment import Assignment
 from orm.takepart import Role, Scope
@@ -17,7 +17,7 @@ from sqlalchemy.sql.expression import select
 from tornado import httputil, web
 from tornado.web import HTTPError, RequestHandler
 from orm.base import DeleteState, Serializable
-from models.base_model_ import Model
+from api.models.base_model_ import Model
 from tornado_sqlalchemy import SessionMixin
 from tornado.escape import json_decode
 from sqlalchemy.orm.exc import MultipleResultsFound, NoResultFound

@@ -5,7 +5,7 @@ from orm.base import DeleteState
 from orm.file import File
 from orm.takepart import Role, Scope
 from server import GraderServer
-from models.assignment import Assignment as AssignmentModel
+from api.models.assignment import Assignment as AssignmentModel
 from sqlalchemy.orm.exc import ObjectDeletedError
 import tornado
 from tornado.web import HTTPError

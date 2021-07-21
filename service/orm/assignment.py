@@ -1,7 +1,7 @@
 from .base import Base, DeleteState, Serializable
 from sqlalchemy import Column, Integer, String, ForeignKey, DateTime, Enum, Boolean
 from sqlalchemy.orm import relationship
-from models import assignment
+from api.models import assignment
 
 
 class Assignment(Base, Serializable):

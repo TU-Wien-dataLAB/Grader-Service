@@ -2,7 +2,7 @@ from sqlalchemy.sql.schema import UniqueConstraint
 from .base import Base, Serializable, DeleteState
 from sqlalchemy import Column, Integer, String, ForeignKey, DateTime, Enum, Boolean
 from sqlalchemy.orm import relationship
-from models import lecture
+from api.models import lecture
 import enum
 
 class LectureState(enum.IntEnum):
