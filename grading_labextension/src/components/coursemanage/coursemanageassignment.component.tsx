@@ -1,5 +1,5 @@
 import { Button, Collapse, Icon } from '@blueprintjs/core';
-import { Dialog, InputDialog, showDialog, showErrorMessage } from '@jupyterlab/apputils';
+import { Dialog, showDialog, showErrorMessage } from '@jupyterlab/apputils';
 import * as React from 'react';
 import { GlobalObjects } from '../../index';
 import { Assignment } from '../../model/assignment';
