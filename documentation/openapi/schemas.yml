@@ -1,3 +1,26 @@
+## Model generation:
+#  
+# Typescript:
+# java -jar ../openapi-generator-cli.jar generate -i documentation/openapi/schemas.yml -g typescript-angular -o grading_labextension/src --global-property models
+#
+# Python (service):
+# java -Dmodels -DsupportingFiles=util.py,base_model_.py,typing_utils.py -jar ../openapi-generator-cli.jar generate -i documentation/openapi/schemas.yml -g python-flask -o service/ --additional-properties=packageName='api' ; rm -r service/api/test service/api/controllers service/api/openapi
+# 
+# Python (labextension)
+# java -Dmodels -DsupportingFiles=util.py,base_model_.py,typing_utils.py -jar ../openapi-generator-cli.jar generate -i documentation/openapi/schemas.yml -g python-flask -o grading_labextension/grading_labextension --additional-properties=packageName='api' ; rm -r grading_labextension/grading_labextension/api/test grading_labextension/grading_labextension/api/controllers grading_labextension/grading_labextension/api/openapi
+
+openapi: '3.0.2'
+info:
+  title: Grader Extension API Schemas
+  version: '0.1'
+
+paths:
+ /:
+  get:
+    responses:
+      200:
+        description: OK
+
 ###### Data type definitions
 components:
   schemas:
@@ -129,10 +152,14 @@ components:
             - not_graded
             - automatically_graded
             - manually_graded
+        score:
+          type: number
+          format: float
       example:
         id: 2
         submitted_at: "2021-07-21T11:53:07Z"
         status: "not_graded"
+        score: 10.0
     Feedback:
       type: "object"
       properties:
