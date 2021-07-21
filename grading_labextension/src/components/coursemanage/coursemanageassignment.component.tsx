@@ -9,6 +9,9 @@ import { User } from '../../model/user';
 import { getAllSubmissions } from '../../services/submissions.service';
 import { deleteAssignment, pullAssignment, pushAssignment, updateAssignment } from '../../services/assignments.service';
 import { InputDialog } from './coursemanageassignment-list.component';
+import { DirListing } from '@jupyterlab/filebrowser/lib/listing'
+import { FilterFileBrowserModel } from '@jupyterlab/filebrowser/lib/model';
+import { ExistingNodeRenderer } from '../assignments/assignment.component'
 
 
 export interface AssignmentProps {
@@ -30,6 +33,8 @@ export class CourseManageAssignmentComponent extends React.Component<AssignmentP
     isOpen: false,
     submissions: new Array<{ user: User, submissions: Submission[] }>(),
   };
+  public dirListingNode: HTMLElement;
+  public dirListing: DirListing;
 
 
   constructor(props: AssignmentProps) {
@@ -40,7 +45,7 @@ export class CourseManageAssignmentComponent extends React.Component<AssignmentP
     this.lecture = props.lecture;
   }
 
-  public componentDidMount() {
+  public async componentDidMount() {
     if (this.assignment.status == "released") {
       getAllSubmissions(this.lecture, this.assignment, false, true).subscribe(userSubmissions => {
         this.setState(this.state.submissions = userSubmissions)
@@ -48,6 +53,37 @@ export class CourseManageAssignmentComponent extends React.Component<AssignmentP
         console.log(this.state.submissions.length)
       }
       )
+    }
+    console.log("dirListingNode: " + this.dirListingNode)
+    let renderer = new ExistingNodeRenderer(this.dirListingNode);
+    let model = new FilterFileBrowserModel({ auto: true, manager: GlobalObjects.docManager });
+
+    const LISTING_CLASS = 'jp-FileBrowser-listing';
+    this.dirListing = new DirListing({ model, renderer })
+    this.dirListing.addClass(LISTING_CLASS);
+    await model.cd("source");
+    await model.cd(this.lecture.code);
+    await model.cd(this.assignment.name);
+    this.dirListingNode.onclick = async (ev) => {
+      let model = this.dirListing.modelForClick(ev);
+      if (model == undefined) {
+        this.dirListing.handleEvent(ev);
+        return;
+      }
+      if (!this.dirListing.isSelected(model.name)) {
+        await this.dirListing.selectItemByName(model.name);
+      } else {
+        this.dirListing.clearSelectedItems();
+        this.dirListing.update();
+      }
+    }
+    this.dirListingNode.ondblclick = (ev) => {
+      let model = this.dirListing.modelForClick(ev);
+      this.openFile(model.path);
+    }
+    this.dirListingNode.oncontextmenu = ev => {
+      ev.preventDefault();
+      ev.stopPropagation();
     }
   }
 
@@ -89,7 +125,6 @@ export class CourseManageAssignmentComponent extends React.Component<AssignmentP
 
     // TODO: remove push to release, only for test purposes before nbconvert works
     pushAssignment(this.lecture.id, this.assignment.id, "release");
-
   }
 
   private async pullAssignment() {
@@ -128,7 +163,8 @@ export class CourseManageAssignmentComponent extends React.Component<AssignmentP
     } else {
       result = await InputDialog.getText({ title: 'Filename with extension' });
     }
-    console.log(result);
+    // TODO: finish
+    console.log("Create file: " + result);
   }
 
   private async delete() {
@@ -139,7 +175,6 @@ export class CourseManageAssignmentComponent extends React.Component<AssignmentP
     });
     if (!result.button.accept) return;
 
-    //TODO: delete assignment
     deleteAssignment(this.lecture.id, this.assignment.id)
     this.props.assignments.filter(a => a.id != this.assignment.id);
   }
@@ -166,7 +201,7 @@ export class CourseManageAssignmentComponent extends React.Component<AssignmentP
             <Icon icon="chevron-right" iconSize={this.iconSize}
               className={`collapse-icon-small ${this.state.isOpen ? "collapse-icon-small-open" : ""}`}></Icon>
             <Icon icon="inbox" iconSize={this.iconSize} className="flavor-icon"></Icon>
-            {this.assignment.name}
+            {this.assignment.name} Source Files
           </span>
 
           <span className="button-list">
@@ -179,22 +214,8 @@ export class CourseManageAssignmentComponent extends React.Component<AssignmentP
           </span>
         </div>
 
-        <Collapse isOpen={this.state.isOpen}>
-          <div className="assignment-content">
-            {this.assignment.exercises.map((ex, i) =>
-              <div className="list-element" onClick={() => this.openFile(`${this.lectureName}/${this.assignment.name}/${ex.name}`)}>
-                <Icon icon="edit" iconSize={this.iconSize} className="flavor-icon"></Icon>
-                {ex.name}
-              </div>
-            )}
-
-            {this.assignment.files.map((file, i) =>
-              <div className="list-element" onClick={() => this.openFile(`${this.lectureName}/${this.assignment.name}/${file.name}`)}>
-                <Icon icon="document" iconSize={this.iconSize} className="flavor-icon"></Icon>
-                {file.name}
-              </div>
-            )}
-          </div>
+        <Collapse isOpen={this.state.isOpen} keepChildrenMounted={true}>
+          <div className="assignment-dir-listing" ref={_element => this.dirListingNode = _element}></div>
           <Button icon="add" outlined onClick={() => this.createFile(true)} className="assignment-button">Add Notebook</Button>
           <Button icon="add" outlined onClick={() => this.createFile(false)} className="assignment-button">Add File</Button>
         </Collapse>
