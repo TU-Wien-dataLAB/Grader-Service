@@ -2,7 +2,6 @@ from logging.config import fileConfig
 
 from sqlalchemy import engine_from_config
 from sqlalchemy import pool
-
 from alembic import context
 
 # this is the Alembic Config object, which provides
@@ -17,11 +16,10 @@ fileConfig(config.config_file_name)
 # imprt model.py
 import os
 import sys
-MODEL_PATH = os.path.join(os.path.abspath(os.path.dirname(__file__)), "../grader/service")
+MODEL_PATH = os.path.join(os.path.abspath(os.path.dirname(__file__)), "../")
 sys.path.append(MODEL_PATH)
-from grader.service import orm
 
-
+import orm
 # edit this line and pass metadata
 target_metadata = orm.Base.metadata
 

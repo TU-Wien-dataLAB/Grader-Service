@@ -7,7 +7,8 @@ import { Lecture } from '../../model/lecture';
 import { Submission } from '../../model/submission';
 import { User } from '../../model/user';
 import { getAllSubmissions } from '../../services/submissions.service';
-import { deleteAssignment, pullAssignment, pushAssignment } from '../../services/assignments.service';
+import { deleteAssignment, pullAssignment, pushAssignment, updateAssignment } from '../../services/assignments.service';
+import { InputDialog } from './coursemanageassignment-list.component';
 
 
 export interface AssignmentProps {
@@ -133,6 +134,20 @@ export class CourseManageAssignmentComponent extends React.Component<AssignmentP
     this.props.assignments.filter(a => a.id !=this.assignment.id);
   }
 
+  private async editAssignment() {
+    InputDialog.getDate({ title: 'Input Deadline' }).then((date: { button: { accept: any; }; value: any; }) => {
+      if (date.button.accept) {
+        this.assignment.due_date = date.value;
+        this.assignment.type = this.assignment.type
+        console.log(this.assignment);
+        updateAssignment(this.lecture.id, this.assignment).subscribe(
+          assignment => {
+            console.log(assignment)
+          })
+      }
+    })
+  }
+
   public render() {
     return <li key={this.index}>
       <div className="assignment">
@@ -145,7 +160,7 @@ export class CourseManageAssignmentComponent extends React.Component<AssignmentP
           </span>
 
           <span className="button-list">
-            <Button icon='edit' outlined className="assignment-button">Edit</Button>
+            <Button icon='edit' outlined className="assignment-button" onClick={() => this.editAssignment()}>Edit</Button>
             <Button icon='git-push' intent={"success"} outlined className="assignment-button" onClick={() => this.pushAssignment()} >Push</Button>
             <Button icon='git-pull' intent={"primary"} outlined className="assignment-button" onClick={() => this.pullAssignment()}> Pull</Button>
             <Button icon='cloud-upload' outlined className="assignment-button" disabled={this.assignment.status=="created"} onClick={() => this.releaseAssignment()} >Release</Button>

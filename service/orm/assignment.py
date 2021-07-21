@@ -8,7 +8,7 @@ class Assignment(Base, Serializable):
     __tablename__ = "assignment"
     id = Column(Integer, primary_key=True, autoincrement=True)
     name = Column(String(255), nullable=False)
-    type = Column(Enum("user", "group"), nullable=False, default="user")
+    type = Column(Enum("user", "group"), nullable=False, server_default="user")
     lectid = Column(Integer, ForeignKey("lecture.id"))
     duedate = Column(DateTime, nullable=False)
     points = Column(Integer, nullable=True)
@@ -26,7 +26,7 @@ class Assignment(Base, Serializable):
     @property
     def model(self) -> assignment.Assignment:
         assignment_model = assignment.Assignment(
-            id=self.id, name=self.name, due_date=self.duedate, status=self.status
+            id=self.id, name=self.name, due_date=self.duedate, status=self.status, type=self.type
         )
         assignment_model.exercises = [ex.model for ex in self.files if ex.exercise]
         assignment_model.files = [f.model for f in self.files if not f.exercise]

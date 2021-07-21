@@ -17,4 +17,4 @@ class Submission(Base, Serializable):
 
   @property
   def model(self) -> submission.Submission:
-      return submission.Submission(id=self.id, submitted_at=self.date, status=self.status)
+      return submission.Submission(id=self.id, submitted_at=self.date, status=self.status, score=self.score)

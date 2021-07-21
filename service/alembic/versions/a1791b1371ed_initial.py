@@ -36,7 +36,7 @@ def upgrade():
     op.create_table('assignment',
     sa.Column('id', sa.Integer(), autoincrement=True, nullable=False),
     sa.Column('name', sa.String(length=255), nullable=False),
-    sa.Column('type', sa.Enum("user", "group"), nullable=False, default="user"),
+    sa.Column('type', sa.Enum("user", "group"), nullable=False, server_default="user"),
     sa.Column('lectid', sa.Integer(), nullable=True),
     sa.Column('duedate', sa.DateTime(), nullable=True),
     sa.Column('points', sa.Integer(), nullable=False),
