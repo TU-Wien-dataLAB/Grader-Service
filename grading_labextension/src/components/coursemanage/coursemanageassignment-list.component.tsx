@@ -63,6 +63,8 @@ class InputDialogBase extends Widget {
 
 class InputDateDialog extends InputDialogBase {
     private _input: any;
+    private _datepicker: any;
+    private _optional: any;
     /**
      * constructor
      *
@@ -70,14 +72,24 @@ class InputDateDialog extends InputDialogBase {
      */
     constructor(options: { label: any; text: any; placeholder: any; }) {
         super(options.label);
-        this._input = document.createElement('input');
-        this._input.classList.add('jp-mod-styled');
-        this._input.type = 'datetime-local';
-        this._input.value = options.text ? options.text : '';
+        this._input = document.createElement('div');
+        this._optional = document.createElement('input');
+        this._optional.type = 'checkbox';
+        const wrapper = document.createElement('div');
+        const label = document.createTextNode("Add Deadline");
+        wrapper.appendChild(label);
+        this._optional.appendChild(wrapper);
+        
+        this._datepicker = document.createElement('input');
+        this._datepicker.classList.add('jp-mod-styled');
+        this._datepicker.type = 'datetime-local';
+        this._datepicker.value = options.text ? options.text : '';
         if (options.placeholder) {
-            this._input.placeholder = options.placeholder;
+            this._datepicker.placeholder = options.placeholder;
         }
         // Initialize the node
+        this._input.appendChild(this._optional);
+        this._input.appendChild(this._datepicker);
         this.node.appendChild(this._input);
     }
     /**
@@ -152,17 +164,14 @@ export class CourseManageAssignmentsComponent extends React.Component<Assignment
         assignname = input;
         //TODO: Implement own InputDialog to set Date correct
         if (input.button.accept) {
-          InputDialog.getDate({ title: 'Input Deadline' }).then((date: { button: { accept: any; }; value: any; }) => {
-            if (date.button.accept) {
-              createAssignment(id, { "name": assignname.value, "due_date": date.value, "status": "created" }).subscribe(
-                assignment => {
-                  console.log(assignment)
-                  this.setState({ assignments: [...this.state.assignments, assignment] }, () => {
-                    console.log("New State:" + JSON.stringify(this.state.assignments))
-                  });
-                })
-            }
-          })
+          createAssignment(id, { "name": assignname.value, "due_date": null, "status": "created"}).subscribe(
+            assignment => {
+              console.log(assignment)
+              this.setState({ assignments: [...this.state.assignments, assignment] }, () => {
+                console.log("New State:" + JSON.stringify(this.state.assignments))
+              });
+            })
+          
         }
       })
     } catch (e) {

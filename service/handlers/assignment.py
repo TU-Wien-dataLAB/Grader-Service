@@ -48,6 +48,7 @@ class AssignmentBaseHandler(GraderBaseHandler):
         assignment.lectid = lecture_id
         assignment.duedate = assignment_model.due_date
         assignment.status = assignment_model.status
+        assignment.type = assignment_model.type
         assignment.points = 0
         assignment.deleted = DeleteState.active
         self.session.add(assignment)
