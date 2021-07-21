@@ -1,5 +1,5 @@
 from sqlalchemy.ext.declarative import declarative_base
-from models.base_model_ import Model
+from api.models.base_model_ import Model
 import enum
 
 Base = declarative_base()

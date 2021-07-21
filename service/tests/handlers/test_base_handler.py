@@ -2,7 +2,7 @@ import json
 from handlers.base_handler import GraderBaseHandler
 from orm.assignment import Assignment
 from datetime import datetime
-from models.error_message import ErrorMessage
+from api.models.error_message import ErrorMessage
 from orm.lecture import Lecture
 from .db_util import *
 from unittest.mock import AsyncMock, MagicMock, Mock

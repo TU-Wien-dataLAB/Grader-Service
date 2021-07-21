@@ -4,7 +4,7 @@
 # java -jar ../openapi-generator-cli.jar generate -i documentation/openapi/schemas.yml -g typescript-angular -o grading_labextension/src --global-property models
 #
 # Python (service):
-# java -Dmodels -DsupportingFiles=util.py,base_model_.py,typing_utils.py -jar ../openapi-generator-cli.jar generate -i documentation/openapi/schemas.yml -g python-flask -o service/ --additional-properties=packageName='api' ; rm -r service/api/test service/api/controllers service/api/openapi
+# java -Dmodels -DsupportingFiles=util.py,base_model_.py,typing_utils.py -jar ../openapi-generator-cli.jar generate -i documentation/openapi/schemas.yml -g python-flask -o service/ --additional-properties=packageName='api' ; rm -r service/api/test service/api/controllers service/api/openapi service/.openapi-generator/ ; touch service/api/__init__.py ; touch service/api/models/__init__.py
 # 
 # Python (labextension)
 # java -Dmodels -DsupportingFiles=util.py,base_model_.py,typing_utils.py -jar ../openapi-generator-cli.jar generate -i documentation/openapi/schemas.yml -g python-flask -o grading_labextension/grading_labextension --additional-properties=packageName='api' ; rm -r grading_labextension/grading_labextension/api/test grading_labextension/grading_labextension/api/controllers grading_labextension/grading_labextension/api/openapi grading_labextension/grading_labextension/.openapi-generator ; touch grading_labextension/grading_labextension/api/__init__.py ; touch grading_labextension/grading_labextension/api/models/__init__.py

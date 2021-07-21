@@ -5,8 +5,8 @@ from datetime import date, datetime  # noqa: F401
 
 from typing import List, Dict  # noqa: F401
 
-from models.base_model_ import Model
-import util
+from api.models.base_model_ import Model
+from api import util
 
 
 class AssignmentFile(Model):

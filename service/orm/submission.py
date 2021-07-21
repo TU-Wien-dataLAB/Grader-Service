@@ -1,7 +1,7 @@
 from .base import Base, Serializable
 from sqlalchemy import Column, Integer, String, ForeignKey, DateTime, Enum, Boolean
 from sqlalchemy.orm import relationship
-from models import submission
+from api.models import submission
 
 class Submission(Base, Serializable):
   __tablename__ = "submission"
