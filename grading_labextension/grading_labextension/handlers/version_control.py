@@ -37,6 +37,7 @@ class PullHandler(ExtensionBaseHandler):
             if not git_service.is_git():
                 git_service.init()
                 git_service.set_remote("grader")
+                git_service.set_author()
             git_service.pull("grader", force=True)
             self.write("OK")
         except GitError:
@@ -75,6 +76,9 @@ class PushHandler(ExtensionBaseHandler):
             if not git_service.is_git():
                 git_service.init()
                 git_service.set_remote("grader")
+                git_service.set_author()
+                # TODO: create .gitignore file
+            git_service.commit()
             git_service.push("grader", force=True)
             self.write("OK")
         except GitError:

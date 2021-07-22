@@ -80,17 +80,16 @@ class AssignmentObjectHandler(ExtensionBaseHandler):
             }
         )
 
-        if self.get_argument("metadata-only", "false") == "true":
-            try:
-                response = await self.request_service.request(
-                    method="GET",
-                    endpoint=f"{self.base_url}/lectures/{lecture_id}/assignments/{assignment_id}{query_params}",
-                    header=self.grader_authentication_header,
-                )
-            except HTTPError as e:
-                self.write_error(e.code)
-                return
-            self.write(json.dumps(response))
+        try:
+            response = await self.request_service.request(
+                method="GET",
+                endpoint=f"{self.base_url}/lectures/{lecture_id}/assignments/{assignment_id}{query_params}",
+                header=self.grader_authentication_header,
+            )
+        except HTTPError as e:
+            self.write_error(e.code)
+            return
+        self.write(json.dumps(response))
 
     async def delete(self, lecture_id: int, assignment_id: int):
         try:
