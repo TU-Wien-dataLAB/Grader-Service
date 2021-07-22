@@ -175,7 +175,7 @@ export class AssignmentComponent extends React.Component<AssignmentProps> {
           <span className="button-list">
             <Button className="assignment-button" onClick={this.fetchAssignment} icon={IconNames.CLOUD_DOWNLOAD} disabled={this.assignment.status != "released"} outlined intent={Intent.PRIMARY}>Fetch</Button>
             <Button className="assignment-button" onClick={this.submitAssignment} icon={IconNames.SEND_MESSAGE} disabled={this.assignment.status != "fetched"} outlined intent={Intent.SUCCESS}>Submit</Button>
-            <DeadlineComponent due_date={this.assignment.due_date}/>
+            {this.assignment.due_date ? (<DeadlineComponent due_date={this.assignment.due_date}/>) : <p/>}
           </span>
 
         </div>
