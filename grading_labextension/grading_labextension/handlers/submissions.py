@@ -5,6 +5,7 @@ from jupyter_server.utils import url_path_join
 from grading_labextension.services.request import RequestService
 
 import tornado
+from tornado.httpclient import HTTPError
 
 
 @register_handler(
@@ -18,21 +19,29 @@ class SubmissionHandler(ExtensionBaseHandler):
                 "latest": self.get_argument("latest", None),
             }
         )
-        response = await self.request_service.request(
-            method="GET",
-            endpoint=f"{self.base_url}/lectures/{lecture_id}/assignments/{assignment_id}/submissions{query_params}",
-            header=self.grader_authentication_header,
-        )
+        try:
+            response = await self.request_service.request(
+                method="GET",
+                endpoint=f"{self.base_url}/lectures/{lecture_id}/assignments/{assignment_id}/submissions{query_params}",
+                header=self.grader_authentication_header,
+            )
+        except HTTPError as e:
+            self.write_error(e.code)
+            return
         self.write(json.dumps(response))
 
     async def post(self, lecture_id: int, assignment_id: int):
         data = tornado.escape.json_decode(self.request.body)
-        response = await self.request_service.request(
-            method="POST",
-            endpoint=f"{self.base_url}/lectures/{lecture_id}/assignments/{assignment_id}/submissions",
-            body=data,
-            header=self.grader_authentication_header,
-        )
+        try:
+            response = await self.request_service.request(
+                method="POST",
+                endpoint=f"{self.base_url}/lectures/{lecture_id}/assignments/{assignment_id}/submissions",
+                body=data,
+                header=self.grader_authentication_header,
+            )
+        except HTTPError as e:
+            self.write_error(e.code)
+            return
         self.write(json.dumps(response))
 
 
@@ -47,12 +56,17 @@ class FeedbackHandler(ExtensionBaseHandler):
                 "latest": self.get_argument("latest", None),
             }
         )
-        response = await self.request_service.request(
-            method="GET",
-            endpoint=f"{self.base_url}/lectures/{lecture_id}/assignments/{assignment_id}/feedback{query_params}",
-            header=self.grader_authentication_header,
-        )
+        try:
+            response = await self.request_service.request(
+                method="GET",
+                endpoint=f"{self.base_url}/lectures/{lecture_id}/assignments/{assignment_id}/feedback{query_params}",
+                header=self.grader_authentication_header,
+            )
+        except HTTPError as e:
+            self.write_error(e.code)
+            return
         self.write(response)
+
 
 @register_handler(
     path=r"\/lectures\/(?P<lecture_id>\d*)\/assignments\/(?P<assignment_id>\d*)\/feedback\/(?P<feedback_id>\d*)\/?"

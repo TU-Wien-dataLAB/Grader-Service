@@ -25,5 +25,4 @@ class ExtensionBaseHandler(APIHandler):
   # curl -X GET -H "Authorization: token ebce9dfa2a694fb9bb06883bd8bb6012" "http://128.130.202.214:8080/hub/api/authorizations/token/ebce9dfa2a694fb9bb06883bd8bb6012"
   @property
   def grader_authentication_header(self):
-    logging.getLogger().critical(HandlerConfig.instance().hub_api_token)
     return dict(Authorization="Token " + HandlerConfig.instance().hub_api_token)
