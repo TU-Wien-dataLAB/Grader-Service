@@ -17,6 +17,7 @@ class Assignment(Base, Serializable):
         default="created",
     )
     deleted = Column(Enum(DeleteState), nullable=False, unique=False)
+    lecture = relationship("Lecture", back_populates="assignments")
     submissions = relationship("Submission", back_populates="assignment")
 
     @property

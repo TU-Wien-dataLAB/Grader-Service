@@ -15,8 +15,6 @@ class File(Base, Serializable):
     exercise = Column(Boolean, nullable=False)
     points = Column(Integer)
 
-    assignment = relationship("Assignment", back_populates="files")
-
     @property
     def model(self) -> Union[Exercise, AssignmentFile]:
         if self.exercise:
