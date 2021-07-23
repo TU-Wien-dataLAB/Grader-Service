@@ -26,7 +26,6 @@ export function request<T>(method: HTTPMethod, endPoint: string, body: object = 
     endPoint
   );
 
-  console.log("Request " + method.toString() + " URL: " + requestUrl);
   return from(ServerConnection.makeRequest(requestUrl, options, settings)).pipe(
     switchMap(async response => {
       let data: any = await response.text();
@@ -37,6 +36,8 @@ export function request<T>(method: HTTPMethod, endPoint: string, body: object = 
           console.log('Not a JSON response body.', response);
         }
       }
+      console.log("Request " + method.toString() + " URL: " + requestUrl);
+      console.log(data)
       return data
     })
   )

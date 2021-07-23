@@ -17,17 +17,11 @@ class Assignment(Base, Serializable):
         default="created",
     )
     deleted = Column(Enum(DeleteState), nullable=False, unique=False)
-
-
-    lecture = relationship("Lecture", back_populates="assignments")
-    files = relationship("File", back_populates="assignment")
     submissions = relationship("Submission", back_populates="assignment")
 
     @property
     def model(self) -> assignment.Assignment:
         assignment_model = assignment.Assignment(
-            id=self.id, name=self.name, due_date=self.duedate, status=self.status, type=self.type
+            id=self.id, name=self.name, due_date=self.duedate, status=self.status, type=self.type, points=self.points
         )
-        assignment_model.exercises = [ex.model for ex in self.files if ex.exercise]
-        assignment_model.files = [f.model for f in self.files if not f.exercise]
         return assignment_model

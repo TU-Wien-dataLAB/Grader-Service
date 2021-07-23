@@ -72,14 +72,6 @@ components:
           enum:
             - user
             - group
-        exercises:
-          type: "array"
-          items:
-            $ref: "#/components/schemas/Exercise"
-        files:
-          type: "array"
-          items:
-            $ref: "#/components/schemas/AssignmentFile"
         due_date:
           type: "string"
           format: "date-time"
@@ -92,16 +84,12 @@ components:
             - fetching
             - fetched
             - complete # final state -> final grade is calculated
+        points:
+          type: number
+          format: float
       example:
         id: 1
         name: "assignment_1"
-        exercises: [
-          $ref: "#/components/schemas/Exercise/example",
-          $ref: "#/components/schemas/Exercise/example"
-        ]
-        files: [
-          $ref: "#/components/schemas/AssignmentFile/example"
-        ]
         due_date: "2021-07-21T23:55:00Z"
         status: "released"
     Exercise:
