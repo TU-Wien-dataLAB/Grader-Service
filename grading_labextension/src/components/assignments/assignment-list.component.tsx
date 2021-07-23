@@ -4,7 +4,7 @@ import { Collapse } from '@jupyterlab/ui-components'
 import { Assignment } from '../../model/assignment';
 import { AssignmentComponent } from './assignment.component';
 
-import { Icon } from "@blueprintjs/core";
+import { Icon, Tag } from "@blueprintjs/core";
 import { IconNames } from "@blueprintjs/icons";
 import { Lecture } from '../../model/lecture';
 
@@ -40,7 +40,8 @@ export class AssignmentsComponent extends React.Component<AssignmentListProps> {
     return <div>
       <div onClick={this.toggleOpen} className="collapse-header">
         <Icon icon={IconNames.LEARNING} className="flavor-icon"></Icon>
-        {this.lecture.name} 
+        {this.lecture.name}
+        { this.state.assignments.length == 0 && <Tag icon="warning-sign" intent="primary" className="assignment-tag">No assignments released yet</Tag>}
         <Icon iconSize={Icon.SIZE_LARGE} icon={IconNames.CHEVRON_DOWN} className={`collapse-icon ${this.state.isOpen ? "collapse-icon-open" : ""}`}></Icon> 
         </div>
       <Collapse isOpen={this.state.isOpen} className="collapse-body" transitionDuration={300} keepChildrenMounted={true}>
