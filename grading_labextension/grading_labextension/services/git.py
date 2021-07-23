@@ -10,13 +10,20 @@ from datetime import datetime
 import getpass
 
 class GitError(Exception):
-    pass
+    def __init__(self, error: str):
+        self.error = error
+    
+    def __str__(self):
+        return self.error
+    
+    def __repr__(self) -> str:
+        return self.__str__()
 
 class GitService(Configurable):
     git_root_dir = Unicode(os.path.expanduser("~"), allow_none=False).tag(config=False) # is set by application
-    git_access_token = Unicode(None, allow_none=False).tag(config=True)
-    git_http_scheme = Unicode('http', allow_none=False).tag(config=True)
-    git_remote_url = Unicode(None, allow_none=False).tag(config=True)
+    git_access_token = Unicode(os.environ.get("JUPYTERHUB_API_TOKEN"), allow_none=False).tag(config=True)
+    git_http_scheme = Unicode(os.environ.get("GRADER_HTTP_SCHEME", 'http'), allow_none=False).tag(config=True)
+    git_remote_url = Unicode(f'{os.environ.get("GRADER_HOST_URL", "127.0.0.1")}:{os.environ.get("GRADER_HOST_PORT", "4010")}{os.environ.get("GRADER_GIT_BASE_URL", "/services/grader/git")}', allow_none=False).tag(config=True)
 
     def __init__(self, lecture_code: str, assignment_name: str, repo_type: str, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -88,11 +95,13 @@ class GitService(Configurable):
     
     def _run_command(self, command, cwd=None, capture_output=False):
         try:
-            ret = subprocess.run(shlex.split(command), check=True, cwd=cwd, capture_output=capture_output)
+            ret = subprocess.run(shlex.split(command), check=True, cwd=cwd, capture_output=True)
             if capture_output:
                 return str(ret.stdout, 'utf-8')
-        except subprocess.CalledProcessError:
+        except subprocess.CalledProcessError as e:
             if capture_output:
                 return None
             else:
-                raise GitError
+                raise GitError(e.stderr)
+        except FileNotFoundError as e:
+            raise GitError(e.strerror)

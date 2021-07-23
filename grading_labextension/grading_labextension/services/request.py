@@ -6,12 +6,13 @@ from tornado.escape import json_decode
 from traitlets.traitlets import Int, TraitError, Unicode, validate
 import socket
 from urllib.parse import urlencode, quote_plus
+import os
 
 
 class RequestService(LoggingConfigurable):
-    scheme = Unicode('http', help="The http scheme to use. Either 'http' or 'https'").tag(config=True)
-    host = Unicode('127.0.0.1', help="Host adress the service should make requests to").tag(config=True)
-    port = Int(4010, help="Host port of service").tag(config=True)
+    scheme = Unicode(os.environ.get("GRADER_HTTP_SCHEME", 'http'), help="The http scheme to use. Either 'http' or 'https'").tag(config=True)
+    host = Unicode(os.environ.get("GRADER_HOST_URL", '127.0.0.1'), help="Host adress the service should make requests to").tag(config=True)
+    port = Int(int(os.environ.get("GRADER_HOST_PORT", "4010")), help="Host port of service").tag(config=True)
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
