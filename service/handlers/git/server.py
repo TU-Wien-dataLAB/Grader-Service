@@ -139,7 +139,7 @@ class GitBaseHandler(GraderBaseHandler):
         gitdir = self.gitlookup(rpc)
         if gitdir is None:
             raise HTTPError(404, "unable to find repository")
-        logger.debug("Accessing git at: %s", gitdir)
+        logger.info("Accessing git at: %s", gitdir)
 
         return gitdir
 
@@ -180,7 +180,7 @@ class InfoRefsHandler(GitBaseHandler):
     async def prepare(self):
         await super().prepare()
         self.rpc = self.get_argument("service")[4:]
-        self.cmd = f"git {self.rpc} --stateless-rpc --advertise-refs {self.get_gitdir()}"
+        self.cmd = f"git {self.rpc} --stateless-rpc --advertise-refs {self.get_gitdir(self.rpc)}"
         self.process = Subprocess(
             shlex.split(self.cmd),
             stdin=Subprocess.STREAM,
