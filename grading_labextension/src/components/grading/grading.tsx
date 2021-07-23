@@ -101,13 +101,13 @@ export class GradingComponent extends React.Component<GradingProps> {
         let latest = sub.submissions.reduce((a, b) => {
           return new Date(a.submitted_at) > new Date(b.submitted_at) ? a : b;
         });
-        rows.push({id: rows.length, name: sub.user.name, date: latest.submitted_at, status: latest.status})
+        rows.push({id: rows.length, name: sub.user.name, date: latest.submitted_at, status: latest.status, score: latest.score})
       });
 
     } else {
 
       this.state.submissions.forEach( sub => {sub.submissions.forEach(s => {
-        rows.push({id: rows.length, name: sub.user.name, date: s.submitted_at, status: s.status})
+        rows.push({id: rows.length, name: sub.user.name, date: s.submitted_at, status: s.status, score: s.score})
       }); });
 
     }
