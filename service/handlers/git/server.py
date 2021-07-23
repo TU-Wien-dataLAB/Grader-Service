@@ -179,6 +179,8 @@ class InfoRefsHandler(GitBaseHandler):
 
     async def prepare(self):
         await super().prepare()
+        if self.get_status() != 200:
+            return
         self.rpc = self.get_argument("service")[4:]
         self.cmd = f"git {self.rpc} --stateless-rpc --advertise-refs {self.get_gitdir(self.rpc)}"
         self.process = Subprocess(

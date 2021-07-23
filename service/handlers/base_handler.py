@@ -15,6 +15,7 @@ from server import GraderServer
 from jupyterhub.services.auth import HubAuthenticated
 from sqlalchemy.sql.expression import select
 from tornado import httputil, web
+from tornado.httpclient import HTTPClientError
 from tornado.web import HTTPError, RequestHandler
 from orm.base import DeleteState, Serializable
 from api.models.base_model_ import Model
@@ -82,7 +83,7 @@ class GraderBaseHandler(SessionMixin, web.RequestHandler):
         ) = httputil.split_host_and_port(hub_api_parsed.netloc)
         self.hub_api_base_path: str = hub_api_parsed.path
 
-        self.error_message = None
+        self.error_message = "Unknown Error"
         self.has_auth = False
 
     async def prepare(self) -> Optional[Awaitable[None]]:
@@ -97,12 +98,18 @@ class GraderBaseHandler(SessionMixin, web.RequestHandler):
         token = self.get_request_token()
         if token is None:
             self.error_message = "Unauthorized"
-            raise HTTPError(403)
+            self.write_error(403)
+            self.finish()
+            return
+            #raise HTTPError(403)
         
         user = await self.authenticate_token_user(token)
         if user is None:
             self.error_message = "Unauthorized"
-            raise HTTPError(403)
+            self.write_error(403)
+            self.finish()
+            return
+            # raise HTTPError(403)
 
         user_model = self.session.query(User).get(user["name"])
         if user_model is None:
@@ -192,7 +199,10 @@ class GraderBaseHandler(SessionMixin, web.RequestHandler):
             if user["kind"] != "user":
                 return None
         except HTTPError as e:
-            logging.getLogger().error(e)
+            logging.getLogger(str(self.__class__)).error(e.reason)
+            return None
+        except HTTPClientError as e:
+            logging.getLogger(str(self.__class__)).error(e.response.error)
             return None
         return user
     
@@ -203,6 +213,8 @@ class GraderBaseHandler(SessionMixin, web.RequestHandler):
     
     def write_error(self, status_code: int, **kwargs) -> None:
         self.clear()
+        if status_code == 403 and not self.has_auth:
+            status_code = 401
         self.set_status(status_code)
         self.write_json(ErrorMessage(self.error_message))
 

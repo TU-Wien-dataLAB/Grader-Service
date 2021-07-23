@@ -37,9 +37,9 @@ def upgrade():
     op.execute('INSERT INTO "takepart" ("username","lectid","role") VALUES ("user2",2,"student")')
 
     op.execute('INSERT INTO "takepart" ("username","lectid","role") VALUES ("fjaeger",1,"instructor")')
-    op.execute('INSERT INTO "takepart" ("username","lectid","role") VALUES ("ubuntu",1,"tutor")')
+    op.execute('INSERT INTO "takepart" ("username","lectid","role") VALUES ("ubuntu",1,"instructor")')
     op.execute('INSERT INTO "takepart" ("username","lectid","role") VALUES ("fjaeger",3,"student")')
-    op.execute('INSERT INTO "takepart" ("username","lectid","role") VALUES ("ubuntu",3,"student")')
+    op.execute('INSERT INTO "takepart" ("username","lectid","role") VALUES ("ubuntu",3,"instructor")')
 
     ## Assignments
     op.execute('INSERT INTO "assignment" ("name","lectid","duedate","points","status", "type") VALUES ("assignment_1",1,"2021-09-21 23:59:00.000",20,"released","user")')
