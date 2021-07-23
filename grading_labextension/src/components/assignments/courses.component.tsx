@@ -31,6 +31,9 @@ export class CoursesComponent extends React.Component<CoursesProps> {
 
   public render() {
     return <div className="course-list">
+       <h1>
+        <p style={{textAlign:'center'}}>Assignments</p>
+      </h1>
       {this.state.lectures.map((el, index) => <AssignmentsComponent lecture={el} open={index==0} />)}
     </div>
   }

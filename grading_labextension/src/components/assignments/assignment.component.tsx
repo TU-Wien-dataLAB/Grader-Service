@@ -54,6 +54,7 @@ export class AssignmentComponent extends React.Component<AssignmentProps> {
   public index: number;
   public iconSize: number = 14;
   public state = {
+    filesOpen: false,
     submissionsOpen: false,
     submissions: new Array<Submission>()
   };
@@ -107,7 +108,9 @@ export class AssignmentComponent extends React.Component<AssignmentProps> {
   }
 
   private toggleOpen = (collapsable: string) => {
-    if (collapsable == "submissions") {
+    if (collapsable == "files") {
+      this.setState({ filesOpen: !this.state.filesOpen });
+    } else if (collapsable == "submissions") {
       this.setState({ submissionsOpen: !this.state.submissionsOpen })
     }
   }
@@ -171,7 +174,7 @@ export class AssignmentComponent extends React.Component<AssignmentProps> {
 
           <Icon icon={IconNames.INBOX} iconSize={this.iconSize} className="flavor-icon"></Icon>
           {this.assignment.name}
-          { this.assignment.status != "released" && <Tag icon="warning-sign" intent="danger" style={{marginLeft: "10px"}} >Not released for students</Tag> }
+          { this.assignment.status != "released" && <Tag icon="warning-sign" intent="danger" className="assignment-tag" style={{marginLeft: "10px"}} >Not released for students</Tag> }
           <span className="button-list">
             <Button className="assignment-button" onClick={this.fetchAssignment} icon={IconNames.CLOUD_DOWNLOAD} disabled={this.assignment.status != "released"} outlined intent={Intent.PRIMARY}>Fetch</Button>
             <Button className="assignment-button" onClick={this.submitAssignment} icon={IconNames.SEND_MESSAGE} disabled={this.assignment.status != "fetched"} outlined intent={Intent.SUCCESS}>Submit</Button>
@@ -179,11 +182,16 @@ export class AssignmentComponent extends React.Component<AssignmentProps> {
           </span>
 
         </div>
-        <div className="assignment-title">
+        
+        <div className="assignment-title" onClick={() => this.toggleOpen("files")}>
+          <Icon icon={IconNames.CHEVRON_RIGHT} iconSize={this.iconSize}
+            className={`collapse-icon-small ${this.state.filesOpen ? "collapse-icon-small-open" : ""}`}></Icon>
           <Icon icon={IconNames.FOLDER_CLOSE} iconSize={this.iconSize} className="flavor-icon"></Icon>
           Exercises and Files
         </div>
+        <Collapse isOpen={this.state.filesOpen} keepChildrenMounted={true}>
         <div className="assignment-dir-listing" ref={_element => this.dirListingNode = _element}></div>
+        </Collapse>
 
         <div onClick={() => this.toggleOpen("submissions")} className="assignment-title">
           <Icon icon={IconNames.CHEVRON_RIGHT} iconSize={this.iconSize}
