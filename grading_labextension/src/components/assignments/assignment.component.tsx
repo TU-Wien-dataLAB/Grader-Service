@@ -86,6 +86,7 @@ export class AssignmentComponent extends React.Component<AssignmentProps> {
       await model.cd(this.lecture.code);
       await model.cd(this.assignment.name);
     } catch (error) {
+      console.log(error)
       return;
     }
 

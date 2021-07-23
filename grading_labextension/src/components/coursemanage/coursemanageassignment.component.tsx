@@ -182,7 +182,11 @@ export class CourseManageAssignmentComponent extends React.Component<AssignmentP
   private async editAssignment() {
     InputDialog.getDate({ title: 'Input Deadline' }).then((date: Dialog.IResult<string>) => {
       if (date.button.accept) {
-        this.assignment.due_date = date.value;
+        if (date.value === "") {
+          this.assignment.due_date = null;
+        } else {
+          this.assignment.due_date = date.value;
+        }
         this.assignment.type = this.assignment.type
         console.log(this.assignment);
         updateAssignment(this.lecture.id, this.assignment).subscribe(
