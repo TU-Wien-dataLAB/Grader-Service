@@ -9,18 +9,15 @@
  * https://openapi-generator.tech
  * Do not edit the class manually.
  */
-import { AssignmentFile } from './assignmentFile';
-import { Exercise } from './exercise';
 
 
 export interface Assignment { 
     id?: number;
     name?: string;
     type?: Assignment.TypeEnum;
-    exercises?: Array<Exercise>;
-    files?: Array<AssignmentFile>;
     due_date?: string;
     status?: Assignment.StatusEnum;
+    points?: number;
 }
 export namespace Assignment {
     export type TypeEnum = 'user' | 'group';
