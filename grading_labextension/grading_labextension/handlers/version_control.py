@@ -40,7 +40,8 @@ class PullHandler(ExtensionBaseHandler):
                 git_service.set_author()
             git_service.pull("grader", force=True)
             self.write("OK")
-        except GitError:
+        except GitError as e:
+            logging.getLogger(str(self.__class__)).error("GitError:\n" + e.error)
             self.write_error(400)
 
 
@@ -78,8 +79,19 @@ class PushHandler(ExtensionBaseHandler):
                 git_service.set_remote("grader")
                 git_service.set_author()
                 # TODO: create .gitignore file
-            git_service.commit()
-            git_service.push("grader", force=True)
-            self.write("OK")
-        except GitError:
+        except GitError as e:
+            logging.getLogger(str(self.__class__)).error("GitError:\n" + e.error)
             self.write_error(400)
+            return
+        try:
+            git_service.commit()
+        except GitError as e:
+            logging.getLogger(str(self.__class__)).error("GitError:\n" + e.error)
+        ## committing might fail because there is nothing to commit -> try to push regardless
+        try:
+            git_service.push("grader", force=True)
+        except GitError as e:
+            logging.getLogger(str(self.__class__)).error("GitError:\n" + e.error)
+            self.write_error(400)
+            return
+        self.write("OK")

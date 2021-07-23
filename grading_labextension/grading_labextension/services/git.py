@@ -51,7 +51,7 @@ class GitService(Configurable):
         self.log.info(f"Setting remote {origin} for {self.path}")
         url = posixpath.join(self.git_remote_url, self.lecture_code, self.assignment_name, self.repo_type)
         self._run_command(f"git remote add {origin} {self.git_http_scheme}://oauth:{self.git_access_token}@{url}", cwd=self.path)
-        self._run_command(f"git push --set-upstream {origin} main", cwd=self.path)
+        # self._run_command(f"git push --set-upstream {origin} main", cwd=self.path)
     
     def delete_remote(self, origin: str):
         raise NotImplementedError()
@@ -64,18 +64,21 @@ class GitService(Configurable):
             self.log.info(f"Calling init for {self.path}")
             if self.git_version < (2,28):
                 self._run_command(f"git init {self.path}")
-                self._run_command("git checkout -b main")
+                self._run_command("git checkout -b main", cwd=self.path)
             else:
-                self._run_command(f"git init {self.path} -b main")
+                self._run_command(f"git init {self.path} -b main", cwd=self.path)
     
     def is_git(self):
         return os.path.exists(os.path.join(self.path, ".git"))
     
 
     def commit(self, m=str(datetime.now())):
-        self.log.info("Committing repository")
-        self._run_command(f'git add -A', cwd=self.path)
-        self._run_command(f'git commit -m "{m}"', cwd=self.path)
+        # self.log.info("Adding all files")
+        # self._run_command(f'git add -A', cwd=self.path)
+        # self.log.info("Committing repository")
+        # self._run_command(f'git commit -m "{m}"', cwd=self.path)
+        self.log.info("Adding all files and committing")
+        self._run_command(f'sh -c "git add -A && git commit -m "{m}""', cwd=self.path)
 
     def set_author(self, author=getpass.getuser()):
         self._run_command(f'git config user.name "{author}"', cwd=self.path)
@@ -102,6 +105,6 @@ class GitService(Configurable):
             if capture_output:
                 return None
             else:
-                raise GitError(e.stderr)
+                raise GitError(str(e.stdout, 'utf-8') + str(e.stderr, 'utf-8'))
         except FileNotFoundError as e:
             raise GitError(e.strerror)
