@@ -6,8 +6,6 @@
   color: var(--text-color);
   font-size: 12pt;
   margin: 8pt;
-  padding-left: 10pt;
-  padding-top: 6pt;
   user-select: none;
   -webkit-user-select: none;
   cursor: pointer;

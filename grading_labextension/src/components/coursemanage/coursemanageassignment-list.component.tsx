@@ -3,7 +3,7 @@ import { createAssignment, getAllAssignments } from '../../services/assignments.
 import { Collapse } from '@jupyterlab/ui-components'
 import { Assignment } from '../../model/assignment';
 import { CourseManageAssignmentComponent } from './coursemanageassignment.component';
-import { Button, Icon } from '@blueprintjs/core';
+import { Button, Card, Elevation, Icon } from '@blueprintjs/core';
 import { Dialog, showDialog,showErrorMessage } from '@jupyterlab/apputils/lib/dialog';
 //import { InputDialog } from '@jupyterlab/apputils/lib/inputdialog';
 import { Widget } from '@lumino/widgets';
@@ -192,6 +192,7 @@ export class CourseManageAssignmentsComponent extends React.Component<Assignment
 
   public render() {
     return <div className="assignment-list">
+    <Card elevation={Elevation.TWO}>
       <div onClick={this.toggleOpen} className="collapse-header">
         <Icon icon="learning" className="flavor-icon"></Icon>
         <Icon icon="chevron-down" className={`collapse-icon ${this.state.isOpen ? "collapse-icon-open" : ""}`}></Icon>
@@ -209,6 +210,7 @@ export class CourseManageAssignmentsComponent extends React.Component<Assignment
           <Button icon="add" outlined onClick={() => this.createAssignment(this.lecture.id)} className="assignment-button">Create new Assignment</Button>
         </div>
       </Collapse>
+      </Card>
     </div>;
   }
 }
