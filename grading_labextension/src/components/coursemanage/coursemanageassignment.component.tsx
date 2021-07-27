@@ -158,7 +158,6 @@ export class CourseManageAssignmentComponent extends React.Component<AssignmentP
     });
     if (!result.button.accept) return;
 
-    // TODO: release assignment
     this.state.assignment.status = "released"
     updateAssignment(this.lecture.id,this.state.assignment).subscribe(a => this.setState({assignment : a}))
   }
@@ -175,7 +174,6 @@ export class CourseManageAssignmentComponent extends React.Component<AssignmentP
       filename = result.value
     }
     if (!result.button.accept) return;
-    // TODO: finish
     console.log("Create file: " + filename);
     GlobalObjects.docManager.createNew(`source/${this.lecture.code}/${this.state.assignment.name}/${filename}`)
     this.dirListing.update()

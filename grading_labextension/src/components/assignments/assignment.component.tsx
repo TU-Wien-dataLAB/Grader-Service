@@ -28,8 +28,8 @@ export class ExistingNodeRenderer extends DirListing.Renderer {
     super();
     this.node = node
   }
-  
-   createNode(): HTMLElement {
+
+  createNode(): HTMLElement {
     const CONTENT_CLASS = 'jp-DirListing-content';
     const HEADER_CLASS = 'jp-DirListing-header';
 
@@ -77,10 +77,10 @@ export class AssignmentComponent extends React.Component<AssignmentProps> {
   public async componentDidMount() {
     this.getSubmissions();
     let renderer = new ExistingNodeRenderer(this.dirListingNode);
-    let model = new FilterFileBrowserModel({auto: true, manager: GlobalObjects.docManager});
+    let model = new FilterFileBrowserModel({ auto: true, manager: GlobalObjects.docManager });
 
     const LISTING_CLASS = 'jp-FileBrowser-listing';
-    this.dirListing = new DirListing({model, renderer})
+    this.dirListing = new DirListing({ model, renderer })
     this.dirListing.addClass(LISTING_CLASS);
     try {
       await model.cd(this.lecture.code);
@@ -173,6 +173,29 @@ export class AssignmentComponent extends React.Component<AssignmentProps> {
     );
   }
 
+  private getSubmissionComponent() {
+    if (this.state.submissions.length > 0) {
+      return <div className="assignment-content">
+        {this.state.submissions.map((submission, i) =>
+          <div className="submission-element" >
+            <Icon icon={IconNames.FORM} iconSize={this.iconSize} className="flavor-icon"></Icon>
+            {submission.submitted_at}
+            {submission.status != "not_graded" ?
+              <Button className="assignment-button" icon={IconNames.CLOUD_DOWNLOAD} active={true} outlined={true} intent={Intent.PRIMARY} small={true}>
+                Fetch Feedback
+              </Button>
+              : null}
+            {i != this.state.submissions.length -1 ? <Divider /> : null}
+          </div>
+        )}
+      </div>
+    } else {
+      return <div className="assignment-content">
+        No submissions yet!
+    </div>
+    }
+  }
+
   public render() {
     return <li key={this.index}>
       <div className="assignment">
@@ -180,15 +203,15 @@ export class AssignmentComponent extends React.Component<AssignmentProps> {
 
           <Icon icon={IconNames.INBOX} iconSize={this.iconSize} className="flavor-icon"></Icon>
           {this.assignment.name}
-          { this.assignment.status != "released" && <Tag icon="warning-sign" intent="danger" className="assignment-tag" style={{marginLeft: "10px"}} >Not released for students</Tag> }
+          {this.assignment.status != "released" && <Tag icon="warning-sign" intent="danger" className="assignment-tag" style={{ marginLeft: "10px" }} >Not released for students</Tag>}
           <span className="button-list">
             <Button className="assignment-button" onClick={this.fetchAssignment} icon={IconNames.CLOUD_DOWNLOAD} disabled={this.assignment.status != "released"} outlined intent={Intent.PRIMARY}>Fetch</Button>
             <Button className="assignment-button" onClick={this.submitAssignment} icon={IconNames.SEND_MESSAGE} disabled={this.assignment.status != "fetched"} outlined intent={Intent.SUCCESS}>Submit</Button>
-            {this.assignment.due_date && (<DeadlineComponent due_date={this.assignment.due_date}/>)}
+            {this.assignment.due_date && (<DeadlineComponent due_date={this.assignment.due_date} />)}
           </span>
 
         </div>
-        
+
         <div className="assignment-title" onClick={() => this.toggleOpen("files")}>
           <Icon icon={IconNames.CHEVRON_RIGHT} iconSize={this.iconSize}
             className={`collapse-icon-small ${this.state.filesOpen ? "collapse-icon-small-open" : ""}`}></Icon>
@@ -196,7 +219,7 @@ export class AssignmentComponent extends React.Component<AssignmentProps> {
           Exercises and Files
         </div>
         <Collapse isOpen={this.state.filesOpen} keepChildrenMounted={true}>
-        <div className="assignment-dir-listing" ref={_element => this.dirListingNode = _element}></div>
+          <div className="assignment-dir-listing" ref={_element => this.dirListingNode = _element}></div>
         </Collapse>
 
         <div onClick={() => this.toggleOpen("submissions")} className="assignment-title">
@@ -206,19 +229,7 @@ export class AssignmentComponent extends React.Component<AssignmentProps> {
           Submissions
         </div>
         <Collapse isOpen={this.state.submissionsOpen}>
-          <div className="assignment-content">
-            {this.state.submissions.map((submission, i) =>
-              <div className="submission-element" >
-                <Icon icon={IconNames.FORM} iconSize={this.iconSize} className="flavor-icon"></Icon>
-                {submission.submitted_at}
-                {submission.status != "not_graded" ?
-                  <Button className="assignment-button" icon={IconNames.CLOUD_DOWNLOAD} active={true} outlined={true} intent={Intent.PRIMARY} small={true}>
-                    Fetch Feedback
-                  </Button>
-                  : null}
-              </div>
-            )}
-          </div>
+          {this.getSubmissionComponent()}
         </Collapse>
       </div>
       <Divider />
