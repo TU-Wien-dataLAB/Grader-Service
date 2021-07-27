@@ -1,6 +1,6 @@
 import { URLExt } from '@jupyterlab/coreutils';
 import { ServerConnection } from '@jupyterlab/services';
-import { Observable, from } from 'rxjs';
+import { Observable, from, throwError } from 'rxjs';
 import { switchMap } from 'rxjs/operators'
 
 export enum HTTPMethod {
@@ -28,6 +28,10 @@ export function request<T>(method: HTTPMethod, endPoint: string, body: object = 
 
   return from(ServerConnection.makeRequest(requestUrl, options, settings)).pipe(
     switchMap(async response => {
+      if(response.status != 200) {
+        throw throwError(await response.text())
+      }
+      console.log(response)
       let data: any = await response.text();
       if (data.length > 0) {
         try {
