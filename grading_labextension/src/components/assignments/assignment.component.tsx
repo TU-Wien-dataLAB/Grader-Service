@@ -8,7 +8,7 @@ import { GlobalObjects } from '../../index';
 import { showErrorMessage, showDialog, Dialog } from '@jupyterlab/apputils'
 import { Submission } from '../../model/submission';
 import { getSubmissions, submitAssignment } from '../../services/submissions.service'
-import { fetchAssignment } from '../../services/assignments.service'
+import { pullAssignment } from '../../services/assignments.service'
 import { Lecture } from '../../model/lecture';
 import { DirListing } from '@jupyterlab/filebrowser/lib/listing'
 import { FilterFileBrowserModel } from '@jupyterlab/filebrowser/lib/model';
@@ -142,7 +142,7 @@ export class AssignmentComponent extends React.Component<AssignmentProps> {
       })
       if (result.button.accept) {
         // update assignment
-        this.assignment = await fetchAssignment(this.lecture.id, this.assignment.id).toPromise();
+        pullAssignment(this.lecture.id, this.assignment.id, 'release');
       }
     } catch (e) {
       showErrorMessage("Error Fetching Assignment", e);

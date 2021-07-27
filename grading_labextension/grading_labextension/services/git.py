@@ -89,8 +89,11 @@ class GitService(Configurable):
     def set_author(self, author=getpass.getuser()):
         self._run_command(f'git config user.name "{author}"', cwd=self.path)
     
-    def clone():
-        raise NotImplementedError()
+    def clone(self,origin: str, force=False):
+        self.init(force=force)
+        self.set_remote(origin=origin)
+        self.pull(origin=origin,force=force)
+
 
     @property
     def git_version(self):

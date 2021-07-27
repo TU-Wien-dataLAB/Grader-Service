@@ -22,9 +22,13 @@ export interface AssignmentProps {
   assignments: Assignment[];
 }
 
+export interface AssignmentState {
+   isOpen: boolean;
+   submissions: { user: User, submissions: Submission[] }[];
+   assignment: Assignment;
+}
 
-export class CourseManageAssignmentComponent extends React.Component<AssignmentProps> {
-  public assignment: Assignment;
+export class CourseManageAssignmentComponent extends React.Component<AssignmentProps, AssignmentState> {
   public lectureName: string;
   public lecture: Lecture;
   public index: number;
@@ -32,6 +36,7 @@ export class CourseManageAssignmentComponent extends React.Component<AssignmentP
   public state = {
     isOpen: false,
     submissions: new Array<{ user: User, submissions: Submission[] }>(),
+    assignment: {} as Assignment,
   };
   public dirListingNode: HTMLElement;
   public dirListing: DirListing;
@@ -39,16 +44,16 @@ export class CourseManageAssignmentComponent extends React.Component<AssignmentP
 
   constructor(props: AssignmentProps) {
     super(props);
-    this.assignment = props.assignment;
+    this.state.assignment = props.assignment;
     this.index = props.assignment.id;
     this.lectureName = props.lectureName;
     this.lecture = props.lecture;
   }
 
   public async componentDidMount() {
-    if (this.assignment.status == "released") {
-      getAllSubmissions(this.lecture, this.assignment, false, true).subscribe(userSubmissions => {
-        this.setState(this.state.submissions = userSubmissions)
+    if (this.state.assignment.status == "released") {
+      getAllSubmissions(this.lecture, this.state.assignment, false, true).subscribe(userSubmissions => {
+        this.setState({submissions : userSubmissions})
         console.log(this.state.submissions)
         console.log(this.state.submissions.length)
       }
@@ -63,7 +68,7 @@ export class CourseManageAssignmentComponent extends React.Component<AssignmentP
     this.dirListing.addClass(LISTING_CLASS);
     await model.cd("source");
     await model.cd(this.lecture.code);
-    await model.cd(this.assignment.name);
+    await model.cd(this.state.assignment.name);
     this.dirListingNode.onclick = async (ev) => {
       let model = this.dirListing.modelForClick(ev);
       if (model == undefined) {
@@ -116,44 +121,46 @@ export class CourseManageAssignmentComponent extends React.Component<AssignmentP
   private async pushAssignment() {
     let result = await showDialog({
       title: "Push Assignment",
-      body: `Do you want to push ${this.assignment.name}? This updates the state of the assignment on the server with your local state.`,
+      body: `Do you want to push ${this.state.assignment.name}? This updates the state of the assignment on the server with your local state.`,
       buttons: [Dialog.cancelButton(), Dialog.okButton({ label: "Push" })],
     });
     if (!result.button.accept) return;
 
-    pushAssignment(this.lecture.id, this.assignment.id, "source");
+    pushAssignment(this.lecture.id, this.state.assignment.id, "source");
 
     // TODO: remove push to release, only for test purposes before nbconvert works
-    pushAssignment(this.lecture.id, this.assignment.id, "release");
+    pushAssignment(this.lecture.id, this.state.assignment.id, "release");
   }
 
   private async pullAssignment() {
     let result = await showDialog({
       title: "Pull Assignment",
-      body: `Do you want to pull ${this.assignment.name}? This updates your assignment with the state of the server.`,
+      body: `Do you want to pull ${this.state.assignment.name}? This updates your assignment with the state of the server.`,
       buttons: [Dialog.cancelButton(), Dialog.okButton({ label: "Pull" })],
     });
     if (!result.button.accept) return;
 
-    pullAssignment(this.lecture.id, this.assignment.id, "source");
+    pullAssignment(this.lecture.id, this.state.assignment.id, "source");
   }
 
   private async releaseAssignment() {
     let result = await showDialog({
       title: "Release Assignment",
-      body: `Do you want to release ${this.assignment.name} for all students? This can NOT be undone!`,
+      body: `Do you want to release ${this.state.assignment.name} for all students? This can NOT be undone!`,
       buttons: [Dialog.cancelButton(), Dialog.warnButton({ label: "Release" })],
     });
     if (!result.button.accept) return;
 
     result = await showDialog({
       title: "Confirmation",
-      body: `Are you sure you want to release ${this.assignment.name}?`,
+      body: `Are you sure you want to release ${this.state.assignment.name}?`,
       buttons: [Dialog.cancelButton(), Dialog.warnButton({ label: "Release" })],
     });
     if (!result.button.accept) return;
 
     // TODO: release assignment
+    this.state.assignment.status = "released"
+    updateAssignment(this.lecture.id,this.state.assignment).subscribe(a => this.setState({assignment : a}))
   }
 
   private async createFile(notebook: boolean = true) {
@@ -170,26 +177,26 @@ export class CourseManageAssignmentComponent extends React.Component<AssignmentP
   private async delete() {
     let result = await showDialog({
       title: "Release Assignment",
-      body: `Do you want to delete ${this.assignment.name}? This can NOT be undone!`,
+      body: `Do you want to delete ${this.state.assignment.name}? This can NOT be undone!`,
       buttons: [Dialog.cancelButton(), Dialog.warnButton({ label: "Delete" })],
     });
     if (!result.button.accept) return;
 
-    deleteAssignment(this.lecture.id, this.assignment.id)
-    this.props.assignments.filter(a => a.id != this.assignment.id);
+    deleteAssignment(this.lecture.id, this.state.assignment.id)
+    this.props.assignments.filter(a => a.id != this.state.assignment.id);
   }
 
   private async editAssignment() {
     InputDialog.getDate({ title: 'Input Deadline' }).then((date: Dialog.IResult<string>) => {
       if (date.button.accept) {
         if (date.value === "") {
-          this.assignment.due_date = null;
+          this.state.assignment.due_date = null;
         } else {
-          this.assignment.due_date = date.value;
+          this.state.assignment.due_date = date.value;
         }
-        this.assignment.type = this.assignment.type
-        console.log(this.assignment);
-        updateAssignment(this.lecture.id, this.assignment).subscribe(
+        this.state.assignment.type = this.state.assignment.type
+        console.log(this.state.assignment);
+        updateAssignment(this.lecture.id, this.state.assignment).subscribe(
           assignment => {
             console.log(assignment)
           })
@@ -205,16 +212,16 @@ export class CourseManageAssignmentComponent extends React.Component<AssignmentP
             <Icon icon="chevron-right" iconSize={this.iconSize}
               className={`collapse-icon-small ${this.state.isOpen ? "collapse-icon-small-open" : ""}`}></Icon>
             <Icon icon="inbox" iconSize={this.iconSize} className="flavor-icon"></Icon>
-            {this.assignment.name} Source Files
+            {this.state.assignment.name} Source Files
           </span>
 
           <span className="button-list">
             <Button icon='edit' outlined className="assignment-button" onClick={() => this.editAssignment()}>Edit</Button>
             <Button icon='git-push' intent={"success"} outlined className="assignment-button" onClick={() => this.pushAssignment()} >Push</Button>
             <Button icon='git-pull' intent={"primary"} outlined className="assignment-button" onClick={() => this.pullAssignment()}> Pull</Button>
-            <Button icon='cloud-upload' outlined className="assignment-button" disabled={this.assignment.status == "created"} onClick={() => this.releaseAssignment()} >Release</Button>
+            <Button icon='cloud-upload' outlined className="assignment-button" /*TODO: make state change to pushed disabled={this.state.assignment.status == "created"}*/ onClick={() => this.releaseAssignment()} >Release</Button>
             <Button icon='delete' intent="danger" outlined className="assignment-button" onClick={() => this.delete()}>Delete</Button>
-            <Button icon="arrow-top-right" intent="primary" outlined className="assignment-button" onClick={() => { this.openGrading(this.lecture.id, this.assignment.id) }}>{this.state.submissions.length} {"Submission" + ((this.state.submissions.length > 1) ? "s" : "")}</Button>
+            <Button icon="arrow-top-right" intent="primary" outlined className="assignment-button" onClick={() => { this.openGrading(this.lecture.id, this.state.assignment.id) }}>{this.state.submissions.length} {"Submission" + ((this.state.submissions.length > 1) ? "s" : "")}</Button>
           </span>
         </div>
 
