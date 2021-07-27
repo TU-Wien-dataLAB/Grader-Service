@@ -22,6 +22,7 @@ class LectureBaseHandler(ExtensionBaseHandler):
                 header=self.grader_authentication_header,
             )
         except HTTPError as e:
+            self.set_status(e.code)
             self.write_error(e.code)
             return
         self.write(json.dumps(response))
@@ -35,6 +36,7 @@ class LectureBaseHandler(ExtensionBaseHandler):
                 header=self.grader_authentication_header,
             )
         except HTTPError as e:
+            self.set_status(e.code)
             self.write_error(e.code)
             return
         self.write(json.dumps(response))
@@ -53,6 +55,7 @@ class LectureObjectHandler(ExtensionBaseHandler):
                 header=self.grader_authentication_header,
             )
         except HTTPError as e:
+            self.set_status(e.code)
             self.write_error(e.code)
             return
         self.write(json.dumps(response_data))
@@ -66,6 +69,7 @@ class LectureObjectHandler(ExtensionBaseHandler):
                 header=self.grader_authentication_header,
             )
         except HTTPError as e:
+            self.set_status(e.code)
             self.write_error(e.code)
             return
         self.write(json.dumps(response_data))
@@ -79,6 +83,7 @@ class LectureObjectHandler(ExtensionBaseHandler):
                 header=self.grader_authentication_header,
             )
         except HTTPError as e:
+            self.set_status(e.code)
             self.write_error(e.code)
             return
         self.write("OK")

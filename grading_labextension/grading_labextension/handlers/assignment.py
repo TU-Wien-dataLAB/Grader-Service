@@ -19,6 +19,7 @@ class AssignmentBaseHandler(ExtensionBaseHandler):
                 header=self.grader_authentication_header,
             )
         except HTTPError as e:
+            self.set_status(e.code)
             self.write_error(e.code)
             return
         self.write(json.dumps(response))
@@ -39,6 +40,7 @@ class AssignmentBaseHandler(ExtensionBaseHandler):
                 header=self.grader_authentication_header,
             )
         except HTTPError as e:
+            self.set_status(e.code)
             self.write_error(e.code)
             return
         # if we did not get an error when creating the assignment (i.e. the user is authorized etc.) then we can create the directory structure if it does not exist yet
@@ -68,6 +70,7 @@ class AssignmentObjectHandler(ExtensionBaseHandler):
                 header=self.grader_authentication_header,
             )
         except HTTPError as e:
+            self.set_status(e.code)
             self.write_error(e.code)
             return
         self.write(json.dumps(response))
@@ -87,6 +90,7 @@ class AssignmentObjectHandler(ExtensionBaseHandler):
                 header=self.grader_authentication_header,
             )
         except HTTPError as e:
+            self.set_status(e.code)
             self.write_error(e.code)
             return
         self.write(json.dumps(response))
@@ -99,6 +103,7 @@ class AssignmentObjectHandler(ExtensionBaseHandler):
                 header=self.grader_authentication_header,
             )
         except HTTPError as e:
+            self.set_status(e.code)
             self.write_error(e.code)
             return
         self.write(json.dumps(response))

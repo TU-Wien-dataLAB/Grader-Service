@@ -26,6 +26,7 @@ class SubmissionHandler(ExtensionBaseHandler):
                 header=self.grader_authentication_header,
             )
         except HTTPError as e:
+            self.set_status(e.code)
             self.write_error(e.code)
             return
         self.write(json.dumps(response))
@@ -40,6 +41,7 @@ class SubmissionHandler(ExtensionBaseHandler):
                 header=self.grader_authentication_header,
             )
         except HTTPError as e:
+            self.set_status(e.code)
             self.write_error(e.code)
             return
         self.write(json.dumps(response))
@@ -63,6 +65,7 @@ class FeedbackHandler(ExtensionBaseHandler):
                 header=self.grader_authentication_header,
             )
         except HTTPError as e:
+            self.set_status(e.code)
             self.write_error(e.code)
             return
         self.write(response)

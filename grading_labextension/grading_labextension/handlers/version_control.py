@@ -24,6 +24,7 @@ class PullHandler(ExtensionBaseHandler):
                 header=self.grader_authentication_header,
             )
         except HTTPError as e:
+            self.set_status(e.code)
             self.write_error(e.code)
             return
 
@@ -65,6 +66,7 @@ class PushHandler(ExtensionBaseHandler):
                 header=self.grader_authentication_header,
             )
         except HTTPError as e:
+            self.set_status(e.code)
             self.write_error(e.code)
             return
 
