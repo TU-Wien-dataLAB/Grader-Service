@@ -32,6 +32,7 @@ class PullHandler(ExtensionBaseHandler):
             assignment_name=assignment["name"],
             repo_type=repo,
             config=self.config,
+            force_user_repo=True if repo=="release" else False
         )
         try:
             if not git_service.is_git():

@@ -25,13 +25,13 @@ class GitService(Configurable):
     git_http_scheme = Unicode(os.environ.get("GRADER_HTTP_SCHEME", 'http'), allow_none=False).tag(config=True)
     git_remote_url = Unicode(f'{os.environ.get("GRADER_HOST_URL", "127.0.0.1")}:{os.environ.get("GRADER_HOST_PORT", "4010")}{os.environ.get("GRADER_GIT_BASE_URL", "/services/grader/git")}', allow_none=False).tag(config=True)
 
-    def __init__(self, lecture_code: str, assignment_name: str, repo_type: str, *args, **kwargs):
+    def __init__(self, lecture_code: str, assignment_name: str, repo_type: str, force_user_repo=False, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self._git_version = None
         self.lecture_code = lecture_code
         self.assignment_name = assignment_name
         self.repo_type = repo_type
-        if self.repo_type in {"user", "group"}:
+        if self.repo_type in {"user", "group"} or force_user_repo:
             self.path = os.path.join(self.git_root_dir, self.lecture_code, self.assignment_name)
         else:
             self.path = os.path.join(self.git_root_dir, self.repo_type, self.lecture_code, self.assignment_name)
