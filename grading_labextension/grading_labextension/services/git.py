@@ -57,7 +57,13 @@ class GitService(Configurable):
         raise NotImplementedError()
 
     def pull(self, origin: str, force=False):
-        self._run_command(f"git pull {origin} main" + (" --force" if force else ""), cwd=self.path)
+        if force:
+            self._run_command(f'sh -c "git clean -fd && git fetch --all && git reset --hard {origin}/main"',cwd=self.path)
+            #self._run_command(f"git clean -fd", cwd=self.path)
+            #self._run_command(f"git fetch --all", cwd=self.path)
+            #self._run_command(f"git reset --hard {origin}/main", cwd=self.path)
+        else:
+            self._run_command(f"git pull {origin} main", cwd=self.path)
 
     def init(self, force=False):
         if not self.is_git() or force:

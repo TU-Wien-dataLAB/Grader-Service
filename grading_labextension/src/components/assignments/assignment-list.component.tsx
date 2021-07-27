@@ -42,7 +42,7 @@ export class AssignmentsComponent extends React.Component<AssignmentListProps> {
       <div onClick={this.toggleOpen} className="collapse-header">
         <Icon icon={IconNames.LEARNING} className="flavor-icon"></Icon>
         {this.lecture.name}
-        { this.state.assignments.length == 0 && <Tag icon="warning-sign" intent="primary" className="assignment-tag" style={{marginLeft: "10px"}}>No assignments created/released yet</Tag>}
+        { this.state.assignments.length == 0 && <Tag icon="warning-sign" intent="primary" className="assignment-tag" style={{marginLeft: "10px"}}>No assignments released yet</Tag>}
         <Icon iconSize={Icon.SIZE_LARGE} icon={IconNames.CHEVRON_DOWN} className={`collapse-icon ${this.state.isOpen ? "collapse-icon-open" : ""}`}></Icon> 
         </div>
       <Collapse isOpen={this.state.isOpen} className="collapse-body" transitionDuration={300} keepChildrenMounted={true}>
