@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { Assignment } from '../../model/assignment';
 
-import { Icon, Collapse, Button, Intent, Tag } from "@blueprintjs/core";
+import { Icon, Collapse, Button, Intent, Tag, Divider } from "@blueprintjs/core";
 import { IconNames } from "@blueprintjs/icons";
 
 import { GlobalObjects } from '../../index';
@@ -221,6 +221,7 @@ export class AssignmentComponent extends React.Component<AssignmentProps> {
           </div>
         </Collapse>
       </div>
+      <Divider />
     </li>
   }
 }

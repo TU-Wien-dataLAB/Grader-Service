@@ -7,6 +7,7 @@ import { AssignmentComponent } from './assignment.component';
 import { Card, Elevation, Icon, Tag } from "@blueprintjs/core";
 import { IconNames } from "@blueprintjs/icons";
 import { Lecture } from '../../model/lecture';
+import { Scope, UserPermissions } from '../../services/permission.service';
 
 export interface AssignmentListProps {
   lecture: Lecture;
@@ -47,7 +48,9 @@ export class AssignmentsComponent extends React.Component<AssignmentListProps> {
         </div>
       <Collapse isOpen={this.state.isOpen} className="collapse-body" transitionDuration={300} keepChildrenMounted={true}>
         <ul>
-          {this.state.assignments.map((el, index) =>
+          {this.state.assignments.filter(v => {
+            return v.status == "released" || UserPermissions.getScope(this.lecture) > Scope.student
+          }).map((el, index) =>
             <AssignmentComponent index={index} lecture={this.lecture} assignment={el} />
             )}
 
