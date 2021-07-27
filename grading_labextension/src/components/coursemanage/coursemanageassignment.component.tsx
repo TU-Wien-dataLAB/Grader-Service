@@ -165,13 +165,20 @@ export class CourseManageAssignmentComponent extends React.Component<AssignmentP
 
   private async createFile(notebook: boolean = true) {
     let result: Dialog.IResult<string>
+    let filename: string = ";"
     if (notebook) {
       result = await InputDialog.getText({ title: 'Notebook name' });
+  
+      filename = result.value + ".ipynb"
     } else {
       result = await InputDialog.getText({ title: 'Filename with extension' });
+      filename = result.value
     }
+    if (!result.button.accept) return;
     // TODO: finish
-    console.log("Create file: " + result);
+    console.log("Create file: " + filename);
+    GlobalObjects.docManager.createNew(`source/${this.lecture.code}/${this.state.assignment.name}/${filename}`)
+    this.dirListing.update()
   }
 
   private async delete() {

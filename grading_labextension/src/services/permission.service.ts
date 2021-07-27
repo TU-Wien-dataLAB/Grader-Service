@@ -29,7 +29,7 @@ export namespace UserPermissions {
     return permissions
   }
 
-  export async function getScope(lecture: Lecture) {
+  export function getScope(lecture: Lecture) {
     if (permissions == null) {
       return null;
     }

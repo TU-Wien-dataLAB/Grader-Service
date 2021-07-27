@@ -18,6 +18,7 @@ import { DocumentRegistry } from '@jupyterlab/docregistry';
 import { ServiceManager } from '@jupyterlab/services';
 import { IDocumentManager } from '@jupyterlab/docmanager';
 import { IFileBrowserFactory } from '@jupyterlab/filebrowser';
+import { UserPermissions } from './services/permission.service';
 
 
 namespace AssignmentsCommandIDs {
@@ -62,9 +63,9 @@ const extension: JupyterFrontEndPlugin<void> = {
     GlobalObjects.commands = app.commands;
     GlobalObjects.docRegistry = app.docRegistry;
     GlobalObjects.serviceManager = app.serviceManager;
-    GlobalObjects.docManager = docManager;  
+    GlobalObjects.docManager = docManager;
     GlobalObjects.browserFactory = browserFactory;
-    
+
     /* ##### Course Manage View Widget ##### */
     let command: string = CourseManageCommandIDs.create;
 
@@ -81,31 +82,42 @@ const extension: JupyterFrontEndPlugin<void> = {
       }
     })
 
-    command = CourseManageCommandIDs.open;
-    app.commands.addCommand(command, {
-      label: 'Course Management',
-      execute: async () => {
-        const gradingWidget = await app.commands.execute(CourseManageCommandIDs.create)
-
-        if (!gradingWidget.isAttached) {
-          // Attach the widget to the main work area if it's not there
-          app.shell.add(gradingWidget, 'main');
+    // If the user has no instructor roles in any lecture we do not display the course management
+    UserPermissions.loadPermissions().then(() => {
+      let permissions = UserPermissions.getPermissions()
+      let sum = 0;
+      for (var el in permissions) {
+        if (permissions.hasOwnProperty(el)) {
+          sum += permissions[el];
         }
-        // Activate the widget
-        app.shell.activateById(gradingWidget.id);
-      },
-      icon: checkIcon
+      }
+      if (sum != 0) {
+        console.log("Non-student permissions found! Adding coursemanage launcher");
+        command = CourseManageCommandIDs.open;
+        app.commands.addCommand(command, {
+          label: 'Course Management',
+          execute: async () => {
+            const gradingWidget = await app.commands.execute(CourseManageCommandIDs.create)
+
+            if (!gradingWidget.isAttached) {
+              // Attach the widget to the main work area if it's not there
+              app.shell.add(gradingWidget, 'main');
+            }
+            // Activate the widget
+            app.shell.activateById(gradingWidget.id);
+          },
+          icon: checkIcon
+        });
+
+        // Add the command to the launcher
+        console.log("Add course management launcher");
+        launcher.add({
+          command: command,
+          category: 'Assignments',
+          rank: 0
+        });
+      }
     });
-
-    // Add the command to the launcher
-    console.log("Add course management launcher");
-    launcher.add({
-      command: command,
-      category: 'Assignments',
-      rank: 0
-    });
-
-
 
     // Add the command to the palette.
     // palette.addItem({ command, category: 'Tutorial' });
