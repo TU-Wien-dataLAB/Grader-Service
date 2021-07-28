@@ -1,5 +1,6 @@
 import logging
 import subprocess
+from typing import List
 from traitlets.config.configurable import Configurable
 from traitlets.config.loader import Config
 from traitlets.traitlets import Int, TraitError, Unicode, validate
@@ -8,6 +9,8 @@ import posixpath
 import shlex
 from datetime import datetime
 import getpass
+import shutil
+import sys
 
 class GitError(Exception):
     def __init__(self, error: str):
@@ -93,6 +96,31 @@ class GitService(Configurable):
         self.init(force=force)
         self.set_remote(origin=origin)
         self.pull(origin=origin,force=force)
+    
+
+    def delete_repo_contents(self):
+        for root, dirs, files in os.walk(self.path):
+            for f in files:
+                os.unlink(os.path.join(root, f))
+            for d in dirs:
+                if d != ".git":
+                    shutil.rmtree(os.path.join(root, d))
+    
+
+    # ATTENTION: dirs_exist_ok was only added in Python 3.8
+    def copy_repo_contents(self, src: str):
+        ignore = shutil.ignore_patterns(".git", "__pycache__")
+        if sys.version_info.major == 3 and sys.version_info.minor >= 8:
+            shutil.copytree(src, self.path, ignore=ignore, dirs_exist_ok=True)
+        else:
+            for item in os.listdir(src):
+                s = os.path.join(src, item)
+                d = os.path.join(self.path, item)
+                if os.path.isdir(s):
+                    shutil.copytree(s, d, ignore=ignore)
+                else:
+                    shutil.copy2(s, d)
+
 
 
     @property

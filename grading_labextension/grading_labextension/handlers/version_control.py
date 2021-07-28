@@ -1,8 +1,10 @@
 import logging
+import os
 from grading_labextension.registry import register_handler
 from grading_labextension.handlers.base_handler import ExtensionBaseHandler
 from grading_labextension.services.git import GitError, GitService
 from tornado.httpclient import HTTPError
+from distutils.dir_util import copy_tree, remove_tree
 
 
 @register_handler(
@@ -33,7 +35,7 @@ class PullHandler(ExtensionBaseHandler):
             assignment_name=assignment["name"],
             repo_type=repo,
             config=self.config,
-            force_user_repo=True if repo=="release" else False
+            force_user_repo=True if repo == "release" else False,
         )
         try:
             if not git_service.is_git():
@@ -76,6 +78,17 @@ class PushHandler(ExtensionBaseHandler):
             repo_type=repo,
             config=self.config,
         )
+
+        if repo == "release":
+            git_service.delete_repo_contents()
+            src_path = GitService(
+                lecture["code"],
+                assignment["name"],
+                repo_type="source",
+                config=self.config,
+            ).path
+            git_service.copy_repo_contents(src=src_path)
+
         try:
             if not git_service.is_git():
                 git_service.init()
