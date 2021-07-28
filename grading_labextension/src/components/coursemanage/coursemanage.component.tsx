@@ -20,12 +20,12 @@ export class CourseManageComponent extends React.Component<CourseManageProps> {
     // this.state = {"lectures": props.lectures};
   }
 
-  public async componentDidMount() {
+  public async componentWillMount() {
+    await UserPermissions.loadPermissions();
     getAllLectures().subscribe(lectures => {
       console.log(lectures)
       this.setState(this.state.lectures = lectures)
     })
-    await UserPermissions.loadPermissions();
   }
 
   public render() {
