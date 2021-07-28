@@ -10,6 +10,7 @@ from tornado import web
 from tornado.httpserver import HTTPServer
 from tornado_sqlalchemy import SQLAlchemy
 from traitlets import config
+from traitlets import log as traitlets_log
 import secrets
 
 # run __init__.py to register handlers
@@ -95,12 +96,43 @@ class GraderService(config.Application):
         "INFO",
     ).tag(config=True)
 
+    def setup_loggers(self, log_level: str):  # pragma: no cover
+        """Handles application, Tornado, and SQLAlchemy logging configuration."""
+        stream_handler = logging.StreamHandler
+        root_logger = logging.getLogger()
+        root_logger.setLevel(log_level)
+        root_logger.removeHandler(root_logger.handlers[0]) # remove root handler to prevent duplicate logging
+        for log in ('access', 'application', 'general'):
+            logger = logging.getLogger('tornado.{}'.format(log))
+            if len(logger.handlers) > 0:
+                logger.removeHandler(logger.handlers[0])
+            logger.setLevel(log_level)
+            handler = stream_handler(stream=sys.stdout)
+            formatter = tornado.log.LogFormatter(color=True, datefmt=None)
+            handler.setFormatter(formatter)
+            logger.addHandler(handler)
+        sql_logger = logging.getLogger('sqlalchemy')
+        sql_logger.propagate = False
+        sql_logger.setLevel("WARN")
+        sql_handler = stream_handler(stream=sys.stdout)
+        sql_handler.setLevel("WARN")
+        sql_handler.setFormatter(logging.Formatter(
+            '[%(asctime)s] %(levelname)-8s sqlalchemy %(message)s'
+        ))
+        sql_logger.addHandler(sql_handler)
+
+        traitlet_logger = traitlets_log.get_logger()
+        traitlet_logger.removeHandler(traitlet_logger.handlers[0])
+        traitlet_logger.setLevel(log_level)
+        traitlets_handler = stream_handler(stream=sys.stdout)
+        traitlets_handler.setFormatter(logging.Formatter(
+            '[%(asctime)s] %(levelname)-8s %(name)-13s %(module)-15s %(message)s'
+        ))
+        traitlet_logger.addHandler(traitlets_handler)
+
     def initialize(self, argv, *args, **kwargs):
         super().initialize(*args, **kwargs)
-        logging.basicConfig(
-            format=f"%(color)s[%(levelname)1.1s %(asctime)s.%(msecs).03d %(name)s %(module)s:%"
-        )
-        self.log.setLevel(self.log_level)
+        self.setup_loggers(self.log_level)
         self.log.info("Starting Initialization...")
         self._start_future = asyncio.Future()
 
@@ -139,19 +171,6 @@ class GraderService(config.Application):
 
         self.log.info(
             f"Grader service running at {self.service_host}:{self.service_port}"
-        )
-
-        self.log.info(
-            f"GraderServer: hub_service_name - { self.http_server.request_callback.hub_service_name }"
-        )
-        self.log.info(
-            f"GraderServer: hub_api_token - {self.http_server.request_callback.hub_api_token}"
-        )
-        self.log.info(
-            f"GraderServer: hub_api_url - {self.http_server.request_callback.hub_api_url}"
-        )
-        self.log.info(
-            f"GraderServer: hub_base_url - {self.http_server.request_callback.hub_base_url}"
         )
 
         # finish start

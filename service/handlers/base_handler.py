@@ -56,6 +56,7 @@ def authorize(scopes: List[Scope]):
 
             role = self.session.query(Role).get((self.user.name, lect_id))
             if role is None or not role.role in scopes:
+                    self.log.warn(f'User {self.user.name} tried to access {self.request.path} with insufficient privileges')
                     self.error_message = "Unauthorized"
                     raise HTTPError(403)
             return await handler_method(self, *args, **kwargs)
@@ -85,6 +86,7 @@ class GraderBaseHandler(SessionMixin, web.RequestHandler):
 
         self.error_message = "Unknown Error"
         self.has_auth = False
+        self.log = self.application.log
 
     async def prepare(self) -> Optional[Awaitable[None]]:
         await self.authenticate_user()
@@ -105,17 +107,16 @@ class GraderBaseHandler(SessionMixin, web.RequestHandler):
         
         user = await self.authenticate_token_user(token)
         if user is None:
+            self.log.warn("Request from unauthenticated user")
             self.error_message = "Unauthorized"
             self.write_error(403)
             self.finish()
             return
             # raise HTTPError(403)
-
+        self.log.info(f'User {user["name"]} has been authenticated')
         user_model = self.session.query(User).get(user["name"])
         if user_model is None:
-            logging.getLogger("RequestHandler").info(
-                f'User {user["name"]} does not exist and will be created.'
-            )
+            self.log.info(f'User {user["name"]} does not exist and will be created.')
             user_model = User(name=user["name"])
             self.session.add(user_model)
             self.session.commit()
@@ -130,6 +131,7 @@ class GraderBaseHandler(SessionMixin, web.RequestHandler):
         for lecture_code in lecture_roles.keys():
             lecture = self.session.query(Lecture).filter(Lecture.code == lecture_code).one_or_none()
             if lecture is None: # create inactive lecture if no lecture with that name exists yet (code is set in create)
+                self.log.info(f"Adding inactive lecture with lecture_code {lecture_code}")
                 lecture = Lecture()
                 lecture.code = lecture_code
                 lecture.state = LectureState.inactive

@@ -18,7 +18,6 @@ class RequestService(LoggingConfigurable):
         self.http_client = AsyncHTTPClient()
 
     async def request(self, method: str, endpoint: str, body: dict=None, header: Dict[str, str]=None) -> Union[dict, list]:
-        logging.getLogger().critical(self.url + endpoint)
         if body:
             response: HTTPResponse = await self.http_client.fetch(self.url+endpoint, method=method, headers=header, body=json.dumps(body))
         else:

@@ -4,7 +4,7 @@ from traitlets import config
 from traitlets.traitlets import Enum, Int, Integer, Unicode, validate
 
 
-class GraderServer(config.Configurable, web.Application):
+class GraderServer(config.LoggingConfigurable, web.Application):
     # As an unmanage jupyter hub service, the application gets these environment variables from the hub
     # see: https://jupyterhub.readthedocs.io/en/stable/reference/services.html#launching-a-hub-managed-service
     hub_service_name = Unicode(os.environ.get("JUPYTERHUB_SERVICE_NAME", "")).tag(
@@ -20,16 +20,23 @@ class GraderServer(config.Configurable, web.Application):
         config=True
     )
 
-    max_user_cookie_age_days = Integer(15, help="Time in days until cookie expires.").tag(
-        config=True
-    )
+    max_user_cookie_age_days = Integer(
+        15, help="Time in days until cookie expires."
+    ).tag(config=True)
 
-    max_token_cookie_age_minutes = Integer(10, help="Time in minutes until a token cookie expires.").tag(config=True)
+    max_token_cookie_age_minutes = Integer(
+        10, help="Time in minutes until a token cookie expires."
+    ).tag(config=True)
 
     def __init__(self, grader_service_dir: str, **kwargs):
         super().__init__(**kwargs)
         self.grader_service_dir = grader_service_dir
-    
+
+        self.log.info(f"hub_service_name - { self.hub_service_name }")
+        self.log.info(f"hub_api_token - {self.hub_api_token}")
+        self.log.info(f"hub_api_url - {self.hub_api_url}")
+        self.log.info(f"hub_base_url - {self.hub_base_url}")
+
     @property
     def max_token_cookie_age_days(self):
         return self.max_token_cookie_age_minutes / 1440
