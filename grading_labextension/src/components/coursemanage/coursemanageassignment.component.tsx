@@ -9,6 +9,7 @@ import { User } from '../../model/user';
 import { getAllSubmissions } from '../../services/submissions.service';
 import { deleteAssignment, pullAssignment, pushAssignment, updateAssignment } from '../../services/assignments.service';
 import { InputDialog } from './coursemanageassignment-list.component';
+import { InputDialog as LabInputDialog } from '@jupyterlab/apputils/lib/inputdialog';
 import { DirListing } from '@jupyterlab/filebrowser/lib/listing'
 import { FilterFileBrowserModel } from '@jupyterlab/filebrowser/lib/model';
 import { ExistingNodeRenderer } from '../assignments/assignment.component'
@@ -23,9 +24,9 @@ export interface AssignmentProps {
 }
 
 export interface AssignmentState {
-   isOpen: boolean;
-   submissions: { user: User, submissions: Submission[] }[];
-   assignment: Assignment;
+  isOpen: boolean;
+  submissions: { user: User, submissions: Submission[] }[];
+  assignment: Assignment;
 }
 
 export class CourseManageAssignmentComponent extends React.Component<AssignmentProps, AssignmentState> {
@@ -53,7 +54,7 @@ export class CourseManageAssignmentComponent extends React.Component<AssignmentP
   public async componentDidMount() {
     if (this.state.assignment.status == "released") {
       getAllSubmissions(this.lecture, this.state.assignment, false, true).subscribe(userSubmissions => {
-        this.setState({submissions : userSubmissions})
+        this.setState({ submissions: userSubmissions })
         console.log(this.state.submissions)
         console.log(this.state.submissions.length)
       }
@@ -159,7 +160,7 @@ export class CourseManageAssignmentComponent extends React.Component<AssignmentP
     if (!result.button.accept) return;
 
     this.state.assignment.status = "released"
-    updateAssignment(this.lecture.id,this.state.assignment).subscribe(a => this.setState({assignment : a}))
+    updateAssignment(this.lecture.id, this.state.assignment).subscribe(a => this.setState({ assignment: a }))
   }
 
   private async createFile(notebook: boolean = true) {
@@ -167,7 +168,7 @@ export class CourseManageAssignmentComponent extends React.Component<AssignmentP
     let filename: string = ";"
     if (notebook) {
       result = await InputDialog.getText({ title: 'Notebook name' });
-  
+
       filename = result.value + ".ipynb"
     } else {
       result = await InputDialog.getText({ title: 'Filename with extension' });
@@ -192,21 +193,25 @@ export class CourseManageAssignmentComponent extends React.Component<AssignmentP
   }
 
   private async editAssignment() {
-    InputDialog.getDate({ title: 'Input Deadline' }).then((date: Dialog.IResult<string>) => {
-      if (date.button.accept) {
-        if (date.value === "") {
-          this.state.assignment.due_date = null;
-        } else {
-          this.state.assignment.due_date = date.value;
-        }
-        this.state.assignment.type = this.state.assignment.type
-        console.log(this.state.assignment);
-        updateAssignment(this.lecture.id, this.state.assignment).subscribe(
-          assignment => {
-            console.log(assignment)
-          })
-      }
-    })
+    let name: Dialog.IResult<string> = await LabInputDialog.getText(({ title: 'Assignment name', placeholder: this.state.assignment.name }))
+    if (!name.button.accept) return;
+    let date: Dialog.IResult<string> = await InputDialog.getDate({ title: 'Input Deadline' });
+    if (!date.button.accept) return;
+    let type: Dialog.IResult<string> = await LabInputDialog.getItem({ title: "Assignment Type", items: ["user", "group"], current: (this.state.assignment.type === Assignment.TypeEnum.User) ? 0 : 1 })
+    if (!type.button.accept) return;
+
+    if (date.value === "") this.state.assignment.due_date = null;
+    else this.state.assignment.due_date = date.value;
+
+    if (type.value === "user") this.state.assignment.type = Assignment.TypeEnum.User;
+    else this.state.assignment.type = Assignment.TypeEnum.Group;
+
+    if (name.value !== "") this.state.assignment.name = name.value;
+
+    updateAssignment(this.lecture.id, this.state.assignment).subscribe(
+      assignment => {
+        this.setState({ assignment })
+      })
   }
 
   public render() {

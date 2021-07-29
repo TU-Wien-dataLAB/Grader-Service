@@ -5,7 +5,6 @@ import { Assignment } from '../../model/assignment';
 import { CourseManageAssignmentComponent } from './coursemanageassignment.component';
 import { Button, Card, Elevation, Icon } from '@blueprintjs/core';
 import { Dialog, showDialog, showErrorMessage } from '@jupyterlab/apputils/lib/dialog';
-//import { InputDialog } from '@jupyterlab/apputils/lib/inputdialog';
 import { Widget } from '@lumino/widgets';
 import { Lecture } from '../../model/lecture';
 
