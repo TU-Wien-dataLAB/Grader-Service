@@ -157,6 +157,7 @@ class GraderService(config.Application):
                 cookie_secret=secrets.token_hex(nbytes=32), # generate new cookie secret at startup
                 config=self.config,
                 db=SQLAlchemy(DataBaseManager.instance().get_database_url()),
+                parent=self
             ),
             # ssl_options=ssl_context,
             xheaders=True,
