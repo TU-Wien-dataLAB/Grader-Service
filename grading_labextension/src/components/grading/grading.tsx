@@ -59,7 +59,7 @@ export class GradingComponent extends React.Component<GradingProps> {
         renderCell: (params: GridCellParams) => (
             <Button icon="highlight" outlined>Autograde</Button>
         ),
-      },
+      } as GridColDef,
       {
         field: 'Manualgrade',
         headerName: '',
@@ -69,7 +69,7 @@ export class GradingComponent extends React.Component<GradingProps> {
         renderCell: (params: GridCellParams) => (
             <Button icon="highlight" outlined>Manualgrade</Button>
         ),
-      },
+      } as GridColDef,
       { field: 'score', headerName: 'Score', width: 130 },
 
     ];
