@@ -72,6 +72,8 @@ class AssignmentObjectHandler(GraderBaseHandler):
         assignment.name = assignment_model.name
         assignment.duedate = assignment_model.due_date
         assignment.status = assignment_model.status
+        assignment.type = assignment_model.type
+        self.session.commit()
         self.write_json(assignment)
 
     @authorize([Scope.student, Scope.tutor, Scope.instructor])
