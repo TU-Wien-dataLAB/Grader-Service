@@ -33,7 +33,7 @@ paths:
     $ref: './openapi/paths_grader.yml#/assignmentsById'
 
   /lectures/{lect_id}/assignments/{a_id}/submissions:
-    $ref: './openapi/paths.yml#/submissions'
+    $ref: './openapi/paths_grader.yml#/submissions'
 
   /lectures/{lect_id}/assignments/{a_id}/feedback:
     $ref: './openapi/paths.yml#/feedback'

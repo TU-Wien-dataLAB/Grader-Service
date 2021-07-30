@@ -80,6 +80,7 @@ def upgrade():
     sa.Column('score', sa.Integer(), nullable=True),
     sa.Column('assignid', sa.Integer(), nullable=True),
     sa.Column('username', sa.String(length=255), nullable=True),
+    sa.Column('commit_hash', sa.String(length=40), nullable=False),
     sa.ForeignKeyConstraint(['assignid'], ['assignment.id'], ),
     sa.ForeignKeyConstraint(['username'], ['user.name'], ),
     sa.PrimaryKeyConstraint('id')

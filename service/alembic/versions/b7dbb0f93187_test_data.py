@@ -42,27 +42,27 @@ def upgrade():
     op.execute('INSERT INTO "takepart" ("username","lectid","role") VALUES ("ubuntu",3,"instructor")')
 
     ## Assignments
-    op.execute('INSERT INTO "assignment" ("name","lectid","duedate","points","status", "type") VALUES ("assignment_1",1,"2021-09-21 23:59:00.000",20,"released","user")')
-    op.execute('INSERT INTO "assignment" ("name","lectid","duedate","points","status", "type") VALUES ("assignment_2",1,"2021-09-22 23:59:00.000",10,"created","user")')
+    op.execute('INSERT INTO "assignment" ("name","lectid","duedate","points","status", "type") VALUES ("assignment_1",1,"2021-09-21T23:59:00.000Z",20,"released","user")')
+    op.execute('INSERT INTO "assignment" ("name","lectid","duedate","points","status", "type") VALUES ("assignment_2",1,"2021-09-22T23:59:00.000Z",10,"created","user")')
     ## Submissions
-    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-05 14:43:35.863","not_graded",1,"user1")')
-    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-07 14:44:35.863","manually_graded",1,"user1",10)')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","commit_hash") VALUES ("2021-05-05T14:43:35.863Z","not_graded",1,"user1", "e93ae2b2369cb0ddb647f1c608148ccda59e22a1")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score","commit_hash") VALUES ("2021-05-07T14:44:35.863Z","manually_graded",1,"user1",10, "e93ae2b2369cb0ddb647f1c608148ccda59e22a1")')
 
-    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-06 14:43:35.863","not_graded",1,"fjaeger")')
-    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-08 14:44:35.863","manually_graded",1,"fjaeger",10)')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","commit_hash") VALUES ("2021-05-06T14:43:35.863Z","not_graded",1,"fjaeger", "e93ae2b2369cb0ddb647f1c608148ccda59e22a1")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score","commit_hash") VALUES ("2021-05-08T14:44:35.863Z","manually_graded",1,"fjaeger",10,"e93ae2b2369cb0ddb647f1c608148ccda59e22a1")')
 
-    op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-05 14:43:35.863","not_graded",1,"ubuntu")')
-    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-07 14:44:35.863","manually_graded",1,"ubuntu",10)')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","commit_hash") VALUES ("2021-05-05T14:43:35.863Z","not_graded",1,"ubuntu", "e93ae2b2369cb0ddb647f1c608148ccda59e22a1")')
+    op.execute('INSERT INTO "submission" ("date","status","assignid","username","score","commit_hash") VALUES ("2021-05-07T14:44:35.863Z","manually_graded",1,"ubuntu",10, "e93ae2b2369cb0ddb647f1c608148ccda59e22a1")')
 
     for i in range(0,100):
-        op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-05 14:43:35.863","not_graded",1,"user1")')
-        op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-07 14:44:35.863","manually_graded",1,"user1",10)')
+        op.execute('INSERT INTO "submission" ("date","status","assignid","username","commit_hash") VALUES ("2021-05-05T14:43:35.863Z","not_graded",1,"user1", "e93ae2b2369cb0ddb647f1c608148ccda59e22a1")')
+        op.execute('INSERT INTO "submission" ("date","status","assignid","username","score","commit_hash") VALUES ("2021-05-07T14:44:35.863Z","manually_graded",1,"user1",10, "e93ae2b2369cb0ddb647f1c608148ccda59e22a1")')
 
-        op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-06 14:43:35.863","not_graded",1,"fjaeger")')
-        op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-08 14:44:35.863","manually_graded",1,"fjaeger",10)')
+        op.execute('INSERT INTO "submission" ("date","status","assignid","username","commit_hash") VALUES ("2021-05-06T14:43:35.863Z","not_graded",1,"fjaeger", "e93ae2b2369cb0ddb647f1c608148ccda59e22a1")')
+        op.execute('INSERT INTO "submission" ("date","status","assignid","username","score","commit_hash") VALUES ("2021-05-08T14:44:35.863Z","manually_graded",1,"fjaeger",10, "e93ae2b2369cb0ddb647f1c608148ccda59e22a1")')
 
-        op.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-05 14:43:35.863","not_graded",1,"ubuntu")')
-        op.execute('INSERT INTO "submission" ("date","status","assignid","username","score") VALUES ("2021-05-07 14:44:35.863","manually_graded",1,"ubuntu",10)')   
+        op.execute('INSERT INTO "submission" ("date","status","assignid","username","commit_hash") VALUES ("2021-05-05T14:43:35.863Z","not_graded",1,"ubuntu", "e93ae2b2369cb0ddb647f1c608148ccda59e22a1")')
+        op.execute('INSERT INTO "submission" ("date","status","assignid","username","score","commit_hash") VALUES ("2021-05-07T14:44:35.863Z","manually_graded",1,"ubuntu",10, "e93ae2b2369cb0ddb647f1c608148ccda59e22a1")')   
 
 
 

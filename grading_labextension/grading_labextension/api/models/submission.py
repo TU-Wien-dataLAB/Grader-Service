@@ -15,7 +15,7 @@ class Submission(Model):
     Do not edit the class manually.
     """
 
-    def __init__(self, id=None, submitted_at=None, status=None, score=None):  # noqa: E501
+    def __init__(self, id=None, submitted_at=None, status=None, score=None, commit_hash=None):  # noqa: E501
         """Submission - a model defined in OpenAPI
 
         :param id: The id of this Submission.  # noqa: E501
@@ -26,25 +26,30 @@ class Submission(Model):
         :type status: str
         :param score: The score of this Submission.  # noqa: E501
         :type score: float
+        :param commit_hash: The commit_hash of this Submission.  # noqa: E501
+        :type commit_hash: str
         """
         self.openapi_types = {
             'id': int,
             'submitted_at': datetime,
             'status': str,
-            'score': float
+            'score': float,
+            'commit_hash': str
         }
 
         self.attribute_map = {
             'id': 'id',
             'submitted_at': 'submitted_at',
             'status': 'status',
-            'score': 'score'
+            'score': 'score',
+            'commit_hash': 'commit_hash'
         }
 
         self._id = id
         self._submitted_at = submitted_at
         self._status = status
         self._score = score
+        self._commit_hash = commit_hash
 
     @classmethod
     def from_dict(cls, dikt) -> 'Submission':
@@ -146,3 +151,24 @@ class Submission(Model):
         """
 
         self._score = score
+
+    @property
+    def commit_hash(self):
+        """Gets the commit_hash of this Submission.
+
+
+        :return: The commit_hash of this Submission.
+        :rtype: str
+        """
+        return self._commit_hash
+
+    @commit_hash.setter
+    def commit_hash(self, commit_hash):
+        """Sets the commit_hash of this Submission.
+
+
+        :param commit_hash: The commit_hash of this Submission.
+        :type commit_hash: str
+        """
+
+        self._commit_hash = commit_hash
