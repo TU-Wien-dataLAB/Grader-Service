@@ -53,7 +53,11 @@ class GitService(Configurable):
     def set_remote(self, origin: str):
         self.log.info(f"Setting remote {origin} for {self.path}")
         url = posixpath.join(self.git_remote_url, self.lecture_code, self.assignment_name, self.repo_type)
-        self._run_command(f"git remote add {origin} {self.git_http_scheme}://oauth:{self.git_access_token}@{url}", cwd=self.path)
+        try:
+            self._run_command(f"git remote add {origin} {self.git_http_scheme}://oauth:{self.git_access_token}@{url}", cwd=self.path)
+        except GitError:
+            self.log.info(f"Remote set: Updating remote {origin} for {self.path}")
+            self._run_command(f"git remote set-url {origin} {self.git_http_scheme}://oauth:{self.git_access_token}@{url}", cwd=self.path)
         # self._run_command(f"git push --set-upstream {origin} main", cwd=self.path)
     
     def delete_remote(self, origin: str):
