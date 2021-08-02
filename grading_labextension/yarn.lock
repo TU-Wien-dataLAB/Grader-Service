@@ -733,7 +733,7 @@
     "react-is" "^16.8.0 || ^17.0.0"
     "react-transition-group" "^4.4.0"
 
-"@material-ui/data-grid@^4.0.0-alpha.24":
+"@material-ui/data-grid@^4.0.0-alpha.34":
   "integrity" "sha512-hXHjyLRKbOk+rObEnQbTzZ8Xgtfn/Li40NVmzkall+eIPktqqJ3GJDzOv0EVD+GGjXDixf+XT9BppjXk87EwiQ=="
   "resolved" "https://registry.npmjs.org/@material-ui/data-grid/-/data-grid-4.0.0-alpha.34.tgz"
   "version" "4.0.0-alpha.34"

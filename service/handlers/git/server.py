@@ -15,6 +15,7 @@ from handlers.base_handler import GraderBaseHandler, authenticated
 import os
 import subprocess
 from server import GraderServer
+from urllib.parse import unquote
 
 
 import logging
@@ -62,7 +63,7 @@ class GitBaseHandler(GraderBaseHandler):
             return None
         pathlets = pathlets[3:]
         lecture_path = os.path.abspath(os.path.join(self.gitbase, pathlets[0]))
-        assignment_path = os.path.abspath(os.path.join(self.gitbase, pathlets[0], pathlets[1]))
+        assignment_path = os.path.abspath(os.path.join(self.gitbase, pathlets[0], unquote(pathlets[1])))
         
         repo_type = pathlets[2]
         if repo_type not in {"source", "release", "assignment"}:
@@ -86,7 +87,7 @@ class GitBaseHandler(GraderBaseHandler):
             raise HTTPError(403)
 
         try:
-            assignment = self.session.query(Assignment).filter(Assignment.lectid == lecture.id, Assignment.name == pathlets[1]).one()
+            assignment = self.session.query(Assignment).filter(Assignment.lectid == lecture.id, Assignment.name == unquote(pathlets[1])).one()
         except NoResultFound:
             self.error_message = "Not Found"
             raise HTTPError(404)
@@ -154,7 +155,7 @@ class RPCHandler(GitBaseHandler):
     async def prepare(self):
         await super().prepare()
         self.rpc = self.path_args[0]
-        self.cmd = f"git {self.rpc} --stateless-rpc {self.get_gitdir(rpc=self.rpc)}"
+        self.cmd = f'git {self.rpc} --stateless-rpc "{self.get_gitdir(rpc=self.rpc)}"'
         self.process = Subprocess(
             shlex.split(self.cmd),
             stdin=Subprocess.STREAM,
@@ -182,7 +183,7 @@ class InfoRefsHandler(GitBaseHandler):
         if self.get_status() != 200:
             return
         self.rpc = self.get_argument("service")[4:]
-        self.cmd = f"git {self.rpc} --stateless-rpc --advertise-refs {self.get_gitdir(self.rpc)}"
+        self.cmd = f'git {self.rpc} --stateless-rpc --advertise-refs "{self.get_gitdir(self.rpc)}"'
         self.process = Subprocess(
             shlex.split(self.cmd),
             stdin=Subprocess.STREAM,
