@@ -60,6 +60,7 @@
     "@material-ui/core": "^4.11.3",
     "@material-ui/data-grid": "^4.0.0-alpha.34",
     "is-plain-object": "^5.0.0",
+    "moment": "^2.29.1",
     "react": "^17.0.2",
     "rxjs": "^6.6.7"
   },
