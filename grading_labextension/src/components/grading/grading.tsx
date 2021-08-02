@@ -26,7 +26,7 @@ export class GradingComponent extends React.Component<GradingProps> {
   public lectureID: number;
   public assignmentID: number;
   public title: Title<Widget>;
-
+  
   public submissions: Submission[];
   public lectureId: number;
   public assignmentId: number;
@@ -115,15 +115,28 @@ export class GradingComponent extends React.Component<GradingProps> {
   }
 
 
+  public datagrid() {
+    return (
+    <DataGrid rows={this.state.rows} columns={this.columns} checkboxSelection disableSelectionOnClick
+    onSelectionModelChange={(e) => {
+      const selectedIDs = new Set(e);
+      const selectedRowData = this.state.rows.filter((row) =>
+        selectedIDs.has(row.id)
+      );
+      console.log("selected rowData:", selectedRowData);
+    }}
+     />)
+
+  }
 
   public render() {
     const items = ["latest","all"]
     const buttonText = this.state.option
     
+
     return (
         <div style={{ height: "100%",  display: "flex", flexDirection: "column"}}>
-            <DataGrid rows={this.state.rows} columns={this.columns} checkboxSelection
-             />
+            {this.datagrid()}
 
             <StringSelect
 
