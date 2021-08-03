@@ -2,7 +2,6 @@ from registry import register_handler
 from handlers.base_handler import GraderBaseHandler, authorize
 from orm.assignment import Assignment
 from orm.base import DeleteState
-from orm.file import File
 from orm.takepart import Role, Scope
 from server import GraderServer
 from api.models.assignment import Assignment as AssignmentModel

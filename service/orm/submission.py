@@ -30,4 +30,5 @@ class Submission(Base, Serializable):
             else (self.date.isoformat("T", "milliseconds") + "Z"),
             status=self.status,
             score=self.score,
+            commit_hash=self.commit_hash
         )

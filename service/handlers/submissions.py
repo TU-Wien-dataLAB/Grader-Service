@@ -34,7 +34,7 @@ class SubmissionHandler(GraderBaseHandler):
             submissions = []
             if latest:
                 submissions = (
-                    self.session.query(Submission.id,Submission.status,Submission.score, Submission.username,Submission.assignid,func.max(Submission.date))
+                    self.session.query(Submission.id,Submission.status,Submission.score, Submission.username,Submission.assignid,Submission.commit_hash,func.max(Submission.date))
                     .filter(Submission.assignid == assignment_id)
                     .group_by(Submission.username).all()
                 )
@@ -51,7 +51,7 @@ class SubmissionHandler(GraderBaseHandler):
         else:
             if latest:
                 submissions = (
-                    self.session.query(Submission.id,Submission.status,Submission.score, Submission.username,Submission.assignid,func.max(Submission.date))
+                    self.session.query(Submission.id,Submission.status,Submission.score, Submission.username,Submission.assignid,Submission.commit_hash,func.max(Submission.date))
                     .filter(Submission.assignid == assignment_id, Submission.username == role.username)
                     .group_by(Submission.username)
                 )
