@@ -124,8 +124,8 @@ export class GradingComponent extends React.Component<GradingProps> {
       const selectedRowData = this.state.rows.filter((row) =>
         selectedIDs.has(row.id)
       );
-      this.setState({selected : selectedRowData})
-      console.log("selected rowData:", selectedRowData);
+      this.setState({selected : selectedRowData}, () => {console.log("selected rowData:", this.state.selected);})
+      
     }}
      />)
 
