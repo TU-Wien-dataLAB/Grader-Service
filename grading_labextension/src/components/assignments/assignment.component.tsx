@@ -206,8 +206,8 @@ export class AssignmentComponent extends React.Component<AssignmentProps> {
           {this.assignment.status != "released" && <Tag icon="warning-sign" intent="danger" className="assignment-tag" style={{ marginLeft: "10px" }} >Not released for students</Tag>}
           <span className="button-list">
             <Button className="assignment-button" onClick={this.fetchAssignment} icon={IconNames.CLOUD_DOWNLOAD} disabled={this.assignment.status != "released"} outlined intent={Intent.PRIMARY}>Fetch</Button>
-            <Button className="assignment-button" onClick={this.submitAssignment} icon={IconNames.SEND_MESSAGE} disabled={this.assignment.status != "fetched"} outlined intent={Intent.SUCCESS}>Submit</Button>
-            {this.assignment.due_date && (<DeadlineComponent due_date={this.assignment.due_date} />)}
+            <Button className="assignment-button" onClick={this.submitAssignment} icon={IconNames.SEND_MESSAGE} disabled={this.assignment.status == "created"} outlined intent={Intent.SUCCESS}>Submit</Button>
+            {this.assignment.due_date ? (<DeadlineComponent due_date={this.assignment.due_date} />) : <Tag intent="primary" style={{ marginLeft: "10px" }}>No Deadline 😀</Tag>}
           </span>
 
         </div>

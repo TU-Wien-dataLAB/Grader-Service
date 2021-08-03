@@ -1,5 +1,6 @@
 import json
 from orm.assignment import Assignment
+from orm.submission import Submission
 from orm.lecture import Lecture
 from orm.takepart import Role, Scope
 from orm.group import Group
@@ -15,6 +16,8 @@ from handlers.base_handler import GraderBaseHandler, authenticated
 import os
 import subprocess
 from server import GraderServer
+from urllib.parse import unquote
+import datetime
 
 
 import logging
@@ -56,13 +59,14 @@ class GitBaseHandler(GraderBaseHandler):
             pass
 
     def gitlookup(self, rpc: str):
+        # TODO: right now instructors/grader cannot pull from user repo (path is determined by self.user.name) -> make optional path argument username and when given, check auth and set path to user
         pathlets = self.request.path.strip("/").split("/")
         # pathlets = ['services', 'grader', 'git', 'lecture_code', 'assignment_name', 'repo_type', ...]
         if len(pathlets) < 6:
             return None
         pathlets = pathlets[3:]
         lecture_path = os.path.abspath(os.path.join(self.gitbase, pathlets[0]))
-        assignment_path = os.path.abspath(os.path.join(self.gitbase, pathlets[0], pathlets[1]))
+        assignment_path = os.path.abspath(os.path.join(self.gitbase, pathlets[0], unquote(pathlets[1])))
         
         repo_type = pathlets[2]
         if repo_type not in {"source", "release", "assignment"}:
@@ -86,7 +90,7 @@ class GitBaseHandler(GraderBaseHandler):
             raise HTTPError(403)
 
         try:
-            assignment = self.session.query(Assignment).filter(Assignment.lectid == lecture.id, Assignment.name == pathlets[1]).one()
+            assignment = self.session.query(Assignment).filter(Assignment.lectid == lecture.id, Assignment.name == unquote(pathlets[1])).one()
         except NoResultFound:
             self.error_message = "Not Found"
             raise HTTPError(404)
@@ -154,7 +158,8 @@ class RPCHandler(GitBaseHandler):
     async def prepare(self):
         await super().prepare()
         self.rpc = self.path_args[0]
-        self.cmd = f"git {self.rpc} --stateless-rpc {self.get_gitdir(rpc=self.rpc)}"
+        self.gitdir = self.get_gitdir(rpc=self.rpc)
+        self.cmd = f'git {self.rpc} --stateless-rpc "{self.gitdir}"'
         self.process = Subprocess(
             shlex.split(self.cmd),
             stdin=Subprocess.STREAM,
@@ -163,12 +168,59 @@ class RPCHandler(GitBaseHandler):
         )
 
     async def post(self, rpc):
-        self.set_header("Content-Type", "application/x-git-%s-result" % rpc)
-        self.set_header(
-            "Cache-Control", "no-store, no-cache, must-revalidate, max-age=0"
-        )
-        await self.git_response()
-        self.finish()
+        ## Create submission in database
+        # pathlets = ['services', 'grader', 'git', 'lecture_code', 'assignment_name', 'repo_type', ...]
+        pathlets = self.request.path.strip("/").split("/")
+        pathlets = pathlets[3:]
+        if pathlets[-1] == "git-receive-pack" and pathlets[-2] == "assignment":
+            # get lecture and assignment if they exist
+            try:
+                lecture = self.session.query(Lecture).filter(Lecture.code == pathlets[0]).one()
+                assignment = self.session.query(Assignment).filter(Assignment.lectid == lecture.id, Assignment.name == unquote(pathlets[1])).one()
+            except NoResultFound:
+                self.error_message = "Not Found"
+                raise HTTPError(404)
+            except MultipleResultsFound:
+                raise HTTPError(400)
+
+            submission = Submission()
+            submission.assignid = assignment.id
+            submission.date = datetime.datetime.utcnow()
+            submission.username = self.user.name
+
+            if assignment.duedate is not None and submission.date > assignment.duedate:
+                self.write({"message": "Cannot submit assignment: Past due date!"})
+                self.write_error(400)
+
+            await self.git_response()
+
+            try:
+                ret = subprocess.run(shlex.split("git rev-parse main"), capture_output=True, cwd=self.gitdir)
+                submission.commit_hash = str(ret.stdout, 'utf-8').strip()
+                submission.status = "not_graded"
+            except subprocess.CalledProcessError as e:
+                self.write_error(400)
+                return
+            except FileNotFoundError as e:
+                self.write_error(404)
+                return
+
+            self.session.add(submission)
+            self.session.commit()
+
+            self.set_header("Content-Type", "application/x-git-%s-result" % rpc)
+            self.set_header(
+                "Cache-Control", "no-store, no-cache, must-revalidate, max-age=0"
+            )
+
+            self.finish()
+        else:
+            self.set_header("Content-Type", "application/x-git-%s-result" % rpc)
+            self.set_header(
+                "Cache-Control", "no-store, no-cache, must-revalidate, max-age=0"
+            )
+            await self.git_response()
+            self.finish()
 
 
 @register_handler(path="/.*/info/refs")
@@ -182,7 +234,7 @@ class InfoRefsHandler(GitBaseHandler):
         if self.get_status() != 200:
             return
         self.rpc = self.get_argument("service")[4:]
-        self.cmd = f"git {self.rpc} --stateless-rpc --advertise-refs {self.get_gitdir(self.rpc)}"
+        self.cmd = f'git {self.rpc} --stateless-rpc --advertise-refs "{self.get_gitdir(self.rpc)}"'
         self.process = Subprocess(
             shlex.split(self.cmd),
             stdin=Subprocess.STREAM,

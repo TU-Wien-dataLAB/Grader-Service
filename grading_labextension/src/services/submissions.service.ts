@@ -8,8 +8,8 @@ import { User } from "../model/user";
 import { request, HTTPMethod } from "./request.service";
 
 
-  export function submitAssignment(lecture: Lecture, assignment : Assignment): Observable<void> {
-    return request<void>(HTTPMethod.POST, `/lectures/${lecture.id}/assignments/${assignment.id}/submissions`)
+  export function submitAssignment(lecture: Lecture, assignment : Assignment) {
+    return request<void>(HTTPMethod.PUT, `/lectures/${lecture.id}/assignments/${assignment.id}/push/assignment`)
   }
 
   export function getSubmissions(lecture: Lecture, assignment : Assignment, latest: boolean = false): Observable<{user: User, submissions: Submission[]}> {

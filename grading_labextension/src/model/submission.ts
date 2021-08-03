@@ -16,6 +16,7 @@ export interface Submission {
     submitted_at?: string;
     status?: Submission.StatusEnum;
     score?: number;
+    commit_hash?: string;
 }
 export namespace Submission {
     export type StatusEnum = 'submitting' | 'not_graded' | 'automatically_graded' | 'manually_graded';

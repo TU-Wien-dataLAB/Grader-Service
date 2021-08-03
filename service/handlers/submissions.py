@@ -4,7 +4,9 @@ from orm.assignment import Assignment
 from orm.base import DeleteState
 from orm.submission import Submission
 from orm.takepart import Role, Scope
+from api.models.submission import Submission as SubmissionModel
 from sqlalchemy.sql.expression import func
+import tornado
 from tornado.httpclient import HTTPError
 
 
@@ -32,7 +34,7 @@ class SubmissionHandler(GraderBaseHandler):
             submissions = []
             if latest:
                 submissions = (
-                    self.session.query(Submission.id,Submission.status,Submission.score, Submission.username,Submission.assignid,func.max(Submission.date))
+                    self.session.query(Submission.id,Submission.status,Submission.score, Submission.username,Submission.assignid,Submission.commit_hash,func.max(Submission.date))
                     .filter(Submission.assignid == assignment_id)
                     .group_by(Submission.username).all()
                 )
@@ -49,7 +51,7 @@ class SubmissionHandler(GraderBaseHandler):
         else:
             if latest:
                 submissions = (
-                    self.session.query(Submission.id,Submission.status,Submission.score, Submission.username,Submission.assignid,func.max(Submission.date))
+                    self.session.query(Submission.id,Submission.status,Submission.score, Submission.username,Submission.assignid,Submission.commit_hash,func.max(Submission.date))
                     .filter(Submission.assignid == assignment_id, Submission.username == role.username)
                     .group_by(Submission.username)
                 )
@@ -67,7 +69,17 @@ class SubmissionHandler(GraderBaseHandler):
 
     @authorize([Scope.student, Scope.tutor, Scope.instructor])
     async def post(self, lecture_id: int, assignment_id: int):
-        pass
+        body = tornado.escape.json_decode(self.request.body)
+        sub_model = SubmissionModel.from_dict(body)
+        sub = Submission()
+        sub.date = sub_model.submitted_at
+        sub.assignid = assignment_id
+        sub.username = self.user.name
+        sub.status = sub_model.status
+        
+        self.session.add(sub)
+        self.session.commit()
+        self.write_json(sub)
 
 
 @register_handler(

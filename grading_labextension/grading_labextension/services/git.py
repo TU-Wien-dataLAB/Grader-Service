@@ -11,6 +11,7 @@ from datetime import datetime
 import getpass
 import shutil
 import sys
+from urllib.parse import quote
 
 class GitError(Exception):
     def __init__(self, error: str):
@@ -30,17 +31,18 @@ class GitService(Configurable):
 
     def __init__(self, lecture_code: str, assignment_name: str, repo_type: str, force_user_repo=False, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        self.log = logging.getLogger(str(self.__class__))
         self._git_version = None
         self.lecture_code = lecture_code
         self.assignment_name = assignment_name
         self.repo_type = repo_type
-        if self.repo_type in {"user", "group"} or force_user_repo:
+        if self.repo_type == "assignment" or force_user_repo:
             self.path = os.path.join(self.git_root_dir, self.lecture_code, self.assignment_name)
         else:
             self.path = os.path.join(self.git_root_dir, self.repo_type, self.lecture_code, self.assignment_name)
+        self.log.info(f"New git service working in {self.path}")
         os.makedirs(self.path, exist_ok=True)
 
-        self.log = logging.getLogger(str(self.__class__))
         self.log.info("git_access_token: " + self.git_access_token)
         self.log.info("git_http_scheme: " + self.git_http_scheme)
         self.log.info("git_remote_url: " + self.git_remote_url)        
@@ -52,15 +54,20 @@ class GitService(Configurable):
     
     def set_remote(self, origin: str):
         self.log.info(f"Setting remote {origin} for {self.path}")
-        url = posixpath.join(self.git_remote_url, self.lecture_code, self.assignment_name, self.repo_type)
-        self._run_command(f"git remote add {origin} {self.git_http_scheme}://oauth:{self.git_access_token}@{url}", cwd=self.path)
-        # self._run_command(f"git push --set-upstream {origin} main", cwd=self.path)
+        url = posixpath.join(self.git_remote_url, self.lecture_code, quote(self.assignment_name), self.repo_type)
+        try:
+            self._run_command(f"git remote add {origin} {self.git_http_scheme}://oauth:{self.git_access_token}@{url}", cwd=self.path)
+        except GitError as e:
+            self.log.error("GitError:\n" + e.error)
+            self.log.info(f"Remote set: Updating remote {origin} for {self.path}")
+            self._run_command(f"git remote set-url {origin} {self.git_http_scheme}://oauth:{self.git_access_token}@{url}", cwd=self.path)
     
     def delete_remote(self, origin: str):
         raise NotImplementedError()
 
     def pull(self, origin: str, force=False):
         if force:
+            self.log.info(f"Pulling remote {origin}")
             self._run_command(f'sh -c "git clean -fd && git fetch --all && git reset --hard {origin}/main"',cwd=self.path)
             #self._run_command(f"git clean -fd", cwd=self.path)
             #self._run_command(f"git fetch --all", cwd=self.path)
@@ -72,10 +79,10 @@ class GitService(Configurable):
         if not self.is_git() or force:
             self.log.info(f"Calling init for {self.path}")
             if self.git_version < (2,28):
-                self._run_command(f"git init {self.path}")
+                self._run_command(f"git init", cwd=self.path)
                 self._run_command("git checkout -b main", cwd=self.path)
             else:
-                self._run_command(f"git init {self.path} -b main", cwd=self.path)
+                self._run_command(f"git init -b main", cwd=self.path)
     
     def is_git(self):
         return os.path.exists(os.path.join(self.path, ".git"))
@@ -86,7 +93,7 @@ class GitService(Configurable):
         # self._run_command(f'git add -A', cwd=self.path)
         # self.log.info("Committing repository")
         # self._run_command(f'git commit -m "{m}"', cwd=self.path)
-        self.log.info("Adding all files and committing")
+        self.log.info(f"Adding all files and committing in {self.path}")
         self._run_command(f'sh -c "git add -A && git commit -m "{m}""', cwd=self.path)
 
     def set_author(self, author=getpass.getuser()):
@@ -135,6 +142,7 @@ class GitService(Configurable):
     
     def _run_command(self, command, cwd=None, capture_output=False):
         try:
+            self.log.info(f"Running: {command}")
             ret = subprocess.run(shlex.split(command), check=True, cwd=cwd, capture_output=True)
             if capture_output:
                 return str(ret.stdout, 'utf-8')
