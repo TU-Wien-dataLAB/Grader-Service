@@ -36,7 +36,7 @@ class GitService(Configurable):
         self.lecture_code = lecture_code
         self.assignment_name = assignment_name
         self.repo_type = repo_type
-        if self.repo_type in {"user", "group"} or force_user_repo:
+        if self.repo_type == "assignment" or force_user_repo:
             self.path = os.path.join(self.git_root_dir, self.lecture_code, self.assignment_name)
         else:
             self.path = os.path.join(self.git_root_dir, self.repo_type, self.lecture_code, self.assignment_name)
@@ -93,7 +93,7 @@ class GitService(Configurable):
         # self._run_command(f'git add -A', cwd=self.path)
         # self.log.info("Committing repository")
         # self._run_command(f'git commit -m "{m}"', cwd=self.path)
-        self.log.info("Adding all files and committing")
+        self.log.info(f"Adding all files and committing in {self.path}")
         self._run_command(f'sh -c "git add -A && git commit -m "{m}""', cwd=self.path)
 
     def set_author(self, author=getpass.getuser()):

@@ -185,8 +185,12 @@ class RPCHandler(GitBaseHandler):
 
             submission = Submission()
             submission.assignid = assignment.id
-            submission.date = datetime.datetime.now()
+            submission.date = datetime.datetime.utcnow()
             submission.username = self.user.name
+
+            if assignment.duedate is not None and submission.date > assignment.duedate:
+                self.write({"message": "Cannot submit assignment: Past due date!"})
+                self.write_error(400)
 
             await self.git_response()
 

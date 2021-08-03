@@ -16,7 +16,7 @@ class Submission(Base, Serializable):
     score = Column(Integer, nullable=True)
     assignid = Column(Integer, ForeignKey("assignment.id"))
     username = Column(String(255), ForeignKey("user.name"))
-    commit_hash = (Column(String(length=40), nullable=False),)
+    commit_hash = (Column(String(length=40), nullable=False))
 
     assignment = relationship("Assignment", back_populates="submissions")
     user = relationship("User", back_populates="submissions")
