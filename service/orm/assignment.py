@@ -23,6 +23,6 @@ class Assignment(Base, Serializable):
     @property
     def model(self) -> assignment.Assignment:
         assignment_model = assignment.Assignment(
-            id=self.id, name=self.name, due_date=self.duedate, status=self.status, type=self.type, points=self.points
+            id=self.id, name=self.name, due_date=(self.duedate.isoformat("T", "milliseconds") + "Z"), status=self.status, type=self.type, points=self.points
         )
         return assignment_model

@@ -65,10 +65,5 @@ def upgrade():
         op.execute('INSERT INTO "submission" ("date","status","assignid","username","score","commit_hash") VALUES ("2021-05-07 14:44:35.863","manually_graded",1,"ubuntu",10, "e93ae2b2369cb0ddb647f1c608148ccda59e22a1")')   
 
 
-
-    op.execute('INSERT INTO "file" ("name","assignid","path","exercise","points") VALUES ("exercise1.ipynb",1,"./exercise1.ipynb",true,5)')
-    op.execute('INSERT INTO "file" ("name","assignid","path","exercise") VALUES ("dataset.csv",1,"./dataset.csv",false)')
-
-
 def downgrade():
     pass
