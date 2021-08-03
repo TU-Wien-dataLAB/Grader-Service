@@ -37,6 +37,7 @@ export class GradingComponent extends React.Component<GradingProps> {
     submissions: new Array<{user: User, submissions: Submission[]}>(),
     option: "latest",
     rows: new Array(),
+    selected: new Array(),
   };
 
 
@@ -101,13 +102,13 @@ export class GradingComponent extends React.Component<GradingProps> {
         let latest = sub.submissions.reduce((a, b) => {
           return new Date(a.submitted_at) > new Date(b.submitted_at) ? a : b;
         });
-        rows.push({id: rows.length, name: sub.user.name, date: latest.submitted_at, status: latest.status, score: latest.score})
+        rows.push({id: latest.id, name: sub.user.name, date: latest.submitted_at, status: latest.status, score: latest.score})
       });
 
     } else {
 
       this.state.submissions.forEach( sub => {sub.submissions.forEach(s => {
-        rows.push({id: rows.length, name: sub.user.name, date: s.submitted_at, status: s.status, score: s.score})
+        rows.push({id: s.id, name: sub.user.name, date: s.submitted_at, status: s.status, score: s.score})
       }); });
 
     }
@@ -123,6 +124,7 @@ export class GradingComponent extends React.Component<GradingProps> {
       const selectedRowData = this.state.rows.filter((row) =>
         selectedIDs.has(row.id)
       );
+      this.setState({selected : selectedRowData})
       console.log("selected rowData:", selectedRowData);
     }}
      />)
