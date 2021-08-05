@@ -142,7 +142,8 @@ export class AssignmentComponent extends React.Component<AssignmentProps> {
       })
       if (result.button.accept) {
         // update assignment
-        pullAssignment(this.lecture.id, this.assignment.id, 'release');
+      await pullAssignment(this.lecture.id, this.assignment.id, 'release').toPromise();
+      await this.updateDirListing();
       }
     } catch (e) {
       showErrorMessage("Error Fetching Assignment", e);
@@ -196,6 +197,22 @@ export class AssignmentComponent extends React.Component<AssignmentProps> {
     }
   }
 
+
+  public async updateDirListing() {
+    let renderer = new ExistingNodeRenderer(this.dirListingNode);
+    let model = new FilterFileBrowserModel({ auto: true, manager: GlobalObjects.docManager });
+
+    const LISTING_CLASS = 'jp-FileBrowser-listing';
+    this.dirListing = new DirListing({ model, renderer })
+    this.dirListing.addClass(LISTING_CLASS);
+    try {
+      await model.cd(this.lecture.code);
+      await model.cd(this.assignment.name);
+    } catch (error) {
+      console.log(error)
+      return;
+    }
+  }
   public render() {
     return <li key={this.index}>
       <div className="assignment">
