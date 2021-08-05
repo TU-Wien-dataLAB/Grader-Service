@@ -27,14 +27,14 @@ export function fetchAssignment(lectureId: number, assignmentId: number, instruc
   return request<Assignment>(HTTPMethod.GET, url)
 }
 
-export function deleteAssignment(lectureId: number, assignmentId: number): void {
-  request<void>(HTTPMethod.DELETE, `/lectures/${lectureId}/assignments/${assignmentId}`)
+export function deleteAssignment(lectureId: number, assignmentId: number): Observable<void> {
+  return request<void>(HTTPMethod.DELETE, `/lectures/${lectureId}/assignments/${assignmentId}`)
 }
 
-export function pushAssignment(lectureId: number, assignmentId: number, repoType: string): void {
-  request<void>(HTTPMethod.PUT, `/lectures/${lectureId}/assignments/${assignmentId}/push/${repoType}`)
+export function pushAssignment(lectureId: number, assignmentId: number, repoType: string): Observable<void> {
+  return request<void>(HTTPMethod.PUT, `/lectures/${lectureId}/assignments/${assignmentId}/push/${repoType}`)
 }
 
-export function pullAssignment(lectureId: number, assignmentId: number, repoType: string): void {
-  request<void>(HTTPMethod.GET, `/lectures/${lectureId}/assignments/${assignmentId}/pull/${repoType}`)
+export function pullAssignment(lectureId: number, assignmentId: number, repoType: string): Observable<void> {
+  return request<void>(HTTPMethod.GET, `/lectures/${lectureId}/assignments/${assignmentId}/pull/${repoType}`)
 }
