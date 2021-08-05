@@ -5,7 +5,7 @@ from textwrap import dedent
 from traitlets import List, Bool, default
 
 from ..api import Gradebook, MissingEntry
-from .base import BaseConverter, NbGraderException
+from .base import BaseConverter, GraderConvertException
 from ..preprocessors import (
     IncludeHeaderFooter,
     LockCells,
@@ -64,7 +64,7 @@ class GenerateSolution(BaseConverter):
             except MissingEntry:
                 msg = "No assignment with ID '%s' exists in the database" % assignment_id
                 self.log.error(msg)
-                raise NbGraderException(msg)
+                raise GraderConvertException(msg)
 
     def start(self) -> None:
         old_student_id = self.coursedir.student_id

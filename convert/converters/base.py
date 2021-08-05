@@ -8,13 +8,14 @@ import importlib
 
 from rapidfuzz import fuzz
 from traitlets.config import LoggingConfigurable, Config
-from traitlets import Bool, List, Dict, Integer, Instance, Type, Any
+from traitlets import Bool, List, Dict, Integer, Instance, Type, Any, TraitError
 from traitlets import default, validate
 from textwrap import dedent
 from nbconvert.exporters import Exporter, NotebookExporter
 from nbconvert.writers import FilesWriter
 
-from ..coursedir import CourseDirectory
+# TODO: replace CourseDirectory with a path that can be supplied as an argument
+# from ..coursedir import CourseDirectory
 from ..utils import find_all_files, rmtree, remove
 from ..preprocessors.execute import UnresponsiveKernelError
 from ..nbgraderformat import SchemaTooOldError, SchemaTooNewError
@@ -22,7 +23,7 @@ import typing
 from nbconvert.exporters.exporter import ResourcesDict
 
 
-class NbGraderException(Exception):
+class GraderConvertException(Exception):
     pass
 
 
@@ -36,6 +37,22 @@ class BaseConverter(LoggingConfigurable):
     preprocessors = List([])
 
     force = Bool(False, help="Whether to overwrite existing assignments/submissions").tag(config=True)
+
+    ignore = List(
+        [
+            ".ipynb_checkpoints",
+            "*.pyc",
+            "__pycache__",
+            "feedback",
+        ],
+        help=dedent(
+            """
+            List of file names or file globs.
+            Upon copying directories recursively, matching files and
+            directories will be ignored with a debug message.
+            """
+        )
+    ).tag(config=True)
 
     pre_convert_hook = Any(
         None,
@@ -106,11 +123,12 @@ class BaseConverter(LoggingConfigurable):
             raise TraitError("post_convert_hook must be callable")
         return value
 
-    coursedir = Instance(CourseDirectory, allow_none=True)
-
-    def __init__(self, coursedir: CourseDirectory = None, **kwargs: typing.Any) -> None:
-        self.coursedir = coursedir
+    # TODO: all file handling should happen here (no need for CourseDir) -> exporters have from_filename method
+    def __init__(self, input_dir: str, output_dir: str, file_pattern: str, **kwargs: typing.Any) -> None:
         super(BaseConverter, self).__init__(**kwargs)
+        self._input_directory = input_dir
+        self._output_directory = output_dir
+        self._file_pattern = file_pattern
         if self.parent and hasattr(self.parent, "logfile"):
             self.logfile = self.parent.logfile
         else:
@@ -120,6 +138,9 @@ class BaseConverter(LoggingConfigurable):
         c.Exporter.default_preprocessors = []
         self.update_config(c)
 
+    # register pre-processors to self.exporter
+    # self.convert_notebooks() converts all notebooks in the CourseDir
+    # notebooks are set in init_notebooks()
     def start(self) -> None:
         self.init_notebooks()
         self.writer = FilesWriter(parent=self, config=self.config)
@@ -143,19 +164,16 @@ class BaseConverter(LoggingConfigurable):
                 classes.append(pp)
         return classes
 
-    @property
-    def _input_directory(self):
-        raise NotImplementedError
 
-    @property
-    def _output_directory(self):
-        raise NotImplementedError
+    # these methods rely on coursedir which should be replaced by configured functions
+    # should return string that can be used for globs
+    def _format_source(self, escape: bool = False) -> str:
+        source = os.path.join(self._input_directory, self._file_pattern)
+        if escape:
+            return re.escape(source)
+        else:
+            return source
 
-    def _format_source(self, assignment_id: str, student_id: str, escape: bool = False) -> str:
-        return self.coursedir.format_path(self._input_directory, student_id, assignment_id, escape=escape)
-
-    def _format_dest(self, assignment_id: str, student_id: str, escape: bool = False) -> str:
-        return self.coursedir.format_path(self._output_directory, student_id, assignment_id, escape=escape)
 
     def init_notebooks(self) -> None:
         self.assignments = {}
@@ -179,7 +197,7 @@ class BaseConverter(LoggingConfigurable):
                 scores = sorted([(fuzz.ratio(assignment_glob, x), x) for x in found])
                 self.log.error("Did you mean: %s", scores[-1][1])
 
-            raise NbGraderException(msg)
+            raise GraderConvertException(msg)
 
     def init_single_notebook_resources(self, notebook_filename: str) -> typing.Dict[str, typing.Any]:
         regexp = re.escape(os.path.sep).join([
@@ -191,7 +209,7 @@ class BaseConverter(LoggingConfigurable):
         if m is None:
             msg = "Could not match '%s' with regexp '%s'" % (notebook_filename, regexp)
             self.log.error(msg)
-            raise NbGraderException(msg)
+            raise GraderConvertException(msg)
 
         gd = m.groupdict()
 
@@ -213,8 +231,7 @@ class BaseConverter(LoggingConfigurable):
 
     def write_single_notebook(self, output: str, resources: ResourcesDict) -> None:
         # configure the writer build directory
-        self.writer.build_directory = self._format_dest(
-            resources['nbgrader']['assignment'], resources['nbgrader']['student'])
+        self.writer.build_directory = self._output_directory
 
         # write out the results
         self.writer.write(output, resources, notebook_name=resources['unique_key'])
@@ -230,7 +247,7 @@ class BaseConverter(LoggingConfigurable):
             if student_id in exclude_ids:
                 return False
 
-        dest = os.path.normpath(self._format_dest(assignment_id, student_id))
+        dest = os.path.normpath(self._output_directory)
 
         # the destination doesn't exist, so we haven't processed it
         if self.coursedir.notebook_id == "*":
@@ -287,10 +304,10 @@ class BaseConverter(LoggingConfigurable):
 
         """
         source = self._format_source(assignment_id, student_id)
-        dest = self._format_dest(assignment_id, student_id)
+        dest = self._output_directory
 
         # detect other files in the source directory
-        for filename in find_all_files(source, self.coursedir.ignore + ["*.ipynb"]):
+        for filename in find_all_files(source, self.ignore + ["*.ipynb"]):
             # Make sure folder exists.
             path = os.path.join(dest, os.path.relpath(filename, source))
             if not os.path.exists(os.path.dirname(path)):
@@ -302,7 +319,7 @@ class BaseConverter(LoggingConfigurable):
 
     def set_permissions(self, assignment_id: str, student_id: str) -> None:
         self.log.info("Setting destination file permissions to %s", self.permissions)
-        dest = os.path.normpath(self._format_dest(assignment_id, student_id))
+        dest = os.path.normpath(self._output_directory)
         permissions = int(str(self.permissions), 8)
         for dirname, _, filenames in os.walk(dest):
             for filename in filenames:
@@ -348,7 +365,7 @@ class BaseConverter(LoggingConfigurable):
         errors = []
 
         def _handle_failure(gd: typing.Dict[str, str]) -> None:
-            dest = os.path.normpath(self._format_dest(gd['assignment_id'], gd['student_id']))
+            dest = os.path.normpath(self._output_directory)
             if self.coursedir.notebook_id == "*":
                 if os.path.exists(dest):
                     self.log.warning("Removing failed assignment: {}".format(dest))
@@ -366,12 +383,12 @@ class BaseConverter(LoggingConfigurable):
             self.notebooks = sorted(self.assignments[assignment])
 
             # parse out the assignment and student ids
-            regexp = self._format_source("(?P<assignment_id>.*)", "(?P<student_id>.*)", escape=True)
+            regexp = self._format_source(escape=True)
             m = re.match(regexp, assignment)
             if m is None:
                 msg = "Could not match '%s' with regexp '%s'" % (assignment, regexp)
                 self.log.error(msg)
-                raise NbGraderException(msg)
+                raise GraderConvertException(msg)
             gd = m.groupdict()
 
             try:
@@ -416,7 +433,7 @@ class BaseConverter(LoggingConfigurable):
                     "command `nbgrader db upgrade`."
                 )
                 self.log.error(msg)
-                raise NbGraderException(msg)
+                raise GraderConvertException(msg)
 
             except SchemaTooOldError:
                 _handle_failure(gd)
@@ -426,7 +443,7 @@ class BaseConverter(LoggingConfigurable):
                     "directory** and then update the metadata using:\n\nnbgrader update .\n"
                 )
                 self.log.error(msg)
-                raise NbGraderException(msg)
+                raise GraderConvertException(msg)
 
             except SchemaTooNewError:
                 _handle_failure(gd)
@@ -436,7 +453,7 @@ class BaseConverter(LoggingConfigurable):
                     "nbgrader to the latest version to be able to use this notebook.\n"
                 )
                 self.log.error(msg)
-                raise NbGraderException(msg)
+                raise GraderConvertException(msg)
 
             except KeyboardInterrupt:
                 _handle_failure(gd)
@@ -465,7 +482,7 @@ class BaseConverter(LoggingConfigurable):
                     "errors on the above failures.")
 
             self.log.error(msg)
-            raise NbGraderException(msg)
+            raise GraderConvertException(msg)
 
     def run_pre_convert_hook(self):
         if self.pre_convert_hook:

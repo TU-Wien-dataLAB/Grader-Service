@@ -1,4 +1,4 @@
-from .base import BaseConverter, NbGraderException
+from .base import BaseConverter, GraderConvertException
 from .assign import Assign
 from .generate_assignment import GenerateAssignment
 from .autograde import Autograde

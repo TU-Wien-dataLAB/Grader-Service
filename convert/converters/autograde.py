@@ -4,7 +4,7 @@ import shutil
 from textwrap import dedent
 from traitlets import Bool, List, Dict
 
-from .base import BaseConverter, NbGraderException
+from .base import BaseConverter, GraderConvertException
 from ..preprocessors import (
     AssignLatePenalties, ClearOutput, DeduplicateIds, OverwriteCells, SaveAutoGrades,
     Execute, LimitOutput, OverwriteKernelspec, CheckCellMetadata)
@@ -87,7 +87,7 @@ class Autograde(BaseConverter):
                 except MissingEntry:
                     msg = "No student with ID '%s' exists in the database" % student_id
                     self.log.error(msg)
-                    raise NbGraderException(msg)
+                    raise GraderConvertException(msg)
 
         # make sure the assignment exists
         with Gradebook(self.coursedir.db_url, self.coursedir.course_id) as gb:
@@ -96,7 +96,7 @@ class Autograde(BaseConverter):
             except MissingEntry:
                 msg = "No assignment with ID '%s' exists in the database" % assignment_id
                 self.log.error(msg)
-                raise NbGraderException(msg)
+                raise GraderConvertException(msg)
 
         # try to read in a timestamp from file
         src_path = self._format_source(assignment_id, student_id)
@@ -147,7 +147,7 @@ class Autograde(BaseConverter):
         if len(self.notebooks) == 0:
             msg = "No notebooks found, did you forget to run 'nbgrader generate_assignment'?"
             self.log.error(msg)
-            raise NbGraderException(msg)
+            raise GraderConvertException(msg)
 
         # check for missing notebooks and give them a score of zero if they
         # do not exist
