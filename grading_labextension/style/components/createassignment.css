@@ -1,6 +1,8 @@
 .nbgrader-CreateAssignmentWidget {
     background: var(--jp-layout-color1);
     color: var(--jp-ui-font-color1);
+    min-width: 251px;
+
   }
   
   .nbgrader-NotebookPanelWidget {
