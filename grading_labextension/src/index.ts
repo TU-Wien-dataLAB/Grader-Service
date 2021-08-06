@@ -10,6 +10,18 @@ import { INotebookTools } from '@jupyterlab/notebook';
 
 import { CourseManageView } from './widgets/coursemanage';
 
+import {
+  INotebookTracker
+} from '@jupyterlab/notebook';
+
+import {
+  BoxPanel
+} from '@lumino/widgets';
+
+import {
+  CreateAssignmentWidget
+} from './create-assignment/extension';
+
 import { checkIcon, editIcon } from '@jupyterlab/ui-components'
 import { AssignmentList } from './widgets/assignment-list';
 import { CommandRegistry } from '@lumino/commands'
@@ -39,12 +51,19 @@ namespace GradingCommandIDs {
   export const open = 'grading:open';
 }
 
+namespace CreateAssignmentIDs {
+  export const create = 'create-assignment:create';
+  
+  export const open = 'create-assignment:open';
+}
+
 export class GlobalObjects {
   static commands: CommandRegistry;
   static docRegistry: DocumentRegistry;
   static serviceManager: ServiceManager;
   static docManager: IDocumentManager;
-  static browserFactory: IFileBrowserFactory
+  static browserFactory: IFileBrowserFactory;
+  static tracker: INotebookTracker;
 }
 
 
@@ -54,20 +73,42 @@ export class GlobalObjects {
 const extension: JupyterFrontEndPlugin<void> = {
   id: 'coursemanage:plugin',
   autoStart: true,
-  requires: [ICommandPalette, ILauncher, INotebookTools, IDocumentManager, IFileBrowserFactory],
-  activate: (app: JupyterFrontEnd, palette: ICommandPalette, launcher: ILauncher, nbtools: INotebookTools, docManager: IDocumentManager, browserFactory: IFileBrowserFactory,) => {
+  requires: [ICommandPalette, ILauncher, INotebookTools, IDocumentManager, IFileBrowserFactory, INotebookTracker],
+  activate: (app: JupyterFrontEnd, palette: ICommandPalette, launcher: ILauncher, nbtools: INotebookTools, docManager: IDocumentManager, browserFactory: IFileBrowserFactory, tracker: INotebookTracker) => {
     console.log('JupyterLab extension grading is activated!');
     console.log('JupyterFrontEnd:', app)
     console.log('ICommandPalette:', palette);
+    console.log('Tracker', tracker)
 
     GlobalObjects.commands = app.commands;
     GlobalObjects.docRegistry = app.docRegistry;
     GlobalObjects.serviceManager = app.serviceManager;
     GlobalObjects.docManager = docManager;
     GlobalObjects.browserFactory = browserFactory;
+    GlobalObjects.tracker = tracker;
+
+    console.log('Activating extension "create_assignment".');
+    const panel = new BoxPanel();
+    const createAssignmentWidget = new CreateAssignmentWidget(tracker);
+    panel.addWidget(createAssignmentWidget);
+    panel.id = 'nbgrader-create_assignemnt';
+    panel.title.label = 'Create Assignment';
+    panel.title.caption = 'nbgrader Create Assignment';
+    app.shell.add(panel, 'right');
+    console.log('Extension "create_assignment" activated.');
+
+    let command : string = CreateAssignmentIDs.open;
+    app.commands.addCommand(command, {
+      label: 'Create Assignment',
+      execute: async () => {
+
+       
+      },
+      icon: editIcon
+    });
 
     /* ##### Course Manage View Widget ##### */
-    let command: string = CourseManageCommandIDs.create;
+    command = CourseManageCommandIDs.create;
 
     app.commands.addCommand(command, {
       execute: () => {
