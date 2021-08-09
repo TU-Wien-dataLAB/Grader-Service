@@ -6,7 +6,7 @@ from nbconvert.exporters import HTMLExporter
 from nbconvert.preprocessors import CSSHTMLHeaderPreprocessor
 
 from .base import BaseConverter
-from ..preprocessors import GetGrades
+from preprocessors import GetGrades
 
 
 class GenerateFeedback(BaseConverter):

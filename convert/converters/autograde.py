@@ -5,11 +5,10 @@ from textwrap import dedent
 from traitlets import Bool, List, Dict
 
 from .base import BaseConverter, GraderConvertException
-from ..preprocessors import (
-    AssignLatePenalties, ClearOutput, DeduplicateIds, OverwriteCells, SaveAutoGrades,
+from preprocessors import (
+    ClearOutput, DeduplicateIds, OverwriteCells, SaveAutoGrades,
     Execute, LimitOutput, OverwriteKernelspec, CheckCellMetadata)
-from ..api import Gradebook, MissingEntry
-from .. import utils
+import utils
 
 
 class Autograde(BaseConverter):
@@ -61,14 +60,13 @@ class Autograde(BaseConverter):
         Execute,
         LimitOutput,
         SaveAutoGrades,
-        AssignLatePenalties,
         CheckCellMetadata
     ]).tag(config=True)
 
     preprocessors = List([])
 
     def init_assignment(self, assignment_id: str, student_id: str) -> None:
-        super(Autograde, self).init_assignment(assignment_id, student_id)
+        super(Autograde, self).init_directories(assignment_id, student_id)
         # try to get the student from the database, and throw an error if it
         # doesn't exist
         student = {}

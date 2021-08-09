@@ -6,7 +6,7 @@ from nbformat import current_nbformat
 from traitlets import Unicode
 
 from . import NbGraderPreprocessor
-from ..nbgraderformat import read as read_nb
+from nbgraderformat import read as read_nb
 from nbconvert.exporters.exporter import ResourcesDict
 from nbformat.notebooknode import NotebookNode
 from typing import Tuple

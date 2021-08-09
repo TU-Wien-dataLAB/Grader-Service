@@ -1,13 +1,13 @@
 from sys import path
-from baseapp import ConverterApp
+from converters.baseapp import ConverterApp
 import os
 import re
 from textwrap import dedent
 
 from traitlets import List, Bool, default
 
-from base import BaseConverter, GraderConvertException
-from ..preprocessors import (
+from converters.base import BaseConverter, GraderConvertException
+from preprocessors import (
     IncludeHeaderFooter,
     ClearSolutions,
     LockCells,
@@ -65,9 +65,10 @@ class GenerateAssignment(BaseConverter):
         super(GenerateAssignment, self).__init__(
             input_dir, output_dir, file_pattern, **kwargs
         )
+        self.force = True # always overwrite generated assignments
 
     def init_assignment(self, assignment_id: str, student_id: str) -> None:
-        super(GenerateAssignment, self).init_assignment(assignment_id, student_id)
+        super(GenerateAssignment, self).init_directories(assignment_id, student_id)
 
     def start(self) -> None:
         super(GenerateAssignment, self).start()
@@ -82,11 +83,3 @@ class GenerateAssignmentApp(ConverterApp):
             output_dir=self.output_directory,
             file_pattern=self.file_pattern,
         ).start()
-
-if __name__ == "__main__":
-    cfg = {
-        "input_directory": "/etc",
-        "output_directory": os.path.expanduser("~")
-    }
-    app = GenerateAssignmentApp()
-    app.start()

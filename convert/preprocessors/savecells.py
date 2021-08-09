@@ -1,7 +1,6 @@
 import json
 
-from .. import utils
-from ..api import Gradebook, MissingEntry
+import utils
 from . import NbGraderPreprocessor
 from nbformat.notebooknode import NotebookNode
 from nbconvert.exporters.exporter import ResourcesDict

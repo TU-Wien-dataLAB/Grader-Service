@@ -4,8 +4,7 @@ from nbconvert.exporters.exporter import ResourcesDict
 from nbformat.notebooknode import NotebookNode
 from typing import Optional, Any, Tuple
 
-from .. import utils
-from ..api import Gradebook
+import utils
 from . import NbGraderPreprocessor
 
 

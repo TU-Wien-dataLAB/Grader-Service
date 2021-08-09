@@ -26,6 +26,8 @@ class ConverterApp(JupyterApp):
     description = """Base app for converters
     """
 
+    __version__ = "0.0.1"
+
     aliases = base_converter_aliases
     flags = base_converter_flags
 
@@ -34,8 +36,8 @@ class ConverterApp(JupyterApp):
     file_pattern = Unicode("*.ipynb", allow_none=False).tag(config=True)
 
     @validate("input_directory", "output_directory")
-    def _dir_exits(path: str) -> bool:
-        if os.path.exists(path):
-            return path
+    def _dir_exits(self, proposal: str) -> bool:
+        if os.path.isdir(proposal["value"]):
+            return proposal["value"]
         else:
             return None

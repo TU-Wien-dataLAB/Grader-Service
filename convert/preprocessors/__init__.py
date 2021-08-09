@@ -12,13 +12,11 @@ from .getgrades import GetGrades
 from .clearoutput import ClearOutput
 from .limitoutput import LimitOutput
 from .deduplicateids import DeduplicateIds
-from .latesubmissions import AssignLatePenalties
 from .clearhiddentests import ClearHiddenTests
 from .clearmarkingscheme import ClearMarkScheme
 from .overwritekernelspec import OverwriteKernelspec
 
 __all__ = [
-    "AssignLatePenalties",
     "IncludeHeaderFooter",
     "LockCells",
     "ClearSolutions",

@@ -1,9 +1,9 @@
-from convert.converters.baseapp import (
+from converters.baseapp import (
     ConverterApp,
     base_converter_aliases,
     base_converter_flags,
 )
-from convert.converters.generate_assignment import GenerateAssignmentApp
+from converters.generate_assignment import GenerateAssignmentApp
 from textwrap import dedent
 
 
@@ -40,3 +40,6 @@ class GraderConverter(ConverterApp):
 
 def main():
     GraderConverter.launch_instance()
+
+if __name__ == "__main__":
+    main()

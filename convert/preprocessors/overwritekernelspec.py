@@ -1,7 +1,6 @@
 import json
 
 from . import NbGraderPreprocessor
-from ..api import Gradebook
 from nbconvert.exporters.exporter import ResourcesDict
 from nbformat.notebooknode import NotebookNode
 from typing import Tuple

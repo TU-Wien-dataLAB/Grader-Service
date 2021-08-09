@@ -4,7 +4,7 @@ from traitlets import Bool, Unicode
 from textwrap import dedent
 
 from . import NbGraderPreprocessor
-from .. import utils
+import utils
 from nbformat.notebooknode import NotebookNode
 from nbconvert.exporters.exporter import ResourcesDict
 from typing import Tuple

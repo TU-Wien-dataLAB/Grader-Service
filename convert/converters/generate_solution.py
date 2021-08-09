@@ -4,9 +4,8 @@ from textwrap import dedent
 
 from traitlets import List, Bool, default
 
-from ..api import Gradebook, MissingEntry
 from .base import BaseConverter, GraderConvertException
-from ..preprocessors import (
+from preprocessors import (
     IncludeHeaderFooter,
     LockCells,
     SaveCells,
@@ -16,7 +15,6 @@ from ..preprocessors import (
 )
 from traitlets.config.loader import Config
 from typing import Any
-from ..coursedir import CourseDirectory
 
 
 class GenerateSolution(BaseConverter):
@@ -53,11 +51,11 @@ class GenerateSolution(BaseConverter):
     # NB: ClearHiddenTests must come after ComputeChecksums and SaveCells.
     # ComputerChecksums must come again after ClearHiddenTests.
 
-    def __init__(self, coursedir: CourseDirectory = None, **kwargs: Any) -> None:
-        super(GenerateSolution, self).__init__(coursedir=coursedir, **kwargs)
+    def __init__(self, **kwargs: Any) -> None:
+        super(GenerateSolution, self).__init__(coursedir=None, **kwargs)
 
     def init_assignment(self, assignment_id: str, student_id: str) -> None:
-        super(GenerateSolution, self).init_assignment(assignment_id, student_id)
+        super(GenerateSolution, self).init_directories(assignment_id, student_id)
         with Gradebook(self.coursedir.db_url, self.coursedir.course_id) as gb:
             try:
                 gb.find_assignment(assignment_id)

@@ -16,9 +16,9 @@ from nbconvert.writers import FilesWriter
 
 # TODO: replace CourseDirectory with a path that can be supplied as an argument
 # from ..coursedir import CourseDirectory
-from ..utils import find_all_files, rmtree, remove
-from ..preprocessors.execute import UnresponsiveKernelError
-from ..nbgraderformat import SchemaTooOldError, SchemaTooNewError
+from utils import find_all_files, rmtree, remove
+from preprocessors.execute import UnresponsiveKernelError
+from nbgraderformat import SchemaTooOldError, SchemaTooNewError
 import typing
 from nbconvert.exporters.exporter import ResourcesDict
 
@@ -36,7 +36,7 @@ class BaseConverter(LoggingConfigurable):
     exporter_class = Type(NotebookExporter, klass=Exporter).tag(config=True)
     preprocessors = List([])
 
-    force = Bool(False, help="Whether to overwrite existing assignments/submissions").tag(config=True)
+    force = Bool(False, help="Whether to overwrite existing files").tag(config=True)
 
     ignore = List(
         [
@@ -126,8 +126,8 @@ class BaseConverter(LoggingConfigurable):
     # TODO: all file handling should happen here (no need for CourseDir) -> exporters have from_filename method
     def __init__(self, input_dir: str, output_dir: str, file_pattern: str, **kwargs: typing.Any) -> None:
         super(BaseConverter, self).__init__(**kwargs)
-        self._input_directory = input_dir
-        self._output_directory = output_dir
+        self._input_directory = os.path.normpath(os.path.expanduser(input_dir))
+        self._output_directory = os.path.normpath(os.path.expanduser(output_dir))
         self._file_pattern = file_pattern
         if self.parent and hasattr(self.parent, "logfile"):
             self.logfile = self.parent.logfile
@@ -148,7 +148,7 @@ class BaseConverter(LoggingConfigurable):
         for pp in self.preprocessors:
             self.exporter.register_preprocessor(pp)
         currdir = os.getcwd()
-        os.chdir(self.coursedir.root)
+        os.chdir(self._output_directory)
         try:
             self.convert_notebooks()
         finally:
@@ -176,56 +176,17 @@ class BaseConverter(LoggingConfigurable):
 
 
     def init_notebooks(self) -> None:
-        self.assignments = {}
         self.notebooks = []
-        assignment_glob = self._format_source(self.coursedir.assignment_id, self.coursedir.student_id)
-        for assignment in glob.glob(assignment_glob):
-            notebook_glob = os.path.join(assignment, self.coursedir.notebook_id + ".ipynb")
-            found = glob.glob(notebook_glob)
-            if len(found) == 0:
-                self.log.warning("No notebooks were matched by '%s'", notebook_glob)
-                continue
-            self.assignments[assignment] = found
-
-        if len(self.assignments) == 0:
-            msg = "No notebooks were matched by '%s'" % assignment_glob
-            self.log.error(msg)
-
-            assignment_glob2 = self._format_source("*", self.coursedir.student_id)
-            found = glob.glob(assignment_glob2)
-            if found:
-                scores = sorted([(fuzz.ratio(assignment_glob, x), x) for x in found])
-                self.log.error("Did you mean: %s", scores[-1][1])
-
-            raise GraderConvertException(msg)
+        notebook_glob = self._format_source()
+        self.notebooks = glob.glob(notebook_glob)
+        if len(self.notebooks) == 0:
+            self.log.warning("No notebooks were matched by '%s'", notebook_glob)
 
     def init_single_notebook_resources(self, notebook_filename: str) -> typing.Dict[str, typing.Any]:
-        regexp = re.escape(os.path.sep).join([
-            self._format_source("(?P<assignment_id>.*)", "(?P<student_id>.*)", escape=True),
-            "(?P<notebook_id>.*).ipynb"
-        ])
-
-        m = re.match(regexp, notebook_filename)
-        if m is None:
-            msg = "Could not match '%s' with regexp '%s'" % (notebook_filename, regexp)
-            self.log.error(msg)
-            raise GraderConvertException(msg)
-
-        gd = m.groupdict()
-
-        self.log.debug("Student: %s", gd['student_id'])
-        self.log.debug("Assignment: %s", gd['assignment_id'])
-        self.log.debug("Notebook: %s", gd['notebook_id'])
-
         resources = {}
-        resources['unique_key'] = gd['notebook_id']
-        resources['output_files_dir'] = '%s_files' % gd['notebook_id']
-
-        resources['nbgrader'] = {}
-        resources['nbgrader']['student'] = gd['student_id']
-        resources['nbgrader']['assignment'] = gd['assignment_id']
-        resources['nbgrader']['notebook'] = gd['notebook_id']
-        resources['nbgrader']['db_url'] = self.coursedir.db_url
+        resources['unique_key'] = os.path.basename(notebook_filename)
+        resources['output_files_dir'] = '%s_files' % os.path.basename(notebook_filename)
+        resources['output_json_file'] = f'{os.path.basename(notebook_filename)}_out.json'
 
         return resources
 
@@ -236,88 +197,29 @@ class BaseConverter(LoggingConfigurable):
         # write out the results
         self.writer.write(output, resources, notebook_name=resources['unique_key'])
 
-    def init_destination(self, assignment_id: str, student_id: str) -> bool:
+    def init_destination(self) -> bool:
         """Initialize the destination for an assignment. Returns whether the
         assignment should actually be processed or not (i.e. whether the
         initialization was successful).
 
         """
-        if self.coursedir.student_id_exclude:
-            exclude_ids = self.coursedir.student_id_exclude.split(',')
-            if student_id in exclude_ids:
-                return False
-
-        dest = os.path.normpath(self._output_directory)
-
-        # the destination doesn't exist, so we haven't processed it
-        if self.coursedir.notebook_id == "*":
-            if not os.path.exists(dest):
-                return True
-        else:
-            # if any of the notebooks don't exist, then we want to process them
-            for notebook in self.notebooks:
-                filename = os.path.splitext(os.path.basename(notebook))[0] + self.exporter.file_extension
-                path = os.path.join(dest, filename)
-                if not os.path.exists(path):
-                    return True
+        dest = self._output_directory
+        source = self._input_directory
 
         # if we have specified --force, then always remove existing stuff
         if self.force:
-            if self.coursedir.notebook_id == "*":
-                self.log.warning("Removing existing assignment: {}".format(dest))
-                rmtree(dest)
-            else:
-                for notebook in self.notebooks:
-                    filename = os.path.splitext(os.path.basename(notebook))[0] + self.exporter.file_extension
-                    path = os.path.join(dest, filename)
-                    if os.path.exists(path):
-                        self.log.warning("Removing existing notebook: {}".format(path))
-                        remove(path)
             return True
 
-        src = self._format_source(assignment_id, student_id)
-        new_timestamp = self.coursedir.get_existing_timestamp(src)
-        old_timestamp = self.coursedir.get_existing_timestamp(dest)
+        # if files exist in in the destination and force is not specified return false
+        src_files = glob.glob(self._format_source())
+        for src in src_files:
+            file_name = os.path.join(dest, os.path.relpath(src, source))
+            if os.path.exists(os.path.join(dest, file_name)):
+                return False
+        return True
 
-        # if --force hasn't been specified, but the source assignment is newer,
-        # then we want to overwrite it
-        if new_timestamp is not None and old_timestamp is not None and new_timestamp > old_timestamp:
-            if self.coursedir.notebook_id == "*":
-                self.log.warning("Updating existing assignment: {}".format(dest))
-                rmtree(dest)
-            else:
-                for notebook in self.notebooks:
-                    filename = os.path.splitext(os.path.basename(notebook))[0] + self.exporter.file_extension
-                    path = os.path.join(dest, filename)
-                    if os.path.exists(path):
-                        self.log.warning("Updating existing notebook: {}".format(path))
-                        remove(path)
-            return True
 
-        # otherwise, we should skip the assignment
-        self.log.info("Skipping existing assignment: {}".format(dest))
-        return False
-
-    def init_assignment(self, assignment_id: str, student_id: str) -> None:
-        """Initializes resources/dependencies/etc. that are common to all
-        notebooks in an assignment.
-
-        """
-        source = self._format_source(assignment_id, student_id)
-        dest = self._output_directory
-
-        # detect other files in the source directory
-        for filename in find_all_files(source, self.ignore + ["*.ipynb"]):
-            # Make sure folder exists.
-            path = os.path.join(dest, os.path.relpath(filename, source))
-            if not os.path.exists(os.path.dirname(path)):
-                os.makedirs(os.path.dirname(path))
-            if os.path.exists(path):
-                remove(path)
-            self.log.info("Copying %s -> %s", filename, path)
-            shutil.copy(filename, path)
-
-    def set_permissions(self, assignment_id: str, student_id: str) -> None:
+    def set_permissions(self) -> None:
         self.log.info("Setting destination file permissions to %s", self.permissions)
         dest = os.path.normpath(self._output_directory)
         permissions = int(str(self.permissions), 8)
@@ -378,93 +280,80 @@ class BaseConverter(LoggingConfigurable):
                         self.log.warning("Removing failed notebook: {}".format(path))
                         remove(path)
 
-        for assignment in sorted(self.assignments.keys()):
-            # initialize the list of notebooks and the exporter
-            self.notebooks = sorted(self.assignments[assignment])
+        # initialize the list of notebooks and the exporter
+        self.notebooks = sorted(self.notebooks)
 
-            # parse out the assignment and student ids
-            regexp = self._format_source(escape=True)
-            m = re.match(regexp, assignment)
-            if m is None:
-                msg = "Could not match '%s' with regexp '%s'" % (assignment, regexp)
-                self.log.error(msg)
-                raise GraderConvertException(msg)
-            gd = m.groupdict()
+        try:
+            # determine whether we actually even want to process the notebooks
+            should_process = self.init_destination()
+            if not should_process:
+                return
 
-            try:
-                # determine whether we actually even want to process this submission
-                should_process = self.init_destination(gd['assignment_id'], gd['student_id'])
-                if not should_process:
-                    continue
+            self.run_pre_convert_hook()
 
-                self.run_pre_convert_hook()
+            # convert all the notebooks
+            for notebook_filename in self.notebooks:
+                self.convert_single_notebook(notebook_filename)
 
-                # initialize the destination
-                self.init_assignment(gd['assignment_id'], gd['student_id'])
+            # set assignment permissions
+            self.set_permissions(gd['assignment_id'], gd['student_id'])
+            self.run_post_convert_hook()
 
-                # convert all the notebooks
-                for notebook_filename in self.notebooks:
-                    self.convert_single_notebook(notebook_filename)
+        except UnresponsiveKernelError:
+            self.log.error(
+                "While processing file %s, the kernel became "
+                "unresponsive and we could not interrupt it. This probably "
+                "means that the students' code has an infinite loop that "
+                "consumes a lot of memory or something similar. nbgrader "
+                "doesn't know how to deal with this problem, so you will "
+                "have to manually edit the students' code (for example, to "
+                "just throw an error rather than enter an infinite loop). ",
+                assignment)
+            errors.append((gd['assignment_id'], gd['student_id']))
+            _handle_failure(gd)
 
-                # set assignment permissions
-                self.set_permissions(gd['assignment_id'], gd['student_id'])
-                self.run_post_convert_hook()
+        except sqlalchemy.exc.OperationalError:
+            _handle_failure(gd)
+            self.log.error(traceback.format_exc())
+            msg = (
+                "There was an error accessing the nbgrader database. This "
+                "may occur if you recently upgraded nbgrader. To resolve "
+                "the issue, first BACK UP your database and then run the "
+                "command `nbgrader db upgrade`."
+            )
+            self.log.error(msg)
+            raise GraderConvertException(msg)
 
-            except UnresponsiveKernelError:
-                self.log.error(
-                    "While processing assignment %s, the kernel became "
-                    "unresponsive and we could not interrupt it. This probably "
-                    "means that the students' code has an infinite loop that "
-                    "consumes a lot of memory or something similar. nbgrader "
-                    "doesn't know how to deal with this problem, so you will "
-                    "have to manually edit the students' code (for example, to "
-                    "just throw an error rather than enter an infinite loop). ",
-                    assignment)
-                errors.append((gd['assignment_id'], gd['student_id']))
-                _handle_failure(gd)
+        except SchemaTooOldError:
+            _handle_failure(gd)
+            msg = (
+                "One or more notebooks in the assignment use an old version \n"
+                "of the nbgrader metadata format. Please **back up your class files \n"
+                "directory** and then update the metadata using:\n\nnbgrader update .\n"
+            )
+            self.log.error(msg)
+            raise GraderConvertException(msg)
 
-            except sqlalchemy.exc.OperationalError:
-                _handle_failure(gd)
-                self.log.error(traceback.format_exc())
-                msg = (
-                    "There was an error accessing the nbgrader database. This "
-                    "may occur if you recently upgraded nbgrader. To resolve "
-                    "the issue, first BACK UP your database and then run the "
-                    "command `nbgrader db upgrade`."
-                )
-                self.log.error(msg)
-                raise GraderConvertException(msg)
+        except SchemaTooNewError:
+            _handle_failure(gd)
+            msg = (
+                "One or more notebooks in the assignment use an newer version \n"
+                "of the nbgrader metadata format. Please update your version of \n"
+                "nbgrader to the latest version to be able to use this notebook.\n"
+            )
+            self.log.error(msg)
+            raise GraderConvertException(msg)
 
-            except SchemaTooOldError:
-                _handle_failure(gd)
-                msg = (
-                    "One or more notebooks in the assignment use an old version \n"
-                    "of the nbgrader metadata format. Please **back up your class files \n"
-                    "directory** and then update the metadata using:\n\nnbgrader update .\n"
-                )
-                self.log.error(msg)
-                raise GraderConvertException(msg)
+        except KeyboardInterrupt:
+            _handle_failure(gd)
+            self.log.error("Canceled")
+            raise
 
-            except SchemaTooNewError:
-                _handle_failure(gd)
-                msg = (
-                    "One or more notebooks in the assignment use an newer version \n"
-                    "of the nbgrader metadata format. Please update your version of \n"
-                    "nbgrader to the latest version to be able to use this notebook.\n"
-                )
-                self.log.error(msg)
-                raise GraderConvertException(msg)
-
-            except KeyboardInterrupt:
-                _handle_failure(gd)
-                self.log.error("Canceled")
-                raise
-
-            except Exception:
-                self.log.error("There was an error processing assignment: %s", assignment)
-                self.log.error(traceback.format_exc())
-                errors.append((gd['assignment_id'], gd['student_id']))
-                _handle_failure(gd)
+        except Exception:
+            self.log.error("There was an error processing assignment: %s", assignment)
+            self.log.error(traceback.format_exc())
+            errors.append((gd['assignment_id'], gd['student_id']))
+            _handle_failure(gd)
 
         if len(errors) > 0:
             for assignment_id, student_id in errors:
