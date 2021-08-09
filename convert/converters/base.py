@@ -266,19 +266,9 @@ class BaseConverter(LoggingConfigurable):
     def convert_notebooks(self) -> None:
         errors = []
 
-        def _handle_failure(gd: typing.Dict[str, str]) -> None:
+        def _handle_failure(exception) -> None:
             dest = os.path.normpath(self._output_directory)
-            if self.coursedir.notebook_id == "*":
-                if os.path.exists(dest):
-                    self.log.warning("Removing failed assignment: {}".format(dest))
-                    rmtree(dest)
-            else:
-                for notebook in self.notebooks:
-                    filename = os.path.splitext(os.path.basename(notebook))[0] + self.exporter.file_extension
-                    path = os.path.join(dest, filename)
-                    if os.path.exists(path):
-                        self.log.warning("Removing failed notebook: {}".format(path))
-                        remove(path)
+            rmtree(dest)
 
         # initialize the list of notebooks and the exporter
         self.notebooks = sorted(self.notebooks)
@@ -296,24 +286,24 @@ class BaseConverter(LoggingConfigurable):
                 self.convert_single_notebook(notebook_filename)
 
             # set assignment permissions
-            self.set_permissions(gd['assignment_id'], gd['student_id'])
+            self.set_permissions()
             self.run_post_convert_hook()
 
-        except UnresponsiveKernelError:
+        except UnresponsiveKernelError as e:
             self.log.error(
-                "While processing file %s, the kernel became "
+                "While processing files %s, the kernel became "
                 "unresponsive and we could not interrupt it. This probably "
                 "means that the students' code has an infinite loop that "
                 "consumes a lot of memory or something similar. nbgrader "
                 "doesn't know how to deal with this problem, so you will "
                 "have to manually edit the students' code (for example, to "
                 "just throw an error rather than enter an infinite loop). ",
-                assignment)
-            errors.append((gd['assignment_id'], gd['student_id']))
-            _handle_failure(gd)
+                self._format_source())
+            errors.append(e)
+            _handle_failure(e)
 
-        except sqlalchemy.exc.OperationalError:
-            _handle_failure(gd)
+        except sqlalchemy.exc.OperationalError as e:
+            _handle_failure(e)
             self.log.error(traceback.format_exc())
             msg = (
                 "There was an error accessing the nbgrader database. This "
@@ -324,8 +314,8 @@ class BaseConverter(LoggingConfigurable):
             self.log.error(msg)
             raise GraderConvertException(msg)
 
-        except SchemaTooOldError:
-            _handle_failure(gd)
+        except SchemaTooOldError as e:
+            _handle_failure(e)
             msg = (
                 "One or more notebooks in the assignment use an old version \n"
                 "of the nbgrader metadata format. Please **back up your class files \n"
@@ -334,8 +324,8 @@ class BaseConverter(LoggingConfigurable):
             self.log.error(msg)
             raise GraderConvertException(msg)
 
-        except SchemaTooNewError:
-            _handle_failure(gd)
+        except SchemaTooNewError as e:
+            _handle_failure(e)
             msg = (
                 "One or more notebooks in the assignment use an newer version \n"
                 "of the nbgrader metadata format. Please update your version of \n"
@@ -344,16 +334,16 @@ class BaseConverter(LoggingConfigurable):
             self.log.error(msg)
             raise GraderConvertException(msg)
 
-        except KeyboardInterrupt:
-            _handle_failure(gd)
+        except KeyboardInterrupt as e:
+            _handle_failure(e)
             self.log.error("Canceled")
             raise
 
-        except Exception:
-            self.log.error("There was an error processing assignment: %s", assignment)
+        except Exception as e:
+            self.log.error("There was an error processing files: %s", self._format_source())
             self.log.error(traceback.format_exc())
-            errors.append((gd['assignment_id'], gd['student_id']))
-            _handle_failure(gd)
+            errors.append(e)
+            _handle_failure(e)
 
         if len(errors) > 0:
             for assignment_id, student_id in errors:
