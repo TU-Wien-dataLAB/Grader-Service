@@ -174,7 +174,7 @@ export class CreateAssignmentWidget extends Panel {
 /**
  * Shows a cell's assignment data.
  */
-class CellWidget extends Panel {
+export class CellWidget extends Panel {
   private _cell: Cell;
   private _click = new Signal<this, void>(this);
   private metadataChangedHandler:

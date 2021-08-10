@@ -1,1 +1,37 @@
 @import url('base.css');
+
+.jp-CellPlayButton {
+	position: absolute;
+	right: 0;
+	bottom: 0;
+	top: 0;
+	height: 100%;
+	padding: 9px 10px 0 0;
+	display: block;
+	z-index: 600;
+	overflow: unset;
+}
+
+.cellPlayButton {
+	position: sticky;
+	top: 0;
+	background: none;
+	border: none;
+	padding: 0;
+	cursor: pointer;
+}
+
+.cellPlayButton-icon {
+	display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 3px;
+    border-radius: 50%;
+    box-shadow: 0 7.5px 20px rgba(51, 51, 51, 0.1);
+	transition: 0.2s ease-in-out all;
+	background-color: #cccccc;
+}
+
+.cellPlayButton:hover .cellPlayButton-icon {
+	box-shadow: 0 7.5px 20px rgba(51, 51, 51, 0.5);
+}

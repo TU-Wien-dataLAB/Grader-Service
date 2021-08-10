@@ -10,12 +10,16 @@ import { INotebookTools } from '@jupyterlab/notebook';
 
 import { CourseManageView } from './widgets/coursemanage';
 
+import { Cell } from '@jupyterlab/cells';
+
 import {
   INotebookTracker
 } from '@jupyterlab/notebook';
 
+import {CellWidget} from './create-assignment/extension';
+
 import {
-  BoxPanel
+  BoxPanel, PanelLayout
 } from '@lumino/widgets';
 
 import {
@@ -31,6 +35,7 @@ import { ServiceManager } from '@jupyterlab/services';
 import { IDocumentManager } from '@jupyterlab/docmanager';
 import { IFileBrowserFactory } from '@jupyterlab/filebrowser';
 import { UserPermissions } from './services/permission.service';
+import { CellPlayButton} from './create-assignment/widget'
 
 
 namespace AssignmentsCommandIDs {
@@ -51,11 +56,11 @@ namespace GradingCommandIDs {
   export const open = 'grading:open';
 }
 
-namespace CreateAssignmentIDs {
+/*namespace CreateAssignmentIDs {
   export const create = 'create-assignment:create';
   
   export const open = 'create-assignment:open';
-}
+}*/
 
 export class GlobalObjects {
   static commands: CommandRegistry;
@@ -87,6 +92,7 @@ const extension: JupyterFrontEndPlugin<void> = {
     GlobalObjects.browserFactory = browserFactory;
     GlobalObjects.tracker = tracker;
 
+    //Creation of the sidepanel widget for create assignment
     console.log('Activating extension "create_assignment".');
     const panel = new BoxPanel();
     const createAssignmentWidget = new CreateAssignmentWidget(tracker);
@@ -97,18 +103,58 @@ const extension: JupyterFrontEndPlugin<void> = {
     app.shell.add(panel, 'right');
     console.log('Extension "create_assignment" activated.');
 
-    let command : string = CreateAssignmentIDs.open;
-    app.commands.addCommand(command, {
-      label: 'Create Assignment',
-      execute: async () => {
+    //Creation of in-cell widget for create assignment
+    tracker.currentChanged.connect(() => {
 
-       
-      },
-      icon: editIcon
-    });
+      const notebookPanel = tracker.currentWidget;
+      const notebook = tracker.currentWidget.content;
+
+      notebookPanel.context.ready.then(async () => {
+
+
+        let currentCell: Cell = null;
+        let currentCellPlayButton: CellPlayButton = null;
+        notebook.widgets.map((c: Cell) => {
+          const currentLayout = c.layout as PanelLayout;
+          const metadata: CellWidget = new CellWidget(c);
+          currentLayout.addWidget(metadata);
+        });
+        tracker.activeCellChanged.connect(() => {
+
+          // Remove the existing play button from
+          // the previously active cell. This may
+          // well introduce bugs down the road and
+          // there is likely a better way to do this
+          if (currentCell) {
+            notebook.widgets.map((c: Cell) => {
+              const currentLayout = c.layout as PanelLayout;
+              currentLayout.widgets.map(w => {
+                if (w === currentCellPlayButton) {
+                  currentLayout.removeWidget(w)
+                }
+              })
+            });
+          }
+
+          const cell: Cell = notebook.activeCell;
+          const newButton: CellPlayButton = new CellPlayButton(
+              cell, notebookPanel.sessionContext);
+          (cell.layout as PanelLayout).addWidget(newButton);
+
+          
+
+          // Set the current cell and button for future
+          // reference
+          currentCell = cell;
+          currentCellPlayButton = newButton;
+        });
+
+      });
+
+    })
 
     /* ##### Course Manage View Widget ##### */
-    command = CourseManageCommandIDs.create;
+    let command : string = CourseManageCommandIDs.create;
 
     app.commands.addCommand(command, {
       execute: () => {
