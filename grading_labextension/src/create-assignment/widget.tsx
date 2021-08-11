@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-empty-function */
 import { ReactWidget } from '@jupyterlab/apputils';
 
 import { Cell, CodeCell, MarkdownCell } from '@jupyterlab/cells';
@@ -6,8 +7,7 @@ import { runIcon, stopIcon, LabIcon } from '@jupyterlab/ui-components';
 
 import { ISessionContext } from '@jupyterlab/apputils';
 
-import React, {useEffect, useState} from 'react';
-
+import React, { useEffect, useState } from 'react';
 
 /**
  * PlayButton
@@ -22,24 +22,17 @@ interface IPlayButtonComponent {
   onClick: () => void;
 }
 
-const PlayButton = ({
-  icon,
-  onClick
-}: IPlayButtonComponent) => (
-  <button
-      type="button"
-      onClick={() => onClick()}
-      className="cellPlayButton">
+const PlayButton = ({ icon, onClick }: IPlayButtonComponent) => (
+  <button type="button" onClick={() => onClick()} className="cellPlayButton">
     <LabIcon.resolveReact
-        icon={icon}
-        className="cellPlayButton-icon"
-        tag="span"
-        width="15px"
-        height="15px"
+      icon={icon}
+      className="cellPlayButton-icon"
+      tag="span"
+      width="15px"
+      height="15px"
     />
   </button>
 );
-
 
 /**
  * makeCancelable
@@ -56,14 +49,15 @@ const PlayButton = ({
 function makeCancelable<T>(promise: Promise<T>) {
   let active = true;
   return {
-    cancel() {active = false},
+    cancel() {
+      active = false;
+    },
     promise: promise.then(
-      value => active ? value : new Promise(()=>{}),
-      reason => active ? reason : new Promise(()=>{})
+      value => (active ? value : new Promise(() => {})),
+      reason => (active ? reason : new Promise(() => {}))
     )
-  }
+  };
 }
-
 
 /**
  * CodeCellPlayButtonComponent
@@ -84,13 +78,14 @@ interface ICodeCellPlayButtonComponent {
 
 const CodeCellPlayButtonComponent = ({
   cell,
-  session,
+  session
 }: ICodeCellPlayButtonComponent): JSX.Element => {
   // A hacky way to find out if we're currently running
   // anything, but doesn't matter greatly because the status
   // will soon be updated by the returned kernel future promise
   const [isRunning, setIsRunning] = useState(
-      !!(cell.promptNode.textContent === '[*]:'));
+    !!(cell.promptNode.textContent === '[*]:')
+  );
 
   const executeCell = async () => {
     CodeCell.execute(cell, session);
@@ -104,15 +99,15 @@ const CodeCellPlayButtonComponent = ({
   useEffect(() => {
     const codeCellFuture = cell.outputArea.future;
     if (!codeCellFuture) {
-      return
+      return;
     }
-    const {promise, cancel} = makeCancelable(codeCellFuture.done);
+    const { promise, cancel } = makeCancelable(codeCellFuture.done);
     promise.then(() => {
       setIsRunning(false);
     });
     return () => {
-      cancel()
-    }
+      cancel();
+    };
   }, [isRunning]);
 
   return (
@@ -122,7 +117,6 @@ const CodeCellPlayButtonComponent = ({
     />
   );
 };
-
 
 /**
  * MarkdownCellPlayButtonComponent
@@ -138,19 +132,12 @@ interface IMarkdownPlayButtonComponent {
 const MarkdownCellPlayButtonComponent = ({
   cell
 }: IMarkdownPlayButtonComponent) => {
-
   const executeCell = () => {
     cell.rendered = true;
   };
 
-  return (
-    <PlayButton
-      icon={runIcon}
-      onClick={() => executeCell()}
-    />
-  );
+  return <PlayButton icon={runIcon} onClick={() => executeCell()} />;
 };
-
 
 export class CellPlayButton extends ReactWidget {
   /**
@@ -173,11 +160,16 @@ export class CellPlayButton extends ReactWidget {
   render(): JSX.Element {
     switch (this.cell.model.type) {
       case 'markdown':
-        return <MarkdownCellPlayButtonComponent
-            cell={this.cell as MarkdownCell} />;
+        return (
+          <MarkdownCellPlayButtonComponent cell={this.cell as MarkdownCell} />
+        );
       case 'code':
-        return <CodeCellPlayButtonComponent
-            cell={this.cell as CodeCell} session={this.session} />;
+        return (
+          <CodeCellPlayButtonComponent
+            cell={this.cell as CodeCell}
+            session={this.session}
+          />
+        );
       default:
         break;
     }

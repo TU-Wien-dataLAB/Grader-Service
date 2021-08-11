@@ -1,7 +1,8 @@
 @import url('components/assignment-list.css');
 @import url('components/assignment.css');
 @import url('components/courses.css');
-@import url('components/createassignment.css');
+/* @import url('components/createassignment.css'); */
+@import url('components/cellwidget.css');
 
 :root {
   --text-color: #2e373d;
