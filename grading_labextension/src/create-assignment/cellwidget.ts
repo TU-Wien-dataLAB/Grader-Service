@@ -1,3 +1,5 @@
+/* eslint-disable no-var */
+/* eslint-disable eqeqeq */
 import { Styling } from '@jupyterlab/apputils';
 
 import { Cell, ICellModel } from '@jupyterlab/cells';
@@ -27,7 +29,7 @@ const CSS_MOD_UNEDITABLE = 'nbgrader-mod-uneditable';
 /**
  * Shows a cell's assignment data.
  */
- export class CellWidget extends Panel {
+export class CellWidget extends Panel {
   private _cell: Cell;
   private _click = new Signal<this, void>(this);
   private metadataChangedHandler: (

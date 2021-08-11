@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable no-prototype-builtins */
 import {
   JupyterFrontEnd,
@@ -115,7 +116,6 @@ const extension: JupyterFrontEndPlugin<void> = {
     tracker.currentChanged.connect(() => {
       const notebookPanel = tracker.currentWidget;
       const notebook = tracker.currentWidget.content;
-
       notebookPanel.context.ready.then(async () => {
         let currentCell: Cell = null;
         let currentCellPlayButton: CellPlayButton = null;
@@ -137,16 +137,14 @@ const extension: JupyterFrontEndPlugin<void> = {
           // the previously active cell. This may
           // well introduce bugs down the road and
           // there is likely a better way to do this
-          if (currentCell) {
-            notebook.widgets.map((c: Cell) => {
-              const currentLayout = c.layout as PanelLayout;
-              currentLayout.widgets.map(w => {
-                if (w === currentCellPlayButton) {
-                  currentLayout.removeWidget(w);
-                }
-              });
+          notebook.widgets.map((c: Cell) => {
+            const currentLayout = c.layout as PanelLayout;
+            currentLayout.widgets.map(w => {
+              if (w === currentCellPlayButton) {
+                currentLayout.removeWidget(w);
+              }
             });
-          }
+          });
 
           const cell: Cell = notebook.activeCell;
           const newButton: CellPlayButton = new CellPlayButton(

@@ -11,7 +11,6 @@
     font-size: var(--jp-ui-font-size1);
     font-family: var(--jp-content-font-family);
     color: var(--jp-ui-font-color0);
-    border: var(--jp-border-width) solid var(--jp-border-color1);
     flex: 1 1 auto;
     padding: 0 8px 0 8px;
     outline: none;
@@ -22,7 +21,7 @@
     margin-top: 12px;
     height: auto;
     border-style: solid;
-    border-width: 0 0 var(--jp-border-width) 0;
+    border-width: var(--jp-border-width) 0 0 0;
     border-color: var(--jp-border-color2);
   }
   
@@ -97,9 +96,7 @@
     flex-direction: row;
     margin-top: 6px;
     height: auto;
-    border-style: solid;
-    border-width: 0 0 var(--jp-border-width) 0;
-    border-color: var(--jp-border-color2);
+    
   }
   
   .cellWidget:last-child {
@@ -110,14 +107,8 @@
     display: flex;
     flex-direction: row;
     padding: 12px 0px 6px 0px;
-    border-style: solid;
-    border-width: 0 0 0 6px;
-    border-color: #0000;
   }
   
-  .cellWidget.nbgrader-mod-active>div {
-    border-color: var(--jp-brand-color1);
-  }
   
   .cellWidget input {
     background: var(--jp-input-background);
