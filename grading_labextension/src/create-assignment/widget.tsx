@@ -150,11 +150,15 @@ export class CellPlayButton extends ReactWidget {
   cell: Cell = null;
   session: ISessionContext = null;
 
-  constructor(cell: Cell, session: ISessionContext) {
+  constructor(cell: Cell, session: ISessionContext, creationmode: boolean) {
     super();
     this.cell = cell;
     this.session = session;
-    this.addClass('jp-CellPlayButton');
+    if (creationmode) {
+      this.addClass('jp-CellPlayButtonCreation');
+    } else {
+      this.addClass('jp-CellPlayButton');
+    }
   }
 
   render(): JSX.Element {

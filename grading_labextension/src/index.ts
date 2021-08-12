@@ -1,3 +1,4 @@
+/* eslint-disable no-constant-condition */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable no-prototype-builtins */
 import {
@@ -8,7 +9,7 @@ import {
 import { ICommandPalette, MainAreaWidget } from '@jupyterlab/apputils';
 
 import { ILauncher } from '@jupyterlab/launcher';
-import { INotebookTools } from '@jupyterlab/notebook';
+import { INotebookTools, Notebook } from '@jupyterlab/notebook';
 
 import { CourseManageView } from './widgets/coursemanage';
 
@@ -112,10 +113,12 @@ const extension: JupyterFrontEndPlugin<void> = {
     app.shell.add(panel, 'right');
     console.log('Extension "create_assignment" activated.');
 
+    //Creation of widget slider
+    let creationmode = true;
     //Creation of in-cell widget for create assignment
     tracker.currentChanged.connect(() => {
       const notebookPanel = tracker.currentWidget;
-      const notebook = tracker.currentWidget.content;
+      const notebook: Notebook = tracker.currentWidget.content;
       notebookPanel.context.ready.then(async () => {
         let currentCell: Cell = null;
         let currentCellPlayButton: CellPlayButton = null;
@@ -129,7 +132,9 @@ const extension: JupyterFrontEndPlugin<void> = {
           });
           if (!tagSet) {
             const metadata: CellWidget = new CellWidget(c);
-            currentLayout.insertWidget(0, metadata);
+            if (creationmode) {
+              currentLayout.insertWidget(0, metadata);
+            }
           }
         });
         tracker.activeCellChanged.connect(() => {
@@ -149,7 +154,8 @@ const extension: JupyterFrontEndPlugin<void> = {
           const cell: Cell = notebook.activeCell;
           const newButton: CellPlayButton = new CellPlayButton(
             cell,
-            notebookPanel.sessionContext
+            notebookPanel.sessionContext,
+            creationmode
           );
           (cell.layout as PanelLayout).insertWidget(2, newButton);
 
