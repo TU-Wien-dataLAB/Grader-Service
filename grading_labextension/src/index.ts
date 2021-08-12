@@ -22,6 +22,7 @@ import { CellWidget } from './create-assignment/cellwidget';
 import { BoxPanel, PanelLayout } from '@lumino/widgets';
 
 import { CreateAssignmentWidget } from './create-assignment/extension';
+import { CreationmodeSwitch } from './create-assignment/slider';
 
 import { checkIcon, editIcon } from '@jupyterlab/ui-components';
 import { AssignmentList } from './widgets/assignment-list';
@@ -115,10 +116,13 @@ const extension: JupyterFrontEndPlugin<void> = {
 
     //Creation of widget slider
     let creationmode = true;
+
     //Creation of in-cell widget for create assignment
     tracker.currentChanged.connect(() => {
       const notebookPanel = tracker.currentWidget;
       const notebook: Notebook = tracker.currentWidget.content;
+      const switcher: CreationmodeSwitch = new CreationmodeSwitch({});
+      notebookPanel.toolbar.insertItem(10, 'Creationmode', switcher);
       notebookPanel.context.ready.then(async () => {
         let currentCell: Cell = null;
         let currentCellPlayButton: CellPlayButton = null;
