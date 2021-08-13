@@ -9,7 +9,7 @@ import {
 import { ICommandPalette, MainAreaWidget } from '@jupyterlab/apputils';
 
 import { ILauncher } from '@jupyterlab/launcher';
-import { INotebookTools, Notebook } from '@jupyterlab/notebook';
+import { INotebookTools, Notebook, NotebookPanel } from '@jupyterlab/notebook';
 
 import { CourseManageView } from './widgets/coursemanage';
 
@@ -114,31 +114,33 @@ const extension: JupyterFrontEndPlugin<void> = {
     app.shell.add(panel, 'right');
     console.log('Extension "create_assignment" activated.');
 
-    //Creation of widget slider
-    let creationmode = true;
-
     //Creation of in-cell widget for create assignment
     tracker.currentChanged.connect(() => {
       const notebookPanel = tracker.currentWidget;
       const notebook: Notebook = tracker.currentWidget.content;
-      const switcher: CreationmodeSwitch = new CreationmodeSwitch({});
+      //Creation of widget switch
+      const creationmode = false;
+      const switcher: CreationmodeSwitch = new CreationmodeSwitch(
+        creationmode,
+        notebookPanel,
+        notebook
+      );
       notebookPanel.toolbar.insertItem(10, 'Creationmode', switcher);
+
       notebookPanel.context.ready.then(async () => {
         let currentCell: Cell = null;
         let currentCellPlayButton: CellPlayButton = null;
         notebook.widgets.map((c: Cell) => {
           const currentLayout = c.layout as PanelLayout;
-          let tagSet = false;
           currentLayout.widgets.map(w => {
             if (w instanceof CellWidget) {
-              tagSet = true;
+              currentLayout.removeWidget(w);
             }
           });
-          if (!tagSet) {
+
+          if (switcher.ref.current.state.creationmode) {
             const metadata: CellWidget = new CellWidget(c);
-            if (creationmode) {
-              currentLayout.insertWidget(0, metadata);
-            }
+            currentLayout.insertWidget(0, metadata);
           }
         });
         tracker.activeCellChanged.connect(() => {
@@ -159,7 +161,7 @@ const extension: JupyterFrontEndPlugin<void> = {
           const newButton: CellPlayButton = new CellPlayButton(
             cell,
             notebookPanel.sessionContext,
-            creationmode
+            switcher.ref.current.state.creationmode
           );
           (cell.layout as PanelLayout).insertWidget(2, newButton);
 
