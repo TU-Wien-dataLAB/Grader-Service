@@ -1,13 +1,16 @@
 from dataclasses import asdict, dataclass
-from typing import Any, Optional, Type, List
+from typing import Any, Dict, Optional, Set, Type, List
 from enum import Enum
+
 
 class BaseModel:
     def to_dict(self) -> dict:
-        return asdict(self)
+        d = asdict(self)
+        d["_type"] = str(self.__class__)
+        return d
 
     @classmethod
-    def from_dict(cls, d: dict) -> Type["BaseModel"]:
+    def from_dict(cls: Type["BaseModel"], d: dict) -> Type["BaseModel"]:
         return cls(**d)
 
 
@@ -31,7 +34,10 @@ class CellRelashionship:
     cell_id: str
 
 
+@dataclass
 class Grade(BaseModel, IDMixin, NotebookRelashionship, CellRelashionship):
+    """Representation of a grade assigned to the submitted version of a grade cell."""
+
     auto_score: float
     manual_score: float
     extra_credit: float
@@ -41,7 +47,7 @@ class Grade(BaseModel, IDMixin, NotebookRelashionship, CellRelashionship):
     def score(self) -> float:
         """
         The overall score, computed automatically from the
-        :attr:`~api.models.Grade.auto_score` and :attr:`~api.models.Grade.manual_score`
+        :attr:`~models.Grade.auto_score` and :attr:`~models.Grade.manual_score`
         values. If neither are set, the score is zero. If both are set, then the
         manual score takes precedence. If only one is set, then that value is used
         for the score
@@ -54,6 +60,24 @@ class Grade(BaseModel, IDMixin, NotebookRelashionship, CellRelashionship):
             return self.manual_score
         else:
             return self.manual_score
+
+    #: The maximum possible score that can be assigned, inherited from
+    #: :class:`~GradeCell`
+    # TODO: how to keep the values default None but don't have them as class variables?
+    max_score_gradecell: float = None
+    max_score_taskcell: float = None
+
+    @property
+    def max_score(self):
+        if self.max_score_taskcell:
+            return self.max_score_taskcell
+        else:
+            return self.max_score_gradecell
+
+    def to_dict(self) -> dict:
+        d = super().to_dict()
+        d["max_score"] = self.max_score
+        return d
 
 
 @dataclass
@@ -69,25 +93,124 @@ class Comment(BaseModel, IDMixin, NotebookRelashionship, CellRelashionship):
             return self.manual_comment
 
 
-@dataclass
-class BaseCell(BaseModel, IDMixin, NameMixin, NotebookRelashionship):
-    type: str  # type of cell
-    grade: Grade  # we can have only one grade
-    comment: Comment  # we can have only one comment since we only process a single notebook
-
-
 class CellType(Enum):
     "code"
     "markdown"
+
+
+@dataclass
+class BaseCell(BaseModel, IDMixin, NameMixin, NotebookRelashionship):
+    grade: Grade  # we can have only one grade
+    comment: Comment  # we can have only one comment since we only process a single notebook
+
+    @classmethod
+    def from_dict(cls: Type["BaseCell"], d: dict) -> Type["BaseCell"]:
+        if d["_type"] == "GradeCell":
+            return GradeCell.from_dict(d)
+        elif d["_type"] == "SolutionCell":
+            return SolutionCell.from_dict(d)
+        elif d["_type"] == "TaskCell":
+            return TaskCell.from_dict(d)
+        elif d["_type"] == "SourceCell":
+            return SourceCell.from_dict(d)
+
 
 @dataclass
 class GradedMixin:
     max_score: float
     cell_type: CellType
 
-# TODO: finish creating models
+
+@dataclass
+class GradeCell(BaseCell, GradedMixin):
+    @classmethod
+    def from_dict(cls: Type["BaseCell"], d: dict) -> Type["BaseCell"]:
+        grade = Grade.from_dict(d["grade"])
+        comment = Comment.from_dict(d["comment"])
+        return GradeCell(
+            max_score=d["max_score"],
+            cell_type=d["cell_type"],
+            id=d["id"],
+            notebook_id=d["notebook_id"],
+            name=d["name"],
+            grade=grade,
+            comment=comment,
+        )
+
+
+@dataclass
+class SolutionCell(BaseCell):
+    @classmethod
+    def from_dict(cls: Type["BaseCell"], d: dict) -> Type["BaseCell"]:
+        grade = Grade.from_dict(d["grade"])
+        comment = Comment.from_dict(d["comment"])
+        return SolutionCell(
+            id=d["id"],
+            notebook_id=d["notebook_id"],
+            name=d["name"],
+            grade=grade,
+            comment=comment,
+        )
+
+
+@dataclass
+class TaskCell(BaseCell, GradedMixin):
+    @classmethod
+    def from_dict(cls: Type["BaseCell"], d: dict) -> Type["BaseCell"]:
+        grade = Grade.from_dict(d["grade"])
+        comment = Comment.from_dict(d["comment"])
+        return GradeCell(
+            max_score=d["max_score"],
+            cell_type='code', # cell_type from GradedMixin should always be 'code'
+            id=d["id"],
+            notebook_id=d["notebook_id"],
+            name=d["name"],
+            grade=grade,
+            comment=comment,
+        )
+
+
+@dataclass
+class SourceCell(BaseModel, IDMixin, NameMixin, NotebookRelashionship):
+    cell_type: CellType
+
+    #: Whether the cell is locked (e.g. the source saved in the database should
+    #: be used to overwrite the source of students' cells)
+    locked: bool
+
+    #: The source code or text of the cell
+    source: str
+
+    #: A checksum of the cell contents. This should usually be computed
+    #: using :func:`utils.compute_checksum`
+    checksum: str
+
+    @classmethod
+    def from_dict(cls: Type["BaseModel"], d: dict) -> Type["BaseModel"]:
+        return super().from_dict(d)
+
 
 @dataclass
 class Notebook(BaseModel, IDMixin, NameMixin):
     kernelspec: str
-    _base_cells: List[BaseCell]
+    base_cells: Dict[str, Type[BaseCell]]
+
+    @classmethod
+    def from_dict(cls: Type["Notebook"], d: dict) -> Type["Notebook"]:
+        bc = {id: BaseCell.from_dict(v) for id, v in d["base_cells"]}
+        return Notebook(
+            kernelspec=d["kernelspec"], base_cells=bc, id=d["id"], name=d["name"]
+        )
+
+
+@dataclass
+class GradeBook(BaseModel):
+    notebooks: Dict[str, Notebook]
+
+    def get_notebook(self, notebook_id: str) -> Notebook:
+        return self.notebooks[notebook_id]
+
+    @classmethod
+    def from_dict(cls: Type["GradeBook"], d: dict) -> "GradeBook":
+        ns = {id: Notebook.from_dict(v) for id, v in d["notebooks"]}
+        return GradeBook(notebooks=ns)
