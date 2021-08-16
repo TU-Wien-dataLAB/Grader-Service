@@ -96,6 +96,7 @@ class Comment(BaseModel, IDMixin, NotebookRelashionship, CellRelashionship):
 class CellType(Enum):
     "code"
     "markdown"
+    "raw"
 
 
 @dataclass
@@ -195,6 +196,22 @@ class Notebook(BaseModel, IDMixin, NameMixin):
     kernelspec: str
     base_cells: Dict[str, Type[BaseCell]]
 
+    @property
+    def grade_cells(self) -> List[GradeCell]:
+        return [x for x in self.base_cells if isinstance(x, GradeCell)]
+
+    @property
+    def solution_cells(self) -> List[SolutionCell]:
+        return [x for x in self.base_cells if isinstance(x, SolutionCell)]
+
+    @property
+    def task_cells(self) -> List[TaskCell]:
+        return [x for x in self.base_cells if isinstance(x, TaskCell)]
+
+    @property
+    def source_cells(self) -> List[SourceCell]:
+        return [x for x in self.base_cells if isinstance(x, SourceCell)]
+
     @classmethod
     def from_dict(cls: Type["Notebook"], d: dict) -> Type["Notebook"]:
         bc = {id: BaseCell.from_dict(v) for id, v in d["base_cells"]}
@@ -204,13 +221,13 @@ class Notebook(BaseModel, IDMixin, NameMixin):
 
 
 @dataclass
-class GradeBook(BaseModel):
+class GradeBookModel(BaseModel):
     notebooks: Dict[str, Notebook]
 
-    def get_notebook(self, notebook_id: str) -> Notebook:
-        return self.notebooks[notebook_id]
+    def get_notebook(self, notebook_name: str) -> Notebook:
+        return self.notebooks[notebook_name]
 
     @classmethod
-    def from_dict(cls: Type["GradeBook"], d: dict) -> "GradeBook":
+    def from_dict(cls: Type["GradeBookModel"], d: dict) -> "GradeBookModel":
         ns = {id: Notebook.from_dict(v) for id, v in d["notebooks"]}
-        return GradeBook(notebooks=ns)
+        return GradeBookModel(notebooks=ns)
