@@ -1,13 +1,8 @@
 import * as nbformat from '@jupyterlab/nbformat';
 
-import {
-  IObservableJSON
-} from '@jupyterlab/observables';
+import { IObservableJSON } from '@jupyterlab/observables';
 
-import {
-  JSONObject,
-  ReadonlyJSONObject
-} from '@lumino/coreutils';
+import { JSONObject, ReadonlyJSONObject } from '@lumino/coreutils';
 
 const NBGRADER_KEY = 'nbgrader';
 export const NBGRADER_SCHEMA_VERSION = 3;
@@ -22,8 +17,10 @@ export namespace CellModel {
    *
    * @returns Whether cleaning occurred.
    */
-  export function cleanNbgraderData(cellMetadata: IObservableJSON,
-                                    cellType: nbformat.CellType): boolean {
+  export function cleanNbgraderData(
+    cellMetadata: IObservableJSON,
+    cellType: nbformat.CellType
+  ): boolean {
     const data = CellModel.getNbgraderData(cellMetadata);
     if (data == null || !PrivateNbgraderData.isInvalid(data, cellType)) {
       return false;
@@ -81,8 +78,9 @@ export namespace CellModel {
    * gradable or contains autograder tests.
    */
   export function isRelevantToNbgrader(data: NbgraderData): boolean {
-    return PrivateNbgraderData.isGraded(data)
-        || PrivateNbgraderData.isSolution(data);
+    return (
+      PrivateNbgraderData.isGraded(data) || PrivateNbgraderData.isSolution(data)
+    );
   }
 
   /**
@@ -111,9 +109,11 @@ export namespace CellModel {
    * @param data The data to convert. Can be null.
    * @param cellType The notebook cell widget type.
    */
-  export function newToolData(data: NbgraderData, cellType: nbformat.CellType):
-      ToolData {
-    const toolData = new ToolData;
+  export function newToolData(
+    data: NbgraderData,
+    cellType: nbformat.CellType
+  ): ToolData {
+    const toolData = new ToolData();
 
     if (PrivateNbgraderData.isInvalid(data, cellType)) {
       toolData.type = '';
@@ -124,9 +124,11 @@ export namespace CellModel {
       return toolData;
     }
 
-    if (PrivateNbgraderData.isGrade(data)
-        || PrivateNbgraderData.isSolution(data)
-        || PrivateNbgraderData.isLocked(data)) {
+    if (
+      PrivateNbgraderData.isGrade(data) ||
+      PrivateNbgraderData.isSolution(data) ||
+      PrivateNbgraderData.isLocked(data)
+    ) {
       toolData.id = PrivateNbgraderData.getGradeId(data);
     }
 
@@ -145,8 +147,10 @@ export namespace CellModel {
    * @param data The nbgrader data. If null, the nbgrader entry, if it exists,
    * will be removed from the metadata.
    */
-  export function setNbgraderData(data: NbgraderData, cellMetadata:
-                                  IObservableJSON): void {
+  export function setNbgraderData(
+    data: NbgraderData,
+    cellMetadata: IObservableJSON
+  ): void {
     if (data == null) {
       if (cellMetadata.has(NBGRADER_KEY)) {
         cellMetadata.delete(NBGRADER_KEY);
@@ -154,8 +158,10 @@ export namespace CellModel {
       return;
     }
     const currentDataJson = cellMetadata.get(NBGRADER_KEY);
-    const currentData = currentDataJson == null ? null :
-        currentDataJson.valueOf() as NbgraderData;
+    const currentData =
+      currentDataJson == null
+        ? null
+        : (currentDataJson.valueOf() as NbgraderData);
     if (currentData != data) {
       cellMetadata.set(NBGRADER_KEY, data.toJson());
     }
@@ -184,18 +190,26 @@ namespace PrivateNbgraderData {
     return nbgraderData.schema_version;
   }
 
-  export function getType(nbgraderData: NbgraderData,
-                          cellType: nbformat.CellType): CellType {
+  export function getType(
+    nbgraderData: NbgraderData,
+    cellType: nbformat.CellType
+  ): CellType {
     if (PrivateNbgraderData.isTask(nbgraderData)) {
       return 'task';
-    } else if (PrivateNbgraderData.isSolution(nbgraderData)
-               && isGrade(nbgraderData)) {
+    } else if (
+      PrivateNbgraderData.isSolution(nbgraderData) &&
+      isGrade(nbgraderData)
+    ) {
       return 'manual';
-    } else if (PrivateNbgraderData.isSolution(nbgraderData)
-               && cellType === 'code') {
+    } else if (
+      PrivateNbgraderData.isSolution(nbgraderData) &&
+      cellType === 'code'
+    ) {
       return 'solution';
-    } else if (PrivateNbgraderData.isGrade(nbgraderData)
-               && cellType === 'code') {
+    } else if (
+      PrivateNbgraderData.isGrade(nbgraderData) &&
+      cellType === 'code'
+    ) {
       return 'tests';
     } else if (PrivateNbgraderData.isLocked(nbgraderData)) {
       return 'readonly';
@@ -209,21 +223,30 @@ namespace PrivateNbgraderData {
   }
 
   export function isGraded(nbgraderData: NbgraderData): boolean {
-    return PrivateNbgraderData.isGrade(nbgraderData)
-        || PrivateNbgraderData.isTask(nbgraderData);
+    return (
+      PrivateNbgraderData.isGrade(nbgraderData) ||
+      PrivateNbgraderData.isTask(nbgraderData)
+    );
   }
 
-  export function isInvalid(nbgraderData: NbgraderData,
-                            cellType: nbformat.CellType): boolean {
-    return !PrivateNbgraderData.isTask(nbgraderData) && cellType !== 'code'
-        && (PrivateNbgraderData.isSolution(nbgraderData)
-            != PrivateNbgraderData.isGrade(nbgraderData));
+  export function isInvalid(
+    nbgraderData: NbgraderData,
+    cellType: nbformat.CellType
+  ): boolean {
+    return (
+      !PrivateNbgraderData.isTask(nbgraderData) &&
+      cellType !== 'code' &&
+      PrivateNbgraderData.isSolution(nbgraderData) !=
+        PrivateNbgraderData.isGrade(nbgraderData)
+    );
   }
 
   export function isLocked(nbgraderData: NbgraderData): boolean {
-    return !PrivateNbgraderData.isSolution(nbgraderData)
-        && (PrivateNbgraderData.isGraded(nbgraderData)
-            || (nbgraderData != null && nbgraderData.locked === true));
+    return (
+      !PrivateNbgraderData.isSolution(nbgraderData) &&
+      (PrivateNbgraderData.isGraded(nbgraderData) ||
+        (nbgraderData != null && nbgraderData.locked === true))
+    );
   }
 
   export function isSolution(nbgraderData: NbgraderData): boolean {
@@ -238,11 +261,10 @@ namespace PrivateNbgraderData {
     if (val == null || val === '') {
       return 0;
     }
-    const valType = typeof(val);
+    const valType = typeof val;
     if (valType === 'string') {
       return parseFloat(val);
-    }
-    else if (valType === 'number') {
+    } else if (valType === 'number') {
       return val;
     }
     return 0;
@@ -265,8 +287,9 @@ namespace PrivateToolData {
     if (PrivateToolData.getGrade(data)) {
       return true;
     }
-    return data.type === 'task' || data.type === 'tests'
-        || data.type === 'readonly';
+    return (
+      data.type === 'task' || data.type === 'tests' || data.type === 'readonly'
+    );
   }
 
   export function getPoints(data: ToolData): number {
@@ -338,5 +361,10 @@ export class ToolData {
   locked: boolean;
 }
 
-export type CellType = '' | 'manual' | 'task' | 'solution' | 'tests' |
-    'readonly';
+export type CellType =
+  | ''
+  | 'manual'
+  | 'task'
+  | 'solution'
+  | 'tests'
+  | 'readonly';

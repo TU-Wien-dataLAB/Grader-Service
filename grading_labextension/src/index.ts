@@ -115,12 +115,12 @@ const extension: JupyterFrontEndPlugin<void> = {
     console.log('Extension "create_assignment" activated.');
 
     //Creation of in-cell widget for create assignment
-    tracker.currentChanged.connect(() => {
+    tracker.currentChanged.connect(async () => {
       const notebookPanel = tracker.currentWidget;
       const notebook: Notebook = tracker.currentWidget.content;
       //Creation of widget switch
       const creationmode = false;
-      const switcher: CreationmodeSwitch = new CreationmodeSwitch(
+      const switcher: CreationmodeSwitch = await new CreationmodeSwitch(
         creationmode,
         notebookPanel,
         notebook
@@ -137,11 +137,6 @@ const extension: JupyterFrontEndPlugin<void> = {
               currentLayout.removeWidget(w);
             }
           });
-
-          if (switcher.ref.current.state.creationmode) {
-            const metadata: CellWidget = new CellWidget(c);
-            currentLayout.insertWidget(0, metadata);
-          }
         });
         tracker.activeCellChanged.connect(() => {
           // Remove the existing play button from
@@ -158,17 +153,18 @@ const extension: JupyterFrontEndPlugin<void> = {
           });
 
           const cell: Cell = notebook.activeCell;
-          const newButton: CellPlayButton = new CellPlayButton(
-            cell,
-            notebookPanel.sessionContext,
-            switcher.ref.current.state.creationmode
-          );
-          (cell.layout as PanelLayout).insertWidget(2, newButton);
-
-          // Set the current cell and button for future
-          // reference
-          currentCell = cell;
-          currentCellPlayButton = newButton;
+          if (switcher.component.props.creationmode !== null) {
+            const newButton: CellPlayButton = new CellPlayButton(
+              cell,
+              notebookPanel.sessionContext,
+              creationmode
+            );
+            (cell.layout as PanelLayout).insertWidget(2, newButton);
+            // Set the current cell and button for future
+            // reference
+            currentCell = cell;
+            currentCellPlayButton = newButton;
+          }
         });
       });
     });
