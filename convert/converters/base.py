@@ -187,6 +187,7 @@ class BaseConverter(LoggingConfigurable):
         resources['unique_key'] = os.path.basename(notebook_filename)
         resources['output_files_dir'] = '%s_files' % os.path.basename(notebook_filename)
         resources['output_json_file'] = f'{os.path.basename(notebook_filename)}_out.json'
+        resources['output_json_path'] = os.path.join(os.getcwd(), resources['output_json_file'])
 
         return resources
 

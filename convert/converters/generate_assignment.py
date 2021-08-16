@@ -36,7 +36,7 @@ class GenerateAssignment(BaseConverter):
 
     @default("permissions")
     def _permissions_default(self) -> int:
-        return 664 if self.coursedir.groupshared else 644
+        return 664
 
     preprocessors = List(
         [

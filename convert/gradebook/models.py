@@ -3,12 +3,23 @@ from typing import Any, Dict, Optional, Set, Type, List
 from enum import Enum
 
 
+@dataclass
 class BaseModel:
+
+    def __post_init__(self):
+        self._type = self.__class__.__name__
+
+    @classmethod
+    def empty_dict(cls: Type['BaseModel']) -> dict:
+        fields = cls.__dataclass_fields__.keys()
+        return {f: None for f in fields}
+
+
     def to_dict(self) -> dict:
         d = asdict(self)
-        d["_type"] = str(self.__class__)
+        d["_type"] = str(self.__class__.__name__)
         return d
-
+    
     @classmethod
     def from_dict(cls: Type["BaseModel"], d: dict) -> Type["BaseModel"]:
         return cls(**d)
@@ -198,23 +209,23 @@ class Notebook(BaseModel, IDMixin, NameMixin):
 
     @property
     def grade_cells(self) -> List[GradeCell]:
-        return [x for x in self.base_cells if isinstance(x, GradeCell)]
+        return [x for x in self.base_cells.values() if isinstance(x, GradeCell)]
 
     @property
     def solution_cells(self) -> List[SolutionCell]:
-        return [x for x in self.base_cells if isinstance(x, SolutionCell)]
+        return [x for x in self.base_cells.values() if isinstance(x, SolutionCell)]
 
     @property
     def task_cells(self) -> List[TaskCell]:
-        return [x for x in self.base_cells if isinstance(x, TaskCell)]
+        return [x for x in self.base_cells.values() if isinstance(x, TaskCell)]
 
     @property
     def source_cells(self) -> List[SourceCell]:
-        return [x for x in self.base_cells if isinstance(x, SourceCell)]
+        return [x for x in self.base_cells.values() if isinstance(x, SourceCell)]
 
     @classmethod
     def from_dict(cls: Type["Notebook"], d: dict) -> Type["Notebook"]:
-        bc = {id: BaseCell.from_dict(v) for id, v in d["base_cells"]}
+        bc = {id: BaseCell.from_dict(v) for id, v in d["base_cells"].items()}
         return Notebook(
             kernelspec=d["kernelspec"], base_cells=bc, id=d["id"], name=d["name"]
         )
@@ -224,10 +235,7 @@ class Notebook(BaseModel, IDMixin, NameMixin):
 class GradeBookModel(BaseModel):
     notebooks: Dict[str, Notebook]
 
-    def get_notebook(self, notebook_name: str) -> Notebook:
-        return self.notebooks[notebook_name]
-
     @classmethod
     def from_dict(cls: Type["GradeBookModel"], d: dict) -> "GradeBookModel":
-        ns = {id: Notebook.from_dict(v) for id, v in d["notebooks"]}
+        ns = {id: Notebook.from_dict(v) for id, v in d["notebooks"].items()}
         return GradeBookModel(notebooks=ns)

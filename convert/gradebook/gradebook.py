@@ -1,4 +1,5 @@
-from models import GradeBookModel, Notebook, GradeCell, TaskCell, SolutionCell, SourceCell, Grade, Comment
+from nbconvert.exporters import notebook
+from .models import GradeBookModel, Notebook, GradeCell, TaskCell, SolutionCell, SourceCell, Grade, Comment
 from typing import Optional, Any, Union
 import os
 import json
@@ -25,7 +26,7 @@ class Gradebook:
                 self.data: dict = json.load(f)
         else:
             os.makedirs(os.path.dirname(self.json_file), exist_ok=True)
-            self.data: dict = dict()
+            self.data: dict = {"notebooks": dict()}
             with open(self.json_file, "w") as f:
                 json.dump(self.data, f)
         self.model: GradeBookModel = GradeBookModel.from_dict(self.data)
@@ -56,7 +57,8 @@ class Gradebook:
         -------
         notebook : :class:`~Notebook`
         """
-        raise NotImplementedError()
+        kwargs = {k:v for k,v in kwargs.items() if k in set(Notebook.empty_dict().keys())}
+        self.model.notebooks[name] = Notebook(name=name, **kwargs)
 
     def find_notebook(self, name: str) -> Notebook:
         """Find a particular notebook.
@@ -66,9 +68,12 @@ class Gradebook:
             the name of the notebook
         Returns
         -------
-        notebook : :class:`~nNotebook`
+        notebook : :class:`~Notebook`
         """
-        raise NotImplementedError()
+        try:
+            return self.model.notebooks[name]
+        except KeyError:
+            raise MissingEntry()
 
     def update_or_create_notebook(self, name: str, **kwargs):
         """Update an existing notebook, or create it if it doesn't exist.
@@ -91,7 +96,7 @@ class Gradebook:
         name : string
             the name of the notebook to delete
         """
-        raise NotImplementedError()
+        self.model.notebooks.pop(name, None)
 
     # Grade cells
 
@@ -109,7 +114,10 @@ class Gradebook:
         -------
         grade_cell
         """
-        raise NotImplementedError()
+        kwargs = {k:v for k,v in kwargs.items() if k in set(GradeCell.empty_dict().keys())}
+        nb = self.find_notebook(notebook)
+        nb.base_cells[name] = GradeCell(name=name, **kwargs)
+        return nb.base_cells[name]
 
     def find_grade_cell(self, name: str, notebook: str) -> GradeCell:
         """Find a grade cell in a particular notebook.
@@ -123,7 +131,11 @@ class Gradebook:
         -------
         grade_cell
         """
-        raise NotImplementedError()
+        nb = self.find_notebook(notebook)
+        try:
+            return [x for x in nb.grade_cells if x.name == name][0]
+        except IndexError:
+            raise MissingEntry()
 
     def find_graded_cell(self, name: str, notebook: str) -> Union[GradeCell, TaskCell]:
         """Find a graded cell in a particular notebook. This can be either a GradeCell or a TaskCell.
@@ -155,7 +167,14 @@ class Gradebook:
         -------
         grade_cell
         """
-        raise NotImplementedError()
+        try:
+            grade_cell = self.find_grade_cell(name, notebook)
+        except MissingEntry:
+            grade_cell = self.add_grade_cell(name, notebook, **kwargs)
+        else:
+            for attr in kwargs:
+                setattr(grade_cell, attr, kwargs[attr])
+        return grade_cell
 
     # Solution cells
 
@@ -175,7 +194,10 @@ class Gradebook:
         -------
         solution_cell : :class:`~SolutionCell`
         """
-        raise NotImplementedError()
+        kwargs = {k:v for k,v in kwargs.items() if k in set(SolutionCell.empty_dict().keys())}
+        nb = self.find_notebook(notebook)
+        nb.base_cells[name] = SolutionCell(name=name, **kwargs)
+        return nb.base_cells[name]
 
     def find_solution_cell(self, name: str, notebook: str) -> SolutionCell:
         """Find a solution cell in a particular notebook.
@@ -189,7 +211,11 @@ class Gradebook:
         -------
         solution_cell : :class:`~SolutionCell`
         """
-        raise NotImplementedError()
+        nb = self.find_notebook(notebook)
+        try:
+            return [x for x in nb.solution_cells if x.name == name][0]
+        except IndexError:
+            raise MissingEntry()
 
     def update_or_create_solution_cell(
         self, name: str, notebook: str, **kwargs: dict
@@ -207,7 +233,14 @@ class Gradebook:
         -------
         solution_cell
         """
-        raise NotImplementedError()
+        try:
+            solution_cell = self.find_solution_cell(name, notebook)
+        except MissingEntry:
+            solution_cell = self.add_solution_cell(name, notebook, **kwargs)
+        else:
+            for attr in kwargs:
+                setattr(solution_cell, attr, kwargs[attr])
+        return solution_cell
     
     # Task cells
 
@@ -225,7 +258,10 @@ class Gradebook:
         -------
         task_cell
         """
-        raise NotImplementedError()
+        kwargs = {k:v for k,v in kwargs.items() if k in set(TaskCell.empty_dict().keys())}
+        nb = self.find_notebook(notebook)
+        nb.base_cells[name] = TaskCell(name=name, **kwargs)
+        return nb.base_cells[name]
     
     def find_task_cell(self, name: str, notebook: str) -> TaskCell:
         """Find a task cell in a particular notebook.
@@ -239,7 +275,11 @@ class Gradebook:
         -------
         task_cell : :class:`~TaskCell`
         """
-        raise NotImplementedError()
+        nb = self.find_notebook(notebook)
+        try:
+            return [x for x in nb.task_cells if x.name == name][0]
+        except IndexError:
+            raise MissingEntry()
     
     def update_or_create_task_cell(self, name: str, notebook: str, **kwargs) -> TaskCell:
         """Update an existing task cell in a notebook, or create the task cell if it does not exist.
@@ -255,7 +295,14 @@ class Gradebook:
         -------
         task_cell : :class:`~TaskCell`
         """
-        raise NotImplementedError()
+        try:
+            task_cell = self.find_task_cell(name, notebook)
+        except MissingEntry:
+            task_cell = self.add_task_cell(name, notebook, **kwargs)
+        else:
+            for attr in kwargs:
+                setattr(task_cell, attr, kwargs[attr])
+        return task_cell
     
     # Source cell
 
@@ -273,7 +320,10 @@ class Gradebook:
         -------
         source_cell : :class:`~SourceCell`
         """
-        raise NotImplementedError()
+        kwargs = {k:v for k,v in kwargs.items() if k in set(SourceCell.empty_dict().keys())}
+        nb = self.find_notebook(notebook)
+        nb.base_cells[name] = SourceCell(name=name, **kwargs)
+        return nb.base_cells[name]
     
     def find_source_cell(self, name: str, notebook: str) -> SourceCell:
         """Find a source cell in a particular notebook.
@@ -287,7 +337,11 @@ class Gradebook:
         -------
         source_cell : :class:`~SourceCell`
         """
-        raise NotImplementedError()
+        nb = self.find_notebook(notebook)
+        try:
+            return [x for x in nb.source_cells if x.name == name][0]
+        except IndexError:
+            raise MissingEntry()
     
     def update_or_create_source_cell(self, name: str, notebook: str, **kwargs: dict) -> SourceCell:
         """Update an existing source cell in a notebook of an assignment, or
@@ -304,7 +358,14 @@ class Gradebook:
         -------
         source_cell
         """
-        raise NotImplementedError()
+        try:
+            source_cell = self.find_source_cell(name, notebook)
+        except MissingEntry:
+            source_cell = self.add_source_cell(name, notebook, **kwargs)
+        else:
+            for attr in kwargs:
+                setattr(source_cell, attr, kwargs[attr])
+        return source_cell
     
     # Grades
 

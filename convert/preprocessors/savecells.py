@@ -1,3 +1,4 @@
+from gradebook.models import GradeCell, SolutionCell, TaskCell, SourceCell
 import json
 
 import utils
@@ -5,6 +6,7 @@ from . import NbGraderPreprocessor
 from nbformat.notebooknode import NotebookNode
 from nbconvert.exporters.exporter import ResourcesDict
 from typing import Tuple
+from gradebook.gradebook import Gradebook, MissingEntry
 
 
 class SaveCells(NbGraderPreprocessor):
@@ -14,7 +16,7 @@ class SaveCells(NbGraderPreprocessor):
         notebook_info = None
 
         try:
-            notebook = self.gradebook.find_notebook(self.notebook_id, self.assignment_id)
+            notebook = self.gradebook.find_notebook(self.notebook_id)
         except MissingEntry:
             notebook_info = {}
         else:
@@ -24,63 +26,49 @@ class SaveCells(NbGraderPreprocessor):
             self.old_task_cells = set(x.name for x in notebook.task_cells)
             self.old_source_cells = set(x.name for x in notebook.source_cells)
 
-            # throw an error if we're trying to modify a notebook that has
-            # submissions associated with it
-            if len(notebook.submissions) > 0:
-                changed = set(self.new_grade_cells.keys()) != self.old_grade_cells
-                changed = changed | (set(self.new_solution_cells.keys()) != self.old_solution_cells)
-                changed = changed | (set(self.new_task_cells.keys()) != self.old_task_cells)
-                changed = changed | (set(self.new_source_cells.keys()) != self.old_source_cells)
-                if changed:
-                    raise RuntimeError(
-                        "Cannot add or remove cells for notebook '%s' because there "
-                        "are submissions associated with it" % self.notebook_id)
-
-            else:
-                # clear data about the existing notebook
-                self.log.debug("Removing existing notebook '%s' from the database", self.notebook_id)
-                notebook_info = notebook.to_dict()
-                del notebook_info['name']
-                self.gradebook.remove_notebook(self.notebook_id, self.assignment_id)
+            # clear data about the existing notebook
+            self.log.debug("Removing existing notebook '%s' from the database", self.notebook_id)
+            notebook_info = notebook.to_dict()
+            del notebook_info['name']
+            self.gradebook.remove_notebook(self.notebook_id)
 
         # create the notebook
         if notebook_info is not None:
             kernelspec = nb.metadata.get('kernelspec', {})
             notebook_info['kernelspec'] = json.dumps(kernelspec)
+            notebook_info['base_cells'] = dict()
+            notebook_info['id'] = self.notebook_id
             self.log.debug("Creating notebook '%s' in the database", self.notebook_id)
             self.log.debug("Notebook kernelspec: {}".format(kernelspec))
-            self.gradebook.add_notebook(self.notebook_id, self.assignment_id, **notebook_info)
+            self.gradebook.add_notebook(self.notebook_id, **notebook_info)
 
         # save grade cells
         for name, info in self.new_grade_cells.items():
-            grade_cell = self.gradebook.update_or_create_grade_cell(name, self.notebook_id, self.assignment_id, **info)
+            grade_cell = self.gradebook.update_or_create_grade_cell(name, self.notebook_id, **info)
             self.log.debug("Recorded grade cell %s into the gradebook", grade_cell)
 
         # save solution cells
         for name, info in self.new_solution_cells.items():
-            solution_cell = self.gradebook.update_or_create_solution_cell(name, self.notebook_id, self.assignment_id, **info)
+            solution_cell = self.gradebook.update_or_create_solution_cell(name, self.notebook_id, **info)
             self.log.debug("Recorded solution cell %s into the gradebook", solution_cell)
 
         # save task cells
         for name, info in self.new_task_cells.items():
-            task_cell = self.gradebook.update_or_create_task_cell(name, self.notebook_id, self.assignment_id, **info)
+            task_cell = self.gradebook.update_or_create_task_cell(name, self.notebook_id, **info)
             self.log.debug("Recorded task cell %s into the gradebook from info %s", task_cell, info)
 
         # save source cells
         for name, info in self.new_source_cells.items():
-            source_cell = self.gradebook.update_or_create_source_cell(name, self.notebook_id, self.assignment_id, **info)
+            source_cell = self.gradebook.update_or_create_source_cell(name, self.notebook_id, **info)
             self.log.debug("Recorded source cell %s into the gradebook", source_cell)
 
     def preprocess(self, nb: NotebookNode, resources: ResourcesDict) -> Tuple[NotebookNode, ResourcesDict]:
         # pull information from the resources
-        self.notebook_id = resources['nbgrader']['notebook']
-        self.assignment_id = resources['nbgrader']['assignment']
-        self.db_url = resources['nbgrader']['db_url']
+        self.notebook_id = resources['unique_key']
+        self.json_path = resources['output_json_path']
 
         if self.notebook_id == '':
             raise ValueError("Invalid notebook id: '{}'".format(self.notebook_id))
-        if self.assignment_id == '':
-            raise ValueError("Invalid assignment id: '{}'".format(self.assignment_id))
 
         # create a place to put new cell information
         self.new_grade_cells = {}
@@ -89,7 +77,7 @@ class SaveCells(NbGraderPreprocessor):
         self.new_source_cells = {}
 
         # connect to the database
-        self.gradebook = Gradebook(self.db_url)
+        self.gradebook = Gradebook(self.json_path)
 
         with self.gradebook:
             nb, resources = super(SaveCells, self).preprocess(nb, resources)
@@ -103,12 +91,12 @@ class SaveCells(NbGraderPreprocessor):
         grade_id = cell.metadata.nbgrader['grade_id']
 
         try:
-            grade_cell = self.gradebook.find_grade_cell(grade_id, self.notebook_id, self.assignment_id).to_dict()
+            grade_cell = self.gradebook.find_grade_cell(grade_id, self.notebook_id).to_dict()
             del grade_cell['name']
             del grade_cell['notebook']
-            del grade_cell['assignment']
         except MissingEntry:
-            grade_cell = {}
+            grade_cell = GradeCell.empty_dict()
+            del grade_cell['name']
 
         grade_cell.update({
             'max_score': float(cell.metadata.nbgrader['points']),
@@ -121,24 +109,26 @@ class SaveCells(NbGraderPreprocessor):
         grade_id = cell.metadata.nbgrader['grade_id']
 
         try:
-            solution_cell = self.gradebook.find_solution_cell(grade_id, self.notebook_id, self.assignment_id).to_dict()
+            solution_cell = self.gradebook.find_solution_cell(grade_id, self.notebook_id).to_dict()
             del solution_cell['name']
             del solution_cell['notebook']
             del solution_cell['assignment']
         except MissingEntry:
-            solution_cell = {}
+            solution_cell = SolutionCell.empty_dict()
+            del solution_cell['name']
 
         self.new_solution_cells[grade_id] = solution_cell
 
     def _create_task_cell(self, cell: NotebookNode) -> None:
         grade_id = cell.metadata.nbgrader['grade_id']
         try:
-            task_cell = self.gradebook.find_task_cell(grade_id, self.notebook_id, self.assignment_id).to_dict()
+            task_cell = self.gradebook.find_task_cell(grade_id, self.notebook_id).to_dict()
             del task_cell['name']
             del task_cell['notebook']
             del task_cell['assignment']
         except MissingEntry:
-            task_cell = {}
+            task_cell = TaskCell.empty_dict()
+            del task_cell['name']
 
         task_cell.update({
             'max_score': float(cell.metadata.nbgrader['points']),
@@ -151,12 +141,13 @@ class SaveCells(NbGraderPreprocessor):
         grade_id = cell.metadata.nbgrader['grade_id']
 
         try:
-            source_cell = self.gradebook.find_source_cell(grade_id, self.notebook_id, self.assignment_id).to_dict()
+            source_cell = self.gradebook.find_source_cell(grade_id, self.notebook_id).to_dict()
             del source_cell['name']
             del source_cell['notebook']
             del source_cell['assignment']
         except MissingEntry:
-            source_cell = {}
+            source_cell = SourceCell.empty_dict()
+            del source_cell['name']
 
         source_cell.update({
             'cell_type': cell.cell_type,
