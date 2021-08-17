@@ -36,8 +36,9 @@ class SaveCells(NbGraderPreprocessor):
         if notebook_info is not None:
             kernelspec = nb.metadata.get('kernelspec', {})
             notebook_info['kernelspec'] = json.dumps(kernelspec)
-            notebook_info['base_cells'] = dict()
-            notebook_info['src_cells'] = dict()
+            notebook_info.setdefault('base_cells', dict())
+            notebook_info.setdefault('src_cells', dict())
+            notebook_info.setdefault('flagged', False)
             notebook_info['id'] = self.notebook_id
             self.log.debug("Creating notebook '%s' in the database", self.notebook_id)
             self.log.debug("Notebook kernelspec: {}".format(kernelspec))
@@ -63,8 +64,6 @@ class SaveCells(NbGraderPreprocessor):
             source_cell = self.gradebook.update_or_create_source_cell(name, self.notebook_id, **info)
             self.log.debug("Recorded source cell %s into the gradebook", source_cell)
         
-        return
-
     def preprocess(self, nb: NotebookNode, resources: ResourcesDict) -> Tuple[NotebookNode, ResourcesDict]:
         # pull information from the resources
         self.notebook_id = resources['unique_key']
@@ -96,7 +95,6 @@ class SaveCells(NbGraderPreprocessor):
         try:
             grade_cell = self.gradebook.find_grade_cell(grade_id, self.notebook_id).to_dict()
             del grade_cell['name']
-            del grade_cell['notebook']
         except MissingEntry:
             grade_cell = GradeCell.empty_dict()
             del grade_cell['name']
@@ -114,8 +112,6 @@ class SaveCells(NbGraderPreprocessor):
         try:
             solution_cell = self.gradebook.find_solution_cell(grade_id, self.notebook_id).to_dict()
             del solution_cell['name']
-            del solution_cell['notebook']
-            del solution_cell['assignment']
         except MissingEntry:
             solution_cell = SolutionCell.empty_dict()
             del solution_cell['name']
@@ -127,8 +123,6 @@ class SaveCells(NbGraderPreprocessor):
         try:
             task_cell = self.gradebook.find_task_cell(grade_id, self.notebook_id).to_dict()
             del task_cell['name']
-            del task_cell['notebook']
-            del task_cell['assignment']
         except MissingEntry:
             task_cell = TaskCell.empty_dict()
             del task_cell['name']
@@ -146,8 +140,6 @@ class SaveCells(NbGraderPreprocessor):
         try:
             source_cell = self.gradebook.find_source_cell(grade_id, self.notebook_id).to_dict()
             del source_cell['name']
-            del source_cell['notebook']
-            del source_cell['assignment']
         except MissingEntry:
             source_cell = SourceCell.empty_dict()
             del source_cell['name']

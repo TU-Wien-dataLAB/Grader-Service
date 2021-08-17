@@ -5,6 +5,7 @@ from . import NbGraderPreprocessor
 from nbconvert.exporters.exporter import ResourcesDict
 from nbformat.notebooknode import NotebookNode
 from typing import Tuple, Any
+from gradebook.gradebook import Gradebook, MissingEntry
 
 
 class OverwriteCells(NbGraderPreprocessor):
@@ -12,12 +13,11 @@ class OverwriteCells(NbGraderPreprocessor):
 
     def preprocess(self, nb: NotebookNode, resources: ResourcesDict) -> Tuple[NotebookNode, ResourcesDict]:
         # pull information from the resources
-        self.notebook_id = resources['nbgrader']['notebook']
-        self.assignment_id = resources['nbgrader']['assignment']
-        self.db_url = resources['nbgrader']['db_url']
+        self.notebook_id = resources['unique_key']
+        self.json_path = resources['output_json_path']
 
         # connect to the database
-        self.gradebook = Gradebook(self.db_url)
+        self.gradebook = Gradebook(self.json_path)
 
         with self.gradebook:
             nb, resources = super(OverwriteCells, self).preprocess(nb, resources)
@@ -56,8 +56,7 @@ class OverwriteCells(NbGraderPreprocessor):
         try:
             source_cell = self.gradebook.find_source_cell(
                 grade_id,
-                self.notebook_id,
-                self.assignment_id)
+                self.notebook_id)
         except MissingEntry:
             self.log.warning("Cell '{}' does not exist in the database".format(grade_id))
             del cell.metadata.nbgrader['grade_id']
@@ -77,8 +76,7 @@ class OverwriteCells(NbGraderPreprocessor):
         if utils.is_grade(cell):
             grade_cell = self.gradebook.find_graded_cell(
                 grade_id,
-                self.notebook_id,
-                self.assignment_id)
+                self.notebook_id)
             old_points = float(grade_cell.max_score)
             new_points = float(cell.metadata.nbgrader["points"])
 

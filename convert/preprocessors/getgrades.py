@@ -1,5 +1,5 @@
 from traitlets import List
-
+from gradebook.gradebook import Gradebook, MissingEntry
 from nbconvert.exporters.exporter import ResourcesDict
 from nbformat.notebooknode import NotebookNode
 from typing import Optional, Any, Tuple
@@ -18,28 +18,19 @@ class GetGrades(NbGraderPreprocessor):
                    resources: ResourcesDict,
                    ) -> Tuple[NotebookNode, ResourcesDict]:
         # pull information from the resources
-        self.notebook_id = resources['nbgrader']['notebook']
-        self.assignment_id = resources['nbgrader']['assignment']
-        self.student_id = resources['nbgrader']['student']
-        self.db_url = resources['nbgrader']['db_url']
+        self.notebook_id = resources['unique_key']
+        self.json_path = resources['output_json_path']
 
         # connect to the database
-        self.gradebook = Gradebook(self.db_url)
+        self.gradebook = Gradebook(self.json_path)
 
         with self.gradebook:
             # process the cells
             nb, resources = super(GetGrades, self).preprocess(nb, resources)
-            notebook = self.gradebook.find_submission_notebook(
-                self.notebook_id, self.assignment_id, self.student_id)
+            notebook = self.gradebook.find_notebook(self.notebook_id)
 
-            late_penalty = notebook.late_submission_penalty
-            if late_penalty is None:
-                late_penalty = 0
-            else:
-                self.log.warning("Late submission penalty: {}".format(late_penalty))
-            resources['nbgrader']['score'] = notebook.score - late_penalty
+            resources['nbgrader']['score'] = notebook.score
             resources['nbgrader']['max_score'] = notebook.max_score
-            resources['nbgrader']['late_penalty'] = late_penalty
 
         return nb, resources
 
@@ -54,9 +45,7 @@ class GetGrades(NbGraderPreprocessor):
         # retrieve or create the comment object from the database
         comment = self.gradebook.find_comment(
             cell.metadata['nbgrader']['grade_id'],
-            self.notebook_id,
-            self.assignment_id,
-            self.student_id)
+            self.notebook_id)
 
         # save it in the notebook
         cell.metadata.nbgrader['comment'] = comment.comment
@@ -64,9 +53,7 @@ class GetGrades(NbGraderPreprocessor):
     def _get_score(self, cell: NotebookNode, resources: ResourcesDict) -> None:
         grade = self.gradebook.find_grade(
             cell.metadata['nbgrader']['grade_id'],
-            self.notebook_id,
-            self.assignment_id,
-            self.student_id)
+            self.notebook_id)
 
         cell.metadata.nbgrader['score'] = grade.score
         cell.metadata.nbgrader['points'] = grade.max_score

@@ -51,6 +51,7 @@ class SaveAutoGrades(NbGraderPreprocessor):
         else:
             grade.needs_manual_grade = False
 
+        # TODO: replace with add or maybe reference is updated
         self.gradebook.db.commit()
 
     def _add_comment(self, cell: NotebookNode, resources: ResourcesDict) -> None:
@@ -64,6 +65,7 @@ class SaveAutoGrades(NbGraderPreprocessor):
         else:
             comment.auto_comment = None
 
+        # TODO: replace with add or maybe reference is updated
         self.gradebook.db.commit()
 
     def preprocess_cell(self,

@@ -49,14 +49,15 @@ class BaseConverter(LoggingConfigurable):
             Upon copying directories recursively, matching files and
             directories will be ignored with a debug message.
             """
-        )
+        ),
     ).tag(config=True)
 
     pre_convert_hook = Any(
         None,
         config=True,
         allow_none=True,
-        help=dedent("""
+        help=dedent(
+            """
         An optional hook function that you can implement to do some
         bootstrapping work before converting. 
         This function is called before the notebooks are converted
@@ -65,15 +66,17 @@ class BaseConverter(LoggingConfigurable):
 
         It will be called as (all arguments are passed as keywords)::
 
-            hook(notebooks=notebooks)
-        """)
+            hook(notebooks=notebooks, input_dir=input_dir, output_dir=output_dir)
+        """
+        ),
     )
 
     post_convert_hook = Any(
         None,
         config=True,
         allow_none=True,
-        help=dedent("""
+        help=dedent(
+            """
         An optional hook function that you can implement to do some
         work after converting. 
         This function is called after the notebooks are converted
@@ -82,8 +85,9 @@ class BaseConverter(LoggingConfigurable):
 
         It will be called as (all arguments are passed as keywords)::
 
-            hook(notebooks=notebooks)
-        """)
+            hook(notebooks=notebooks, input_dir=input_dir, output_dir=output_dir)
+        """
+        ),
     )
 
     permissions = Integer(
@@ -101,28 +105,30 @@ class BaseConverter(LoggingConfigurable):
     def _permissions_default(self) -> int:
         return 444
 
-    @validate('pre_convert_hook')
+    @validate("pre_convert_hook")
     def _validate_pre_convert_hook(self, proposal):
-        value = proposal['value']
+        value = proposal["value"]
         if isinstance(value, str):
-            module, function = value.rsplit('.', 1)
+            module, function = value.rsplit(".", 1)
             value = getattr(importlib.import_module(module), function)
         if not callable(value):
             raise TraitError("pre_convert_hook must be callable")
         return value
 
-    @validate('post_convert_hook')
+    @validate("post_convert_hook")
     def _validate_post_convert_hook(self, proposal):
-        value = proposal['value']
+        value = proposal["value"]
         if isinstance(value, str):
-            module, function = value.rsplit('.', 1)
+            module, function = value.rsplit(".", 1)
             value = getattr(importlib.import_module(module), function)
         if not callable(value):
             raise TraitError("post_convert_hook must be callable")
         return value
 
     # TODO: all file handling should happen here (no need for CourseDir) -> exporters have from_filename method
-    def __init__(self, input_dir: str, output_dir: str, file_pattern: str, **kwargs: typing.Any) -> None:
+    def __init__(
+        self, input_dir: str, output_dir: str, file_pattern: str, **kwargs: typing.Any
+    ) -> None:
         super(BaseConverter, self).__init__(**kwargs)
         self._input_directory = os.path.normpath(os.path.expanduser(input_dir))
         self._output_directory = os.path.normpath(os.path.expanduser(output_dir))
@@ -162,7 +168,6 @@ class BaseConverter(LoggingConfigurable):
                 classes.append(pp)
         return classes
 
-
     # returns string that can be used for globs
     def _format_source(self, escape: bool = False) -> str:
         source = os.path.join(self._input_directory, self._file_pattern)
@@ -171,7 +176,6 @@ class BaseConverter(LoggingConfigurable):
         else:
             return source
 
-
     def init_notebooks(self) -> None:
         self.notebooks = []
         notebook_glob = self._format_source()
@@ -179,12 +183,20 @@ class BaseConverter(LoggingConfigurable):
         if len(self.notebooks) == 0:
             self.log.warning("No notebooks were matched by '%s'", notebook_glob)
 
-    def init_single_notebook_resources(self, notebook_filename: str) -> typing.Dict[str, typing.Any]:
+    def init_single_notebook_resources(
+        self, notebook_filename: str
+    ) -> typing.Dict[str, typing.Any]:
         resources = {}
-        resources['unique_key'] = os.path.splitext(os.path.basename(notebook_filename))[0]
-        resources['output_files_dir'] = '%s_files' % os.path.basename(notebook_filename)
-        resources['output_json_file'] = f'{os.path.basename(notebook_filename)}_out.json'
-        resources['output_json_path'] = os.path.join(self._output_directory, resources['output_json_file'])
+        resources["unique_key"] = os.path.splitext(os.path.basename(notebook_filename))[
+            0
+        ]
+        resources["output_files_dir"] = "%s_files" % os.path.basename(notebook_filename)
+        resources[
+            "output_json_file"
+        ] = f"{os.path.basename(notebook_filename)}_out.json"
+        resources["output_json_path"] = os.path.join(
+            self._output_directory, resources["output_json_file"]
+        )
         return resources
 
     def write_single_notebook(self, output: str, resources: ResourcesDict) -> None:
@@ -192,7 +204,7 @@ class BaseConverter(LoggingConfigurable):
         self.writer.build_directory = self._output_directory
 
         # write out the results
-        self.writer.write(output, resources, notebook_name=resources['unique_key'])
+        self.writer.write(output, resources, notebook_name=resources["unique_key"])
 
     def init_destination(self) -> bool:
         """Initialize the destination for an assignment. Returns whether the
@@ -215,7 +227,6 @@ class BaseConverter(LoggingConfigurable):
                 return False
         return True
 
-
     def set_permissions(self) -> None:
         self.log.info("Setting destination file permissions to %s", self.permissions)
         dest = os.path.normpath(self._output_directory)
@@ -235,7 +246,9 @@ class BaseConverter(LoggingConfigurable):
         """
         self.log.info("Converting notebook %s", notebook_filename)
         resources = self.init_single_notebook_resources(notebook_filename)
-        output, resources = self.exporter.from_filename(notebook_filename, resources=resources)
+        output, resources = self.exporter.from_filename(
+            notebook_filename, resources=resources
+        )
         self.write_single_notebook(output, resources)
 
     def convert_notebooks(self) -> None:
@@ -273,7 +286,8 @@ class BaseConverter(LoggingConfigurable):
                 "doesn't know how to deal with this problem, so you will "
                 "have to manually edit the students' code (for example, to "
                 "just throw an error rather than enter an infinite loop). ",
-                self._format_source())
+                self._format_source(),
+            )
             errors.append(e)
             _handle_failure(e)
 
@@ -315,7 +329,9 @@ class BaseConverter(LoggingConfigurable):
             raise
 
         except Exception as e:
-            self.log.error("There was an error processing files: %s", self._format_source())
+            self.log.error(
+                "There was an error processing files: %s", self._format_source()
+            )
             self.log.error(traceback.format_exc())
             errors.append(e)
             _handle_failure(e)
@@ -324,32 +340,44 @@ class BaseConverter(LoggingConfigurable):
             for assignment_id, student_id in errors:
                 self.log.error(
                     "There was an error processing assignment '{}' for student '{}'".format(
-                        assignment_id, student_id))
+                        assignment_id, student_id
+                    )
+                )
 
             if self.logfile:
                 msg = (
                     "Please see the error log ({}) for details on the specific "
-                    "errors on the above failures.".format(self.logfile))
+                    "errors on the above failures.".format(self.logfile)
+                )
             else:
                 msg = (
                     "Please see the the above traceback for details on the specific "
-                    "errors on the above failures.")
+                    "errors on the above failures."
+                )
 
             self.log.error(msg)
             raise GraderConvertException(msg)
 
     def run_pre_convert_hook(self):
         if self.pre_convert_hook:
-            self.log.info('Running pre-convert hook')
+            self.log.info("Running pre-convert hook")
             try:
-                self.pre_convert_hook(notebooks=self.notebooks)
+                self.pre_convert_hook(
+                    notebooks=self.notebooks,
+                    input_dir=self._input_directory,
+                    output_dir=self._output_directory,
+                )
             except Exception:
-                self.log.info('Pre-convert hook failed', exc_info=True)
+                self.log.error("Pre-convert hook failed", exc_info=True)
 
     def run_post_convert_hook(self):
         if self.post_convert_hook:
-            self.log.info('Running post-convert hook')
+            self.log.info("Running post-convert hook")
             try:
-                self.post_convert_hook(notebooks=self.notebooks)
+                self.post_convert_hook(
+                    notebooks=self.notebooks,
+                    input_dir=self._input_directory,
+                    output_dir=self._output_directory,
+                )
             except Exception:
-                self.log.info('Post-convert hook failed', exc_info=True)
+                self.log.error("Post-convert hook failed", exc_info=True)
