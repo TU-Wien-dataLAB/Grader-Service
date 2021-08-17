@@ -1,3 +1,4 @@
+from converters.generate_solution import GenerateSolutionApp
 from converters.baseapp import (
     ConverterApp,
     base_converter_aliases,
@@ -35,11 +36,20 @@ class GraderConverter(ConverterApp):
                 """
             ).strip(),
         ),
+        generate_solution=(
+            GenerateSolutionApp,
+            dedent(
+                """
+                Generates the solution for the given assignment.
+                """
+            ).strip(),
+        ),
     )
 
 
 def main():
     GraderConverter.launch_instance()
+
 
 if __name__ == "__main__":
     main()

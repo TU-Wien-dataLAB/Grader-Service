@@ -1,7 +1,5 @@
 from sys import path
 from converters.baseapp import ConverterApp
-import os
-import re
 from textwrap import dedent
 
 from traitlets import List, Bool, default
@@ -66,9 +64,6 @@ class GenerateAssignment(BaseConverter):
             input_dir, output_dir, file_pattern, **kwargs
         )
         self.force = True # always overwrite generated assignments
-
-    def init_assignment(self, assignment_id: str, student_id: str) -> None:
-        super(GenerateAssignment, self).init_directories(assignment_id, student_id)
 
     def start(self) -> None:
         super(GenerateAssignment, self).start()
