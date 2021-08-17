@@ -12,7 +12,7 @@ class InvalidEntry(ValueError):
 class MissingEntry(ValueError):
     pass
 
-
+# TODO: add decorator to functions that sets dirty flag for methods and checks on __enter__
 class Gradebook:
     """
     The gradebook object to interface with the JSON output file of a conversion.
@@ -322,8 +322,8 @@ class Gradebook:
         """
         kwargs = {k:v for k,v in kwargs.items() if k in set(SourceCell.empty_dict().keys())}
         nb = self.find_notebook(notebook)
-        nb.base_cells[name] = SourceCell(name=name, **kwargs)
-        return nb.base_cells[name]
+        nb.src_cells[name] = SourceCell(name=name, **kwargs)
+        return nb.src_cells[name]
     
     def find_source_cell(self, name: str, notebook: str) -> SourceCell:
         """Find a source cell in a particular notebook.

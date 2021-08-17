@@ -37,6 +37,7 @@ class SaveCells(NbGraderPreprocessor):
             kernelspec = nb.metadata.get('kernelspec', {})
             notebook_info['kernelspec'] = json.dumps(kernelspec)
             notebook_info['base_cells'] = dict()
+            notebook_info['src_cells'] = dict()
             notebook_info['id'] = self.notebook_id
             self.log.debug("Creating notebook '%s' in the database", self.notebook_id)
             self.log.debug("Notebook kernelspec: {}".format(kernelspec))
@@ -61,6 +62,8 @@ class SaveCells(NbGraderPreprocessor):
         for name, info in self.new_source_cells.items():
             source_cell = self.gradebook.update_or_create_source_cell(name, self.notebook_id, **info)
             self.log.debug("Recorded source cell %s into the gradebook", source_cell)
+        
+        return
 
     def preprocess(self, nb: NotebookNode, resources: ResourcesDict) -> Tuple[NotebookNode, ResourcesDict]:
         # pull information from the resources

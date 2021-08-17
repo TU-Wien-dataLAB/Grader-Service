@@ -14,8 +14,6 @@ from textwrap import dedent
 from nbconvert.exporters import Exporter, NotebookExporter
 from nbconvert.writers import FilesWriter
 
-# TODO: replace CourseDirectory with a path that can be supplied as an argument
-# from ..coursedir import CourseDirectory
 from utils import find_all_files, rmtree, remove
 from preprocessors.execute import UnresponsiveKernelError
 from nbgraderformat import SchemaTooOldError, SchemaTooNewError
@@ -67,7 +65,7 @@ class BaseConverter(LoggingConfigurable):
 
         It will be called as (all arguments are passed as keywords)::
 
-            hook(assignment=assignment, student=student, notebooks=notebooks)
+            hook(notebooks=notebooks)
         """)
     )
 
@@ -84,7 +82,7 @@ class BaseConverter(LoggingConfigurable):
 
         It will be called as (all arguments are passed as keywords)::
 
-            hook(assignment=assignment, student=student, notebooks=notebooks)
+            hook(notebooks=notebooks)
         """)
     )
 
@@ -101,7 +99,7 @@ class BaseConverter(LoggingConfigurable):
 
     @default("permissions")
     def _permissions_default(self) -> int:
-        return 664 if self.coursedir.groupshared else 444
+        return 444
 
     @validate('pre_convert_hook')
     def _validate_pre_convert_hook(self, proposal):
@@ -165,8 +163,7 @@ class BaseConverter(LoggingConfigurable):
         return classes
 
 
-    # these methods rely on coursedir which should be replaced by configured functions
-    # should return string that can be used for globs
+    # returns string that can be used for globs
     def _format_source(self, escape: bool = False) -> str:
         source = os.path.join(self._input_directory, self._file_pattern)
         if escape:
@@ -184,11 +181,10 @@ class BaseConverter(LoggingConfigurable):
 
     def init_single_notebook_resources(self, notebook_filename: str) -> typing.Dict[str, typing.Any]:
         resources = {}
-        resources['unique_key'] = os.path.basename(notebook_filename)
+        resources['unique_key'] = os.path.splitext(os.path.basename(notebook_filename))[0]
         resources['output_files_dir'] = '%s_files' % os.path.basename(notebook_filename)
         resources['output_json_file'] = f'{os.path.basename(notebook_filename)}_out.json'
-        resources['output_json_path'] = os.path.join(os.getcwd(), resources['output_json_file'])
-
+        resources['output_json_path'] = os.path.join(self._output_directory, resources['output_json_file'])
         return resources
 
     def write_single_notebook(self, output: str, resources: ResourcesDict) -> None:
@@ -227,28 +223,6 @@ class BaseConverter(LoggingConfigurable):
         for dirname, _, filenames in os.walk(dest):
             for filename in filenames:
                 os.chmod(os.path.join(dirname, filename), permissions)
-            # If groupshared, set dir permissions - see comment below.
-            st_mode = os.stat(dirname).st_mode
-            if self.coursedir.groupshared and st_mode & 0o2770 != 0o2770:
-                try:
-                    os.chmod(dirname, (st_mode|0o2770) & 0o2777)
-                except PermissionError:
-                    self.log.warning("Could not update permissions of %s to make it groupshared", dirname)
-        # If groupshared, set write permissions on directories.  Directories
-        # are created within ipython_genutils.path.ensure_dir_exists via
-        # nbconvert.writer, (unless there are supplementary files) with a
-        # default mode of 755 and there is no way to pass the mode arguments
-        # all the way to there!  So we have to walk and fix.
-        if self.coursedir.groupshared:
-            # Root may be created in this step, and is not included above.
-            rootdir = self.coursedir.format_path(self._output_directory, '.', '.')
-            # Add 2770 to existing dir permissions (don't unconditionally override)
-            st_mode = os.stat(rootdir).st_mode
-            if st_mode & 0o2770 != 0o2770:
-                try:
-                    os.chmod(rootdir, (st_mode|0o2770) & 0o2777)
-                except PermissionError:
-                    self.log.warning("Could not update permissions of %s to make it groupshared", rootdir)
 
     def convert_single_notebook(self, notebook_filename: str) -> None:
         """
@@ -368,10 +342,7 @@ class BaseConverter(LoggingConfigurable):
         if self.pre_convert_hook:
             self.log.info('Running pre-convert hook')
             try:
-                self.pre_convert_hook(
-                    assignment=self.coursedir.assignment_id,
-                    student=self.coursedir.student_id,
-                    notebooks=self.notebooks)
+                self.pre_convert_hook(notebooks=self.notebooks)
             except Exception:
                 self.log.info('Pre-convert hook failed', exc_info=True)
 
@@ -379,9 +350,6 @@ class BaseConverter(LoggingConfigurable):
         if self.post_convert_hook:
             self.log.info('Running post-convert hook')
             try:
-                self.post_convert_hook(
-                    assignment=self.coursedir.assignment_id,
-                    student=self.coursedir.student_id,
-                    notebooks=self.notebooks)
+                self.post_convert_hook(notebooks=self.notebooks)
             except Exception:
                 self.log.info('Post-convert hook failed', exc_info=True)

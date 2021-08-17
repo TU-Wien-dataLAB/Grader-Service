@@ -5,24 +5,23 @@ from enum import Enum
 
 @dataclass
 class BaseModel:
-
     def __post_init__(self):
         self._type = self.__class__.__name__
 
     @classmethod
-    def empty_dict(cls: Type['BaseModel']) -> dict:
+    def empty_dict(cls: Type["BaseModel"]) -> dict:
         fields = cls.__dataclass_fields__.keys()
         return {f: None for f in fields}
 
-
     def to_dict(self) -> dict:
         d = asdict(self)
-        d["_type"] = str(self.__class__.__name__)
+        d["_type"] = self.__class__.__name__
         return d
-    
+
     @classmethod
     def from_dict(cls: Type["BaseModel"], d: dict) -> Type["BaseModel"]:
-        return cls(**d)
+        d_no_type = {k: v for k, v in d.items() if k != "_type"}
+        return cls(**d_no_type)
 
 
 @dataclass
@@ -173,7 +172,7 @@ class TaskCell(BaseCell, GradedMixin):
         comment = Comment.from_dict(d["comment"])
         return GradeCell(
             max_score=d["max_score"],
-            cell_type='code', # cell_type from GradedMixin should always be 'code'
+            cell_type="code",  # cell_type from GradedMixin should always be 'code'
             id=d["id"],
             notebook_id=d["notebook_id"],
             name=d["name"],
@@ -206,6 +205,7 @@ class SourceCell(BaseModel, IDMixin, NameMixin, NotebookRelashionship):
 class Notebook(BaseModel, IDMixin, NameMixin):
     kernelspec: str
     base_cells: Dict[str, Type[BaseCell]]
+    src_cells: Dict[str, Type[SourceCell]]
 
     @property
     def grade_cells(self) -> List[GradeCell]:
@@ -221,14 +221,26 @@ class Notebook(BaseModel, IDMixin, NameMixin):
 
     @property
     def source_cells(self) -> List[SourceCell]:
-        return [x for x in self.base_cells.values() if isinstance(x, SourceCell)]
+        return [x for x in self.src_cells.values()]
 
     @classmethod
     def from_dict(cls: Type["Notebook"], d: dict) -> Type["Notebook"]:
         bc = {id: BaseCell.from_dict(v) for id, v in d["base_cells"].items()}
+        sc = {id: SourceCell.from_dict(v) for id, v in d["_source_cells"]}
         return Notebook(
-            kernelspec=d["kernelspec"], base_cells=bc, id=d["id"], name=d["name"]
+            kernelspec=d["kernelspec"],
+            base_cells=bc,
+            id=d["id"],
+            name=d["name"],
+            src_cells=sc,
         )
+
+    def to_dict(self) -> dict:
+        return {
+            "kernelspec": self.kernelspec,
+            "base_cells": {k: v.to_dict() for k, v in self.base_cells.items()},
+            "src_cells": {k: v.to_dict() for k, v in self.src_cells.items()},
+        }
 
 
 @dataclass
@@ -239,3 +251,6 @@ class GradeBookModel(BaseModel):
     def from_dict(cls: Type["GradeBookModel"], d: dict) -> "GradeBookModel":
         ns = {id: Notebook.from_dict(v) for id, v in d["notebooks"].items()}
         return GradeBookModel(notebooks=ns)
+
+    def to_dict(self) -> dict:
+        return {"notebooks": {k: v.to_dict() for k, v in self.notebooks.items()}}
