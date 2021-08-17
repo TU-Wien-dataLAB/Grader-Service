@@ -153,18 +153,16 @@ const extension: JupyterFrontEndPlugin<void> = {
           });
 
           const cell: Cell = notebook.activeCell;
-          if (switcher.component.props.creationmode !== null) {
-            const newButton: CellPlayButton = new CellPlayButton(
-              cell,
-              notebookPanel.sessionContext,
-              creationmode
-            );
-            (cell.layout as PanelLayout).insertWidget(2, newButton);
-            // Set the current cell and button for future
-            // reference
-            currentCell = cell;
-            currentCellPlayButton = newButton;
-          }
+          const newButton: CellPlayButton = new CellPlayButton(
+            cell,
+            notebookPanel.sessionContext,
+            switcher.mode
+          );
+          (cell.layout as PanelLayout).insertWidget(2, newButton);
+          // Set the current cell and button for future
+          // reference
+          currentCell = cell;
+          currentCellPlayButton = newButton;
         });
       });
     });
