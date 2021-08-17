@@ -118,18 +118,19 @@ const extension: JupyterFrontEndPlugin<void> = {
     tracker.currentChanged.connect(async () => {
       const notebookPanel = tracker.currentWidget;
       const notebook: Notebook = tracker.currentWidget.content;
-      //Creation of widget switch
       const creationmode = false;
-      const switcher: CreationmodeSwitch = await new CreationmodeSwitch(
-        creationmode,
-        notebookPanel,
-        notebook
-      );
-      notebookPanel.toolbar.insertItem(10, 'Creationmode', switcher);
 
-      notebookPanel.context.ready.then(async () => {
+      notebookPanel.context.ready.then(() => {
         let currentCell: Cell = null;
         let currentCellPlayButton: CellPlayButton = null;
+        //Creation of widget switch
+        const switcher: CreationmodeSwitch = new CreationmodeSwitch(
+          creationmode,
+          notebookPanel,
+          notebook
+        );
+        notebookPanel.toolbar.insertItem(10, 'Creationmode', switcher);
+
         notebook.widgets.map((c: Cell) => {
           const currentLayout = c.layout as PanelLayout;
           currentLayout.widgets.map(w => {
@@ -146,7 +147,7 @@ const extension: JupyterFrontEndPlugin<void> = {
           notebook.widgets.map((c: Cell) => {
             const currentLayout = c.layout as PanelLayout;
             currentLayout.widgets.map(w => {
-              if (w === currentCellPlayButton) {
+              if (w instanceof CellPlayButton) {
                 currentLayout.removeWidget(w);
               }
             });
@@ -159,6 +160,18 @@ const extension: JupyterFrontEndPlugin<void> = {
             switcher.mode
           );
           (cell.layout as PanelLayout).insertWidget(2, newButton);
+          //check if in creationmode and new cell was inserted
+          if (
+            switcher.mode &&
+            (cell.layout as PanelLayout).widgets.every(w => {
+              if (w instanceof CellWidget) {
+                return false;
+              }
+              return true;
+            })
+          ) {
+            (cell.layout as PanelLayout).insertWidget(0, new CellWidget(cell));
+          }
           // Set the current cell and button for future
           // reference
           currentCell = cell;
