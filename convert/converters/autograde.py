@@ -2,6 +2,7 @@ import os
 import shutil
 
 from textwrap import dedent
+from typing import Any
 from traitlets import Bool, List, Dict
 
 from .base import BaseConverter, GraderConvertException
@@ -9,6 +10,8 @@ from preprocessors import (
     ClearOutput, DeduplicateIds, OverwriteCells, SaveAutoGrades,
     Execute, LimitOutput, OverwriteKernelspec, CheckCellMetadata)
 import utils
+from traitlets.config.loader import Config
+from gradebook.gradebook import Gradebook, MissingEntry
 
 
 class Autograde(BaseConverter):
@@ -66,69 +69,6 @@ class Autograde(BaseConverter):
     preprocessors = List([])
 
     def init_assignment(self, assignment_id: str, student_id: str) -> None:
-        super(Autograde, self).init_directories(assignment_id, student_id)
-        # try to get the student from the database, and throw an error if it
-        # doesn't exist
-        student = {}
-
-        if student or self.create_student:
-            if 'id' in student:
-                del student['id']
-            self.log.info("Creating/updating student with ID '%s': %s", student_id, student)
-            with Gradebook(self.coursedir.db_url, self.coursedir.course_id) as gb:
-                gb.update_or_create_student(student_id, **student)
-
-        else:
-            with Gradebook(self.coursedir.db_url, self.coursedir.course_id) as gb:
-                try:
-                    gb.find_student(student_id)
-                except MissingEntry:
-                    msg = "No student with ID '%s' exists in the database" % student_id
-                    self.log.error(msg)
-                    raise GraderConvertException(msg)
-
-        # make sure the assignment exists
-        with Gradebook(self.coursedir.db_url, self.coursedir.course_id) as gb:
-            try:
-                gb.find_assignment(assignment_id)
-            except MissingEntry:
-                msg = "No assignment with ID '%s' exists in the database" % assignment_id
-                self.log.error(msg)
-                raise GraderConvertException(msg)
-
-        # try to read in a timestamp from file
-        src_path = self._format_source(assignment_id, student_id)
-        timestamp = self.coursedir.get_existing_timestamp(src_path)
-        with Gradebook(self.coursedir.db_url, self.coursedir.course_id) as gb:
-            if timestamp:
-                submission = gb.update_or_create_submission(
-                    assignment_id, student_id, timestamp=timestamp)
-                self.log.info("%s submitted at %s", submission, timestamp)
-
-                # if the submission is late, print out how many seconds late it is
-                if timestamp and submission.total_seconds_late > 0:
-                    self.log.warning("%s is %s seconds late", submission, submission.total_seconds_late)
-            else:
-                submission = gb.update_or_create_submission(assignment_id, student_id)
-
-        # copy files over from the source directory
-        self.log.info("Overwriting files with master versions from the source directory")
-        dest_path = self._format_dest(assignment_id, student_id)
-        source_path = self.coursedir.format_path(self.coursedir.source_directory, '.', assignment_id)
-        source_files = set(utils.find_all_files(source_path, self.coursedir.ignore + ["*.ipynb"]))
-        exclude_files = set([os.path.join(source_path, x) for x in self.exclude_overwriting.get(assignment_id, [])])
-        source_files = list(source_files - exclude_files)
-
-        # copy them to the build directory
-        for filename in source_files:
-            dest = os.path.join(dest_path, os.path.relpath(filename, source_path))
-            if not os.path.exists(os.path.dirname(dest)):
-                os.makedirs(os.path.dirname(dest))
-            if os.path.exists(dest):
-                os.remove(dest)
-            self.log.info("Copying %s -> %s", filename, dest)
-            shutil.copy(filename, dest)
-
         # ignore notebooks that aren't in the database
         notebooks = []
         with Gradebook(self.coursedir.db_url, self.coursedir.course_id) as gb:
@@ -176,6 +116,15 @@ class Autograde(BaseConverter):
             self.exporter.register_preprocessor(pp)
 
     def convert_single_notebook(self, notebook_filename: str) -> None:
+        # ignore notebooks that aren't in the gradebook
+        resources = self.init_single_notebook_resources(notebook_filename)
+        with Gradebook(resources['output_json_path']) as gb:
+            try:
+                gb.find_notebook(resources['unique_key'])
+            except MissingEntry:
+                self.log.warning("Skipping unknown notebook: %s", notebook_filename)
+                return
+
         self.log.info("Sanitizing %s", notebook_filename)
         self._sanitizing = True
         self._init_preprocessors()
@@ -190,3 +139,37 @@ class Autograde(BaseConverter):
                 super(Autograde, self).convert_single_notebook(notebook_filename)
         finally:
             self._sanitizing = True
+        
+    def convert_notebooks(self) -> None:
+        # check for missing notebooks and give them a score of zero if they do not exist
+        # TODO: finish
+        json_path = os.path.join(self._output_directory, "gradebook.json")
+        with Gradebook(json_path) as gb:
+            for notebook_filename in self.notebooks:
+                resources = self.init_single_notebook_resources(notebook_filename)
+                notebook_id = resources['unique_key']
+                try:
+                    nb = gb.find_notebook(notebook_id)
+                except MissingEntry:
+                    gb.add_notebook(notebook_id)
+                    self.log.warning("No submitted file: {}".format(notebook_filename))
+                    for grade in nb.grades:
+                        grade.auto_score = 0
+                        grade.needs_manual_grade = False
+                        gb.add_grade(grade.id, grade.notebook_id, grade)
+
+        super().convert_notebooks()
+    
+    def _load_config(self, cfg: Config, **kwargs: Any) -> None:
+        super(Autograde, self)._load_config(cfg, **kwargs)
+
+    def __init__(
+        self, input_dir: str, output_dir: str, file_pattern: str, **kwargs: Any
+    ) -> None:
+        super(Autograde, self).__init__(
+            input_dir, output_dir, file_pattern, **kwargs
+        )
+        self.force = True # always overwrite generated assignments
+
+    def start(self) -> None:
+        super(Autograde, self).start()

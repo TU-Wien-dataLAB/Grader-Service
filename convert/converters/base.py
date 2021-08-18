@@ -125,7 +125,6 @@ class BaseConverter(LoggingConfigurable):
             raise TraitError("post_convert_hook must be callable")
         return value
 
-    # TODO: all file handling should happen here (no need for CourseDir) -> exporters have from_filename method
     def __init__(
         self, input_dir: str, output_dir: str, file_pattern: str, **kwargs: typing.Any
     ) -> None:
@@ -187,13 +186,9 @@ class BaseConverter(LoggingConfigurable):
         self, notebook_filename: str
     ) -> typing.Dict[str, typing.Any]:
         resources = {}
-        resources["unique_key"] = os.path.splitext(os.path.basename(notebook_filename))[
-            0
-        ]
+        resources["unique_key"] = os.path.splitext(os.path.basename(notebook_filename))[0]
         resources["output_files_dir"] = "%s_files" % os.path.basename(notebook_filename)
-        resources[
-            "output_json_file"
-        ] = f"{os.path.basename(notebook_filename)}_out.json"
+        resources["output_json_file"] = "gradebook.json"
         resources["output_json_path"] = os.path.join(
             self._output_directory, resources["output_json_file"]
         )

@@ -3,6 +3,7 @@ from . import NbGraderPreprocessor
 from nbconvert.exporters.exporter import ResourcesDict
 from nbformat.notebooknode import NotebookNode
 from typing import Tuple
+from gradebook.gradebook import Gradebook, MissingEntry
 
 
 class SaveAutoGrades(NbGraderPreprocessor):
@@ -10,13 +11,9 @@ class SaveAutoGrades(NbGraderPreprocessor):
 
     def preprocess(self, nb: NotebookNode, resources: ResourcesDict) -> Tuple[NotebookNode, ResourcesDict]:
         # pull information from the resources
-        self.notebook_id = resources['nbgrader']['notebook']
-        self.assignment_id = resources['nbgrader']['assignment']
-        self.student_id = resources['nbgrader']['student']
-        self.db_url = resources['nbgrader']['db_url']
-
-        # connect to the database
-        self.gradebook = Gradebook(self.db_url)
+        self.notebook_id = resources['unique_key']
+        self.json_path = resources['output_json_path']
+        self.gradebook = Gradebook(self.json_path)
 
         with self.gradebook:
             # process the cells
@@ -36,9 +33,8 @@ class SaveAutoGrades(NbGraderPreprocessor):
         # information
         grade = self.gradebook.find_grade(
             cell.metadata['nbgrader']['grade_id'],
-            self.notebook_id,
-            self.assignment_id,
-            self.student_id)
+            self.notebook_id
+        )
 
         # determine what the grade is
         auto_score, _ = utils.determine_grade(cell, self.log)
@@ -51,22 +47,27 @@ class SaveAutoGrades(NbGraderPreprocessor):
         else:
             grade.needs_manual_grade = False
 
-        # TODO: replace with add or maybe reference is updated
-        self.gradebook.db.commit()
+        self.gradebook.add_grade(
+            cell.metadata['nbgrader']['grade_id'],
+            self.notebook_id,
+            grade
+        )
 
     def _add_comment(self, cell: NotebookNode, resources: ResourcesDict) -> None:
         comment = self.gradebook.find_comment(
             cell.metadata['nbgrader']['grade_id'],
-            self.notebook_id,
-            self.assignment_id,
-            self.student_id)
+            self.notebook_id
+        )
         if cell.metadata.nbgrader.get("checksum", None) == utils.compute_checksum(cell) and not utils.is_task(cell):
             comment.auto_comment = "No response."
         else:
             comment.auto_comment = None
 
-        # TODO: replace with add or maybe reference is updated
-        self.gradebook.db.commit()
+        self.gradebook.add_comment(
+            cell.metadata['nbgrader']['grade_id'],
+            self.notebook_id,
+            comment
+        )
 
     def preprocess_cell(self,
                         cell: NotebookNode,

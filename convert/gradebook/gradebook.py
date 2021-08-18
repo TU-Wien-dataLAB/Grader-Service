@@ -435,8 +435,36 @@ class Gradebook:
     
     # Grades
 
+    @write_access
+    def add_grade(self, grade_cell: str, notebook: str, grade: Grade) -> Grade:
+        """Add a grade to a notebook.
+        Parameters
+        ----------
+        grade_cell:
+            the name of a grade or task cell
+        notebook:
+            the name of a notebook
+        grade:
+            the grade to add
+        Returns
+        -------
+        grade
+        """
+        nb = self.find_notebook(notebook)
+        try:
+            c: BaseCell = nb.base_cells[grade_cell]
+        except KeyError:
+            raise MissingEntry()
+        if not isinstance(c, (GradeCell, TaskCell)):
+            raise MissingEntry()
+        grade.id = grade_cell
+        grade.notebook_id = grade
+        c.grade = grade
+        return c.grade
+
     def find_grade(self, grade_cell: str, notebook: str) -> Grade:
-        """Find a particular grade in a notebook.
+        """Find a particular grade in a notebook. 
+        If the grade does not exists an empty grade object is returned.
         Parameters
         ----------
         grade_cell:
@@ -459,6 +487,34 @@ class Gradebook:
         else:
             return c.grade
     
+    @write_access
+    def add_comment(self, solution_cell: str, notebook: str, comment: Comment) -> Comment:
+        """Add a comment to a notebook.
+        Parameters
+        ----------
+        solution_cell:
+            the name of a solution or task cell
+        notebook:
+            the name of a notebook
+        comment:
+            the comment to add
+        Returns
+        -------
+        comment
+        """
+        nb = self.find_notebook(notebook)
+        try:
+            c: BaseCell = nb.base_cells[solution_cell]
+        except KeyError:
+            raise MissingEntry()
+        if not isinstance(c, (SolutionCell, TaskCell)):
+            raise MissingEntry()
+        comment.id = solution_cell
+        comment.notebook_id = notebook
+        c.comment = comment
+        return c.comment
+        
+
     def find_comment(self, solution_cell: str, notebook: str) -> Comment:
         """Find a particular comment in a notebook.
         Parameters

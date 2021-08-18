@@ -15,8 +15,6 @@ class OverwriteCells(NbGraderPreprocessor):
         # pull information from the resources
         self.notebook_id = resources['unique_key']
         self.json_path = resources['output_json_path']
-
-        # connect to the database
         self.gradebook = Gradebook(self.json_path)
 
         with self.gradebook:

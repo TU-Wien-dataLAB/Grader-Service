@@ -44,6 +44,9 @@ class GraderConverter(ConverterApp):
                 """
             ).strip(),
         ),
+        autograde=(
+            
+        )
     )
 
 

@@ -4,6 +4,7 @@ from . import NbGraderPreprocessor
 from nbconvert.exporters.exporter import ResourcesDict
 from nbformat.notebooknode import NotebookNode
 from typing import Tuple
+from gradebook.gradebook import Gradebook, MissingEntry
 
 
 class OverwriteKernelspec(NbGraderPreprocessor):
@@ -11,20 +12,19 @@ class OverwriteKernelspec(NbGraderPreprocessor):
 
     def preprocess(self, nb: NotebookNode, resources: ResourcesDict) -> Tuple[NotebookNode, ResourcesDict]:
         # pull information from the resources
-        notebook_id = resources['nbgrader']['notebook']
-        assignment_id = resources['nbgrader']['assignment']
-        db_url = resources['nbgrader']['db_url']
+        self.notebook_id = resources['unique_key']
+        self.json_path = resources['output_json_path']
 
-        with Gradebook(db_url) as gb:
+        with Gradebook(self.json_path) as gb:
             kernelspec = json.loads(
-                gb.find_notebook(notebook_id, assignment_id).kernelspec)
+                gb.find_notebook(self.notebook_id).kernelspec)
             self.log.debug("Source notebook kernelspec: {}".format(kernelspec))
             self.log.debug(
                 "Submitted notebook kernelspec: {}"
                 "".format(nb.metadata.get('kernelspec', None))
             )
             if kernelspec:
-                self.log.debug(
+                self.log.info(
                     "Overwriting submitted notebook kernelspec: {}"
                     "".format(kernelspec)
                 )
