@@ -68,6 +68,7 @@ class Autograde(BaseConverter):
 
     preprocessors = List([])
 
+    # TODO: delete -> not used anymore
     def init_assignment(self, assignment_id: str, student_id: str) -> None:
         # ignore notebooks that aren't in the database
         notebooks = []
@@ -145,18 +146,14 @@ class Autograde(BaseConverter):
         # TODO: finish
         json_path = os.path.join(self._output_directory, "gradebook.json")
         with Gradebook(json_path) as gb:
-            for notebook_filename in self.notebooks:
-                resources = self.init_single_notebook_resources(notebook_filename)
-                notebook_id = resources['unique_key']
-                try:
-                    nb = gb.find_notebook(notebook_id)
-                except MissingEntry:
-                    gb.add_notebook(notebook_id)
-                    self.log.warning("No submitted file: {}".format(notebook_filename))
-                    for grade in nb.grades:
-                        grade.auto_score = 0
-                        grade.needs_manual_grade = False
-                        gb.add_grade(grade.id, grade.notebook_id, grade)
+            glob_notebooks = {self.init_single_notebook_resources(n)['unique_key']:n for n in self.notebooks}
+            for notebook in gb.model.notebook_id_set.difference(set(glob_notebooks.keys())):
+                self.log.warning("No submitted file: {}".format(glob_notebooks[notebook]))
+                nb = gb.find_notebook(notebook)
+                for grade in nb.grades:
+                    grade.auto_score = 0
+                    grade.needs_manual_grade = False
+                    gb.add_grade(grade.id, notebook, grade)
 
         super().convert_notebooks()
     

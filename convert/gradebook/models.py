@@ -318,6 +318,10 @@ class Notebook(BaseModel, IDMixin, NameMixin):
 class GradeBookModel(BaseModel):
     notebooks: Dict[str, Notebook]
 
+    @property
+    def notebook_id_set(self) -> Set[Notebook]:
+        return {x for x in self.notebooks.keys()}
+
     @classmethod
     def from_dict(cls: Type["GradeBookModel"], d: dict) -> "GradeBookModel":
         ns = {id: Notebook.from_dict(v) for id, v in d["notebooks"].items()}
