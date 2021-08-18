@@ -121,8 +121,6 @@ const extension: JupyterFrontEndPlugin<void> = {
       const creationmode = false;
 
       notebookPanel.context.ready.then(() => {
-        let currentCell: Cell = null;
-        let currentCellPlayButton: CellPlayButton = null;
         //Creation of widget switch
         const switcher: CreationmodeSwitch = new CreationmodeSwitch(
           creationmode,
@@ -130,54 +128,46 @@ const extension: JupyterFrontEndPlugin<void> = {
           notebook
         );
         notebookPanel.toolbar.insertItem(10, 'Creationmode', switcher);
+      });
+    });
 
-        notebook.widgets.map((c: Cell) => {
-          const currentLayout = c.layout as PanelLayout;
-          currentLayout.widgets.map(w => {
-            if (w instanceof CellWidget) {
-              currentLayout.removeWidget(w);
-            }
-          });
-        });
-        tracker.activeCellChanged.connect(() => {
-          // Remove the existing play button from
-          // the previously active cell. This may
-          // well introduce bugs down the road and
-          // there is likely a better way to do this
-          notebook.widgets.map((c: Cell) => {
-            const currentLayout = c.layout as PanelLayout;
-            currentLayout.widgets.map(w => {
-              if (w instanceof CellPlayButton) {
-                currentLayout.removeWidget(w);
-              }
-            });
-          });
-
-          const cell: Cell = notebook.activeCell;
-          const newButton: CellPlayButton = new CellPlayButton(
-            cell,
-            notebookPanel.sessionContext,
-            switcher.mode
-          );
-          (cell.layout as PanelLayout).insertWidget(2, newButton);
-          //check if in creationmode and new cell was inserted
-          if (
-            switcher.mode &&
-            (cell.layout as PanelLayout).widgets.every(w => {
-              if (w instanceof CellWidget) {
-                return false;
-              }
-              return true;
-            })
-          ) {
-            (cell.layout as PanelLayout).insertWidget(0, new CellWidget(cell));
+    tracker.activeCellChanged.connect(() => {
+      const notebookPanel: NotebookPanel = tracker.currentWidget;
+      const notebook: Notebook = tracker.currentWidget.content;
+      const switcher: any = (notebookPanel.toolbar.layout as PanelLayout)
+        .widgets[10];
+      // Remove the existing play button from
+      // the previously active cell. This may
+      // well introduce bugs down the road and
+      // there is likely a better way to do this
+      notebook.widgets.map((c: Cell) => {
+        const currentLayout = c.layout as PanelLayout;
+        currentLayout.widgets.map(w => {
+          if (w instanceof CellPlayButton) {
+            currentLayout.removeWidget(w);
           }
-          // Set the current cell and button for future
-          // reference
-          currentCell = cell;
-          currentCellPlayButton = newButton;
         });
       });
+
+      const cell: Cell = notebook.activeCell;
+      const newButton: CellPlayButton = new CellPlayButton(
+        cell,
+        notebookPanel.sessionContext,
+        switcher.mode
+      );
+      (cell.layout as PanelLayout).insertWidget(2, newButton);
+      //check if in creationmode and new cell was inserted
+      if (
+        switcher.mode &&
+        (cell.layout as PanelLayout).widgets.every(w => {
+          if (w instanceof CellWidget) {
+            return false;
+          }
+          return true;
+        })
+      ) {
+        (cell.layout as PanelLayout).insertWidget(0, new CellWidget(cell));
+      }
     });
 
     /* ##### Course Manage View Widget ##### */
