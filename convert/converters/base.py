@@ -192,6 +192,7 @@ class BaseConverter(LoggingConfigurable):
         resources["output_json_path"] = os.path.join(
             self._output_directory, resources["output_json_file"]
         )
+        resources['nbgrader'] = dict() # support nbgrader pre-processors
         return resources
 
     def write_single_notebook(self, output: str, resources: ResourcesDict) -> None:

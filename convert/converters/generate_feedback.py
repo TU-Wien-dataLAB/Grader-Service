@@ -7,22 +7,11 @@ from nbconvert.preprocessors import CSSHTMLHeaderPreprocessor
 
 from .base import BaseConverter
 from preprocessors import GetGrades
+from converters.baseapp import ConverterApp
 
 
 class GenerateFeedback(BaseConverter):
-
-    @property
-    def _input_directory(self):
-        return self.coursedir.autograded_directory
-
-    @property
-    def _output_directory(self):
-        return self.coursedir.feedback_directory
-
-    preprocessors = List([
-        GetGrades,
-        CSSHTMLHeaderPreprocessor
-    ]).tag(config=True)
+    preprocessors = List([GetGrades, CSSHTMLHeaderPreprocessor]).tag(config=True)
 
     @default("classes")
     def _classes_default(self):
@@ -36,28 +25,31 @@ class GenerateFeedback(BaseConverter):
 
     @default("permissions")
     def _permissions_default(self):
-        return 664 if self.coursedir.groupshared else 644
-
-    def _load_config(self, cfg, **kwargs):
-        if 'Feedback' in cfg:
-            self.log.warning(
-                "Use GenerateFeedback in config, not Feedback. Outdated config:\n%s",
-                '\n'.join(
-                    'Feedback.{key} = {value!r}'.format(key=key, value=value)
-                    for key, value in cfg.GenerateFeedbackApp.items()
-                )
-            )
-            cfg.GenerateFeedback.merge(cfg.Feedback)
-            del cfg.Feedback
-
-        super(GenerateFeedback, self)._load_config(cfg, **kwargs)
+        return 664
 
     def __init__(self, coursedir=None, **kwargs):
         super(GenerateFeedback, self).__init__(coursedir=coursedir, **kwargs)
         c = Config()
-        if 'template_file' not in self.config.HTMLExporter:
-            c.HTMLExporter.template_file = 'feedback.tpl'
-        if 'template_path' not in self.config.HTMLExporter:
-            template_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'server_extensions', 'formgrader', 'templates'))
-            c.HTMLExporter.template_path = ['.', template_path]
+        if "template_file" not in self.config.HTMLExporter:
+            c.HTMLExporter.template_file = "feedback.tpl"
+        if "template_path" not in self.config.HTMLExporter:
+            template_path = os.path.abspath(
+                os.path.join(
+                    os.path.dirname(__file__),
+                    "..",
+                    "templates",
+                )
+            )
+            c.HTMLExporter.template_path = [".", template_path]
         self.update_config(c)
+        self.force = True # always overwrite generated assignments
+
+class GenerateFeedbackApp(ConverterApp):
+    version = ConverterApp.__version__
+
+    def start(self):
+        GenerateFeedback(
+            input_dir=self.input_directory,
+            output_dir=self.output_directory,
+            file_pattern=self.file_pattern,
+        ).start()

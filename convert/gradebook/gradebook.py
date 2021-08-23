@@ -470,6 +470,10 @@ class Gradebook:
             raise MissingEntry()
         grade.id = grade_cell
         grade.notebook_id = notebook
+        if isinstance(c, GradeCell):
+            grade.max_score_gradecell = c.max_score
+        if isinstance(c, TaskCell):
+            grade.max_score_taskcell = c.max_score
         c.grade = grade
         return c.grade
 

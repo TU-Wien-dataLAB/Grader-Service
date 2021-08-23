@@ -54,8 +54,7 @@ class Grade(BaseModel, IDMixin, NotebookRelashionship, CellRelashionship):
     manual_score: float
     extra_credit: float
     needs_manual_grade: bool
-    #: The maximum possible score that can be assigned, inherited from
-    #: :class:`~GradeCell`
+    #: The maximum possible score that can be assigned, inherited from :class:`~GradeCell`
     max_score_gradecell: float
     max_score_taskcell: float
 
