@@ -147,7 +147,7 @@ class BaseConverter(LoggingConfigurable):
     def start(self) -> None:
         self.init_notebooks()
         self.writer = FilesWriter(parent=self, config=self.config)
-        self.exporter = self.exporter_class(parent=self, config=self.config)
+        self.exporter: Exporter = self.exporter_class(parent=self, config=self.config)
         for pp in self.preprocessors:
             self.exporter.register_preprocessor(pp)
         currdir = os.getcwd()
@@ -250,8 +250,9 @@ class BaseConverter(LoggingConfigurable):
         errors = []
 
         def _handle_failure(exception) -> None:
-            dest = os.path.normpath(self._output_directory)
-            rmtree(dest)
+            # dest = os.path.normpath(self._output_directory)
+            # rmtree(dest)
+            pass
 
         # initialize the list of notebooks and the exporter
         self.notebooks = sorted(self.notebooks)
@@ -332,13 +333,6 @@ class BaseConverter(LoggingConfigurable):
             _handle_failure(e)
 
         if len(errors) > 0:
-            for assignment_id, student_id in errors:
-                self.log.error(
-                    "There was an error processing assignment '{}' for student '{}'".format(
-                        assignment_id, student_id
-                    )
-                )
-
             if self.logfile:
                 msg = (
                     "Please see the error log ({}) for details on the specific "

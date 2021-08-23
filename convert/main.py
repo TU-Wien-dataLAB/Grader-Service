@@ -1,3 +1,4 @@
+from converters.autograde import AutogradeApp
 from converters.generate_solution import GenerateSolutionApp
 from converters.baseapp import (
     ConverterApp,
@@ -45,8 +46,14 @@ class GraderConverter(ConverterApp):
             ).strip(),
         ),
         autograde=(
-            
-        )
+            AutogradeApp,
+            dedent(
+                """
+                Autograde submitted assignments. Intended for use by instructors
+                only.
+                """
+            ).strip(),
+        ),
     )
 
 

@@ -1,3 +1,4 @@
+import logging
 from nbconvert.exporters import notebook
 from .models import BaseCell, GradeBookModel, Notebook, GradeCell, TaskCell, SolutionCell, SourceCell, Grade, Comment
 from typing import Optional, Any, Union
@@ -20,11 +21,19 @@ class Gradebook:
     Should only be used as a context manager when changing the data.
     """
 
-    def __init__(self, dest_json: str) -> None:
+    def __init__(self, dest_json: str, log: logging.Logger = None) -> None:
+        if log is None:
+            from traitlets import log as l
+            self.log = l.get_logger()
+        else:
+            self.log = log
+
         self.json_file: str = dest_json
         if os.path.isfile(self.json_file):
             with open(self.json_file, "r") as f:
-                self.data: dict = json.load(f)
+                data = f.read()
+                self.log.info(f"Reading {len(data)} bytes from {self.json_file}")
+                self.data: dict = json.loads(data)
         else:
             os.makedirs(os.path.dirname(self.json_file), exist_ok=True)
             self.data: dict = {"notebooks": dict()}
@@ -56,7 +65,9 @@ class Gradebook:
     
     def write_model(self):
         with open(self.json_file, "w") as f:
-            json.dump(self.model.to_dict(), f)
+            json_str = json.dumps(self.model.to_dict())
+            self.log.info(f"Writing {len(json_str.encode('utf-8'))} bytes to {self.json_file}")
+            f.write(json_str)
     
     def write_access(fn):
         @wraps(fn)
@@ -458,7 +469,7 @@ class Gradebook:
         if not isinstance(c, (GradeCell, TaskCell)):
             raise MissingEntry()
         grade.id = grade_cell
-        grade.notebook_id = grade
+        grade.notebook_id = notebook
         c.grade = grade
         return c.grade
 

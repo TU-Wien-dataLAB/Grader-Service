@@ -283,11 +283,11 @@ class Notebook(BaseModel, IDMixin, NameMixin):
 
     @property
     def grades(self) -> List[Grade]:
-        return [g.grade for g in self.grade_cells if g is not None]
+        return [g.grade for g in self.grade_cells if g is not None and g.grade is not None]
 
     @property
     def comments(self) -> List[Comment]:
-        return [g.comment for g in self.grade_cells if g is not None]
+        return [g.comment for g in self.grade_cells if g is not None and g.comment is not None]
 
     @classmethod
     def from_dict(cls: Type["Notebook"], d: dict) -> Type["Notebook"]:

@@ -1,6 +1,4 @@
 import os
-import shutil
-
 from textwrap import dedent
 from typing import Any
 from traitlets import Bool, List, Dict
@@ -12,6 +10,7 @@ from preprocessors import (
 import utils
 from traitlets.config.loader import Config
 from gradebook.gradebook import Gradebook, MissingEntry
+from converters.baseapp import ConverterApp
 
 
 class Autograde(BaseConverter):
@@ -41,16 +40,6 @@ class Autograde(BaseConverter):
 
     _sanitizing = True
 
-    @property
-    def _input_directory(self) -> str:
-        if self._sanitizing:
-            return self.coursedir.submitted_directory
-        else:
-            return self.coursedir.autograded_directory
-
-    @property
-    def _output_directory(self) -> str:
-        return self.coursedir.autograded_directory
 
     sanitize_preprocessors = List([
         ClearOutput,
@@ -67,44 +56,6 @@ class Autograde(BaseConverter):
     ]).tag(config=True)
 
     preprocessors = List([])
-
-    # TODO: delete -> not used anymore
-    def init_assignment(self, assignment_id: str, student_id: str) -> None:
-        # ignore notebooks that aren't in the database
-        notebooks = []
-        with Gradebook(self.coursedir.db_url, self.coursedir.course_id) as gb:
-            for notebook in self.notebooks:
-                notebook_id = os.path.splitext(os.path.basename(notebook))[0]
-                try:
-                    gb.find_notebook(notebook_id, assignment_id)
-                except MissingEntry:
-                    self.log.warning("Skipping unknown notebook: %s", notebook)
-                    continue
-                else:
-                    notebooks.append(notebook)
-        self.notebooks = notebooks
-        if len(self.notebooks) == 0:
-            msg = "No notebooks found, did you forget to run 'nbgrader generate_assignment'?"
-            self.log.error(msg)
-            raise GraderConvertException(msg)
-
-        # check for missing notebooks and give them a score of zero if they
-        # do not exist
-        with Gradebook(self.coursedir.db_url, self.coursedir.course_id) as gb:
-            assignment = gb.find_assignment(assignment_id)
-            for notebook in assignment.notebooks:
-                path = os.path.join(self.coursedir.format_path(
-                    self.coursedir.submitted_directory,
-                    student_id,
-                    assignment_id), "{}.ipynb".format(notebook.name))
-                if not os.path.exists(path):
-                    self.log.warning("No submitted file: {}".format(path))
-                    submission = gb.find_submission_notebook(
-                        notebook.name, assignment_id, student_id)
-                    for grade in submission.grades:
-                        grade.auto_score = 0
-                        grade.needs_manual_grade = False
-                    gb.db.commit()
 
     def _init_preprocessors(self) -> None:
         self.exporter._preprocessors = []
@@ -143,7 +94,6 @@ class Autograde(BaseConverter):
         
     def convert_notebooks(self) -> None:
         # check for missing notebooks and give them a score of zero if they do not exist
-        # TODO: finish
         json_path = os.path.join(self._output_directory, "gradebook.json")
         with Gradebook(json_path) as gb:
             glob_notebooks = {self.init_single_notebook_resources(n)['unique_key']:n for n in self.notebooks}
@@ -170,3 +120,14 @@ class Autograde(BaseConverter):
 
     def start(self) -> None:
         super(Autograde, self).start()
+
+class AutogradeApp(ConverterApp):
+    version = ConverterApp.__version__
+
+    def start(self):
+        Autograde(
+            input_dir=self.input_directory,
+            output_dir=self.output_directory,
+            file_pattern=self.file_pattern,
+        ).start()
+        
