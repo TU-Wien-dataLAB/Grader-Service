@@ -7,6 +7,7 @@ from converters.baseapp import (
 )
 from converters.generate_assignment import GenerateAssignmentApp
 from converters.generate_feedback import GenerateFeedbackApp
+from converters.validateapp import ValidateApp
 from textwrap import dedent
 
 
@@ -61,6 +62,14 @@ class GraderConverter(ConverterApp):
                 """
                 Generate feedback (after autograding and manual grading).
                 Intended for use by instructors only.
+                """
+            ).strip(),
+        ),
+        validate=(
+            ValidateApp,
+            dedent(
+                """
+                Validate a notebook. Intended for use by instructors and students.
                 """
             ).strip(),
         ),
