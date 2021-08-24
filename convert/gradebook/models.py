@@ -224,7 +224,7 @@ class Notebook(BaseModel, IDMixin, NameMixin):
     def __post_init__(self):
         super().__post_init__()
         if self.flagged is None:
-            self.flagged = False        
+            self.flagged = False
 
     @property
     def grade_cells(self) -> List[GradeCell]:
@@ -282,11 +282,17 @@ class Notebook(BaseModel, IDMixin, NameMixin):
 
     @property
     def grades(self) -> List[Grade]:
-        return [g.grade for g in self.grade_cells if g is not None and g.grade is not None]
+        return [
+            g.grade for g in self.grade_cells if g is not None and g.grade is not None
+        ]
 
     @property
     def comments(self) -> List[Comment]:
-        return [g.comment for g in self.grade_cells if g is not None and g.comment is not None]
+        return [
+            g.comment
+            for g in self.grade_cells
+            if g is not None and g.comment is not None
+        ]
 
     @classmethod
     def from_dict(cls: Type["Notebook"], d: dict) -> Type["Notebook"]:
@@ -309,7 +315,7 @@ class Notebook(BaseModel, IDMixin, NameMixin):
             "kernelspec": self.kernelspec,
             "base_cells": {k: v.to_dict() for k, v in self.base_cells.items()},
             "src_cells": {k: v.to_dict() for k, v in self.src_cells.items()},
-            "_type": self._type
+            "_type": self._type,
         }
 
 
@@ -327,4 +333,8 @@ class GradeBookModel(BaseModel):
         return GradeBookModel(notebooks=ns)
 
     def to_dict(self) -> dict:
-        return {"notebooks": {k: v.to_dict() for k, v in self.notebooks.items()}, "_type": self._type}
+        return {
+            "notebooks": {k: v.to_dict() for k, v in self.notebooks.items()},
+            "_type": self._type,
+            "schema_version": "1",
+        }
