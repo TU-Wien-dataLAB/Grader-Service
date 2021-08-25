@@ -30,14 +30,24 @@ class SaveCells(NbGraderPreprocessor):
             self.log.debug("Removing existing notebook '%s' from the database", self.notebook_id)
             notebook_info = notebook.to_dict()
             del notebook_info['name']
+            del notebook_info['grade_cells_dict']
+            del notebook_info['solution_cells_dict']
+            del notebook_info['task_cells_dict']
+            del notebook_info['source_cells_dict']
+            del notebook_info['grades_dict']
+            del notebook_info['comments_dict']
             self.gradebook.remove_notebook(self.notebook_id)
 
         # create the notebook
         if notebook_info is not None:
             kernelspec = nb.metadata.get('kernelspec', {})
             notebook_info['kernelspec'] = json.dumps(kernelspec)
-            notebook_info.setdefault('base_cells', dict())
-            notebook_info.setdefault('src_cells', dict())
+            notebook_info.setdefault('grade_cells_dict', dict())
+            notebook_info.setdefault('solution_cells_dict', dict())
+            notebook_info.setdefault('task_cells_dict', dict())
+            notebook_info.setdefault('source_cells_dict', dict())
+            notebook_info.setdefault('grades_dict', dict())
+            notebook_info.setdefault('comments_dict', dict())
             notebook_info.setdefault('flagged', False)
             notebook_info['id'] = self.notebook_id
             self.log.debug("Creating notebook '%s' in the database", self.notebook_id)

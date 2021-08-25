@@ -164,8 +164,8 @@ class Gradebook:
         kwargs = {k:v for k,v in kwargs.items() if k in set(GradeCell.empty_dict().keys())}
         kwargs["name"] = name
         nb = self.find_notebook(notebook)
-        nb.base_cells[name] = GradeCell.from_dict(kwargs)
-        return nb.base_cells[name]
+        nb.grade_cells_dict[name] = GradeCell.from_dict(kwargs)
+        return nb.grade_cells_dict[name]
 
     def find_grade_cell(self, name: str, notebook: str) -> GradeCell:
         """Find a grade cell in a particular notebook.
@@ -181,8 +181,8 @@ class Gradebook:
         """
         nb = self.find_notebook(notebook)
         try:
-            return [x for x in nb.grade_cells if x.name == name][0]
-        except IndexError:
+            return nb.grade_cells_dict[name]
+        except KeyError:
             raise MissingEntry()
 
     def find_graded_cell(self, name: str, notebook: str) -> Union[GradeCell, TaskCell]:
@@ -226,12 +226,7 @@ class Gradebook:
             grade_cell = self.add_grade_cell(name, notebook, **kwargs)
         else:
             for attr in kwargs:
-                if attr == "grade":
-                    grade_cell.grade = Grade.from_dict(kwargs[attr])
-                elif attr == "comment":
-                    grade_cell.comment = Comment.from_dict(kwargs[attr])
-                else:
-                    setattr(grade_cell, attr, kwargs[attr])
+                setattr(grade_cell, attr, kwargs[attr])
         return grade_cell
 
     # Solution cells
@@ -256,8 +251,8 @@ class Gradebook:
         kwargs = {k:v for k,v in kwargs.items() if k in set(SolutionCell.empty_dict().keys())}
         kwargs["name"] = name
         nb = self.find_notebook(notebook)
-        nb.base_cells[name] = SolutionCell.from_dict(kwargs)
-        return nb.base_cells[name]
+        nb.solution_cells_dict[name] = SolutionCell.from_dict(kwargs)
+        return nb.solution_cells_dict[name]
 
     def find_solution_cell(self, name: str, notebook: str) -> SolutionCell:
         """Find a solution cell in a particular notebook.
@@ -273,8 +268,8 @@ class Gradebook:
         """
         nb = self.find_notebook(notebook)
         try:
-            return [x for x in nb.solution_cells if x.name == name][0]
-        except IndexError:
+            return nb.solution_cells_dict[name]
+        except KeyError:
             raise MissingEntry()
 
     @write_access
@@ -300,12 +295,7 @@ class Gradebook:
             solution_cell = self.add_solution_cell(name, notebook, **kwargs)
         else:
             for attr in kwargs:
-                if attr == "grade":
-                    solution_cell.grade = Grade.from_dict(kwargs[attr])
-                elif attr == "comment":
-                    solution_cell.comment = Comment.from_dict(kwargs[attr])
-                else:
-                    setattr(solution_cell, attr, kwargs[attr])        
+                setattr(solution_cell, attr, kwargs[attr])        
         return solution_cell
     
     # Task cells
@@ -328,8 +318,8 @@ class Gradebook:
         kwargs = {k:v for k,v in kwargs.items() if k in set(TaskCell.empty_dict().keys())}
         kwargs["name"] = name
         nb = self.find_notebook(notebook)
-        nb.base_cells[name] = TaskCell.from_dict(kwargs)
-        return nb.base_cells[name]
+        nb.task_cells_dict[name] = TaskCell.from_dict(kwargs)
+        return nb.task_cells_dict[name]
     
     def find_task_cell(self, name: str, notebook: str) -> TaskCell:
         """Find a task cell in a particular notebook.
@@ -345,8 +335,8 @@ class Gradebook:
         """
         nb = self.find_notebook(notebook)
         try:
-            return [x for x in nb.task_cells if x.name == name][0]
-        except IndexError:
+            return nb.task_cells_dict[name]
+        except KeyError:
             raise MissingEntry()
     
     @write_access
@@ -370,12 +360,7 @@ class Gradebook:
             task_cell = self.add_task_cell(name, notebook, **kwargs)
         else:
             for attr in kwargs:
-                if attr == "grade":
-                    task_cell.grade = Grade.from_dict(kwargs[attr])
-                elif attr == "comment":
-                    task_cell.comment = Comment.from_dict(kwargs[attr])
-                else:
-                    setattr(task_cell, attr, kwargs[attr])
+                setattr(task_cell, attr, kwargs[attr])
         return task_cell
     
     # Source cell
@@ -398,8 +383,8 @@ class Gradebook:
         kwargs = {k:v for k,v in kwargs.items() if k in set(SourceCell.empty_dict().keys())}
         kwargs["name"] = name
         nb = self.find_notebook(notebook)
-        nb.src_cells[name] = SourceCell.from_dict(kwargs)
-        return nb.src_cells[name]
+        nb.source_cells_dict[name] = SourceCell.from_dict(kwargs)
+        return nb.source_cells_dict[name]
     
     def find_source_cell(self, name: str, notebook: str) -> SourceCell:
         """Find a source cell in a particular notebook.
@@ -415,8 +400,8 @@ class Gradebook:
         """
         nb = self.find_notebook(notebook)
         try:
-            return [x for x in nb.source_cells if x.name == name][0]
-        except IndexError:
+            return nb.source_cells_dict[name]
+        except KeyError:
             raise MissingEntry()
     
     @write_access
@@ -462,20 +447,25 @@ class Gradebook:
         grade
         """
         nb = self.find_notebook(notebook)
-        try:
-            c: BaseCell = nb.base_cells[grade_cell]
-        except KeyError:
-            raise MissingEntry()
-        if not isinstance(c, (GradeCell, TaskCell)):
+
+        grade_c: GradeCell = nb.grade_cells_dict.get(grade_cell, None)
+        task_c: TaskCell = nb.task_cells_dict.get(grade_cell, None)
+        solution_c: SolutionCell = nb.solution_cells_dict.get(grade_cell, None)
+        if all([x is None for x in [grade_c, task_c, solution_c]]):
             raise MissingEntry()
         grade.id = grade_cell
         grade.notebook_id = notebook
-        if isinstance(c, GradeCell):
-            grade.max_score_gradecell = c.max_score
-        if isinstance(c, TaskCell):
-            grade.max_score_taskcell = c.max_score
-        c.grade = grade
-        return c.grade
+        grade.cell_id = grade_cell
+        if grade_c is not None:
+            grade.max_score_gradecell = grade_c.max_score
+            grade_c.grade_id = grade.id
+        if task_c is not None:
+            grade.max_score_taskcell = task_c.max_score
+            task_c.grade_id = grade.id
+        if solution_c is not None:
+            solution_c.grade_id = grade.id
+        nb.grades_dict[grade.id] = grade
+        return grade
 
     def find_grade(self, grade_cell: str, notebook: str) -> Grade:
         """Find a particular grade in a notebook. 
@@ -492,15 +482,9 @@ class Gradebook:
         """
         nb = self.find_notebook(notebook)
         try:
-            c: BaseCell = nb.base_cells[grade_cell]
+            return nb.grades_dict[grade_cell]
         except KeyError:
-            raise MissingEntry()
-        if not isinstance(c, (GradeCell, TaskCell)):
-            raise MissingEntry()
-        if c.grade is None:
             return Grade.from_dict(Grade.empty_dict())
-        else:
-            return c.grade
     
     @write_access
     def add_comment(self, solution_cell: str, notebook: str, comment: Comment) -> Comment:
@@ -518,16 +502,23 @@ class Gradebook:
         comment
         """
         nb = self.find_notebook(notebook)
-        try:
-            c: BaseCell = nb.base_cells[solution_cell]
-        except KeyError:
-            raise MissingEntry()
-        if not isinstance(c, (SolutionCell, TaskCell)):
+
+        grade_c: GradeCell = nb.grade_cells_dict.get(solution_cell, None)
+        task_c: TaskCell = nb.task_cells_dict.get(solution_cell, None)
+        solution_c: SolutionCell = nb.solution_cells_dict.get(solution_cell, None)
+        if all([x is None for x in [solution_c, task_c, solution_c]]):
             raise MissingEntry()
         comment.id = solution_cell
         comment.notebook_id = notebook
-        c.comment = comment
-        return c.comment
+        comment.cell_id = solution_cell
+        if grade_c is not None:
+            grade_c.comment_id = comment.id
+        if task_c is not None:
+            task_c.comment_id = comment.id
+        if solution_c is not None:
+            solution_c.comment_id = comment.id
+        nb.comments_dict[comment.id] = comment
+        return comment
         
 
     def find_comment(self, solution_cell: str, notebook: str) -> Comment:
@@ -544,14 +535,8 @@ class Gradebook:
         """
         nb = self.find_notebook(notebook)
         try:
-            c: BaseCell = nb.base_cells[solution_cell]
+            return nb.comments_dict[solution_cell]
         except KeyError:
-            raise MissingEntry()
-        if not isinstance(c, (SolutionCell, TaskCell)):
-            raise MissingEntry()
-        if c.comment is None:
             return Comment.from_dict(Comment.empty_dict())
-        else:
-            return c.comment
     
     

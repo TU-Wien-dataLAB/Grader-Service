@@ -88,6 +88,13 @@ class Grade(BaseModel, IDMixin, NotebookRelashionship, CellRelashionship):
         else:
             return self.max_score_gradecell
 
+    @classmethod
+    def from_dict(cls: Type["Grade"], d: dict) -> Type["Grade"]:
+        if d is None or len(d) == 0:
+            return None
+        d = {k: v for k, v in d.items() if k not in ["_type", "max_score"]}
+        return cls(**d)
+
     def to_dict(self) -> dict:
         d = super().to_dict()
         d["max_score"] = self.max_score
@@ -114,23 +121,8 @@ class CellType(Enum):
 
 @dataclass
 class BaseCell(BaseModel, IDMixin, NameMixin, NotebookRelashionship):
-    grade: Grade  # we can have only one grade
-    comment: Comment  # we can have only one comment since we only process a single notebook
-
-    def __post_init__(self):
-        super().__post_init__()
-        if isinstance(self.grade, dict):
-            self.grade = Grade.from_dict(self.grade)
-        if isinstance(self.comment, dict):
-            self.comment = Comment.from_dict(self.comment)
-
-    def to_dict(self) -> dict:
-        d = super().to_dict()
-        if d["grade"] is None or len(d["grade"]) == 0:
-            d["grade"] = None
-        if d["comment"] is None or len(d["comment"]) == 0:
-            d["comment"] = None
-        return d
+    grade_id: str  # we can have only one grade
+    comment_id: str  # we can have only one comment since we only process a single notebook
 
     @classmethod
     def from_dict(cls: Type["BaseCell"], d: dict) -> Type["BaseCell"]:
@@ -160,8 +152,8 @@ class GradeCell(BaseCell, GradedMixin):
             id=d["id"],
             notebook_id=d["notebook_id"],
             name=d["name"],
-            grade=Grade.from_dict(d["grade"]),
-            comment=Comment.from_dict(d["comment"]),
+            grade_id=d["grade_id"],
+            comment_id=d["comment_id"],
         )
 
 
@@ -173,8 +165,8 @@ class SolutionCell(BaseCell):
             id=d["id"],
             notebook_id=d["notebook_id"],
             name=d["name"],
-            grade=Grade.from_dict(d["grade"]),
-            comment=Comment.from_dict(d["comment"]),
+            grade_id=d["grade_id"],
+            comment_id=d["comment_id"],
         )
 
 
@@ -188,8 +180,8 @@ class TaskCell(BaseCell, GradedMixin):
             id=d["id"],
             notebook_id=d["notebook_id"],
             name=d["name"],
-            grade=Grade.from_dict(d["grade"]),
-            comment=Comment.from_dict(d["comment"]),
+            grade_id=d["grade_id"],
+            comment_id=d["comment_id"],
         )
 
 
@@ -216,8 +208,12 @@ class SourceCell(BaseModel, IDMixin, NameMixin, NotebookRelashionship):
 @dataclass
 class Notebook(BaseModel, IDMixin, NameMixin):
     kernelspec: str
-    base_cells: Dict[str, Type[BaseCell]]
-    src_cells: Dict[str, Type[SourceCell]]
+    grade_cells_dict: Dict[str, Type[GradeCell]]
+    solution_cells_dict: Dict[str, Type[SolutionCell]]
+    task_cells_dict: Dict[str, Type[TaskCell]]
+    source_cells_dict: Dict[str, Type[SourceCell]]
+    grades_dict: Dict[str, Type[Grade]]
+    comments_dict: Dict[str, Type[Comment]]
     #: Whether this assignment has been flagged by a human grader
     flagged: bool
 
@@ -228,25 +224,25 @@ class Notebook(BaseModel, IDMixin, NameMixin):
 
     @property
     def grade_cells(self) -> List[GradeCell]:
-        return [x for x in self.base_cells.values() if isinstance(x, GradeCell)]
+        return [x for x in self.grade_cells_dict.values() if isinstance(x, GradeCell)]
 
     @property
     def solution_cells(self) -> List[SolutionCell]:
-        return [x for x in self.base_cells.values() if isinstance(x, SolutionCell)]
+        return [
+            x for x in self.solution_cells_dict.values() if isinstance(x, SolutionCell)
+        ]
 
     @property
     def task_cells(self) -> List[TaskCell]:
-        return [x for x in self.base_cells.values() if isinstance(x, TaskCell)]
+        return [x for x in self.task_cells_dict.values() if isinstance(x, TaskCell)]
 
     @property
     def source_cells(self) -> List[SourceCell]:
-        return [x for x in self.src_cells.values()]
+        return [x for x in self.source_cells_dict.values()]
 
     @property
     def graded_cells(self) -> List[Union[GradeCell, TaskCell]]:
-        return [
-            x for x in self.base_cells.values() if isinstance(x, (GradeCell, TaskCell))
-        ]
+        return self.grade_cells + self.task_cells
 
     @property
     def max_score(self) -> float:
@@ -254,11 +250,17 @@ class Notebook(BaseModel, IDMixin, NameMixin):
 
     @property
     def score(self) -> float:
-        return sum([g.grade.score for g in self.graded_cells])
+        return sum([self.grades_dict[g.grade_id].score for g in self.graded_cells if g is not None and g.grade_id is not None])
 
     @property
     def code_score(self) -> float:
-        return sum([g.grade.score for g in self.graded_cells if g.cell_type == "code"])
+        return sum(
+            [
+                self.grades_dict[g.grade_id].score
+                for g in self.graded_cells
+                if g.cell_type == "code" and g is not None and g.grade_id is not None
+            ]
+        )
 
     @property
     def max_code_score(self) -> float:
@@ -267,7 +269,11 @@ class Notebook(BaseModel, IDMixin, NameMixin):
     @property
     def written_score(self) -> float:
         return sum(
-            [g.grade.score for g in self.graded_cells if g.cell_type == "markdown"]
+            [
+                self.grades_dict[g.grade_id].score
+                for g in self.graded_cells
+                if g.cell_type == "markdown"
+            ]
         )
 
     @property
@@ -278,33 +284,35 @@ class Notebook(BaseModel, IDMixin, NameMixin):
 
     @property
     def failed_tests(self) -> bool:
-        return any([g.grade.failed_tests for g in self.graded_cells])
+        return any([g.failed_tests for g in self.grades])
 
     @property
     def grades(self) -> List[Grade]:
-        return [
-            g.grade for g in self.grade_cells if g is not None and g.grade is not None
-        ]
+        return list(self.grades_dict.values())
 
     @property
     def comments(self) -> List[Comment]:
-        return [
-            g.comment
-            for g in self.grade_cells
-            if g is not None and g.comment is not None
-        ]
+        return list(self.comments_dict.values())
 
     @classmethod
     def from_dict(cls: Type["Notebook"], d: dict) -> Type["Notebook"]:
-        bc = {id: BaseCell.from_dict(v) for id, v in d["base_cells"].items()}
-        sc = {id: SourceCell.from_dict(v) for id, v in d["src_cells"].items()}
+        gc = {id: GradeCell.from_dict(v) for id, v in d["grade_cells_dict"].items()}
+        sc = {i: SolutionCell.from_dict(v) for i, v in d["solution_cells_dict"].items()}
+        tc = {id: TaskCell.from_dict(v) for id, v in d["task_cells_dict"].items()}
+        sr = {id: SourceCell.from_dict(v) for id, v in d["source_cells_dict"].items()}
+        gr = {id: Grade.from_dict(v) for id, v in d["grades_dict"].items()}
+        co = {id: Comment.from_dict(v) for id, v in d["comments_dict"].items()}
         return Notebook(
             kernelspec=d["kernelspec"],
-            base_cells=bc,
+            grade_cells_dict=gc,
+            solution_cells_dict=sc,
+            task_cells_dict=tc,
             id=d["id"],
             name=d["name"],
             flagged=d["flagged"],
-            src_cells=sc,
+            source_cells_dict=sr,
+            grades_dict=gr,
+            comments_dict=co,
         )
 
     def to_dict(self) -> dict:
@@ -313,8 +321,20 @@ class Notebook(BaseModel, IDMixin, NameMixin):
             "name": self.name,
             "flagged": self.flagged,
             "kernelspec": self.kernelspec,
-            "base_cells": {k: v.to_dict() for k, v in self.base_cells.items()},
-            "src_cells": {k: v.to_dict() for k, v in self.src_cells.items()},
+            "grade_cells_dict": {
+                k: v.to_dict() for k, v in self.grade_cells_dict.items()
+            },
+            "solution_cells_dict": {
+                k: v.to_dict() for k, v in self.solution_cells_dict.items()
+            },
+            "task_cells_dict": {
+                k: v.to_dict() for k, v in self.task_cells_dict.items()
+            },
+            "source_cells_dict": {
+                k: v.to_dict() for k, v in self.source_cells_dict.items()
+            },
+            "grades_dict": {k: v.to_dict() for k, v in self.grades_dict.items()},
+            "comments_dict": {k: v.to_dict() for k, v in self.comments_dict.items()},
             "_type": self._type,
         }
 
