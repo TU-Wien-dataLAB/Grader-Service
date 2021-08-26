@@ -150,6 +150,7 @@ class GitService(Configurable):
             if capture_output:
                 return None
             else:
+                
                 raise GitError(str(e.stdout, 'utf-8') + str(e.stderr, 'utf-8'))
         except FileNotFoundError as e:
             raise GitError(e.strerror)

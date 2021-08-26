@@ -1,6 +1,6 @@
 from orm.assignment import Assignment
 from orm.group import Group
-from orm.takepart import Role
+from orm.takepart import Role, Scope
 import pytest
 from unittest.mock import Mock
 from handlers.git.server import GitBaseHandler

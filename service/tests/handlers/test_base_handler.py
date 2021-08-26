@@ -85,7 +85,7 @@ async def test_authenticate_user_no_cookies(session):
 
     await GraderBaseHandler.authenticate_user(m)
 
-    lecture99 = session.query(Lecture).filter(Lecture.name == "lecture99").one_or_none()
+    lecture99 = session.query(Lecture).filter(Lecture.code == "lecture99").one_or_none()
     assert lecture99 is not None
 
 
@@ -128,10 +128,10 @@ def test_assignment_serialization():
     d = {
         "id": 1,
         "name": "test",
-        "due_date": datetime.now().strftime("%m/%d/%Y, %H:%M:%S"),
+        "due_date": datetime.now(),
         "status": "created",
-        "exercises": [],
-        "files": []
+        'type': None,
+        'points': 0
     }
     a = Assignment(
         id=d["id"],
@@ -142,6 +142,7 @@ def test_assignment_serialization():
         status=d["status"],
     )
 
+    d["due_date"] = (d["due_date"].isoformat("T", "milliseconds") + "Z")
     assert GraderBaseHandler._serialize(a) == d
 
 def test_nested_serialization():
