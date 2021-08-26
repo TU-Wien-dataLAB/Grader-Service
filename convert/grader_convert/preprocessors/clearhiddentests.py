@@ -4,21 +4,21 @@ from traitlets import Bool, Unicode
 from textwrap import dedent
 
 from . import NbGraderPreprocessor
-import utils
+from .. import utils
 from nbformat.notebooknode import NotebookNode
 from nbconvert.exporters.exporter import ResourcesDict
 from typing import Tuple
 
 
-class ClearMarkScheme(NbGraderPreprocessor):
+class ClearHiddenTests(NbGraderPreprocessor):
 
-    begin_mark_scheme_delimeter = Unicode(
-        "BEGIN MARK SCHEME",
+    begin_test_delimeter = Unicode(
+        "BEGIN HIDDEN TESTS",
         help="The delimiter marking the beginning of hidden tests cases"
     ).tag(config=True)
 
-    end_mark_scheme_delimeter = Unicode(
-        "END MARK SCHEME",
+    end_test_delimeter = Unicode(
+        "END HIDDEN TESTS",
         help="The delimiter marking the end of hidden tests cases"
     ).tag(config=True)
 
@@ -26,8 +26,8 @@ class ClearMarkScheme(NbGraderPreprocessor):
         True,
         help=dedent(
             """
-            Whether or not to complain if cells containing marking scheme regions
-            are not marked as task cells. WARNING: this will potentially cause
+            Whether or not to complain if cells containing hidden test regions
+            are not marked as grade cells. WARNING: this will potentially cause
             things to break if you are using the full nbgrader pipeline. ONLY
             disable this option if you are only ever planning to use nbgrader
             assign.
@@ -35,54 +35,54 @@ class ClearMarkScheme(NbGraderPreprocessor):
         )
     ).tag(config=True)
 
-    def _remove_mark_scheme_region(self, cell: NotebookNode) -> bool:
+    def _remove_hidden_test_region(self, cell: NotebookNode) -> bool:
         """Find a region in the cell that is delimeted by
-        `self.begin_mark_scheme_delimeter` and `self.end_mark_scheme_delimeter` (e.g.  ###
-        BEGIN MARK SCHEME and ### END MARK SCHEME). Remove that region
+        `self.begin_test_delimeter` and `self.end_test_delimeter` (e.g.  ###
+        BEGIN HIDDEN TESTS and ### END HIDDEN TESTS). Remove that region
         depending the cell type.
 
         This modifies the cell in place, and then returns True if a
-        mark region was removed, and False otherwise.
+        hidden test region was removed, and False otherwise.
         """
         # pull out the cell input/source
         lines = cell.source.split("\n")
 
         new_lines = []
-        in_ms = False
-        removed_ms = False
+        in_test = False
+        removed_test = False
 
         for line in lines:
             # begin the test area
-            if self.begin_mark_scheme_delimeter in line:
+            if self.begin_test_delimeter in line:
 
                 # check to make sure this isn't a nested BEGIN HIDDEN TESTS
                 # region
-                if in_ms:
+                if in_test:
                     raise RuntimeError(
-                        "Encountered nested begin mark scheme statements")
-                in_ms = True
-                removed_ms = True
+                        "Encountered nested begin hidden tests statements")
+                in_test = True
+                removed_test = True
 
             # end the solution area
-            elif self.end_mark_scheme_delimeter in line:
-                in_ms = False
+            elif self.end_test_delimeter in line:
+                in_test = False
 
             # add lines as long as it's not in the hidden tests region
-            elif not in_ms:
+            elif not in_test:
                 new_lines.append(line)
 
         # we finished going through all the lines, but didn't find a
         # matching END HIDDEN TESTS statment
-        if in_ms:
-            raise RuntimeError("No end mark scheme tests statement found")
+        if in_test:
+            raise RuntimeError("No end hidden tests statement found")
 
         # replace the cell source
         cell.source = "\n".join(new_lines)
 
-        return removed_ms
+        return removed_test
 
     def preprocess(self, nb: NotebookNode, resources: ResourcesDict) -> Tuple[NotebookNode, ResourcesDict]:
-        nb, resources = super(ClearMarkScheme, self).preprocess(nb, resources)
+        nb, resources = super(ClearHiddenTests, self).preprocess(nb, resources)
         if 'celltoolbar' in nb.metadata:
             del nb.metadata['celltoolbar']
         return nb, resources
@@ -93,20 +93,20 @@ class ClearMarkScheme(NbGraderPreprocessor):
                         cell_index: int
                         ) -> Tuple[NotebookNode, ResourcesDict]:
         # remove hidden test regions
-        removed_ms = self._remove_mark_scheme_region(cell)
+        removed_test = self._remove_hidden_test_region(cell)
 
-        # determine whether the cell is a task cell
-        is_task = utils.is_task(cell)
+        # determine whether the cell is a grade cell
+        is_grade = utils.is_grade(cell)
 
-        # check that it is marked as a task cell if we remove a mark scheme
+        # check that it is marked as a grade cell if we remove a test
         # region -- if it's not, then this is a problem, because the cell needs
         # to be given an id
-        if not is_task and removed_ms:
+        if not is_grade and removed_test:
             if self.enforce_metadata:
                 raise RuntimeError(
-                    "Mark scheme region detected in a non-grade cell; "
-                    "please make sure all mark scheme regions are within "
-                    "'Manually graded task' cells."
+                    "Hidden test region detected in a non-grade cell; "
+                    "please make sure all solution regions are within "
+                    "'Autograder tests' cells."
                 )
 
         return cell, resources

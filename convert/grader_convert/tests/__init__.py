@@ -14,7 +14,7 @@ from nbconvert.filters import strip_ansi
 
 from ..utils import compute_checksum
 from ..converters.baseapp import ConverterApp
-from validator import Validator
+from ..validator import Validator
 from ..nbgraderformat import SCHEMA_VERSION
 from typing import List, Optional
 

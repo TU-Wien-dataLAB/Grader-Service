@@ -14,9 +14,9 @@ from textwrap import dedent
 from nbconvert.exporters import Exporter, NotebookExporter
 from nbconvert.writers import FilesWriter
 
-from utils import find_all_files, rmtree, remove
-from preprocessors.execute import UnresponsiveKernelError
-from nbgraderformat import SchemaTooOldError, SchemaTooNewError
+from ..utils import find_all_files, rmtree, remove
+from ..preprocessors.execute import UnresponsiveKernelError
+from ..nbgraderformat import SchemaTooOldError, SchemaTooNewError
 import typing
 from nbconvert.exporters.exporter import ResourcesDict
 

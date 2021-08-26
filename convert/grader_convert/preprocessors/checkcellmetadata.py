@@ -1,6 +1,6 @@
 import traceback
 
-from nbgraderformat import MetadataValidator, ValidationError
+from ..nbgraderformat import MetadataValidator, ValidationError
 from . import NbGraderPreprocessor
 from nbformat.notebooknode import NotebookNode
 from typing import Dict, Tuple

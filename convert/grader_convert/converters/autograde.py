@@ -4,13 +4,13 @@ from typing import Any
 from traitlets import Bool, List, Dict
 
 from .base import BaseConverter, GraderConvertException
-from preprocessors import (
+from ..preprocessors import (
     ClearOutput, DeduplicateIds, OverwriteCells, SaveAutoGrades,
     Execute, LimitOutput, OverwriteKernelspec, CheckCellMetadata)
-import utils
+from .. import utils
 from traitlets.config.loader import Config
-from gradebook.gradebook import Gradebook, MissingEntry
-from converters.baseapp import ConverterApp
+from ..gradebook.gradebook import Gradebook, MissingEntry
+from .baseapp import ConverterApp
 
 
 class Autograde(BaseConverter):

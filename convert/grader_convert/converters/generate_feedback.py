@@ -6,8 +6,8 @@ from nbconvert.exporters import HTMLExporter
 from nbconvert.preprocessors import CSSHTMLHeaderPreprocessor
 
 from .base import BaseConverter
-from preprocessors import GetGrades
-from converters.baseapp import ConverterApp
+from ..preprocessors import GetGrades
+from ..converters.baseapp import ConverterApp
 
 
 class GenerateFeedback(BaseConverter):

@@ -6,8 +6,8 @@ import glob
 from traitlets import default
 
 from .baseapp import ConverterApp
-from validator import Validator
-from nbgraderformat import SchemaTooOldError, SchemaTooNewError
+from ..validator import Validator
+from ..nbgraderformat import SchemaTooOldError, SchemaTooNewError
 
 aliases = {}
 flags = {

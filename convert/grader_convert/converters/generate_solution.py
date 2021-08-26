@@ -1,10 +1,10 @@
-from converters.baseapp import ConverterApp
+from ..converters.baseapp import ConverterApp
 from textwrap import dedent
 
 from traitlets import List, Bool, default
 
 from .base import BaseConverter, GraderConvertException
-from preprocessors import (
+from ..preprocessors import (
     IncludeHeaderFooter,
     LockCells,
     ClearOutput,

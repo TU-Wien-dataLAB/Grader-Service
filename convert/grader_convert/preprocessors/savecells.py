@@ -1,12 +1,12 @@
-from gradebook.models import GradeCell, SolutionCell, TaskCell, SourceCell
+from ..gradebook.models import GradeCell, SolutionCell, TaskCell, SourceCell
 import json
 
-import utils
+from .. import utils
 from . import NbGraderPreprocessor
 from nbformat.notebooknode import NotebookNode
 from nbconvert.exporters.exporter import ResourcesDict
 from typing import Tuple
-from gradebook.gradebook import Gradebook, MissingEntry
+from ..gradebook.gradebook import Gradebook, MissingEntry
 
 
 class SaveCells(NbGraderPreprocessor):
