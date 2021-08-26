@@ -1,5 +1,5 @@
 from .base import Base, DeleteState, Serializable
-from sqlalchemy import Column, Integer, String, ForeignKey, DateTime, Enum, Boolean
+from sqlalchemy import Column, Integer, String, ForeignKey, DateTime, Enum, Text, Boolean
 from sqlalchemy.orm import relationship
 from api.models import assignment
 
@@ -17,6 +17,7 @@ class Assignment(Base, Serializable):
         default="created",
     )
     deleted = Column(Enum(DeleteState), nullable=False, unique=False)
+    properties = Column(Text, nullable=True, unique=False)
     lecture = relationship("Lecture", back_populates="assignments")
     submissions = relationship("Submission", back_populates="assignment")
 

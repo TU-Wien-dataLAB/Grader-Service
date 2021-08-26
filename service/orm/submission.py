@@ -1,5 +1,5 @@
 from .base import Base, Serializable
-from sqlalchemy import Column, Integer, String, ForeignKey, DateTime, Enum, Boolean
+from sqlalchemy import Column, Integer, String, ForeignKey, DateTime, Enum, Text, Boolean
 from sqlalchemy.orm import relationship
 from api.models import submission
 
@@ -17,6 +17,7 @@ class Submission(Base, Serializable):
     assignid = Column(Integer, ForeignKey("assignment.id"))
     username = Column(String(255), ForeignKey("user.name"))
     commit_hash = (Column(String(length=40), nullable=False))
+    properties = Column(Text, nullable=True, unique=False)
 
     assignment = relationship("Assignment", back_populates="submissions")
     user = relationship("User", back_populates="submissions")

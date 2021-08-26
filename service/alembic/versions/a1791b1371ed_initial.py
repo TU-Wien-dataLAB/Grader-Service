@@ -42,6 +42,7 @@ def upgrade():
     sa.Column('points', sa.Integer(), nullable=False),
     sa.Column('status', sa.Enum('created', 'released', 'fetching', 'fetched', 'complete'), nullable=True),
     sa.Column('deleted', sa.Enum('active', 'deleted'), server_default='active', nullable=False),
+    sa.Column('properties', sa.Text(), nullable=True, unique=False),
 
     sa.ForeignKeyConstraint(['lectid'], ['lecture.id'], ),
     sa.PrimaryKeyConstraint('id'),
@@ -71,6 +72,7 @@ def upgrade():
     sa.Column('assignid', sa.Integer(), nullable=True),
     sa.Column('username', sa.String(length=255), nullable=True),
     sa.Column('commit_hash', sa.String(length=40), nullable=False),
+    sa.Column('properties', sa.Text(), nullable=True, unique=False),
     sa.ForeignKeyConstraint(['assignid'], ['assignment.id'], ),
     sa.ForeignKeyConstraint(['username'], ['user.name'], ),
     sa.PrimaryKeyConstraint('id')
