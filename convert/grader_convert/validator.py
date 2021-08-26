@@ -7,8 +7,8 @@ from nbformat import current_nbformat, read as read_nb
 from textwrap import fill, dedent
 from nbconvert.filters import ansi2html, strip_ansi
 
-from preprocessors import Execute, ClearOutput, CheckCellMetadata
-import utils
+from .preprocessors import Execute, ClearOutput, CheckCellMetadata
+from . import utils
 from nbformat.notebooknode import NotebookNode
 import typing
 

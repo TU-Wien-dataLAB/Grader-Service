@@ -1,14 +1,14 @@
-from converters.autograde import AutogradeApp
-from converters.generate_solution import GenerateSolutionApp
-from converters.baseapp import (
+from .converters.autograde import AutogradeApp
+from .converters.generate_solution import GenerateSolutionApp
+from .converters.baseapp import (
     ConverterApp,
     base_converter_aliases,
     base_converter_flags,
 )
-from converters.generate_assignment import GenerateAssignmentApp
-from converters.generate_feedback import GenerateFeedbackApp
-from converters.validateapp import ValidateApp
-from converters.updateapp import UpdateApp
+from .converters.generate_assignment import GenerateAssignmentApp
+from .converters.generate_feedback import GenerateFeedbackApp
+from .converters.validateapp import ValidateApp
+from .converters.updateapp import UpdateApp
 from textwrap import dedent
 
 

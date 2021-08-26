@@ -5,7 +5,7 @@ import os
 from textwrap import dedent
 from nbformat.v4 import new_output
 
-from validator import Validator
+from ..validator import Validator
 from . import (
     create_code_cell, create_text_cell)
 from io import StringIO

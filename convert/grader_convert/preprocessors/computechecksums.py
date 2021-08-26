@@ -1,4 +1,4 @@
-import utils
+from .. import utils
 from . import NbGraderPreprocessor
 from nbconvert.exporters.exporter import ResourcesDict
 from nbformat.notebooknode import NotebookNode

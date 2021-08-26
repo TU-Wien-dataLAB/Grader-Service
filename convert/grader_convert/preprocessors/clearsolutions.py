@@ -4,7 +4,7 @@ from traitlets import Dict, Unicode, Bool, observe
 from traitlets.config.loader import Config
 from textwrap import dedent
 
-import utils
+from .. import utils
 from . import NbGraderPreprocessor
 from typing import Any, Tuple
 from nbformat.notebooknode import NotebookNode

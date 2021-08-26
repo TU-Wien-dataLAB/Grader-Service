@@ -1,11 +1,11 @@
 from sys import path
-from converters.baseapp import ConverterApp
+from grader_convert.converters.baseapp import ConverterApp
 from textwrap import dedent
 
 from traitlets import List, Bool, default
 
-from converters.base import BaseConverter, GraderConvertException
-from preprocessors import (
+from grader_convert.converters.base import BaseConverter, GraderConvertException
+from grader_convert.preprocessors import (
     IncludeHeaderFooter,
     ClearSolutions,
     LockCells,

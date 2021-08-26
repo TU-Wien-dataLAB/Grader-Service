@@ -1,10 +1,10 @@
 from traitlets import List
-from gradebook.gradebook import Gradebook, MissingEntry
+from ..gradebook.gradebook import Gradebook, MissingEntry
 from nbconvert.exporters.exporter import ResourcesDict
 from nbformat.notebooknode import NotebookNode
 from typing import Optional, Any, Tuple
 
-import utils
+from .. import utils
 from . import NbGraderPreprocessor
 
 
