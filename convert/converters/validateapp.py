@@ -20,22 +20,22 @@ flags = {
 
 class ValidateApp(ConverterApp):
 
-    name = u'nbgrader-validate'
+    name = u'validate'
     description = u'Validate a notebook by running it'
 
     aliases = aliases
     flags = flags
 
     examples = """
-        You can run `nbgrader validate` on just a single file, e.g.:
-            nbgrader validate "Problem 1.ipynb"
+        You can run `grader-convert validate` on just a single file, e.g.:
+            grader-convert validate "Problem 1.ipynb"
 
         Or, you can run it on multiple files using shell globs:
-            nbgrader validate "Problem Set 1/*.ipynb"
+            grader-convert validate "Problem Set 1/*.ipynb"
 
         If you want to test instead that none of the tests pass (rather than that
         all of the tests pass, which is the default), you can use --invert:
-            nbgrader validate --invert "Problem 1.ipynb"
+            grader-convert validate --invert "Problem 1.ipynb"
         """
 
     @default("classes")

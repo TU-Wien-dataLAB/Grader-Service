@@ -1,6 +1,7 @@
 from jupyter_core.application import JupyterApp
 from traitlets.traitlets import Enum, Int, TraitError, Unicode, observe, validate
 import os
+import sys
 
 base_converter_aliases = {
     'log-level' : 'Application.log_level',
@@ -41,3 +42,8 @@ class ConverterApp(JupyterApp):
             return proposal["value"]
         else:
             return None
+    
+    def fail(self, msg, *args):
+        """Log the error msg using self.log.error and exit using sys.exit(1)."""
+        self.log.error(msg, *args)
+        sys.exit(1)

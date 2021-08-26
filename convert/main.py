@@ -8,6 +8,7 @@ from converters.baseapp import (
 from converters.generate_assignment import GenerateAssignmentApp
 from converters.generate_feedback import GenerateFeedbackApp
 from converters.validateapp import ValidateApp
+from converters.updateapp import UpdateApp
 from textwrap import dedent
 
 
@@ -70,6 +71,14 @@ class GraderConverter(ConverterApp):
             dedent(
                 """
                 Validate a notebook. Intended for use by instructors and students.
+                """
+            ).strip(),
+        ),
+        update=(
+            UpdateApp,
+            dedent(
+                """
+                Update nbgrader cell metadata to the most recent version.
                 """
             ).strip(),
         ),
