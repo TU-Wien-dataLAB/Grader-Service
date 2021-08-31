@@ -118,6 +118,12 @@ class PushHandler(ExtensionBaseHandler):
                 self.log.error(
                     f"Could not set assignment properties! Error code {response.code}"
                 )
+            
+            try:
+                os.remove(gradebook_path)
+            except OSError as e:
+                self.log.error(f"Cannot delete {gradebook_path}! Error: {e.strerror}\n Aborting push!")
+                return
 
         try:
             if not git_service.is_git():
