@@ -1,3 +1,8 @@
+/* eslint-disable no-useless-escape */
+/* eslint-disable eqeqeq */
+/* eslint-disable prefer-const */
+/* eslint-disable no-constant-condition */
+/* eslint-disable @typescript-eslint/no-array-constructor */
 import { Title, Widget } from '@lumino/widgets';
 import * as React from 'react';
 import { Assignment } from '../../model/assignment';
@@ -7,26 +12,31 @@ import { fetchAssignment } from '../../services/assignments.service';
 import { getLecture } from '../../services/lectures.service';
 import { getAllSubmissions } from '../../services/submissions.service';
 
-import { DataGrid, GridCellParams, GridColDef } from '@material-ui/data-grid';
+import {
+  DataGrid,
+  GridApi,
+  GridCellParams,
+  GridCellValue,
+  GridColDef
+} from '@material-ui/data-grid';
 import { Button } from '@blueprintjs/core/lib/cjs/components/button/buttons';
-import { ItemRenderer, Select } from "@blueprintjs/select";
+import { ItemRenderer, Select } from '@blueprintjs/select';
 import { User } from '../../model/user';
 import { MenuItem } from '@blueprintjs/core';
 
-export interface GradingProps {
+export interface IGradingProps {
   lectureID: number;
   assignmentID: number;
   title: Title<Widget>;
 }
 
-const StringSelect = Select.ofType<string>()
+const StringSelect = Select.ofType<string>();
 
-
-export class GradingComponent extends React.Component<GradingProps> {
+export class GradingComponent extends React.Component<IGradingProps> {
   public lectureID: number;
   public assignmentID: number;
   public title: Title<Widget>;
-  
+
   public submissions: Submission[];
   public lectureId: number;
   public assignmentId: number;
@@ -34,14 +44,13 @@ export class GradingComponent extends React.Component<GradingProps> {
   public state = {
     assignment: {},
     lecture: {},
-    submissions: new Array<{user: User, submissions: Submission[]}>(),
-    option: "latest",
+    submissions: new Array<{ user: User; submissions: Submission[] }>(),
+    option: 'latest',
     rows: new Array(),
-    selected: new Array(),
+    selected: new Array()
   };
 
-
-  constructor(props: GradingProps) {
+  constructor(props: IGradingProps) {
     super(props);
     this.lectureID = props.lectureID;
     this.assignmentID = props.assignmentID;
@@ -50,121 +59,186 @@ export class GradingComponent extends React.Component<GradingProps> {
       { field: 'id', headerName: 'Id', width: 110 },
       { field: 'name', headerName: 'User', width: 130 },
       { field: 'date', headerName: 'Date', width: 250 },
-      { field: 'status', headerName: 'Status', width: 250},
+      { field: 'status', headerName: 'Status', width: 250 },
       {
         field: 'Autograde',
         headerName: '',
+        sortable: false,
         width: 150,
         disableClickEventBubbling: true,
-        disableColumnMenu: true,
-        renderCell: (params: GridCellParams) => (
-            <Button icon="highlight" outlined>Autograde</Button>
-        ),
+        renderCell: params => {
+          const onClick = () => {
+            const api: GridApi = params.api;
+            const fields = api
+              .getAllColumns()
+              .map(c => c.field)
+              .filter(c => c !== '__check__' && !!c);
+            const thisRow: Record<string, GridCellValue> = {};
+
+            fields.forEach(f => {
+              thisRow[f] = params.getValue(params.id, f);
+            });
+
+            return alert(JSON.stringify(thisRow, null, 4));
+          };
+
+          return (
+            <Button icon="highlight" onClick={onClick} outlined>
+              Autograde
+            </Button>
+          );
+        }
       } as GridColDef,
       {
         field: 'Manualgrade',
         headerName: '',
+        sortable: false,
         width: 150,
         disableClickEventBubbling: true,
-        disableColumnMenu: true,
-        renderCell: (params: GridCellParams) => (
-            <Button icon="highlight" outlined>Manualgrade</Button>
-        ),
-      } as GridColDef,
-      { field: 'score', headerName: 'Score', width: 130 },
+        renderCell: params => {
+          const onClick = () => {
+            const api: GridApi = params.api;
+            const fields = api
+              .getAllColumns()
+              .map(c => c.field)
+              .filter(c => c !== '__check__' && !!c);
+            const thisRow: Record<string, GridCellValue> = {};
 
+            fields.forEach(f => {
+              thisRow[f] = params.getValue(params.id, f);
+            });
+
+            return alert(JSON.stringify(thisRow, null, 4));
+          };
+
+          return (
+            <Button icon="highlight" onClick={onClick} outlined>
+              Manualgrade
+            </Button>
+          );
+        }
+      } as GridColDef,
+      { field: 'score', headerName: 'Score', width: 130 }
     ];
   }
 
-  public async componentDidMount() {
-    let assignment: Assignment = await fetchAssignment(this.lectureID, this.assignmentID, false, true).toPromise(); //TODO: Not working
-    let lecture: Lecture = await getLecture(this.lectureID).toPromise();
-    this.title.label = "Grading: " + assignment.name;
-    this.setState({ assignment, lecture })
-    getAllSubmissions(lecture, {id: this.assignmentID}, false).subscribe(async userSubmissions => { //{id: this.assignmentID} should be assignment
-      console.log(userSubmissions)
-      this.setState(this.state.submissions = userSubmissions)
-      //Temp rows for testing
-      this.setState(this.state.rows = this.generateRows())
-      console.log("rows:")
-      console.log(this.state.rows)
-    })
+  public async componentDidMount(): Promise<void> {
+    const assignment: Assignment = await fetchAssignment(
+      this.lectureID,
+      this.assignmentID,
+      false,
+      true
+    ).toPromise(); //TODO: Not working
+    const lecture: Lecture = await getLecture(this.lectureID).toPromise();
+    this.title.label = 'Grading: ' + assignment.name;
+    this.setState({ assignment, lecture });
+    getAllSubmissions(lecture, { id: this.assignmentID }, false).subscribe(
+      async userSubmissions => {
+        //{id: this.assignmentID} should be assignment
+        console.log(userSubmissions);
+        this.setState((this.state.submissions = userSubmissions));
+        //Temp rows for testing
+        this.setState((this.state.rows = this.generateRows()));
+        console.log('rows:');
+        console.log(this.state.rows);
+      }
+    );
   }
 
-  public generateRows(): Object[] { 
+  public generateRows(): any[] {
     //let rows = [{ id: 10, user: "hasdf", date: "asdfadfa" }]
     let rows = new Array();
-    //TODO: right now reading only the first 
-    if(this.state.option == "latest") {
-
-      this.state.submissions.forEach( sub => {
+    //TODO: right now reading only the first
+    if (this.state.option == 'latest') {
+      this.state.submissions.forEach(sub => {
         //get latest submission
         let latest = sub.submissions.reduce((a, b) => {
           return new Date(a.submitted_at) > new Date(b.submitted_at) ? a : b;
         });
-        rows.push({id: latest.id, name: sub.user.name, date: latest.submitted_at, status: latest.status, score: latest.score})
+        rows.push({
+          id: latest.id,
+          name: sub.user.name,
+          date: latest.submitted_at,
+          status: latest.status,
+          score: latest.score
+        });
       });
-
     } else {
-
-      this.state.submissions.forEach( sub => {sub.submissions.forEach(s => {
-        rows.push({id: s.id, name: sub.user.name, date: s.submitted_at, status: s.status, score: s.score})
-      }); });
-
+      this.state.submissions.forEach(sub => {
+        sub.submissions.forEach(s => {
+          rows.push({
+            id: s.id,
+            name: sub.user.name,
+            date: s.submitted_at,
+            status: s.status,
+            score: s.score
+          });
+        });
+      });
     }
     return rows;
   }
 
-
   public datagrid() {
     return (
-    <DataGrid rows={this.state.rows} columns={this.columns} checkboxSelection disableSelectionOnClick
-    onSelectionModelChange={(e) => {
-      const selectedIDs = new Set(e);
-      const selectedRowData = this.state.rows.filter((row) =>
-        selectedIDs.has(row.id)
-      );
-      this.setState({selected : selectedRowData}, () => {console.log("selected rowData:", this.state.selected);})
-      
-    }}
-     />)
-
-  }
-
-  public render() {
-    const items = ["latest","all"]
-    const buttonText = this.state.option
-    
-
-    return (
-        <div style={{ height: "100%",  display: "flex", flexDirection: "column"}}>
-            {this.datagrid()}
-
-            <StringSelect
-
-            items={items}    
-            filterable={false}
-            itemRenderer={this.renderSelect}
-            noResults={<MenuItem disabled={true} text="No results." />}
-            onItemSelect={this.handleValueChange} >
-            
-            <Button text={buttonText} rightIcon="caret-up" />
-            </StringSelect>
-
-            <Button icon="highlight" color="primary" outlined style={{alignSelf: "flex-end", marginRight: "20px", marginBottom: "20px"}}>Autograde selected</Button>
-        </div>
-      
+      <DataGrid
+        rows={this.state.rows}
+        columns={this.columns}
+        checkboxSelection
+        disableSelectionOnClick
+        onSelectionModelChange={e => {
+          const selectedIDs = new Set(e);
+          const selectedRowData = this.state.rows.filter(row =>
+            selectedIDs.has(row.id)
+          );
+          this.setState({ selected: selectedRowData }, () => {
+            console.log('selected rowData:', this.state.selected);
+          });
+        }}
+      />
     );
   }
 
+  public render() {
+    const items = ['latest', 'all'];
+    const buttonText = this.state.option;
 
+    return (
+      <div style={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
+        {this.datagrid()}
 
-  private handleValueChange = (select: string) => { 
-    this.setState({option: select}, () => {
+        <StringSelect
+          items={items}
+          filterable={false}
+          itemRenderer={this.renderSelect}
+          noResults={<MenuItem disabled={true} text="No results." />}
+          onItemSelect={this.handleValueChange}
+        >
+          <Button text={buttonText} rightIcon="caret-up" />
+        </StringSelect>
+
+        <Button
+          icon="highlight"
+          color="primary"
+          outlined
+          style={{
+            alignSelf: 'flex-end',
+            marginRight: '20px',
+            marginBottom: '20px'
+          }}
+        >
+          Autograde selected
+        </Button>
+      </div>
+    );
+  }
+
+  private handleValueChange = (select: string) => {
+    this.setState({ option: select }, () => {
       // you get the new value of state immediately at this callback
-      this.setState(this.state.rows = this.generateRows())
-      console.log(this.state.option)
-   });    
+      this.setState((this.state.rows = this.generateRows()));
+      console.log(this.state.option);
+    });
   };
   private renderSelect: ItemRenderer<string> = (
     option,
@@ -194,7 +268,7 @@ function highlightText(text: string, query: string) {
   if (words.length === 0) {
     return [text];
   }
-  const regexp = new RegExp(words.join("|"), "gi");
+  const regexp = new RegExp(words.join('|'), 'gi');
   const tokens: React.ReactNode[] = [];
   while (true) {
     const match = regexp.exec(text);
@@ -217,6 +291,5 @@ function highlightText(text: string, query: string) {
 }
 
 function escapeRegExpChars(text: string) {
-  return text.replace(/([.*+?^=!:${}()|\[\]\/\\])/g, "\\$1");
+  return text.replace(/([.*+?^=!:${}()|\[\]\/\\])/g, '\\$1');
 }
-
