@@ -7,6 +7,7 @@ import { Cell } from '@jupyterlab/cells';
 import { PanelLayout } from '@lumino/widgets';
 import { CellWidget } from './cellwidget';
 import { CellPlayButton } from './widget';
+import { UserPermissions, Scope } from '../services/permission.service';
 
 export class CreationmodeSwitch extends ReactWidget {
   public ref: React.RefObject<CreationmodeSwitchComponent>;
@@ -39,26 +40,41 @@ export class CreationmodeSwitch extends ReactWidget {
   }
 }
 
-export interface ICreationmodeSwitchProbs {
+export interface ICreationmodeSwitchProps {
   creationmode: boolean;
   notebookpanel: NotebookPanel;
   notebook: Notebook;
   onChange: any;
 }
 
-export class CreationmodeSwitchComponent extends React.Component<ICreationmodeSwitchProbs> {
+export class CreationmodeSwitchComponent extends React.Component<ICreationmodeSwitchProps> {
   public state = {
     creationmode: false
   };
   public notebook: Notebook;
   public notebookpanel: NotebookPanel;
   public onChange: any;
+  public isSourceNotebook: boolean;
+  public hasCreationModePermissions: boolean;
 
-  public constructor(props: ICreationmodeSwitchProbs) {
+  public constructor(props: ICreationmodeSwitchProps) {
     super(props);
     this.state.creationmode = props.creationmode || false;
     this.notebook = props.notebook;
     this.notebookpanel = props.notebookpanel;
+    const notebookPaths: string[] = this.notebookpanel.context.contentsModel.path.split("/")
+    console.log("Notebook path: " + this.notebookpanel.context.contentsModel.path)
+    this.isSourceNotebook = notebookPaths[0] === "source"
+    this.hasCreationModePermissions = false;
+    if (this.isSourceNotebook) {
+      const lectureCode = notebookPaths[1]
+      if (UserPermissions.getPermissions().hasOwnProperty(lectureCode)) {
+          this.hasCreationModePermissions = UserPermissions.getPermissions()[lectureCode] !== Scope.student;
+      }
+    }
+    
+    console.log("Source notebook: " + this.isSourceNotebook);
+    console.log("Creation mode permissions: " + this.hasCreationModePermissions);
     this.onChange = this.props.onChange;
     this.handleSwitch = this.handleSwitch.bind(this);
   }
@@ -84,18 +100,15 @@ export class CreationmodeSwitchComponent extends React.Component<ICreationmodeSw
           }
         });
       });
-      /*new button add
-      const cell: Cell = this.notebook.activeCell;
-      const newButton: CellPlayButton = new CellPlayButton(
-        cell,
-        this.notebookpanel.sessionContext,
-        this.state.creationmode
-      );
-      (cell.layout as PanelLayout).insertWidget(2, newButton);*/
     });
   };
 
   public render() {
+    if (!this.hasCreationModePermissions) {
+      return null;
+    }
+
+    // if the user has permissions it is also a source notebook
     return (
       <Switch
         checked={this.state.creationmode}

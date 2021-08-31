@@ -115,60 +115,63 @@ const extension: JupyterFrontEndPlugin<void> = {
     console.log('Extension "create_assignment" activated.');
 
     //Creation of in-cell widget for create assignment
-    tracker.currentChanged.connect(async () => {
-      const notebookPanel = tracker.currentWidget;
-      const notebook: Notebook = tracker.currentWidget.content;
-      const creationmode = false;
+    let connectTrackerSignals = (tracker: INotebookTracker) => {
 
-      notebookPanel.context.ready.then(() => {
-        //Creation of widget switch
-        const switcher: CreationmodeSwitch = new CreationmodeSwitch(
-          creationmode,
-          notebookPanel,
-          notebook
-        );
-        notebookPanel.toolbar.insertItem(10, 'Creationmode', switcher);
-      });
-    });
+      tracker.currentChanged.connect(async () => {
+        const notebookPanel = tracker.currentWidget;
+        const notebook: Notebook = tracker.currentWidget.content;
+        const creationmode = false;
 
-    tracker.activeCellChanged.connect(() => {
-      const notebookPanel: NotebookPanel = tracker.currentWidget;
-      const notebook: Notebook = tracker.currentWidget.content;
-      const switcher: any = (notebookPanel.toolbar.layout as PanelLayout)
-        .widgets[10];
-      // Remove the existing play button from
-      // the previously active cell. This may
-      // well introduce bugs down the road and
-      // there is likely a better way to do this
-      notebook.widgets.map((c: Cell) => {
-        const currentLayout = c.layout as PanelLayout;
-        currentLayout.widgets.map(w => {
-          if (w instanceof CellPlayButton) {
-            currentLayout.removeWidget(w);
-          }
+        notebookPanel.context.ready.then(() => {
+          //Creation of widget switch
+          const switcher: CreationmodeSwitch = new CreationmodeSwitch(
+            creationmode,
+            notebookPanel,
+            notebook
+          );
+          notebookPanel.toolbar.insertItem(10, 'Creationmode', switcher);
         });
       });
 
-      const cell: Cell = notebook.activeCell;
-      const newButton: CellPlayButton = new CellPlayButton(
-        cell,
-        notebookPanel.sessionContext,
-        switcher.mode
-      );
-      (cell.layout as PanelLayout).insertWidget(2, newButton);
-      //check if in creationmode and new cell was inserted
-      if (
-        switcher.mode &&
-        (cell.layout as PanelLayout).widgets.every(w => {
-          if (w instanceof CellWidget) {
-            return false;
-          }
-          return true;
-        })
-      ) {
-        (cell.layout as PanelLayout).insertWidget(0, new CellWidget(cell));
-      }
-    });
+      tracker.activeCellChanged.connect(() => {
+        const notebookPanel: NotebookPanel = tracker.currentWidget;
+        const notebook: Notebook = tracker.currentWidget.content;
+        const switcher: any = (notebookPanel.toolbar.layout as PanelLayout)
+          .widgets[10];
+        // Remove the existing play button from
+        // the previously active cell. This may
+        // well introduce bugs down the road and
+        // there is likely a better way to do this
+        notebook.widgets.map((c: Cell) => {
+          const currentLayout = c.layout as PanelLayout;
+          currentLayout.widgets.map(w => {
+            if (w instanceof CellPlayButton) {
+              currentLayout.removeWidget(w);
+            }
+          });
+        });
+
+        const cell: Cell = notebook.activeCell;
+        const newButton: CellPlayButton = new CellPlayButton(
+          cell,
+          notebookPanel.sessionContext,
+          switcher.mode
+        );
+        (cell.layout as PanelLayout).insertWidget(2, newButton);
+        //check if in creationmode and new cell was inserted
+        if (
+          switcher.mode &&
+          (cell.layout as PanelLayout).widgets.every(w => {
+            if (w instanceof CellWidget) {
+              return false;
+            }
+            return true;
+          })
+        ) {
+          (cell.layout as PanelLayout).insertWidget(0, new CellWidget(cell));
+        }
+      });
+    }
 
     /* ##### Course Manage View Widget ##### */
     let command: string = CourseManageCommandIDs.create;
@@ -199,8 +202,10 @@ const extension: JupyterFrontEndPlugin<void> = {
       }
       if (sum !== 0) {
         console.log(
-          'Non-student permissions found! Adding coursemanage launcher'
+          'Non-student permissions found! Adding coursemanage launcher and connecting creation mode'
         );
+        connectTrackerSignals(tracker);
+
         command = CourseManageCommandIDs.open;
         app.commands.addCommand(command, {
           label: 'Course Management',

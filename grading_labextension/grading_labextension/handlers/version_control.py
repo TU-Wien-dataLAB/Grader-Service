@@ -122,7 +122,7 @@ class PushHandler(ExtensionBaseHandler):
             try:
                 os.remove(gradebook_path)
             except OSError as e:
-                self.log.error(f"Cannot delete {gradebook_path}! Error: {e.strerror}\n Aborting push!")
+                self.log.error(f"Cannot delete {gradebook_path}! Error: {e.strerror}\nAborting push!")
                 return
 
         try:
