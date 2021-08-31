@@ -174,7 +174,7 @@ class SolutionCell(BaseCell):
 class TaskCell(BaseCell, GradedMixin):
     @classmethod
     def from_dict(cls: Type["BaseCell"], d: dict) -> Type["BaseCell"]:
-        return GradeCell(
+        return TaskCell(
             max_score=d["max_score"],
             cell_type="code",  # cell_type from GradedMixin should always be 'code'
             id=d["id"],
