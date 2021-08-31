@@ -1,9 +1,10 @@
+import json
 import logging
 import os
 from grading_labextension.registry import register_handler
 from grading_labextension.handlers.base_handler import ExtensionBaseHandler
 from grading_labextension.services.git import GitError, GitService
-from tornado.httpclient import HTTPError
+from tornado.httpclient import HTTPError, HTTPResponse
 from distutils.dir_util import copy_tree, remove_tree
 from grader_convert.converters.generate_assignment import GenerateAssignment
 
@@ -99,6 +100,24 @@ class PushHandler(ExtensionBaseHandler):
             generator.start()
             self.log.info("GenerateAssignment conversion done")
 
+            gradebook_path = os.path.join(git_service.path, "gradebook.json")
+            with open(gradebook_path, "r") as f:
+                gradebook_json: dict = json.load(f)
+
+            self.log.info(f"Setting properties of assignment from {gradebook_path}")
+            response: HTTPResponse = await self.request_service.request(
+                "PUT",
+                f"{self.base_url}/lectures/{lecture_id}/assignments/{assignment_id}/properties",
+                header=self.grader_authentication_header,
+                body=gradebook_json,
+                decode_response=False,
+            )
+            if response.code == 200:
+                self.log.info("Properties set for assignment")
+            else:
+                self.log.error(
+                    f"Could not set assignment properties! Error code {response.code}"
+                )
 
         try:
             if not git_service.is_git():
