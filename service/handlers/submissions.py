@@ -17,9 +17,7 @@ class SubmissionHandler(GraderBaseHandler):
     @authorize([Scope.student, Scope.tutor, Scope.instructor])
     async def get(self, lecture_id: int, assignment_id: int):
         latest = self.get_argument("latest", None) == "true"
-        instructor_version = (
-            self.get_argument("instructor-version", None) == "true"
-        )
+        instructor_version = self.get_argument("instructor-version", None) == "true"
 
         role = self.session.query(Role).get((self.user.name, lecture_id))
         if instructor_version and role.role < Scope.tutor:
@@ -34,9 +32,18 @@ class SubmissionHandler(GraderBaseHandler):
             submissions = []
             if latest:
                 submissions = (
-                    self.session.query(Submission.id,Submission.status,Submission.score, Submission.username,Submission.assignid,Submission.commit_hash,func.max(Submission.date))
+                    self.session.query(
+                        Submission.id,
+                        Submission.status,
+                        Submission.score,
+                        Submission.username,
+                        Submission.assignid,
+                        Submission.commit_hash,
+                        func.max(Submission.date),
+                    )
                     .filter(Submission.assignid == assignment_id)
-                    .group_by(Submission.username).all()
+                    .group_by(Submission.username)
+                    .all()
                 )
             else:
                 submissions = assignment.submissions
@@ -51,8 +58,19 @@ class SubmissionHandler(GraderBaseHandler):
         else:
             if latest:
                 submissions = (
-                    self.session.query(Submission.id,Submission.status,Submission.score, Submission.username,Submission.assignid,Submission.commit_hash,func.max(Submission.date))
-                    .filter(Submission.assignid == assignment_id, Submission.username == role.username)
+                    self.session.query(
+                        Submission.id,
+                        Submission.status,
+                        Submission.score,
+                        Submission.username,
+                        Submission.assignid,
+                        Submission.commit_hash,
+                        func.max(Submission.date),
+                    )
+                    .filter(
+                        Submission.assignid == assignment_id,
+                        Submission.username == role.username,
+                    )
                     .group_by(Submission.username)
                 )
             else:
@@ -76,7 +94,7 @@ class SubmissionHandler(GraderBaseHandler):
         sub.assignid = assignment_id
         sub.username = self.user.name
         sub.status = sub_model.status
-        
+
         self.session.add(sub)
         self.session.commit()
         self.write_json(sub)
@@ -100,3 +118,30 @@ class FeedbackObjectHandler(GraderBaseHandler):
     @authorize([Scope.student, Scope.tutor, Scope.instructor])
     async def get(self, lecture_id: int, assignment_id: int, feedback_id: int):
         pass
+
+
+@register_handler(
+    path=r"\/lectures\/(?P<lecture_id>\d*)\/assignments\/(?P<assignment_id>\d*)\/submissions\/(?P<submission_id>\d*)\/properties\/?"
+)
+class SubmissionPropertiesHandler(GraderBaseHandler):
+    @authorize([Scope.tutor, Scope.instructor])
+    async def get(self, lecture_id: int, assignment_id: int, submission_id: int):
+        sumbission = self.session.query(Submission).get(submission_id)
+        if sumbission is None or sumbission.deleted == DeleteState.deleted:
+            self.error_message = "Not Found!"
+            raise HTTPError(404)
+        if sumbission.properties is not None:
+            self.write(sumbission.properties)
+        else:
+            self.error_message = "Not Found!"
+            raise HTTPError(404)
+
+    @authorize([Scope.tutor, Scope.instructor])
+    async def put(self, lecture_id: int, assignment_id: int, submission_id: int):
+        submission = self.session.query(Submission).get(submission_id)
+        if submission is None or submission.deleted == DeleteState.deleted:
+            self.error_message = "Not Found!"
+            raise HTTPError(404)
+        properties_string: str = self.request.body.decode("utf-8")
+        submission.properties = properties_string
+        self.session.commit()

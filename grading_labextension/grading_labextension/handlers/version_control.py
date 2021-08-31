@@ -5,6 +5,7 @@ from grading_labextension.handlers.base_handler import ExtensionBaseHandler
 from grading_labextension.services.git import GitError, GitService
 from tornado.httpclient import HTTPError
 from distutils.dir_util import copy_tree, remove_tree
+from grader_convert.converters.generate_assignment import GenerateAssignment
 
 
 @register_handler(
@@ -88,7 +89,16 @@ class PushHandler(ExtensionBaseHandler):
                 config=self.config,
             ).path
             git_service.copy_repo_contents(src=src_path)
-            # TODO: call nbconvert before pushing
+
+            # call nbconvert before pushing
+            generator = GenerateAssignment(
+                input_dir=src_path, output_dir=git_service.path, file_pattern="*.ipynb"
+            )
+            generator.force = True
+            self.log.info("Starting GenerateAssignment converter")
+            generator.start()
+            self.log.info("GenerateAssignment conversion done")
+
 
         try:
             if not git_service.is_git():

@@ -38,7 +38,7 @@ paths:
   /lectures/{lect_id}/assignments/{a_id}/submissions:
     $ref: './openapi/paths_grader.yml#/submissions'
 
-  /lectures/{lect_id}/assignments/{a_id}/submissions/{s_id}:
+  /lectures/{lect_id}/assignments/{a_id}/submissions/{s_id}/properties:
     $ref: './openapi/paths_grader.yml#/propertiesSubmission'
 
   /lectures/{lect_id}/assignments/{a_id}/feedback:

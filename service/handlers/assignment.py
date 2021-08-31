@@ -105,3 +105,32 @@ class AssignmentObjectHandler(GraderBaseHandler):
             self.session.commit()
         except ObjectDeletedError:
             raise HTTPError(404)
+
+
+@register_handler(
+    path=r"\/lectures\/(?P<lecture_id>\d*)\/assignments\/(?P<assignment_id>\d*)\/properties\/?"
+)
+class AssignmentPropertiesHandler(GraderBaseHandler):
+    @authorize([Scope.tutor, Scope.instructor])
+    async def get(self, lecture_id: int, assignment_id: int):
+        assignment = self.session.query(Assignment).get(assignment_id)
+        if assignment is None or assignment.deleted == DeleteState.deleted:
+            self.error_message = "Not Found!"
+            raise HTTPError(404)
+        if assignment.properties is not None:
+            self.write(assignment.properties)
+        else:
+            self.error_message = "Not Found!"
+            raise HTTPError(404)
+
+    @authorize([Scope.tutor, Scope.instructor])
+    async def put(self, lecture_id: int, assignment_id: int):
+        assignment = self.session.query(Assignment).get(assignment_id)
+        if assignment is None or assignment.deleted == DeleteState.deleted:
+            self.error_message = "Not Found!"
+            raise HTTPError(404)
+        properties_string: str = self.request.body.decode("utf-8")
+        assignment.properties = properties_string
+        self.session.commit()
+
+        
