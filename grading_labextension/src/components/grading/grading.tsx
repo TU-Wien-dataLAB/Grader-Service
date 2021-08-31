@@ -15,7 +15,6 @@ import { getAllSubmissions } from '../../services/submissions.service';
 import {
   DataGrid,
   GridApi,
-  GridCellParams,
   GridCellValue,
   GridColDef
 } from '@material-ui/data-grid';
@@ -112,7 +111,12 @@ export class GradingComponent extends React.Component<IGradingProps> {
           };
 
           return (
-            <Button icon="highlight" onClick={onClick} outlined>
+            <Button
+              icon="highlight"
+              onClick={onClick}
+              disabled={params.getValue(params.id, 'status') === 'not_graded'}
+              outlined
+            >
               Manualgrade
             </Button>
           );
