@@ -250,3 +250,216 @@ submissions:
           application/json:
             schema:
               $ref: "./schemas.yml#/components/schemas/ErrorMessage"
+
+propertiesAssignment:
+  put:
+    security:
+      - hub_auth:
+        - instructor
+        - tutor
+    summary: Set properties of an assignment
+    tags:
+    - Assignments
+    parameters:
+    - name: lect_id
+      in: path
+      description: ID of the lecture
+      required: true
+      example: 1
+      schema:
+        type: integer
+        format: int64
+    - name: a_id
+      in: path
+      description: ID of the assignment in the lecture
+      required: true
+      example: 2
+      schema:
+        type: integer
+        format: int64
+    requestBody:
+      description: The properties of the assignment that should be set.
+      required: true
+      content:
+        application/json:
+          schema:
+            type: string
+    responses:
+      200:
+        description: OK
+      403:
+        description: Unautorized
+      404:
+        description: Lecture id or assignment id not found.
+        content: 
+          application/json:
+            schema:
+              $ref: "./schemas.yml#/components/schemas/ErrorMessage"
+      500:
+        description: Internal server error
+        content: 
+          application/json:
+            schema:
+              $ref: "./schemas.yml#/components/schemas/ErrorMessage"
+  get:
+    security:
+      - hub_auth:
+        - instructor
+        - tutor
+        - student
+    summary: "Request the assignment to be fetched"
+    tags: 
+    - "Assignments"
+    parameters:
+    - name: lect_id
+      in: path
+      description: ID of the lecture
+      required: true
+      example: 1
+      schema:
+        type: integer
+        format: int64
+    - name: a_id
+      in: path
+      description: ID of the assignment in the lecture
+      required: true
+      example: 2
+      schema:
+        type: integer
+        format: int64
+    responses:
+      200:
+        description: OK
+        content:
+          application/json:
+            schema:
+              type: string
+      403:
+        description: Unautorized
+      404:
+        description: Lecture id or assignment id not found
+        content: 
+          application/json:
+            schema:
+              $ref: "./schemas.yml#/components/schemas/ErrorMessage"
+      500:
+        description: Internal server error
+        content: 
+          application/json:
+            schema:
+              $ref: "./schemas.yml#/components/schemas/ErrorMessage"
+
+
+propertiesSubmission:
+  put:
+    security:
+      - hub_auth:
+        - instructor
+        - tutor
+    summary: Set properties of a submission
+    tags:
+    - Submissions
+    parameters:
+    - name: lect_id
+      in: path
+      description: ID of the lecture
+      required: true
+      example: 1
+      schema:
+        type: integer
+        format: int64
+    - name: a_id
+      in: path
+      description: ID of the assignment in the lecture
+      required: true
+      example: 2
+      schema:
+        type: integer
+        format: int64
+    - name: s_id
+      in: path
+      description: ID of the assignment in the submission
+      required: true
+      example: 3
+      schema:
+        type: integer
+        format: int64
+    requestBody:
+      description: The properties of the submission that should be set.
+      required: true
+      content:
+        application/json:
+          schema:
+            type: string
+    responses:
+      200:
+        description: OK
+      403:
+        description: Unautorized
+      404:
+        description: Lecture id or assignment id not found.
+        content: 
+          application/json:
+            schema:
+              $ref: "./schemas.yml#/components/schemas/ErrorMessage"
+      500:
+        description: Internal server error
+        content: 
+          application/json:
+            schema:
+              $ref: "./schemas.yml#/components/schemas/ErrorMessage"
+  get:
+    security:
+      - hub_auth:
+        - instructor
+        - tutor
+        - student
+    summary: "Request the assignment to be fetched"
+    tags: 
+    - "Submissions"
+    parameters:
+    - name: lect_id
+      in: path
+      description: ID of the lecture
+      required: true
+      example: 1
+      schema:
+        type: integer
+        format: int64
+    - name: a_id
+      in: path
+      description: ID of the assignment in the lecture
+      required: true
+      example: 2
+      schema:
+        type: integer
+        format: int64
+    - name: s_id
+      in: path
+      description: ID of the assignment in the submission
+      required: true
+      example: 3
+      schema:
+        type: integer
+        format: int64
+    responses:
+      200:
+        description: OK
+        content:
+          application/json:
+            schema:
+              type: string
+      403:
+        description: Unautorized
+      404:
+        description: Lecture id or assignment id not found
+        content: 
+          application/json:
+            schema:
+              $ref: "./schemas.yml#/components/schemas/ErrorMessage"
+      500:
+        description: Internal server error
+        content: 
+          application/json:
+            schema:
+              $ref: "./schemas.yml#/components/schemas/ErrorMessage"

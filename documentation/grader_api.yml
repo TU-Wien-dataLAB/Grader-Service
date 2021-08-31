@@ -31,9 +31,15 @@ paths:
   # get id has no query params for grader 
   /lectures/{lect_id}/assignments/{a_id}:
     $ref: './openapi/paths_grader.yml#/assignmentsById'
+  
+  /lectures/{lect_id}/assignments/{a_id}/properties:
+    $ref: './openapi/paths_grader.yml#/propertiesAssignment'
 
   /lectures/{lect_id}/assignments/{a_id}/submissions:
     $ref: './openapi/paths_grader.yml#/submissions'
+
+  /lectures/{lect_id}/assignments/{a_id}/submissions/{s_id}:
+    $ref: './openapi/paths_grader.yml#/propertiesSubmission'
 
   /lectures/{lect_id}/assignments/{a_id}/feedback:
     $ref: './openapi/paths.yml#/feedback'
