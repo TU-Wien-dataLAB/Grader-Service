@@ -9,6 +9,7 @@ from orm.lecture import Lecture, LectureState
 from orm.assignment import Assignment
 from orm.takepart import Role, Scope
 from orm.user import User
+from registry import VersionSpecifier, register_handler
 from request import RequestService
 from main import GraderService
 from server import GraderServer
@@ -35,9 +36,9 @@ def authorize(scopes: List[Scope]):
         @functools.wraps(handler_method)
         async def request_handler_wrapper(self: 'GraderBaseHandler', *args, **kwargs):
             lect_id = self.path_kwargs.get("lecture_id", None)
-            if self.request.path == "/services/grader/permissions":
+            if "/permissions" in self.request.path:
                 return await handler_method(self, *args, **kwargs)
-            if lect_id is None and self.request.path == "/services/grader/lectures" and self.request.method == "POST":
+            if lect_id is None and "/lectures" in self.request.path and self.request.method == "POST":
                 # lecture name and semester is in post body
                 try:
                     data = json_decode(self.request.body)
@@ -51,7 +52,7 @@ def authorize(scopes: List[Scope]):
                 except json.decoder.JSONDecodeError:
                     self.error_message = "Unauthorized"
                     raise HTTPError(403)
-            elif lect_id is None and self.request.path == "/services/grader/lectures" and self.request.method == "GET":
+            elif lect_id is None and  "/lectures" in self.request.path and self.request.method == "GET":
                 return await handler_method(self, *args, **kwargs)
 
             role = self.session.query(Role).get((self.user.name, lect_id))
@@ -260,3 +261,13 @@ def authenticated(
         return method(self, *args, **kwargs)
 
     return wrapper
+
+@register_handler(r"\/", VersionSpecifier.NONE)
+class VersionHandler(GraderBaseHandler):
+    async def get(self):
+        self.write("1.0")
+
+@register_handler(r"\/", VersionSpecifier.V1)
+class VersionHandlerV1(GraderBaseHandler):
+    async def get(self):
+        self.write("1.0")

@@ -2,7 +2,7 @@
 from typing import List, Set, Tuple
 from tornado.web import RequestHandler
 from jupyter_server.utils import url_path_join
-
+import enum
 
 class Singleton(type):
   _instances = {}
@@ -51,7 +51,22 @@ class HandlerPathRegistry(object, metaclass=Singleton):
     HandlerPathRegistry.registry[cls] = path
 
 
-def register_handler(path: str):
+class VersionSpecifier(enum.Enum):
+  ALL = "all"
+  NONE = "none"
+  V1 = "1"
+
+def register_handler(path: str, version_specifier: VersionSpecifier=VersionSpecifier.NONE):
+  if version_specifier == VersionSpecifier.ALL:
+    # only supports single digit versions
+    regex_versions = "".join([v.value for v in VersionSpecifier if v.value not in ['all', 'none']])
+    v = r"(?:\/v[{}])?".format(regex_versions)
+  elif version_specifier == VersionSpecifier.NONE or version_specifier is None:
+    v = ""
+  else:
+    v = r"\/" + f"v{version_specifier.value}"
+  path = v + path
+
   def _register_class(cls):
     HandlerPathRegistry().add(cls, path)
     return cls

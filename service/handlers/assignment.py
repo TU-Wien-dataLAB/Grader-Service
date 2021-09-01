@@ -1,4 +1,4 @@
-from registry import register_handler
+from registry import VersionSpecifier, register_handler
 from handlers.base_handler import GraderBaseHandler, authorize
 from orm.assignment import Assignment
 from orm.base import DeleteState
@@ -10,7 +10,10 @@ import tornado
 from tornado.web import HTTPError
 
 
-@register_handler(path=r"\/lectures\/(?P<lecture_id>\d*)\/assignments\/?")
+@register_handler(
+    path=r"\/lectures\/(?P<lecture_id>\d*)\/assignments\/?",
+    version_specifier=VersionSpecifier.ALL,
+)
 class AssignmentBaseHandler(GraderBaseHandler):
     @authorize([Scope.student, Scope.tutor, Scope.instructor])
     async def get(self, lecture_id: int):
@@ -56,7 +59,8 @@ class AssignmentBaseHandler(GraderBaseHandler):
 
 
 @register_handler(
-    path=r"\/lectures\/(?P<lecture_id>\d*)\/assignments\/(?P<assignment_id>\d*)\/?"
+    path=r"\/lectures\/(?P<lecture_id>\d*)\/assignments\/(?P<assignment_id>\d*)\/?",
+    version_specifier=VersionSpecifier.ALL,
 )
 class AssignmentObjectHandler(GraderBaseHandler):
     @authorize([Scope.instructor])
@@ -108,7 +112,8 @@ class AssignmentObjectHandler(GraderBaseHandler):
 
 
 @register_handler(
-    path=r"\/lectures\/(?P<lecture_id>\d*)\/assignments\/(?P<assignment_id>\d*)\/properties\/?"
+    path=r"\/lectures\/(?P<lecture_id>\d*)\/assignments\/(?P<assignment_id>\d*)\/properties\/?",
+    version_specifier=VersionSpecifier.ALL,
 )
 class AssignmentPropertiesHandler(GraderBaseHandler):
     @authorize([Scope.tutor, Scope.instructor])
@@ -132,5 +137,3 @@ class AssignmentPropertiesHandler(GraderBaseHandler):
         properties_string: str = self.request.body.decode("utf-8")
         assignment.properties = properties_string
         self.session.commit()
-
-        

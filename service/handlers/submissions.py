@@ -1,4 +1,4 @@
-from registry import register_handler
+from registry import VersionSpecifier, register_handler
 from handlers.base_handler import GraderBaseHandler, authorize
 from orm.assignment import Assignment
 from orm.base import DeleteState
@@ -11,7 +11,8 @@ from tornado.httpclient import HTTPError
 
 
 @register_handler(
-    path=r"\/lectures\/(?P<lecture_id>\d*)\/assignments\/(?P<assignment_id>\d*)\/submissions\/?"
+    path=r"\/lectures\/(?P<lecture_id>\d*)\/assignments\/(?P<assignment_id>\d*)\/submissions\/?",
+    version_specifier=VersionSpecifier.ALL,
 )
 class SubmissionHandler(GraderBaseHandler):
     @authorize([Scope.student, Scope.tutor, Scope.instructor])
@@ -101,7 +102,8 @@ class SubmissionHandler(GraderBaseHandler):
 
 
 @register_handler(
-    path=r"\/lectures\/(?P<lecture_id>\d*)\/assignments\/(?P<assignment_id>\d*)\/feedback\/?"
+    path=r"\/lectures\/(?P<lecture_id>\d*)\/assignments\/(?P<assignment_id>\d*)\/feedback\/?",
+    version_specifier=VersionSpecifier.ALL,
 )
 class FeedbackHandler(GraderBaseHandler):
     @authorize([Scope.student, Scope.tutor, Scope.instructor])
@@ -112,7 +114,8 @@ class FeedbackHandler(GraderBaseHandler):
 
 
 @register_handler(
-    path=r"\/lectures\/(?P<lecture_id>\d*)\/assignments\/(?P<assignment_id>\d*)\/feedback\/(?P<feedback_id>\d*)\/?"
+    path=r"\/lectures\/(?P<lecture_id>\d*)\/assignments\/(?P<assignment_id>\d*)\/feedback\/(?P<feedback_id>\d*)\/?",
+    version_specifier=VersionSpecifier.ALL,
 )
 class FeedbackObjectHandler(GraderBaseHandler):
     @authorize([Scope.student, Scope.tutor, Scope.instructor])
@@ -121,7 +124,8 @@ class FeedbackObjectHandler(GraderBaseHandler):
 
 
 @register_handler(
-    path=r"\/lectures\/(?P<lecture_id>\d*)\/assignments\/(?P<assignment_id>\d*)\/submissions\/(?P<submission_id>\d*)\/properties\/?"
+    path=r"\/lectures\/(?P<lecture_id>\d*)\/assignments\/(?P<assignment_id>\d*)\/submissions\/(?P<submission_id>\d*)\/properties\/?",
+    version_specifier=VersionSpecifier.ALL,
 )
 class SubmissionPropertiesHandler(GraderBaseHandler):
     @authorize([Scope.tutor, Scope.instructor])
