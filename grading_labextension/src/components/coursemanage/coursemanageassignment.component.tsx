@@ -121,15 +121,19 @@ export class CourseManageAssignmentComponent extends React.Component<
     console.log('Opening terminal at: ' + path.replace(" ", "\\ "));
     let args = {}
     if (this.terminalSession !== null && this.terminalSession.connectionStatus === 'connected') {
-      args = {name: this.terminalSession.name}
+      args = { name: this.terminalSession.name }
     }
     const main = (await GlobalObjects.commands.execute(
       'terminal:open', args
     )) as MainAreaWidget<ITerminal.ITerminal>;
 
-    const terminal = main.content;
+    if (main) {
+      const terminal = main.content;
+      this.terminalSession = terminal.session
+    }
+
     try {
-      terminal.session.send({
+      this.terminalSession.send({
         type: 'stdin',
         content: [
           'cd ' + path.replace(" ", "\\ ") + '\n'
@@ -139,8 +143,6 @@ export class CourseManageAssignmentComponent extends React.Component<
       console.error(e);
       main.dispose();
     }
-    this.terminalSession = terminal.session
-    console.log(terminal.session)
   }
 
   private openFile(path: string) {
