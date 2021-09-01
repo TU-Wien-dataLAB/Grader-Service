@@ -18,6 +18,9 @@ import { InputDialog as LabInputDialog } from '@jupyterlab/apputils/lib/inputdia
 import { DirListing } from '@jupyterlab/filebrowser/lib/listing';
 import { FilterFileBrowserModel } from '@jupyterlab/filebrowser/lib/model';
 import { ExistingNodeRenderer } from '../assignments/assignment.component';
+import { ITerminal } from '@jupyterlab/terminal';
+import { Terminal } from '@jupyterlab/services';
+import { MainAreaWidget } from '@jupyterlab/apputils';
 
 export interface AssignmentProps {
   index: number;
@@ -48,6 +51,7 @@ export class CourseManageAssignmentComponent extends React.Component<
   };
   public dirListingNode: HTMLElement;
   public dirListing: DirListing;
+  public terminalSession: Terminal.ITerminalConnection = null;
 
   constructor(props: AssignmentProps) {
     super(props);
@@ -111,6 +115,33 @@ export class CourseManageAssignmentComponent extends React.Component<
     this.setState({ isOpen: !this.state.isOpen });
     this.dirListing.update();
   };
+
+  private async openTerminal() {
+    const path = `~/source/${this.lecture.code}/${this.state.assignment.name}`;
+    console.log('Opening terminal at: ' + path.replace(" ", "\\ "));
+    let args = {}
+    if (this.terminalSession !== null && this.terminalSession.connectionStatus === 'connected') {
+      args = {name: this.terminalSession.name}
+    }
+    const main = (await GlobalObjects.commands.execute(
+      'terminal:open', args
+    )) as MainAreaWidget<ITerminal.ITerminal>;
+
+    const terminal = main.content;
+    try {
+      terminal.session.send({
+        type: 'stdin',
+        content: [
+          'cd ' + path.replace(" ", "\\ ") + '\n'
+        ]
+      });
+    } catch (e) {
+      console.error(e);
+      main.dispose();
+    }
+    this.terminalSession = terminal.session
+    console.log(terminal.session)
+  }
 
   private openFile(path: string) {
     console.log('Opening file: ' + path);
@@ -282,9 +313,8 @@ export class CourseManageAssignmentComponent extends React.Component<
               <Icon
                 icon="chevron-right"
                 iconSize={this.iconSize}
-                className={`collapse-icon-small ${
-                  this.state.isOpen ? 'collapse-icon-small-open' : ''
-                }`}
+                className={`collapse-icon-small ${this.state.isOpen ? 'collapse-icon-small-open' : ''
+                  }`}
               ></Icon>
               <Icon
                 icon="inbox"
@@ -376,6 +406,14 @@ export class CourseManageAssignmentComponent extends React.Component<
               className="assignment-button"
             >
               Add File
+            </Button>
+            <Button
+              icon="console"
+              outlined
+              onClick={() => this.openTerminal()}
+              className="assignment-button"
+            >
+              Open in Terminal
             </Button>
           </Collapse>
         </div>
