@@ -247,9 +247,6 @@ class GraderService(config.Application):
         git_path = os.path.join(path, "git")
         if not os.path.isdir(git_path):
             os.mkdir(git_path)
-        archive_path = os.path.join(path, "archive")
-        if not os.path.isdir(archive_path):
-            os.mkdir(archive_path)
 
 
 main = GraderService.launch_instance

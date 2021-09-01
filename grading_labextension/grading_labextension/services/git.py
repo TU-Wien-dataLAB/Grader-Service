@@ -68,10 +68,8 @@ class GitService(Configurable):
     def pull(self, origin: str, force=False):
         if force:
             self.log.info(f"Pulling remote {origin}")
-            self._run_command(f'sh -c "git clean -fd && git fetch --all && git reset --hard {origin}/main"',cwd=self.path)
-            #self._run_command(f"git clean -fd", cwd=self.path)
-            #self._run_command(f"git fetch --all", cwd=self.path)
-            #self._run_command(f"git reset --hard {origin}/main", cwd=self.path)
+            # self._run_command(f'sh -c "git clean -fd && git fetch --all && git reset --hard {origin}/main"',cwd=self.path)
+            self._run_command(f'sh -c "git fetch --all && git reset --mixed {origin}/main"',cwd=self.path)
         else:
             self._run_command(f"git pull {origin} main", cwd=self.path)
 
@@ -150,7 +148,6 @@ class GitService(Configurable):
             if capture_output:
                 return None
             else:
-                
                 raise GitError(str(e.stdout, 'utf-8') + str(e.stderr, 'utf-8'))
         except FileNotFoundError as e:
             raise GitError(e.strerror)
