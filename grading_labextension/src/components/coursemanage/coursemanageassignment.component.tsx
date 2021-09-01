@@ -109,6 +109,7 @@ export class CourseManageAssignmentComponent extends React.Component<
   private toggleOpen = () => {
     console.log('toggle assignment header');
     this.setState({ isOpen: !this.state.isOpen });
+    this.dirListing.update();
   };
 
   private openFile(path: string) {
@@ -163,6 +164,7 @@ export class CourseManageAssignmentComponent extends React.Component<
     }
 
     pullAssignment(this.lecture.id, this.state.assignment.id, 'source');
+    this.dirListing.update();
   }
 
   private async releaseAssignment() {
@@ -190,9 +192,9 @@ export class CourseManageAssignmentComponent extends React.Component<
     );
   }
 
-  private async createFile(notebook: boolean = true) {
+  private async createFile(notebook = true) {
     let result: Dialog.IResult<string>;
-    let filename: string = ';';
+    let filename = ';';
     if (notebook) {
       result = await InputDialog.getText({ title: 'Notebook name' });
 
