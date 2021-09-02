@@ -35,6 +35,7 @@ export interface AssignmentState {
   isOpen: boolean;
   submissions: { user: User; submissions: Submission[] }[];
   assignment: Assignment;
+  showSource: boolean;
 }
 
 export class CourseManageAssignmentComponent extends React.Component<
@@ -48,7 +49,8 @@ export class CourseManageAssignmentComponent extends React.Component<
   public state = {
     isOpen: false,
     submissions: new Array<{ user: User; submissions: Submission[] }>(),
-    assignment: {} as Assignment
+    assignment: {} as Assignment,
+    showSource: true
   };
   public dirListingNode: HTMLElement;
   public dirListing: DirListing;
@@ -85,9 +87,7 @@ export class CourseManageAssignmentComponent extends React.Component<
     const LISTING_CLASS = 'jp-FileBrowser-listing';
     this.dirListing = new DirListing({ model, renderer });
     this.dirListing.addClass(LISTING_CLASS);
-    await model.cd('source');
-    await model.cd(this.lecture.code);
-    await model.cd(this.state.assignment.name);
+    await model.cd(`source/${this.lecture.code}/${this.state.assignment.name}`);
     this.dirListingNode.onclick = async ev => {
       let model = this.dirListing.modelForClick(ev);
       if (model == undefined) {
@@ -112,13 +112,12 @@ export class CourseManageAssignmentComponent extends React.Component<
   }
 
   private toggleOpen = () => {
-    console.log('toggle assignment header');
     this.setState({ isOpen: !this.state.isOpen });
     this.dirListing.update();
   };
 
   private async openTerminal() {
-    const path = `~/source/${this.lecture.code}/${this.state.assignment.name}`;
+    const path = `~/${this.getRootDir(this.state.showSource)}/${this.lecture.code}/${this.state.assignment.name}`;
     console.log('Opening terminal at: ' + path.replace(" ", "\\ "));
     let args = {}
     if (this.terminalSession !== null && this.terminalSession.connectionStatus === 'connected') {
@@ -147,13 +146,22 @@ export class CourseManageAssignmentComponent extends React.Component<
   }
 
   private async openBrowser() {
-    const path = `source/${this.lecture.code}/${this.state.assignment.name}`;
+    const path = `${this.getRootDir(this.state.showSource)}/${this.lecture.code}/${this.state.assignment.name}`;
     GlobalObjects.commands.execute('filebrowser:go-to-path', {
       path
     })
       .catch(error => {
         showErrorMessage('Error showing in File Browser', error);
       });
+  }
+
+  private async switchRoot() {
+    if (this.state.showSource) { // switching to release
+      await pullAssignment(this.lecture.id, this.state.assignment.id, 'release');
+    }
+    let path = `/${this.getRootDir(!this.state.showSource)}/${this.lecture.code}/${this.state.assignment.name}`
+    await this.dirListing.model.cd(path);
+    this.setState({ showSource: !this.state.showSource });
   }
 
   private openFile(path: string) {
@@ -179,6 +187,10 @@ export class CourseManageAssignmentComponent extends React.Component<
       .catch(error => {
         showErrorMessage('Error Opening Submission View', error);
       });
+  }
+
+  private getRootDir(source: boolean): string {
+    return source ? "source" : "release"
   }
 
   private async pushAssignment() {
@@ -333,7 +345,7 @@ export class CourseManageAssignmentComponent extends React.Component<
                 iconSize={this.iconSize}
                 className="flavor-icon"
               ></Icon>
-              {this.state.assignment.name} Source Files
+              {this.state.assignment.name} {this.state.showSource ? "Source" : "Release"} Files
             </span>
 
             <span className="button-list">
@@ -434,6 +446,14 @@ export class CourseManageAssignmentComponent extends React.Component<
               className="assignment-button"
             >
               Reveal in File Browser
+            </Button>
+            <Button
+              icon="switch"
+              outlined
+              onClick={() => this.switchRoot()}
+              className="assignment-button"
+            >
+              Switch to {!this.state.showSource ? "Source" : "Release"} View
             </Button>
           </Collapse>
         </div>
