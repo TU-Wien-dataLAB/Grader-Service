@@ -21,6 +21,7 @@ import { ExistingNodeRenderer } from '../assignments/assignment.component';
 import { ITerminal } from '@jupyterlab/terminal';
 import { Terminal } from '@jupyterlab/services';
 import { MainAreaWidget } from '@jupyterlab/apputils';
+import { localToUTC } from '../../services/datetime.service';
 
 export interface AssignmentProps {
   index: number;
@@ -295,7 +296,7 @@ export class CourseManageAssignmentComponent extends React.Component<
     if (date.value === '') {
       this.state.assignment.due_date = null;
     } else {
-      this.state.assignment.due_date = date.value;
+      this.state.assignment.due_date = localToUTC(date.value);
     }
 
     if (type.value === 'user') {
