@@ -11,7 +11,7 @@ from tornado.process import Subprocess
 from tornado.ioloop import IOLoop
 from tornado.httpserver import HTTPServer
 import shlex
-from registry import register_handler
+from registry import VersionSpecifier, register_handler
 from handlers.base_handler import GraderBaseHandler, authenticated
 import os
 import subprocess
@@ -148,7 +148,7 @@ class GitBaseHandler(GraderBaseHandler):
         return gitdir
 
 
-@register_handler(path="/.*/git-(.*)")
+@register_handler(path="/.*/git-(.*)", version_specifier=VersionSpecifier.NONE)
 @stream_request_body
 class RPCHandler(GitBaseHandler):
     """Request handler for RPC calls
@@ -223,7 +223,7 @@ class RPCHandler(GitBaseHandler):
             self.finish()
 
 
-@register_handler(path="/.*/info/refs")
+@register_handler(path="/.*/info/refs", version_specifier=VersionSpecifier.NONE)
 class InfoRefsHandler(GitBaseHandler):
     """Request handler for info/refs
 

@@ -18,6 +18,10 @@ import { InputDialog as LabInputDialog } from '@jupyterlab/apputils/lib/inputdia
 import { DirListing } from '@jupyterlab/filebrowser/lib/listing';
 import { FilterFileBrowserModel } from '@jupyterlab/filebrowser/lib/model';
 import { ExistingNodeRenderer } from '../assignments/assignment.component';
+import { ITerminal } from '@jupyterlab/terminal';
+import { Terminal } from '@jupyterlab/services';
+import { MainAreaWidget } from '@jupyterlab/apputils';
+import { localToUTC } from '../../services/datetime.service';
 
 export interface AssignmentProps {
   index: number;
@@ -48,6 +52,7 @@ export class CourseManageAssignmentComponent extends React.Component<
   };
   public dirListingNode: HTMLElement;
   public dirListing: DirListing;
+  public terminalSession: Terminal.ITerminalConnection = null;
 
   constructor(props: AssignmentProps) {
     super(props);
@@ -112,6 +117,45 @@ export class CourseManageAssignmentComponent extends React.Component<
     this.dirListing.update();
   };
 
+  private async openTerminal() {
+    const path = `~/source/${this.lecture.code}/${this.state.assignment.name}`;
+    console.log('Opening terminal at: ' + path.replace(" ", "\\ "));
+    let args = {}
+    if (this.terminalSession !== null && this.terminalSession.connectionStatus === 'connected') {
+      args = { name: this.terminalSession.name }
+    }
+    const main = (await GlobalObjects.commands.execute(
+      'terminal:open', args
+    )) as MainAreaWidget<ITerminal.ITerminal>;
+
+    if (main) {
+      const terminal = main.content;
+      this.terminalSession = terminal.session
+    }
+
+    try {
+      this.terminalSession.send({
+        type: 'stdin',
+        content: [
+          'cd ' + path.replace(" ", "\\ ") + '\n'
+        ]
+      });
+    } catch (e) {
+      console.error(e);
+      main.dispose();
+    }
+  }
+
+  private async openBrowser() {
+    const path = `source/${this.lecture.code}/${this.state.assignment.name}`;
+    GlobalObjects.commands.execute('filebrowser:go-to-path', {
+      path
+    })
+      .catch(error => {
+        showErrorMessage('Error showing in File Browser', error);
+      });
+  }
+
   private openFile(path: string) {
     console.log('Opening file: ' + path);
     GlobalObjects.commands
@@ -148,8 +192,6 @@ export class CourseManageAssignmentComponent extends React.Component<
     }
 
     pushAssignment(this.lecture.id, this.state.assignment.id, 'source');
-
-    // TODO: remove push to release, only for test purposes before nbconvert works
     pushAssignment(this.lecture.id, this.state.assignment.id, 'release');
   }
 
@@ -164,6 +206,7 @@ export class CourseManageAssignmentComponent extends React.Component<
     }
 
     pullAssignment(this.lecture.id, this.state.assignment.id, 'source');
+    pullAssignment(this.lecture.id, this.state.assignment.id, 'release');
     this.dirListing.update();
   }
 
@@ -253,7 +296,7 @@ export class CourseManageAssignmentComponent extends React.Component<
     if (date.value === '') {
       this.state.assignment.due_date = null;
     } else {
-      this.state.assignment.due_date = date.value;
+      this.state.assignment.due_date = localToUTC(date.value);
     }
 
     if (type.value === 'user') {
@@ -282,9 +325,8 @@ export class CourseManageAssignmentComponent extends React.Component<
               <Icon
                 icon="chevron-right"
                 iconSize={this.iconSize}
-                className={`collapse-icon-small ${
-                  this.state.isOpen ? 'collapse-icon-small-open' : ''
-                }`}
+                className={`collapse-icon-small ${this.state.isOpen ? 'collapse-icon-small-open' : ''
+                  }`}
               ></Icon>
               <Icon
                 icon="inbox"
@@ -376,6 +418,22 @@ export class CourseManageAssignmentComponent extends React.Component<
               className="assignment-button"
             >
               Add File
+            </Button>
+            <Button
+              icon="console"
+              outlined
+              onClick={() => this.openTerminal()}
+              className="assignment-button"
+            >
+              Open in Terminal
+            </Button>
+            <Button
+              icon="folder-open"
+              outlined
+              onClick={() => this.openBrowser()}
+              className="assignment-button"
+            >
+              Reveal in File Browser
             </Button>
           </Collapse>
         </div>

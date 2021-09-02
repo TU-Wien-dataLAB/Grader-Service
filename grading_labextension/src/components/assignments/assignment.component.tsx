@@ -13,6 +13,7 @@ import { Lecture } from '../../model/lecture';
 import { DirListing } from '@jupyterlab/filebrowser/lib/listing'
 import { FilterFileBrowserModel } from '@jupyterlab/filebrowser/lib/model';
 import { DeadlineComponent } from './deadline.component';
+import { utcToLocalFormat } from '../../services/datetime.service';
 
 export interface AssignmentProps {
   index: number;
@@ -180,7 +181,7 @@ export class AssignmentComponent extends React.Component<AssignmentProps> {
         {this.state.submissions.map((submission, i) =>
           <div className="submission-element" >
             <Icon icon={IconNames.FORM} iconSize={this.iconSize} className="flavor-icon"></Icon>
-            {submission.submitted_at}
+            {utcToLocalFormat(submission.submitted_at)}
             {submission.status != "not_graded" ?
               <Button className="assignment-button" icon={IconNames.CLOUD_DOWNLOAD} active={true} outlined={true} intent={Intent.PRIMARY} small={true}>
                 Fetch Feedback

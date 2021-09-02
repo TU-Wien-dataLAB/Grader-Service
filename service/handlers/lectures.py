@@ -1,5 +1,5 @@
 from api.models.error_message import ErrorMessage
-from registry import register_handler
+from registry import VersionSpecifier, register_handler
 from orm.lecture import Lecture, LectureState
 from orm.user import User
 from orm.takepart import Role, Scope
@@ -13,7 +13,7 @@ from tornado.httpclient import HTTPError
 from sqlalchemy.orm.exc import MultipleResultsFound, NoResultFound, ObjectDeletedError
 
 
-@register_handler(path=r"\/lectures\/?")
+@register_handler(r"\/lectures\/?", VersionSpecifier.ALL)
 class LectureBaseHandler(GraderBaseHandler):
     @authorize([Scope.student, Scope.tutor, Scope.instructor])
     async def get(self):
@@ -57,7 +57,7 @@ class LectureBaseHandler(GraderBaseHandler):
         self.write_json(lecture)
 
 
-@register_handler(path=r"\/lectures\/(?P<lecture_id>\d*)\/?")
+@register_handler(r"\/lectures\/(?P<lecture_id>\d*)\/?", VersionSpecifier.ALL)
 class LectureObjectHandler(GraderBaseHandler):
     @authorize([Scope.instructor])
     async def put(self, lecture_id: int):
