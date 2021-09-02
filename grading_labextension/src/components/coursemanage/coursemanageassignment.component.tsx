@@ -157,7 +157,7 @@ export class CourseManageAssignmentComponent extends React.Component<
 
   private async switchRoot() {
     if (this.state.showSource) { // switching to release
-      await pullAssignment(this.lecture.id, this.state.assignment.id, 'release');
+      await pullAssignment(this.lecture.id, this.state.assignment.id, 'release').toPromise();
     }
     let path = `/${this.getRootDir(!this.state.showSource)}/${this.lecture.code}/${this.state.assignment.name}`
     await this.dirListing.model.cd(path);
