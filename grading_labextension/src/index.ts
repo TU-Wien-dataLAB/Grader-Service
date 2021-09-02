@@ -19,9 +19,8 @@ import { INotebookTracker } from '@jupyterlab/notebook';
 
 import { CellWidget } from './create-assignment/cellwidget';
 
-import { BoxPanel, PanelLayout } from '@lumino/widgets';
+import { PanelLayout } from '@lumino/widgets';
 
-import { CreateAssignmentWidget } from './create-assignment/extension';
 import { CreationmodeSwitch } from './create-assignment/slider';
 
 import { checkIcon, editIcon } from '@jupyterlab/ui-components';
@@ -103,20 +102,8 @@ const extension: JupyterFrontEndPlugin<void> = {
     GlobalObjects.browserFactory = browserFactory;
     GlobalObjects.tracker = tracker;
 
-    //Creation of the sidepanel widget for create assignment
-    console.log('Activating extension "create_assignment".');
-    const panel = new BoxPanel();
-    const createAssignmentWidget = new CreateAssignmentWidget(tracker);
-    panel.addWidget(createAssignmentWidget);
-    panel.id = 'nbgrader-create_assignemnt';
-    panel.title.label = 'Create Assignment';
-    panel.title.caption = 'nbgrader Create Assignment';
-    app.shell.add(panel, 'right');
-    console.log('Extension "create_assignment" activated.');
-
     //Creation of in-cell widget for create assignment
     let connectTrackerSignals = (tracker: INotebookTracker) => {
-
       tracker.currentChanged.connect(async () => {
         const notebookPanel = tracker.currentWidget;
         const notebook: Notebook = tracker.currentWidget.content;
@@ -171,7 +158,7 @@ const extension: JupyterFrontEndPlugin<void> = {
           (cell.layout as PanelLayout).insertWidget(0, new CellWidget(cell));
         }
       });
-    }
+    };
 
     /* ##### Course Manage View Widget ##### */
     let command: string = CourseManageCommandIDs.create;

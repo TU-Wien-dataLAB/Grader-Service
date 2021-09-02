@@ -78,8 +78,8 @@ export class CourseManageAssignmentComponent extends React.Component<
       });
     }
     console.log('dirListingNode: ' + this.dirListingNode);
-    let renderer = new ExistingNodeRenderer(this.dirListingNode);
-    let model = new FilterFileBrowserModel({
+    const renderer = new ExistingNodeRenderer(this.dirListingNode);
+    const model = new FilterFileBrowserModel({
       auto: true,
       manager: GlobalObjects.docManager
     });
@@ -89,7 +89,7 @@ export class CourseManageAssignmentComponent extends React.Component<
     this.dirListing.addClass(LISTING_CLASS);
     await model.cd(`source/${this.lecture.code}/${this.state.assignment.name}`);
     this.dirListingNode.onclick = async ev => {
-      let model = this.dirListing.modelForClick(ev);
+      const model = this.dirListing.modelForClick(ev);
       if (model == undefined) {
         this.dirListing.handleEvent(ev);
         return;
@@ -102,7 +102,7 @@ export class CourseManageAssignmentComponent extends React.Component<
       }
     };
     this.dirListingNode.ondblclick = ev => {
-      let model = this.dirListing.modelForClick(ev);
+      const model = this.dirListing.modelForClick(ev);
       this.openFile(model.path);
     };
     this.dirListingNode.oncontextmenu = ev => {
@@ -194,7 +194,7 @@ export class CourseManageAssignmentComponent extends React.Component<
   }
 
   private async pushAssignment() {
-    let result = await showDialog({
+    const result = await showDialog({
       title: 'Push Assignment',
       body: `Do you want to push ${this.state.assignment.name}? This updates the state of the assignment on the server with your local state.`,
       buttons: [Dialog.cancelButton(), Dialog.okButton({ label: 'Push' })]
@@ -208,7 +208,7 @@ export class CourseManageAssignmentComponent extends React.Component<
   }
 
   private async pullAssignment() {
-    let result = await showDialog({
+    const result = await showDialog({
       title: 'Pull Assignment',
       body: `Do you want to pull ${this.state.assignment.name}? This updates your assignment with the state of the server.`,
       buttons: [Dialog.cancelButton(), Dialog.okButton({ label: 'Pull' })]
@@ -269,7 +269,7 @@ export class CourseManageAssignmentComponent extends React.Component<
   }
 
   private async delete() {
-    let result = await showDialog({
+    const result = await showDialog({
       title: 'Release Assignment',
       body: `Do you want to delete ${this.state.assignment.name}? This can NOT be undone!`,
       buttons: [Dialog.cancelButton(), Dialog.warnButton({ label: 'Delete' })]
@@ -283,20 +283,20 @@ export class CourseManageAssignmentComponent extends React.Component<
   }
 
   private async editAssignment() {
-    let name: Dialog.IResult<string> = await LabInputDialog.getText({
+    const name: Dialog.IResult<string> = await LabInputDialog.getText({
       title: 'Assignment name',
       placeholder: this.state.assignment.name
     });
     if (!name.button.accept) {
       return;
     }
-    let date: Dialog.IResult<string> = await InputDialog.getDate({
+    const date: Dialog.IResult<string> = await InputDialog.getDate({
       title: 'Input Deadline'
     });
     if (!date.button.accept) {
       return;
     }
-    let type: Dialog.IResult<string> = await LabInputDialog.getItem({
+    const type: Dialog.IResult<string> = await LabInputDialog.getItem({
       title: 'Assignment Type',
       items: ['user', 'group'],
       current: this.state.assignment.type === Assignment.TypeEnum.User ? 0 : 1
