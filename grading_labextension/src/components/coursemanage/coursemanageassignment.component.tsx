@@ -145,6 +145,16 @@ export class CourseManageAssignmentComponent extends React.Component<
     }
   }
 
+  private async openBrowser() {
+    const path = `source/${this.lecture.code}/${this.state.assignment.name}`;
+    GlobalObjects.commands.execute('filebrowser:go-to-path', {
+      path
+    })
+      .catch(error => {
+        showErrorMessage('Error showing in File Browser', error);
+      });
+  }
+
   private openFile(path: string) {
     console.log('Opening file: ' + path);
     GlobalObjects.commands
@@ -181,8 +191,6 @@ export class CourseManageAssignmentComponent extends React.Component<
     }
 
     pushAssignment(this.lecture.id, this.state.assignment.id, 'source');
-
-    // TODO: remove push to release, only for test purposes before nbconvert works
     pushAssignment(this.lecture.id, this.state.assignment.id, 'release');
   }
 
@@ -197,6 +205,7 @@ export class CourseManageAssignmentComponent extends React.Component<
     }
 
     pullAssignment(this.lecture.id, this.state.assignment.id, 'source');
+    pullAssignment(this.lecture.id, this.state.assignment.id, 'release');
     this.dirListing.update();
   }
 
@@ -416,6 +425,14 @@ export class CourseManageAssignmentComponent extends React.Component<
               className="assignment-button"
             >
               Open in Terminal
+            </Button>
+            <Button
+              icon="folder-open"
+              outlined
+              onClick={() => this.openBrowser()}
+              className="assignment-button"
+            >
+              Reveal in File Browser
             </Button>
           </Collapse>
         </div>
