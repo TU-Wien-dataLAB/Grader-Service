@@ -119,26 +119,28 @@ export class CourseManageAssignmentComponent extends React.Component<
 
   private async openTerminal() {
     const path = `~/source/${this.lecture.code}/${this.state.assignment.name}`;
-    console.log('Opening terminal at: ' + path.replace(" ", "\\ "));
-    let args = {}
-    if (this.terminalSession !== null && this.terminalSession.connectionStatus === 'connected') {
-      args = { name: this.terminalSession.name }
+    console.log('Opening terminal at: ' + path.replace(' ', '\\ '));
+    let args = {};
+    if (
+      this.terminalSession !== null &&
+      this.terminalSession.connectionStatus === 'connected'
+    ) {
+      args = { name: this.terminalSession.name };
     }
     const main = (await GlobalObjects.commands.execute(
-      'terminal:open', args
+      'terminal:open',
+      args
     )) as MainAreaWidget<ITerminal.ITerminal>;
 
     if (main) {
       const terminal = main.content;
-      this.terminalSession = terminal.session
+      this.terminalSession = terminal.session;
     }
 
     try {
       this.terminalSession.send({
         type: 'stdin',
-        content: [
-          'cd ' + path.replace(" ", "\\ ") + '\n'
-        ]
+        content: ['cd ' + path.replace(' ', '\\ ') + '\n']
       });
     } catch (e) {
       console.error(e);
@@ -148,9 +150,10 @@ export class CourseManageAssignmentComponent extends React.Component<
 
   private async openBrowser() {
     const path = `source/${this.lecture.code}/${this.state.assignment.name}`;
-    GlobalObjects.commands.execute('filebrowser:go-to-path', {
-      path
-    })
+    GlobalObjects.commands
+      .execute('filebrowser:go-to-path', {
+        path
+      })
       .catch(error => {
         showErrorMessage('Error showing in File Browser', error);
       });
@@ -325,8 +328,9 @@ export class CourseManageAssignmentComponent extends React.Component<
               <Icon
                 icon="chevron-right"
                 iconSize={this.iconSize}
-                className={`collapse-icon-small ${this.state.isOpen ? 'collapse-icon-small-open' : ''
-                  }`}
+                className={`collapse-icon-small ${
+                  this.state.isOpen ? 'collapse-icon-small-open' : ''
+                }`}
               ></Icon>
               <Icon
                 icon="inbox"
