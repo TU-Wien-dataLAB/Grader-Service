@@ -68,8 +68,8 @@ class GitService(Configurable):
     def pull(self, origin: str, force=False):
         if force:
             self.log.info(f"Pulling remote {origin}")
-            # self._run_command(f'sh -c "git clean -fd && git fetch --all && git reset --hard {origin}/main"',cwd=self.path)
-            self._run_command(f'sh -c "git fetch --all && git reset --mixed {origin}/main"',cwd=self.path)
+            self._run_command(f'sh -c "git clean -fd && git fetch --all && git reset --hard {origin}/main"',cwd=self.path)
+            #self._run_command(f'sh -c "git fetch --all && git reset --mixed {origin}/main"',cwd=self.path)
         else:
             self._run_command(f"git pull {origin} main", cwd=self.path)
 
