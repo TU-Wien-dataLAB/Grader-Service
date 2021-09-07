@@ -204,7 +204,7 @@ export class AssignmentComponent extends React.Component<AssignmentProps> {
                 className="flavor-icon"
               ></Icon>
               {utcToLocalFormat(submission.submitted_at)}
-              {submission.status != 'not_graded' ? (
+              {/* {submission.auto_status != 'not_graded' || submission.manual_status != 'not_graded' ? (
                 <Button
                   className="assignment-button"
                   icon={IconNames.CLOUD_DOWNLOAD}
@@ -215,7 +215,7 @@ export class AssignmentComponent extends React.Component<AssignmentProps> {
                 >
                   Fetch Feedback
                 </Button>
-              ) : null}
+              ) : null} */}
               {i != this.state.submissions.length - 1 ? <Divider /> : null}
             </div>
           ))}

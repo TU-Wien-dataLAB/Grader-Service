@@ -8,11 +8,12 @@ class Submission(Base, Serializable):
     __tablename__ = "submission"
     id = Column(Integer, primary_key=True, autoincrement=True)
     date = Column(DateTime, nullable=False)
-    status = Column(
-        Enum("submitting", "not_graded", "automatically_graded", "manually_graded"),
+    auto_status = Column(
+        Enum("pending", "not_graded", "automatically_graded"),
         default="submitting",
         nullable=False,
     )
+    manual_status = Column(Enum("not_graded", "manually_graded"))
     score = Column(Integer, nullable=True)
     assignid = Column(Integer, ForeignKey("assignment.id"))
     username = Column(String(255), ForeignKey("user.name"))
@@ -29,7 +30,8 @@ class Submission(Base, Serializable):
             submitted_at=None
             if self.date is None
             else (self.date.isoformat("T", "milliseconds") + "Z"),
-            status=self.status,
+            auto_status=self.auto_status,
+            manual_status=self.manual_status,
             score=self.score,
             commit_hash=self.commit_hash
         )

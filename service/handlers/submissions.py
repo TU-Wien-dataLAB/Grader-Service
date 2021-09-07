@@ -94,7 +94,8 @@ class SubmissionHandler(GraderBaseHandler):
         sub.date = sub_model.submitted_at
         sub.assignid = assignment_id
         sub.username = self.user.name
-        sub.status = sub_model.status
+        sub.auto_status = sub_model.auto_status
+        sub.manual_status = sub_model.manual_status
 
         self.session.add(sub)
         self.session.commit()

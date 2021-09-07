@@ -14,18 +14,24 @@
 export interface Submission { 
     id?: number;
     submitted_at?: string;
-    status?: Submission.StatusEnum;
+    auto_status?: Submission.Auto_StatusEnum;
+    manual_status?: Submission.Manual_StatusEnum;
     score?: number;
     commit_hash?: string;
 }
 export namespace Submission {
-    export type StatusEnum = 'submitting' | 'not_graded' | 'automatically_graded' | 'manually_graded';
-    export const StatusEnum = {
-        Submitting: 'submitting' as StatusEnum,
-        NotGraded: 'not_graded' as StatusEnum,
-        AutomaticallyGraded: 'automatically_graded' as StatusEnum,
-        ManuallyGraded: 'manually_graded' as StatusEnum
+    export type Auto_StatusEnum = 'not_graded' | 'automatically_graded' | 'pending';
+    export type Manual_StatusEnum = 'not_graded' | 'manually_graded';
+    export const Auto_StatusEnum = {
+        NotGraded: 'not_graded' as Auto_StatusEnum,
+        AutomaticallyGraded: 'automatically_graded' as Auto_StatusEnum,
+        ManuallyGraded: 'pending' as Auto_StatusEnum
+    };
+    export const Manual_StatusEnum = {
+        NotGraded: 'not_graded' as Manual_StatusEnum,
+        ManuallyGraded: 'manually_graded' as Manual_StatusEnum
     };
 }
+
 
 

@@ -197,7 +197,8 @@ class RPCHandler(GitBaseHandler):
             try:
                 ret = subprocess.run(shlex.split("git rev-parse main"), capture_output=True, cwd=self.gitdir)
                 submission.commit_hash = str(ret.stdout, 'utf-8').strip()
-                submission.status = "not_graded"
+                submission.auto_status = "not_graded"
+                submission.manual_status = "not_graded"
             except subprocess.CalledProcessError as e:
                 self.write_error(400)
                 return

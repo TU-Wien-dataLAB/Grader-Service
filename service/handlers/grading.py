@@ -23,7 +23,8 @@ class GradingAutoHandler(GraderBaseHandler):
     @authorize([Scope.tutor, Scope.instructor])
     async def get(self, lecture_id: int, assignment_id: int, sub_id: int):
         submission = self.session.query(Submission).get(sub_id)
-        submission.status = "automatically_graded"
+        # TODO: Autograde
+        submission.auto_status = "automatically_graded"
         self.session.commit()
         self.write_json(submission)
 

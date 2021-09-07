@@ -59,7 +59,8 @@ export class GradingComponent extends React.Component<IGradingProps> {
       { field: 'id', headerName: 'Id', width: 110 },
       { field: 'name', headerName: 'User', width: 130 },
       { field: 'date', headerName: 'Date', width: 250 },
-      { field: 'status', headerName: 'Status', width: 250 },
+      { field: 'auto_status', headerName: 'Autograde-Status', width: 250 },
+      { field: 'manual_status', headerName: 'Manualgrade-Status', width: 250 },
       {
         field: 'Autograde',
         headerName: '',
@@ -170,7 +171,8 @@ export class GradingComponent extends React.Component<IGradingProps> {
           id: latest.id,
           name: sub.user.name,
           date: latest.submitted_at,
-          status: latest.status,
+          auto_status: latest.auto_status,
+          manual_status: latest.manual_status,
           score: latest.score
         });
       });
@@ -181,7 +183,8 @@ export class GradingComponent extends React.Component<IGradingProps> {
             id: s.id,
             name: sub.user.name,
             date: s.submitted_at,
-            status: s.status,
+            auto_status: s.auto_status,
+            manual_status: s.manual_status,
             score: s.score
           });
         });
@@ -202,9 +205,7 @@ export class GradingComponent extends React.Component<IGradingProps> {
           const selectedRowData = this.state.rows.filter(row =>
             selectedIDs.has(row.id)
           );
-          this.setState({ selected: selectedRowData }, () => {
-            console.log('selected rowData:', this.state.selected);
-          });
+          this.setState({ selected: selectedRowData });
         }}
       />
     );
@@ -237,6 +238,7 @@ export class GradingComponent extends React.Component<IGradingProps> {
             marginRight: '20px',
             marginBottom: '20px'
           }}
+          onClick={() => {}}
         >
           Autograde selected
         </Button>
