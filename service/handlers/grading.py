@@ -2,6 +2,7 @@ from registry import VersionSpecifier, register_handler
 from handlers.base_handler import GraderBaseHandler, authorize
 from jupyter_server.utils import url_path_join
 from orm.takepart import Scope
+from orm.submission import Submission
 
 
 @register_handler(
@@ -15,13 +16,16 @@ class GradingBaseHandler(GraderBaseHandler):
 
 
 @register_handler(
-    path=r"\/lectures\/(?P<lecture_id>\d*)\/assignments\/(?P<assignment_id>\d*)\/grading\/(?P<user_id>\d*)\/auto\/?",
+    path=r"\/lectures\/(?P<lecture_id>\d*)\/assignments\/(?P<assignment_id>\d*)\/grading\/(?P<sub_id>\d*)\/auto\/?",
     version_specifier=VersionSpecifier.ALL,
 )
 class GradingAutoHandler(GraderBaseHandler):
     @authorize([Scope.tutor, Scope.instructor])
-    async def post(self, lecture_id: int, assignment_id: int, user_id: int):
-        pass
+    async def get(self, lecture_id: int, assignment_id: int, sub_id: int):
+        submission = self.session.query(Submission).get(sub_id)
+        submission.status = "automatically_graded"
+        self.session.commit()
+        self.write_json(submission)
 
 
 @register_handler(

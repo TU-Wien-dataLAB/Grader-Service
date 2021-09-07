@@ -22,6 +22,7 @@ import { Button } from '@blueprintjs/core/lib/cjs/components/button/buttons';
 import { ItemRenderer, Select } from '@blueprintjs/select';
 import { User } from '../../model/user';
 import { MenuItem } from '@blueprintjs/core';
+import { autogradeSubmission } from '../../services/grading.service';
 
 export interface IGradingProps {
   lectureID: number;
@@ -66,7 +67,7 @@ export class GradingComponent extends React.Component<IGradingProps> {
         width: 150,
         disableClickEventBubbling: true,
         renderCell: params => {
-          const onClick = () => {
+          const onClick = async () => {
             const api: GridApi = params.api;
             const fields = api
               .getAllColumns()
@@ -77,8 +78,9 @@ export class GradingComponent extends React.Component<IGradingProps> {
             fields.forEach(f => {
               thisRow[f] = params.getValue(params.id, f);
             });
-
-            return alert(JSON.stringify(thisRow, null, 4));
+            const response = await autogradeSubmission(this.state.lecture,this.state.assignment,thisRow).toPromise();
+            this.getSubmissions()
+            return console.log(response);
           };
 
           return (
@@ -132,22 +134,27 @@ export class GradingComponent extends React.Component<IGradingProps> {
       this.assignmentID,
       false,
       true
-    ).toPromise(); //TODO: Not working
+    ).toPromise();
+    
     const lecture: Lecture = await getLecture(this.lectureID).toPromise();
     this.title.label = 'Grading: ' + assignment.name;
+
     this.setState({ assignment, lecture });
-    getAllSubmissions(lecture, { id: this.assignmentID }, false).subscribe(
+    this.getSubmissions();
+    
+  }
+
+  public getSubmissions() {
+    getAllSubmissions(this.state.lecture, { id: this.assignmentID }, false).subscribe( //{ id: this.assignmentID } is not Assignment
       async userSubmissions => {
-        //{id: this.assignmentID} should be assignment
         console.log(userSubmissions);
         this.setState((this.state.submissions = userSubmissions));
-        //Temp rows for testing
         this.setState((this.state.rows = this.generateRows()));
         console.log('rows:');
         console.log(this.state.rows);
       }
     );
-  }
+    }
 
   public generateRows(): any[] {
     //let rows = [{ id: 10, user: "hasdf", date: "asdfadfa" }]

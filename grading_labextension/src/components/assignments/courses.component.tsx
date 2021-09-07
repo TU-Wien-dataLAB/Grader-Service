@@ -42,13 +42,6 @@ export class CoursesComponent extends React.Component<CoursesProps> {
           <h1>
             <p style={{ textAlign: 'center' }}>Assignments</p>
           </h1>
-          <Button
-            icon="refresh"
-            className="assignment-button"
-            text="Refresh"
-            outlined
-            onClick={() => this.getLectures()}
-          ></Button>
         </div>
         {this.state.lectures.map((el, index) => (
           <AssignmentsComponent lecture={el} open={index == 0} />

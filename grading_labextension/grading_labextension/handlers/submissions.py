@@ -3,8 +3,6 @@ from grading_labextension.registry import register_handler
 from grading_labextension.handlers.base_handler import ExtensionBaseHandler
 from jupyter_server.utils import url_path_join
 from grading_labextension.services.request import RequestService
-
-import tornado
 from tornado.httpclient import HTTPError
 
 

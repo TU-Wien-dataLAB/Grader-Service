@@ -130,12 +130,12 @@ class FeedbackObjectHandler(GraderBaseHandler):
 class SubmissionPropertiesHandler(GraderBaseHandler):
     @authorize([Scope.tutor, Scope.instructor])
     async def get(self, lecture_id: int, assignment_id: int, submission_id: int):
-        sumbission = self.session.query(Submission).get(submission_id)
-        if sumbission is None or sumbission.deleted == DeleteState.deleted:
+        submission = self.session.query(Submission).get(submission_id)
+        if submission is None or submission.deleted == DeleteState.deleted:
             self.error_message = "Not Found!"
             raise HTTPError(404)
-        if sumbission.properties is not None:
-            self.write(sumbission.properties)
+        if submission.properties is not None:
+            self.write(submission.properties)
         else:
             self.error_message = "Not Found!"
             raise HTTPError(404)
