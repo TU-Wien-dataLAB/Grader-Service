@@ -218,21 +218,21 @@ export class CourseManageAssignmentComponent extends React.Component<
       return;
     }
 
-    pushAssignment(this.lecture.id, this.state.assignment.id, 'source');
+    await pushAssignment(this.lecture.id, this.state.assignment.id, 'source').toPromise();
     pushAssignment(this.lecture.id, this.state.assignment.id, 'release');
   }
 
   private async pullAssignment() {
     const result = await showDialog({
       title: 'Pull Assignment',
-      body: `Do you want to pull ${this.state.assignment.name}? This updates your assignment with the state of the server.`,
+      body: `Do you want to pull ${this.state.assignment.name}? This updates your assignment with the state of the server and overwrites all changes.`,
       buttons: [Dialog.cancelButton(), Dialog.okButton({ label: 'Pull' })]
     });
     if (!result.button.accept) {
       return;
     }
 
-    pullAssignment(this.lecture.id, this.state.assignment.id, 'source');
+    await pullAssignment(this.lecture.id, this.state.assignment.id, 'source').toPromise();
     pullAssignment(this.lecture.id, this.state.assignment.id, 'release');
     this.dirListing.update();
   }

@@ -26,7 +26,6 @@ class GradingAutoHandler(GraderBaseHandler):
         submission = self.session.query(Submission).get(sub_id)
         executor = LocalAutogradeExecutor(self.application.grader_service_dir, submission)
         executor.start()
-        self.session.commit()
         submission = self.session.query(Submission).get(sub_id)
         self.write_json(submission)
 

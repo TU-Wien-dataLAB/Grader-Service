@@ -8,33 +8,41 @@ from tornado.httpclient import HTTPError, HTTPResponse
 from distutils.dir_util import copy_tree, remove_tree
 from grader_convert.converters.generate_assignment import GenerateAssignment
 
+
 @register_handler(
     path=r"\/lectures\/(?P<lecture_id>\d*)\/assignments\/(?P<assignment_id>\d*)\/generate\/?"
 )
 class GenerateHandler(ExtensionBaseHandler):
     async def put(self, lecture_id: int, assignment_id: int):
 
-        lecture = await self.request_service.request(
-            "GET",
-            f"{self.base_url}/lectures/{lecture_id}",
-            header=self.grader_authentication_header,
+        try:
+            lecture = await self.request_service.request(
+                "GET",
+                f"{self.base_url}/lectures/{lecture_id}",
+                header=self.grader_authentication_header,
             )
-        assignment = await self.request_service.request(
-            "GET",
-            f"{self.base_url}/lectures/{lecture_id}/assignments/{assignment_id}",
-            header=self.grader_authentication_header,
+            assignment = await self.request_service.request(
+                "GET",
+                f"{self.base_url}/lectures/{lecture_id}/assignments/{assignment_id}",
+                header=self.grader_authentication_header,
             )
+        except HTTPError as e:
+            self.set_status(e.code)
+            self.write_error(e.code)
+            return
         code = lecture["code"]
         name = assignment["name"]
 
         generator = GenerateAssignment(
-                input_dir=f"~/source/{code}/{name}", output_dir=f"~/release/{code}/{name}", file_pattern="*.ipynb"
-            )
+            input_dir=f"~/source/{code}/{name}",
+            output_dir=f"~/release/{code}/{name}",
+            file_pattern="*.ipynb",
+        )
         generator.force = True
         self.log.info("Starting GenerateAssignment converter")
         generator.start()
         self.log.info("GenerateAssignment conversion done")
-        self.write({"cool":"cool"})
+        self.write({"cool": "cool"})
 
 
 @register_handler(
@@ -72,7 +80,10 @@ class PullHandler(ExtensionBaseHandler):
                 git_service.init()
                 git_service.set_author()
             git_service.set_remote(f"grader_{repo}")
-            git_service.pull(f"grader_{repo}", force=True)
+            try:
+                git_service.pull(f"grader_{repo}", force=True)
+            except GitError as e:
+                self.log.error("GitError:\n" + e.error)
             self.write("OK")
         except GitError as e:
             self.log.error("GitError:\n" + e.error)
@@ -110,7 +121,7 @@ class PushHandler(ExtensionBaseHandler):
         )
 
         if repo == "release":
-            git_service.delete_repo_contents()
+            git_service.delete_repo_contents(include_git=True)
             src_path = GitService(
                 lecture["code"],
                 assignment["name"],
@@ -146,12 +157,18 @@ class PushHandler(ExtensionBaseHandler):
                 self.log.error(
                     f"Could not set assignment properties! Error code {response.code}"
                 )
-            
+
             try:
                 os.remove(gradebook_path)
+                self.log.info(f"Successfully deleted {gradebook_path}")
             except OSError as e:
-                self.log.error(f"Cannot delete {gradebook_path}! Error: {e.strerror}\nAborting push!")
+                self.log.error(
+                    f"Cannot delete {gradebook_path}! Error: {e.strerror}\nAborting push!"
+                )
                 return
+
+        self.log.info(f"File contents of {repo}: {git_service.path}")
+        self.log.info(",".join(os.listdir(git_service.path)))
 
         try:
             if not git_service.is_git():
@@ -163,6 +180,7 @@ class PushHandler(ExtensionBaseHandler):
             self.log.error("GitError:\n" + e.error)
             self.write_error(400)
             return
+
         try:
             git_service.commit()
         except GitError as e:

@@ -68,7 +68,7 @@ class GitService(Configurable):
     def pull(self, origin: str, force=False):
         if force:
             self.log.info(f"Pulling remote {origin}")
-            self._run_command(f'sh -c "git clean -fd && git fetch --all && git reset --hard {origin}/main"',cwd=self.path)
+            self._run_command(f'sh -c "git clean -fd && git fetch {origin} && git reset --hard {origin}/main"',cwd=self.path)
             #self._run_command(f'sh -c "git fetch --all && git reset --mixed {origin}/main"',cwd=self.path)
         else:
             self._run_command(f"git pull {origin} main", cwd=self.path)
@@ -103,13 +103,15 @@ class GitService(Configurable):
         self.pull(origin=origin,force=force)
     
 
-    def delete_repo_contents(self):
+    def delete_repo_contents(self, include_git=False):
         for root, dirs, files in os.walk(self.path):
             for f in files:
                 os.unlink(os.path.join(root, f))
+                self.log.info(f"Deleted {os.path.join(root, f)} from {self.git_root_dir}")
             for d in dirs:
-                if d != ".git":
+                if d != ".git" or include_git:
                     shutil.rmtree(os.path.join(root, d))
+                    self.log.info(f"Deleted {os.path.join(root, d)} from {self.git_root_dir}")
     
 
     # ATTENTION: dirs_exist_ok was only added in Python 3.8
@@ -131,8 +133,9 @@ class GitService(Configurable):
     @property
     def git_version(self):
         if self._git_version is None:
-            version = self._run_command("git --version", capture_output=True)
-            if version is None:
+            try:
+                version = self._run_command("git --version", capture_output=True)
+            except GitError:
                 return tuple()
             version = version.split(" ")[2]
             self._git_version = tuple([int(v) for v in version.split(".")])
@@ -145,9 +148,6 @@ class GitService(Configurable):
             if capture_output:
                 return str(ret.stdout, 'utf-8')
         except subprocess.CalledProcessError as e:
-            if capture_output:
-                return None
-            else:
-                raise GitError(str(e.stdout, 'utf-8') + str(e.stderr, 'utf-8'))
+            raise GitError(str(e.stdout, 'utf-8') + str(e.stderr, 'utf-8'))
         except FileNotFoundError as e:
             raise GitError(e.strerror)
