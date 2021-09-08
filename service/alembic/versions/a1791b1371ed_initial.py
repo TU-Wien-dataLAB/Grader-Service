@@ -67,7 +67,7 @@ def upgrade():
     op.create_table('submission',
     sa.Column('id', sa.Integer(), autoincrement=True, nullable=False),
     sa.Column('date', sa.DateTime(), nullable=False),
-    sa.Column('auto_status', sa.Enum('pending', 'not_graded', 'automatically_graded'), nullable=False),
+    sa.Column('auto_status', sa.Enum('pending', 'not_graded', 'automatically_graded','grading_failed'), nullable=False),
     sa.Column('manual_status', sa.Enum('not_graded', 'manually_graded'), nullable=False),
     sa.Column('score', sa.Integer(), nullable=True),
     sa.Column('assignid', sa.Integer(), nullable=True),

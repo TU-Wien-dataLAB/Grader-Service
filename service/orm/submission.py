@@ -9,7 +9,7 @@ class Submission(Base, Serializable):
     id = Column(Integer, primary_key=True, autoincrement=True)
     date = Column(DateTime, nullable=False)
     auto_status = Column(
-        Enum("pending", "not_graded", "automatically_graded"),
+        Enum("pending", "not_graded", "automatically_graded","grading_failed"),
         default="submitting",
         nullable=False,
     )
