@@ -14,6 +14,10 @@ export function updateAssignment(lectureId: number, assignment: Assignment): Obs
   return request<Assignment>(HTTPMethod.PUT, `/lectures/${lectureId}/assignments/${assignment.id}`, assignment)
 }
 
+export function generateAssignment(lectureId: number, assignment: Assignment): Observable<any> {
+  return request<any>(HTTPMethod.PUT,`/lectures/${lectureId}/assignments/${assignment.id}/generate`)
+}
+
 export function fetchAssignment(lectureId: number, assignmentId: number, instructor: boolean = false, metadataOnly: boolean = false): Observable<Assignment> {
   let url = `/lectures/${lectureId}/assignments/${assignmentId}`;
   if (instructor || metadataOnly) {

@@ -8,6 +8,34 @@ from tornado.httpclient import HTTPError, HTTPResponse
 from distutils.dir_util import copy_tree, remove_tree
 from grader_convert.converters.generate_assignment import GenerateAssignment
 
+@register_handler(
+    path=r"\/lectures\/(?P<lecture_id>\d*)\/assignments\/(?P<assignment_id>\d*)\/generate\/?"
+)
+class GenerateHandler(ExtensionBaseHandler):
+    async def put(self, lecture_id: int, assignment_id: int):
+
+        lecture = await self.request_service.request(
+            "GET",
+            f"{self.base_url}/lectures/{lecture_id}",
+            header=self.grader_authentication_header,
+            )
+        assignment = await self.request_service.request(
+            "GET",
+            f"{self.base_url}/lectures/{lecture_id}/assignments/{assignment_id}",
+            header=self.grader_authentication_header,
+            )
+        code = lecture["code"]
+        name = assignment["name"]
+
+        generator = GenerateAssignment(
+                input_dir=f"~/source/{code}/{name}", output_dir=f"~/release/{code}/{name}", file_pattern="*.ipynb"
+            )
+        generator.force = True
+        self.log.info("Starting GenerateAssignment converter")
+        generator.start()
+        self.log.info("GenerateAssignment conversion done")
+        self.write({"cool":"cool"})
+
 
 @register_handler(
     path=r"\/lectures\/(?P<lecture_id>\d*)\/assignments\/(?P<assignment_id>\d*)\/pull\/(?P<repo>\w*)\/?"
