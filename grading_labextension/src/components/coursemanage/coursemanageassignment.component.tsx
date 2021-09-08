@@ -9,6 +9,7 @@ import { User } from '../../model/user';
 import { getAllSubmissions } from '../../services/submissions.service';
 import {
   deleteAssignment,
+  generateAssignment,
   pullAssignment,
   pushAssignment,
   updateAssignment
@@ -342,6 +343,19 @@ export class CourseManageAssignmentComponent extends React.Component<
     );
   }
 
+  private async generateAssignment() {
+    const result = await showDialog({
+      title: 'Generate Assignment',
+      body: `Do you want to generate ${this.state.assignment.name}? This create a local student-version preview in the release folder.`,
+      buttons: [Dialog.cancelButton(), Dialog.okButton({ label: 'Generate' })]
+    });
+    if (!result.button.accept) {
+      return;
+    }
+    generateAssignment(this.lecture.id, this.state.assignment)
+    this.dirListing.update()
+  }
+
   public render() {
     return (
       <li key={this.index}>
@@ -372,6 +386,14 @@ export class CourseManageAssignmentComponent extends React.Component<
                 onClick={() => this.editAssignment()}
               >
                 Edit
+              </Button>
+              <Button
+                icon="map-create"
+                outlined
+                className="assignment-button"
+                onClick={() => this.generateAssignment()}
+              >
+                Generate
               </Button>
               <Button
                 icon="git-push"
