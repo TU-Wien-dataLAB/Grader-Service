@@ -5,6 +5,7 @@ import os
 import asyncio
 import signal
 from persistence.database import DataBaseManager
+from autograding.local import LocalAutogradeExecutor
 import tornado
 from tornado import web
 from tornado.httpserver import HTTPServer
@@ -162,6 +163,8 @@ class GraderService(config.Application):
             # ssl_options=ssl_context,
             xheaders=True,
         )
+
+        LocalAutogradeExecutor.config = self.config
 
         self.http_server.listen(self.service_port, address=self.service_host)
 

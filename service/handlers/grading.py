@@ -1,3 +1,4 @@
+from autograding.local import LocalAutogradeExecutor
 from registry import VersionSpecifier, register_handler
 from handlers.base_handler import GraderBaseHandler, authorize
 from jupyter_server.utils import url_path_join
@@ -23,9 +24,10 @@ class GradingAutoHandler(GraderBaseHandler):
     @authorize([Scope.tutor, Scope.instructor])
     async def get(self, lecture_id: int, assignment_id: int, sub_id: int):
         submission = self.session.query(Submission).get(sub_id)
-        # TODO: Autograde
-        submission.auto_status = "automatically_graded"
+        executor = LocalAutogradeExecutor(self.application.grader_service_dir, submission)
+        executor.start()
         self.session.commit()
+        submission = self.session.query(Submission).get(sub_id)
         self.write_json(submission)
 
 

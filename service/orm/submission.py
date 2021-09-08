@@ -10,7 +10,7 @@ class Submission(Base, Serializable):
     date = Column(DateTime, nullable=False)
     auto_status = Column(
         Enum("pending", "not_graded", "automatically_graded"),
-        default="submitting",
+        default="not_graded",
         nullable=False,
     )
     manual_status = Column(Enum("not_graded", "manually_graded"))
