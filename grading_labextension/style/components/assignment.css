@@ -1,6 +1,11 @@
 .assignment {
   margin-top: 25px;
 }
+
+.assignment-release {
+  margin-top: 25px;
+  background-color:#eaf8ff;
+}
 .assignment-header {
   margin-top: 12pt;
   margin-bottom: 8pt;
@@ -91,6 +96,7 @@
   min-height: 18px;
   margin-right: 4pt;
   padding: 2pt;
+  background-color: white;
 }
 
 .assignment-button span,

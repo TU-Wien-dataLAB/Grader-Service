@@ -359,7 +359,9 @@ export class CourseManageAssignmentComponent extends React.Component<
   public render() {
     return (
       <li key={this.index}>
-        <div className="assignment">
+        <div className={
+        this.state.showSource ? 'assignment bp3-card bp3-elevation-2' : 'assignment-release bp3-card bp3-elevation-2'
+      }>
           <div className="assignment-header">
             <span onClick={this.toggleOpen}>
               <Icon
