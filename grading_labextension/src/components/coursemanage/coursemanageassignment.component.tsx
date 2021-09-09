@@ -23,6 +23,8 @@ import { ITerminal } from '@jupyterlab/terminal';
 import { Terminal } from '@jupyterlab/services';
 import { MainAreaWidget } from '@jupyterlab/apputils';
 import { localToUTC } from '../../services/datetime.service';
+import { Contents } from '@jupyterlab/services';
+import moment from 'moment';
 
 export interface AssignmentProps {
   index: number;
@@ -57,6 +59,9 @@ export class CourseManageAssignmentComponent extends React.Component<
   public dirListing: DirListing;
   public terminalSession: Terminal.ITerminalConnection = null;
 
+  private generationTimestamp: number = null;
+  private sourceChangeTimestamp: number = moment().valueOf(); // now
+
   constructor(props: AssignmentProps) {
     super(props);
     this.state.assignment = props.assignment;
@@ -88,7 +93,8 @@ export class CourseManageAssignmentComponent extends React.Component<
     const LISTING_CLASS = 'jp-FileBrowser-listing';
     this.dirListing = new DirListing({ model, renderer });
     this.dirListing.addClass(LISTING_CLASS);
-    await model.cd(`source/${this.lecture.code}/${this.state.assignment.name}`);
+    const srcPath = `source/${this.lecture.code}/${this.state.assignment.name}`
+    await model.cd(srcPath);
     this.dirListingNode.onclick = async ev => {
       const model = this.dirListing.modelForClick(ev);
       if (model == undefined) {
@@ -110,6 +116,22 @@ export class CourseManageAssignmentComponent extends React.Component<
       ev.preventDefault();
       ev.stopPropagation();
     };
+
+    GlobalObjects.docManager.services.contents.fileChanged.connect((
+      sender: Contents.IManager,
+      change: Contents.IChangedArgs
+    ) => {
+      const { oldValue, newValue } = change;
+      if (!newValue.path.includes(srcPath)) {
+        return;
+      }
+      
+      const modified = moment(newValue.last_modified).valueOf()
+      if (this.sourceChangeTimestamp === null || this.sourceChangeTimestamp < modified) {
+        this.sourceChangeTimestamp = modified
+      }
+      console.log("New source file changed timestamp: " + this.sourceChangeTimestamp)
+    }, this) 
   }
 
   private toggleOpen = () => {
@@ -118,9 +140,8 @@ export class CourseManageAssignmentComponent extends React.Component<
   };
 
   private async openTerminal() {
-    const path = `~/${this.getRootDir(this.state.showSource)}/${
-      this.lecture.code
-    }/${this.state.assignment.name}`;
+    const path = `~/${this.getRootDir(this.state.showSource)}/${this.lecture.code
+      }/${this.state.assignment.name}`;
     console.log('Opening terminal at: ' + path.replace(' ', '\\ '));
     let args = {};
     if (
@@ -151,9 +172,8 @@ export class CourseManageAssignmentComponent extends React.Component<
   }
 
   private async openBrowser() {
-    const path = `${this.getRootDir(this.state.showSource)}/${
-      this.lecture.code
-    }/${this.state.assignment.name}`;
+    const path = `${this.getRootDir(this.state.showSource)}/${this.lecture.code
+      }/${this.state.assignment.name}`;
     GlobalObjects.commands
       .execute('filebrowser:go-to-path', {
         path
@@ -165,16 +185,15 @@ export class CourseManageAssignmentComponent extends React.Component<
 
   private async switchRoot() {
     if (this.state.showSource) {
-      // switching to release
-      await pullAssignment(
-        this.lecture.id,
-        this.state.assignment.id,
-        'release'
-      ).toPromise();
+      // TODO: check if source files have actually changed before generating
+      if (this.generationTimestamp === null || this.generationTimestamp < this.sourceChangeTimestamp) {
+        // switching to release
+        await generateAssignment(this.lecture.id, this.state.assignment).toPromise();
+        this.generationTimestamp = moment().valueOf();
+      }
     }
-    let path = `/${this.getRootDir(!this.state.showSource)}/${
-      this.lecture.code
-    }/${this.state.assignment.name}`;
+    let path = `/${this.getRootDir(!this.state.showSource)}/${this.lecture.code
+      }/${this.state.assignment.name}`;
     await this.dirListing.model.cd(path);
     this.setState({ showSource: !this.state.showSource });
   }
@@ -233,7 +252,6 @@ export class CourseManageAssignmentComponent extends React.Component<
     }
 
     await pullAssignment(this.lecture.id, this.state.assignment.id, 'source').toPromise();
-    pullAssignment(this.lecture.id, this.state.assignment.id, 'release');
     this.dirListing.update();
   }
 
@@ -360,16 +378,15 @@ export class CourseManageAssignmentComponent extends React.Component<
     return (
       <li key={this.index}>
         <div className={
-        this.state.showSource ? 'assignment bp3-card bp3-elevation-2' : 'assignment-release bp3-card bp3-elevation-2'
-      }>
+          this.state.showSource ? 'assignment bp3-card bp3-elevation-2' : 'assignment-release bp3-card bp3-elevation-2'
+        }>
           <div className="assignment-header">
             <span onClick={this.toggleOpen}>
               <Icon
                 icon="chevron-right"
                 iconSize={this.iconSize}
-                className={`collapse-icon-small ${
-                  this.state.isOpen ? 'collapse-icon-small-open' : ''
-                }`}
+                className={`collapse-icon-small ${this.state.isOpen ? 'collapse-icon-small-open' : ''
+                  }`}
               ></Icon>
               <Icon
                 icon="inbox"
