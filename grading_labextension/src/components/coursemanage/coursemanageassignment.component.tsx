@@ -510,6 +510,7 @@ export class CourseManageAssignmentComponent extends React.Component<
             </Button>
             <Button
               icon="switch"
+              intent={this.state.showSource ? "none" : "primary"}
               outlined
               onClick={() => this.switchRoot()}
               className="assignment-button"
