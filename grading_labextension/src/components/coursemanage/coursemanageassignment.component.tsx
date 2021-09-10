@@ -39,7 +39,7 @@ export interface AssignmentState {
   submissions: { user: User; submissions: Submission[] }[];
   assignment: Assignment;
   showSource: boolean;
-  transition: boolean;
+  transition: string;
 }
 
 export class CourseManageAssignmentComponent extends React.Component<
@@ -55,7 +55,7 @@ export class CourseManageAssignmentComponent extends React.Component<
     submissions: new Array<{ user: User; submissions: Submission[] }>(),
     assignment: {} as Assignment,
     showSource: true,
-    transition: false,
+    transition: "show",
   };
   public dirListingNode: HTMLElement;
   public dirListing: DirListing;
@@ -186,7 +186,7 @@ export class CourseManageAssignmentComponent extends React.Component<
   }
 
   private async switchRoot() {
-    this.setState({transition: true})
+    this.setState({transition: "hide"})
     if (this.state.showSource) {
       // TODO: check if source files have actually changed before generating
       if (this.generationTimestamp === null || this.generationTimestamp < this.sourceChangeTimestamp) {
@@ -198,7 +198,7 @@ export class CourseManageAssignmentComponent extends React.Component<
     let path = `/${this.getRootDir(!this.state.showSource)}/${this.lecture.code
       }/${this.state.assignment.name}`;
     await this.dirListing.model.cd(path);
-    this.setState({ showSource: !this.state.showSource,transition: false });
+    this.setState({ showSource: !this.state.showSource,transition: "show" });
   }
 
   private openFile(path: string) {
@@ -382,7 +382,7 @@ export class CourseManageAssignmentComponent extends React.Component<
     return (
       <li key={this.index}>
         <div className={
-          this.state.showSource ? 'assignment bp3-card bp3-elevation-2' : 'assignment-release bp3-card bp3-elevation-2'
+          'assignment bp3-card bp3-elevation-2'
         }>
           <div className="assignment-header">
             <span onClick={this.toggleOpen}>
@@ -523,7 +523,7 @@ export class CourseManageAssignmentComponent extends React.Component<
   }
   public render() {
     return (
-      <div className={this.state.transition ? 'fadeOut' : 'fadeIn'}>
+      <div className={this.state.transition}>
         {this.assignment()}
       </div>
     );
