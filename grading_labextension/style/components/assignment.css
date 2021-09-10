@@ -85,7 +85,8 @@
 .button-list {
   float: right;
   margin-right: 10%;
-  width: 500px;
+  width: 50%;
+  min-width: 550px;
 }
 .add-buttons {
   margin-top: 4pt;

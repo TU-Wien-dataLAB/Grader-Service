@@ -118,7 +118,7 @@ const extension: JupyterFrontEndPlugin<void> = {
           );
           notebookPanel.toolbar.insertItem(10, 'Creationmode', switcher);
         });
-      });
+      }, this);
 
       tracker.activeCellChanged.connect(() => {
         const notebookPanel: NotebookPanel = tracker.currentWidget;
@@ -157,7 +157,7 @@ const extension: JupyterFrontEndPlugin<void> = {
         ) {
           (cell.layout as PanelLayout).insertWidget(0, new CellWidget(cell));
         }
-      });
+      }, this);
     };
 
     /* ##### Course Manage View Widget ##### */

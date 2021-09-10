@@ -41,6 +41,12 @@ class GenerateHandler(ExtensionBaseHandler):
         generator.force = True
         self.log.info("Starting GenerateAssignment converter")
         generator.start()
+        try:
+            gradebook_path = os.path.join(generator._output_directory, "gradebook.json")
+            os.remove(gradebook_path)
+            self.log.info(f"Successfully deleted {gradebook_path}")
+        except OSError as e:
+            self.log.error(f"Could delete {gradebook_path}! Error: {e.strerror}")
         self.log.info("GenerateAssignment conversion done")
         self.write({"cool": "cool"})
 
