@@ -23,6 +23,7 @@ import { ITerminal } from '@jupyterlab/terminal';
 import { Terminal } from '@jupyterlab/services';
 import { MainAreaWidget } from '@jupyterlab/apputils';
 import { localToUTC } from '../../services/datetime.service';
+import { Transition, SwitchTransition, CSSTransition } from 'react-transition-group';
 
 export interface AssignmentProps {
   index: number;
@@ -37,6 +38,7 @@ export interface AssignmentState {
   submissions: { user: User; submissions: Submission[] }[];
   assignment: Assignment;
   showSource: boolean;
+  transition: boolean;
 }
 
 export class CourseManageAssignmentComponent extends React.Component<
@@ -51,7 +53,8 @@ export class CourseManageAssignmentComponent extends React.Component<
     isOpen: false,
     submissions: new Array<{ user: User; submissions: Submission[] }>(),
     assignment: {} as Assignment,
-    showSource: true
+    showSource: true,
+    transition: false,
   };
   public dirListingNode: HTMLElement;
   public dirListing: DirListing;
@@ -118,9 +121,8 @@ export class CourseManageAssignmentComponent extends React.Component<
   };
 
   private async openTerminal() {
-    const path = `~/${this.getRootDir(this.state.showSource)}/${
-      this.lecture.code
-    }/${this.state.assignment.name}`;
+    const path = `~/${this.getRootDir(this.state.showSource)}/${this.lecture.code
+      }/${this.state.assignment.name}`;
     console.log('Opening terminal at: ' + path.replace(' ', '\\ '));
     let args = {};
     if (
@@ -151,9 +153,8 @@ export class CourseManageAssignmentComponent extends React.Component<
   }
 
   private async openBrowser() {
-    const path = `${this.getRootDir(this.state.showSource)}/${
-      this.lecture.code
-    }/${this.state.assignment.name}`;
+    const path = `${this.getRootDir(this.state.showSource)}/${this.lecture.code
+      }/${this.state.assignment.name}`;
     GlobalObjects.commands
       .execute('filebrowser:go-to-path', {
         path
@@ -164,6 +165,7 @@ export class CourseManageAssignmentComponent extends React.Component<
   }
 
   private async switchRoot() {
+    this.setState({transition: true})
     if (this.state.showSource) {
       // switching to release
       await pullAssignment(
@@ -172,11 +174,10 @@ export class CourseManageAssignmentComponent extends React.Component<
         'release'
       ).toPromise();
     }
-    let path = `/${this.getRootDir(!this.state.showSource)}/${
-      this.lecture.code
-    }/${this.state.assignment.name}`;
+    let path = `/${this.getRootDir(!this.state.showSource)}/${this.lecture.code
+      }/${this.state.assignment.name}`;
     await this.dirListing.model.cd(path);
-    this.setState({ showSource: !this.state.showSource });
+    this.setState({ showSource: !this.state.showSource,transition: false });
   }
 
   private openFile(path: string) {
@@ -356,20 +357,20 @@ export class CourseManageAssignmentComponent extends React.Component<
     this.dirListing.update()
   }
 
-  public render() {
+
+  public assignment() {
     return (
       <li key={this.index}>
         <div className={
-        this.state.showSource ? 'assignment bp3-card bp3-elevation-2' : 'assignment-release bp3-card bp3-elevation-2'
-      }>
+          this.state.showSource ? 'assignment bp3-card bp3-elevation-2' : 'assignment-release bp3-card bp3-elevation-2'
+        }>
           <div className="assignment-header">
             <span onClick={this.toggleOpen}>
               <Icon
                 icon="chevron-right"
                 iconSize={this.iconSize}
-                className={`collapse-icon-small ${
-                  this.state.isOpen ? 'collapse-icon-small-open' : ''
-                }`}
+                className={`collapse-icon-small ${this.state.isOpen ? 'collapse-icon-small-open' : ''
+                  }`}
               ></Icon>
               <Icon
                 icon="inbox"
@@ -420,7 +421,7 @@ export class CourseManageAssignmentComponent extends React.Component<
                 icon="cloud-upload"
                 outlined
                 className="assignment-button"
-                /*TODO: make state change to pushed disabled={this.state.assignment.status == "created"}*/ onClick={() =>
+              /*TODO: make state change to pushed disabled={this.state.assignment.status == "created"}*/ onClick={() =>
                   this.releaseAssignment()
                 }
               >
@@ -498,6 +499,13 @@ export class CourseManageAssignmentComponent extends React.Component<
           </Collapse>
         </div>
       </li>
+    );
+  }
+  public render() {
+    return (
+      <div className={this.state.transition ? 'fadeOut' : 'fadeIn'}>
+        {this.assignment()}
+      </div>
     );
   }
 }
