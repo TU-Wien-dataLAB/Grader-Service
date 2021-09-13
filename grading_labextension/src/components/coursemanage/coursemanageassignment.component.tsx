@@ -485,14 +485,6 @@ export class CourseManageAssignmentComponent extends React.Component<
               Add Notebook
             </Button>
             <Button
-              icon="add"
-              outlined
-              onClick={() => this.createFile(false)}
-              className="assignment-button"
-            >
-              Add File
-            </Button>
-            <Button
               icon="console"
               outlined
               onClick={() => this.openTerminal()}
