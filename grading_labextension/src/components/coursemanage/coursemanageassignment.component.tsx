@@ -1,4 +1,4 @@
-import { Button, Collapse, Icon } from '@blueprintjs/core';
+import { Button, Collapse, Icon, Tag } from '@blueprintjs/core';
 import { Dialog, showDialog, showErrorMessage } from '@jupyterlab/apputils';
 import * as React from 'react';
 import { GlobalObjects } from '../../index';
@@ -127,13 +127,13 @@ export class CourseManageAssignmentComponent extends React.Component<
       if (!newValue.path.includes(srcPath)) {
         return;
       }
-      
+
       const modified = moment(newValue.last_modified).valueOf()
       if (this.sourceChangeTimestamp === null || this.sourceChangeTimestamp < modified) {
         this.sourceChangeTimestamp = modified
       }
       console.log("New source file changed timestamp: " + this.sourceChangeTimestamp)
-    }, this) 
+    }, this)
   }
 
   private toggleOpen = () => {
@@ -186,7 +186,7 @@ export class CourseManageAssignmentComponent extends React.Component<
   }
 
   private async switchRoot() {
-    this.setState({transition: "hide"})
+    this.setState({ transition: "hide" })
     if (this.state.showSource) {
       // TODO: check if source files have actually changed before generating
       if (this.generationTimestamp === null || this.generationTimestamp < this.sourceChangeTimestamp) {
@@ -198,7 +198,7 @@ export class CourseManageAssignmentComponent extends React.Component<
     let path = `/${this.getRootDir(!this.state.showSource)}/${this.lecture.code
       }/${this.state.assignment.name}`;
     await this.dirListing.model.cd(path);
-    this.setState({ showSource: !this.state.showSource,transition: "show" });
+    this.setState({ showSource: !this.state.showSource, transition: "show" });
   }
 
   private openFile(path: string) {
@@ -382,10 +382,10 @@ export class CourseManageAssignmentComponent extends React.Component<
     return (
       <li key={this.index}>
         <div className={
-          'assignment bp3-card bp3-elevation-2'
+          'assignment'    //bp3-card bp3-elevation-2
         }>
           <div className="assignment-header">
-            <span onClick={this.toggleOpen}>
+            <span onClick={this.toggleOpen} className="flex-item">
               <Icon
                 icon="chevron-right"
                 iconSize={this.iconSize}
@@ -401,7 +401,7 @@ export class CourseManageAssignmentComponent extends React.Component<
               {this.state.showSource ? 'Source' : 'Release'} Files
             </span>
 
-            <span className="button-list">
+            <span className="button-list flex-item">
               <Button
                 icon="edit"
                 outlined
@@ -437,25 +437,30 @@ export class CourseManageAssignmentComponent extends React.Component<
                 {' '}
                 Pull
               </Button>
+
               <Button
                 icon="cloud-upload"
                 outlined
                 className="assignment-button"
-              /*TODO: make state change to pushed disabled={this.state.assignment.status == "created"}*/ onClick={() =>
-                  this.releaseAssignment()
-                }
-              >
-                Release
-              </Button>
-              <Button
-                icon="delete"
-                intent="danger"
-                outlined
-                className="assignment-button"
-                onClick={() => this.delete()}
-              >
-                Delete
-              </Button>
+                intent={this.state.assignment.status == "released" ? "danger" : "none"}
+                onClick={this.state.assignment.status == "released" ? 
+                 () => {
+                    const assignment = this.state.assignment;
+                    assignment.status = "created";
+                    updateAssignment(this.lecture.id, assignment).subscribe(
+                      assignment => {
+                        this.setState({ assignment });
+                      }
+                    );
+
+                }  
+
+                 : () => this.releaseAssignment()}>
+                  {this.state.assignment.status != "released" ? "Release" : "Unrelease"}
+                </Button> 
+                  
+
+              
               <Button
                 icon="arrow-top-right"
                 intent="primary"
@@ -467,6 +472,15 @@ export class CourseManageAssignmentComponent extends React.Component<
               >
                 {this.state.submissions.length}{' '}
                 {'Submission' + (this.state.submissions.length > 1 ? 's' : '')}
+              </Button>
+              <Button
+                icon="delete"
+                intent="danger"
+                outlined
+                className="assignment-button"
+                onClick={() => this.delete()}
+              >
+                Delete
               </Button>
             </span>
           </div>
