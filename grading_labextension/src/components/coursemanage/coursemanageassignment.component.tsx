@@ -261,7 +261,7 @@ export class CourseManageAssignmentComponent extends React.Component<
   private async releaseAssignment() {
     let result = await showDialog({
       title: 'Release Assignment',
-      body: `Do you want to release ${this.state.assignment.name} for all students? This can NOT be undone!`,
+      body: `Do you want to release ${this.state.assignment.name} for all students?`,
       buttons: [Dialog.cancelButton(), Dialog.warnButton({ label: 'Release' })]
     });
     if (!result.button.accept) {
@@ -278,6 +278,31 @@ export class CourseManageAssignmentComponent extends React.Component<
     }
 
     this.state.assignment.status = 'released';
+    updateAssignment(this.lecture.id, this.state.assignment).subscribe(a =>
+      this.setState({ assignment: a })
+    );
+  }
+
+  private async withholdAssignment() {
+    let result = await showDialog({
+      title: 'Withhold Assignment',
+      body: `Do you want to withhold ${this.state.assignment.name} for all students?`,
+      buttons: [Dialog.cancelButton(), Dialog.warnButton({ label: 'Withold' })]
+    });
+    if (!result.button.accept) {
+      return;
+    }
+
+    result = await showDialog({
+      title: 'Confirmation',
+      body: `Are you sure you want to withold ${this.state.assignment.name}?`,
+      buttons: [Dialog.cancelButton(), Dialog.warnButton({ label: 'Withold' })]
+    });
+    if (!result.button.accept) {
+      return;
+    }
+
+    this.state.assignment.status = 'created';
     updateAssignment(this.lecture.id, this.state.assignment).subscribe(a =>
       this.setState({ assignment: a })
     );
@@ -444,19 +469,9 @@ export class CourseManageAssignmentComponent extends React.Component<
                 className="assignment-button"
                 intent={this.state.assignment.status == "released" ? "danger" : "none"}
                 onClick={this.state.assignment.status == "released" ? 
-                 () => {
-                    const assignment = this.state.assignment;
-                    assignment.status = "created";
-                    updateAssignment(this.lecture.id, assignment).subscribe(
-                      assignment => {
-                        this.setState({ assignment });
-                      }
-                    );
-
-                }  
-
+                 () => this.withholdAssignment()
                  : () => this.releaseAssignment()}>
-                  {this.state.assignment.status != "released" ? "Release" : "Unrelease"}
+                  {this.state.assignment.status == "released" ? "Withhold" : "Release"}
                 </Button> 
                   
 
