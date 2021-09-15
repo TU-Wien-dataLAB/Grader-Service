@@ -2,13 +2,9 @@
   margin-top: 25px;
 }
 
-.assignment-release {
-  margin-top: 25px;
-  background-color:#eaf8ff;
-}
 .assignment-header {
   margin-top: 12pt;
-  margin-bottom: 8pt;
+  margin-bottom: 12pt;
   margin-right: 16pt;
   user-select: none;
   -webkit-user-select: none;
@@ -83,19 +79,19 @@
 }
 
 .button-list {
-  float: right;
-  margin-right: 10%;
-  width: 50%;
+  margin-left: 25%;
+  margin-right: 10pt;
   min-width: 550px;
 }
 .add-buttons {
   margin-top: 4pt;
+  
 }
 
 .assignment-button,
 .assignment-tag {
   min-height: 18px;
-  margin-right: 4pt;
+  margin-right: 6pt;
   padding: 2pt;
   background-color: white;
 }
@@ -116,3 +112,47 @@
 }
 
 
+.flex-container {
+  display: -ms-flexbox;
+  display: -webkit-flex;
+  display: flex;
+  -webkit-flex-direction: row;
+  -ms-flex-direction: row;
+  flex-direction: row;
+  -webkit-flex-wrap: nowrap;
+  -ms-flex-wrap: nowrap;
+  flex-wrap: nowrap;
+  -webkit-justify-content: flex-start;
+  -ms-flex-pack: start;
+  justify-content: flex-start;
+  -webkit-align-content: stretch;
+  -ms-flex-line-pack: stretch;
+  align-content: stretch;
+  -webkit-align-items: flex-start;
+  -ms-flex-align: start;
+  align-items: flex-start;
+  }
+
+.flex-item:nth-child(1) {
+  -webkit-order: 0;
+  -ms-flex-order: 0;
+  order: 0;
+  -webkit-flex: 0 1 auto;
+  -ms-flex: 0 1 auto;
+  flex: 0 1 auto;
+  -webkit-align-self: auto;
+  -ms-flex-item-align: auto;
+  align-self: auto;
+  }
+
+.flex-item:nth-child(2) {
+  -webkit-order: 0;
+  -ms-flex-order: 0;
+  order: 0;
+  -webkit-flex: 0 1 auto;
+  -ms-flex: 0 1 auto;
+  flex: 0 1 auto;
+  -webkit-align-self: auto;
+  -ms-flex-item-align: auto;
+  align-self: auto;
+  }

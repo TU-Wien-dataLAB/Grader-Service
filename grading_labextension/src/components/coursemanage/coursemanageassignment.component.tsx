@@ -1,4 +1,4 @@
-import { Button, Collapse, Icon } from '@blueprintjs/core';
+import { Button, Collapse, Icon, Tag } from '@blueprintjs/core';
 import { Dialog, showDialog, showErrorMessage } from '@jupyterlab/apputils';
 import * as React from 'react';
 import { GlobalObjects } from '../../index';
@@ -39,6 +39,7 @@ export interface AssignmentState {
   submissions: { user: User; submissions: Submission[] }[];
   assignment: Assignment;
   showSource: boolean;
+  transition: string;
 }
 
 export class CourseManageAssignmentComponent extends React.Component<
@@ -53,7 +54,8 @@ export class CourseManageAssignmentComponent extends React.Component<
     isOpen: false,
     submissions: new Array<{ user: User; submissions: Submission[] }>(),
     assignment: {} as Assignment,
-    showSource: true
+    showSource: true,
+    transition: "show",
   };
   public dirListingNode: HTMLElement;
   public dirListing: DirListing;
@@ -125,13 +127,13 @@ export class CourseManageAssignmentComponent extends React.Component<
       if (!newValue.path.includes(srcPath)) {
         return;
       }
-      
+
       const modified = moment(newValue.last_modified).valueOf()
       if (this.sourceChangeTimestamp === null || this.sourceChangeTimestamp < modified) {
         this.sourceChangeTimestamp = modified
       }
       console.log("New source file changed timestamp: " + this.sourceChangeTimestamp)
-    }, this) 
+    }, this)
   }
 
   private toggleOpen = () => {
@@ -184,6 +186,7 @@ export class CourseManageAssignmentComponent extends React.Component<
   }
 
   private async switchRoot() {
+    this.setState({ transition: "hide" })
     if (this.state.showSource) {
       // TODO: check if source files have actually changed before generating
       if (this.generationTimestamp === null || this.generationTimestamp < this.sourceChangeTimestamp) {
@@ -195,7 +198,7 @@ export class CourseManageAssignmentComponent extends React.Component<
     let path = `/${this.getRootDir(!this.state.showSource)}/${this.lecture.code
       }/${this.state.assignment.name}`;
     await this.dirListing.model.cd(path);
-    this.setState({ showSource: !this.state.showSource });
+    this.setState({ showSource: !this.state.showSource, transition: "show" });
   }
 
   private openFile(path: string) {
@@ -258,7 +261,7 @@ export class CourseManageAssignmentComponent extends React.Component<
   private async releaseAssignment() {
     let result = await showDialog({
       title: 'Release Assignment',
-      body: `Do you want to release ${this.state.assignment.name} for all students? This can NOT be undone!`,
+      body: `Do you want to release ${this.state.assignment.name} for all students?`,
       buttons: [Dialog.cancelButton(), Dialog.warnButton({ label: 'Release' })]
     });
     if (!result.button.accept) {
@@ -275,6 +278,31 @@ export class CourseManageAssignmentComponent extends React.Component<
     }
 
     this.state.assignment.status = 'released';
+    updateAssignment(this.lecture.id, this.state.assignment).subscribe(a =>
+      this.setState({ assignment: a })
+    );
+  }
+
+  private async withholdAssignment() {
+    let result = await showDialog({
+      title: 'Withhold Assignment',
+      body: `Do you want to withhold ${this.state.assignment.name} for all students?`,
+      buttons: [Dialog.cancelButton(), Dialog.warnButton({ label: 'Withold' })]
+    });
+    if (!result.button.accept) {
+      return;
+    }
+
+    result = await showDialog({
+      title: 'Confirmation',
+      body: `Are you sure you want to withold ${this.state.assignment.name}?`,
+      buttons: [Dialog.cancelButton(), Dialog.warnButton({ label: 'Withold' })]
+    });
+    if (!result.button.accept) {
+      return;
+    }
+
+    this.state.assignment.status = 'created';
     updateAssignment(this.lecture.id, this.state.assignment).subscribe(a =>
       this.setState({ assignment: a })
     );
@@ -374,14 +402,15 @@ export class CourseManageAssignmentComponent extends React.Component<
     this.dirListing.update()
   }
 
-  public render() {
+
+  public assignment() {
     return (
       <li key={this.index}>
         <div className={
-          this.state.showSource ? 'assignment bp3-card bp3-elevation-2' : 'assignment-release bp3-card bp3-elevation-2'
+          'assignment'    //bp3-card bp3-elevation-2
         }>
           <div className="assignment-header">
-            <span onClick={this.toggleOpen}>
+            <span onClick={this.toggleOpen} className="flex-item">
               <Icon
                 icon="chevron-right"
                 iconSize={this.iconSize}
@@ -397,7 +426,7 @@ export class CourseManageAssignmentComponent extends React.Component<
               {this.state.showSource ? 'Source' : 'Release'} Files
             </span>
 
-            <span className="button-list">
+            <span className="button-list flex-item">
               <Button
                 icon="edit"
                 outlined
@@ -433,25 +462,20 @@ export class CourseManageAssignmentComponent extends React.Component<
                 {' '}
                 Pull
               </Button>
+
               <Button
                 icon="cloud-upload"
                 outlined
                 className="assignment-button"
-                /*TODO: make state change to pushed disabled={this.state.assignment.status == "created"}*/ onClick={() =>
-                  this.releaseAssignment()
-                }
-              >
-                Release
-              </Button>
-              <Button
-                icon="delete"
-                intent="danger"
-                outlined
-                className="assignment-button"
-                onClick={() => this.delete()}
-              >
-                Delete
-              </Button>
+                intent={this.state.assignment.status == "released" ? "danger" : "none"}
+                onClick={this.state.assignment.status == "released" ? 
+                 () => this.withholdAssignment()
+                 : () => this.releaseAssignment()}>
+                  {this.state.assignment.status == "released" ? "Withhold" : "Release"}
+                </Button> 
+                  
+
+              
               <Button
                 icon="arrow-top-right"
                 intent="primary"
@@ -463,6 +487,15 @@ export class CourseManageAssignmentComponent extends React.Component<
               >
                 {this.state.submissions.length}{' '}
                 {'Submission' + (this.state.submissions.length > 1 ? 's' : '')}
+              </Button>
+              <Button
+                icon="delete"
+                intent="danger"
+                outlined
+                className="assignment-button"
+                onClick={() => this.delete()}
+              >
+                Delete
               </Button>
             </span>
           </div>
@@ -479,14 +512,6 @@ export class CourseManageAssignmentComponent extends React.Component<
               className="assignment-button"
             >
               Add Notebook
-            </Button>
-            <Button
-              icon="add"
-              outlined
-              onClick={() => this.createFile(false)}
-              className="assignment-button"
-            >
-              Add File
             </Button>
             <Button
               icon="console"
@@ -506,6 +531,7 @@ export class CourseManageAssignmentComponent extends React.Component<
             </Button>
             <Button
               icon="switch"
+              intent={this.state.showSource ? "none" : "primary"}
               outlined
               onClick={() => this.switchRoot()}
               className="assignment-button"
@@ -515,6 +541,13 @@ export class CourseManageAssignmentComponent extends React.Component<
           </Collapse>
         </div>
       </li>
+    );
+  }
+  public render() {
+    return (
+      <div className={this.state.transition}>
+        {this.assignment()}
+      </div>
     );
   }
 }
