@@ -1,9 +1,14 @@
+from typing import Any
 from autograding.local import LocalAutogradeExecutor
 from registry import VersionSpecifier, register_handler
 from handlers.base_handler import GraderBaseHandler, authorize
 from jupyter_server.utils import url_path_join
 from orm.takepart import Scope
 from orm.submission import Submission
+from server import GraderServer
+from tornado import httputil, web
+from tornado.ioloop import IOLoop
+import tornado_sqlalchemy
 
 
 @register_handler(
@@ -21,11 +26,16 @@ class GradingBaseHandler(GraderBaseHandler):
     version_specifier=VersionSpecifier.ALL,
 )
 class GradingAutoHandler(GraderBaseHandler):
+
+    def on_finish(self):
+        if self.session:
+            self.session.commit()
+
     @authorize([Scope.tutor, Scope.instructor])
     async def get(self, lecture_id: int, assignment_id: int, sub_id: int):
         submission = self.session.query(Submission).get(sub_id)
         executor = LocalAutogradeExecutor(self.application.grader_service_dir, submission)
-        executor.start()
+        IOLoop.current().spawn_callback(executor.start)
         submission = self.session.query(Submission).get(sub_id)
         self.write_json(submission)
 

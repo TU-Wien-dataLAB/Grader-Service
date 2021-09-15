@@ -1,9 +1,11 @@
+import glob
 from re import S
 from api.models import assignment
 from orm.group import Group
 from orm.lecture import Lecture
 from orm.submission import Submission
 from sqlalchemy.orm import Session
+from tornado.iostream import PipeIOStream
 from traitlets.config.configurable import LoggingConfigurable
 from dataclasses import dataclass
 from datetime import datetime
@@ -12,16 +14,24 @@ import asyncio
 import os
 import shutil
 import shlex
-from tornado.process import Subprocess
+from tornado.process import  Subprocess
 from orm.assignment import Assignment
+from subprocess import CalledProcessError, PIPE
+import stat
 
 
+def rm_error(func, path, exc_info):
+    if not os.access(path, os.W_OK):
+        # Is the error an access error ?
+        os.chmod(path, stat.S_IWUSR)
+        func(path)
+    else:
+        raise
 @dataclass
 class AutogradingStatus:
     status: str
     started_at: datetime
     finished_at: datetime
-
 
 class LocalAutogradeExecutor(LoggingConfigurable):
 
@@ -40,29 +50,16 @@ class LocalAutogradeExecutor(LoggingConfigurable):
         self.autograding_start: datetime = None
         self.autograding_finished: datetime = None
         self.autograding_status: str = None
-        self.autograde_result: asyncio.Future = None
 
     async def start(self):
         self._write_gradebook()
         await self._pull_submission()
         self.autograding_start = datetime.now()
-        self.autograding_result = asyncio.ensure_future(self._run_autograde())
-        await self.autograde_result
+        await self._run_autograde()
         self.autograding_finished = datetime.now()
+        await self._push_results()
         self._set_submission_properties()
         self._cleanup()
-
-    @property
-    def status(self) -> AutogradingStatus:
-        if self.autograde_result is None:
-            status = "not started"
-        elif self.autograde_result.cancelled:
-            status = "cancelled"
-        else:
-            status = "done" if self.autograde_result.done else "running"
-        return AutogradingStatus(
-            status, self.autograding_start, self.autograding_finished
-        )
 
     @property
     def input_path(self):
@@ -73,7 +70,7 @@ class LocalAutogradeExecutor(LoggingConfigurable):
         return os.path.join(self.base_output_path, f"submission_{self.submission.id}")
 
     def _write_gradebook(self):
-        gradebook_str = self.submission.properties
+        gradebook_str = self.submission.assignment.properties
         if not os.path.exists(self.output_path):
             os.mkdir(self.output_path)
         path = os.path.join(self.output_path, "gradebook.json")
@@ -106,21 +103,122 @@ class LocalAutogradeExecutor(LoggingConfigurable):
             assignment.type,
             repo_name,
         )
-        self.log.info(f"Cloning repo {git_repo_path} into input directory")
-        command = f'{self.git_executable} clone "{git_repo_path}" "{self.input_path}"'
-        process = Subprocess(shlex.split(command))
-        await process.wait_for_exit()
+
+        if os.path.exists(self.input_path):
+            shutil.rmtree(self.input_path, onerror=rm_error)
+        os.mkdir(self.input_path)
+
+        self.log.info(f"Pulling repo {git_repo_path} into input directory")
+
+        command = f'{self.git_executable} init'
+        self.log.info(f"Running {command}")
+        process = Subprocess(shlex.split(command), stdout=PIPE, stderr=PIPE, cwd=self.input_path)
+        try:
+            await process.wait_for_exit()
+        except CalledProcessError:
+            error = process.stderr.read().decode("utf-8")
+            self.log.error(error)
+            pass
+
+        command = f'{self.git_executable} pull "{git_repo_path}" main'
+        self.log.info(f"Running {command}")
+        process = Subprocess(shlex.split(command), stdout=PIPE, stderr=PIPE, cwd=self.input_path)
+        try:
+            await process.wait_for_exit()
+        except CalledProcessError:
+            error = process.stderr.read().decode("utf-8")
+            self.log.error(error)
+            pass
         self.log.info("Successfully cloned repo")
+
+        command = f"{self.git_executable} checkout {self.submission.commit_hash}"
+        self.log.info(f"Running {command}")
+        process = Subprocess(shlex.split(command), stdout=PIPE, stderr=PIPE, cwd=self.input_path)
+        try:
+            await process.wait_for_exit()
+        except CalledProcessError:
+            error = process.stderr.read().decode("utf-8")
+            self.log.error(error)
+            pass
+        self.log.info(f"Now at commit {self.submission.commit_hash}")
+
         self.submission.auto_status = "pending"
         self.session.commit()
 
     async def _run_autograde(self):
+        if os.path.exists(self.output_path):
+            shutil.rmtree(self.output_path, onerror=rm_error)
+        os.mkdir(self.output_path)
+
         command = f'{self.convert_executable} autograde -i "{self.input_path}" -o "{self.output_path}" -p "*.ipynb"'
         self.log.info(f"Running {command}")
-        process = Subprocess(shlex.split(command))
-        await process.wait_for_exit()
-        process_out = await process.stdout.read_until_close()
-        self.log.info(process_out.decode("utf-8"))
+        process = Subprocess(shlex.split(command), stdout=PIPE, stderr=PIPE)
+        try:
+            await process.wait_for_exit()
+        except CalledProcessError:
+            error = process.stderr.read().decode("utf-8")
+            self.log.error(error)
+            raise # TODO: exit gracefully
+        output = process.stderr.read().decode("utf-8")
+        self.log.info(output)
+
+    async def _push_results(self):
+        assignment: Assignment = self.submission.assignment
+        lecture: Lecture = assignment.lecture
+
+        if assignment.type == "user":
+            repo_name = self.submission.username
+        else:
+            group = self.session.query(Group).get(
+                (self.submission.username, lecture.id)
+            )
+            if group is None:
+                raise ValueError()
+            repo_name = group.name
+
+        git_repo_path = os.path.join(
+            self.grader_service_dir,
+            "git",
+            lecture.code,
+            assignment.name,
+            "autograde",
+            assignment.type,
+            repo_name,
+        )
+
+        command = f'{self.git_executable} init'
+        self.log.info(f"Running {command}")
+        process = Subprocess(shlex.split(command), stdout=PIPE, stderr=PIPE, cwd=self.input_path)
+        try:
+            await process.wait_for_exit()
+        except CalledProcessError:
+            error = process.stderr.read().decode("utf-8")
+            self.log.error(error)
+            pass
+        
+        self.log.info(f"Creating new branch {self.submission.commit_hash}")
+        command = f"{self.git_executable} switch -c {self.submission.commit_hash}"
+        process = Subprocess(shlex.split(command), stdout=PIPE, stderr=PIPE, cwd=self.input_path)
+        try:
+            await process.wait_for_exit()
+        except CalledProcessError:
+            error = process.stderr.read().decode("utf-8")
+            self.log.error(error)
+            pass
+        self.log.info(f"Now at branch {self.submission.commit_hash}")
+
+        self.log.info(
+            f"Pushing to {git_repo_path} at branch {self.submission.commit_hash}"
+        )
+        command = f"{self.git_executable} push -uf {git_repo_path} {self.submission.commit_hash}"
+        process = Subprocess(shlex.split(command), stdout=PIPE, stderr=PIPE, cwd=self.output_path)
+        try:
+            await process.wait_for_exit()
+        except CalledProcessError:
+            error = process.stderr.read().decode("utf-8")
+            self.log.error(error)
+            pass
+        self.log.info("Pushing complete")
 
     def _set_submission_properties(self):
         with open(os.path.join(self.output_path, "gradebook.json"), "r") as f:
@@ -132,7 +230,7 @@ class LocalAutogradeExecutor(LoggingConfigurable):
     def _cleanup(self):
         shutil.rmtree(self.input_path)
         shutil.rmtree(self.output_path)
-
+            
     @validate("base_input_path", "base_output_path")
     def _validate_service_dir(self, proposal):
         path: str = proposal["value"]

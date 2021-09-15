@@ -69,7 +69,7 @@ class GitBaseHandler(GraderBaseHandler):
         assignment_path = os.path.abspath(os.path.join(self.gitbase, pathlets[0], unquote(pathlets[1])))
         
         repo_type = pathlets[2]
-        if repo_type not in {"source", "release", "assignment"}:
+        if repo_type not in {"source", "release", "assignment", "autograde"}:
             return None
         
         # get lecture and assignment if they exist
@@ -86,6 +86,11 @@ class GitBaseHandler(GraderBaseHandler):
             raise HTTPError(403)
         
         if repo_type == "release" and role.role == Scope.student and rpc == "send-pack":
+            self.error_message = "Unauthorized"
+            raise HTTPError(403)
+
+        # no push allowed -> the autograder executor can push locally so it will not be affected by this
+        if repo_type == "autograde" and rpc == "send-pack": 
             self.error_message = "Unauthorized"
             raise HTTPError(403)
 
@@ -109,25 +114,32 @@ class GitBaseHandler(GraderBaseHandler):
         # construct final path from repo type
         if repo_type == "source" or repo_type == "release":
             path = os.path.join(assignment_path, repo_type)
+        elif repo_type == "autograde":
+            type_path = os.path.join(assignment_path, repo_type, assignment.type)
+            if assignment.type == "user":
+                path = os.path.join(type_path, self.user.name)
+            else:
+                group = self.session.query(Group).get((self.user.name, lecture.id))
+                if group is None:
+                    self.error_message = "Not Found"
+                    raise HTTPError(404)
+                path = os.path.join(type_path, group.name)
         elif repo_type == "user":
             user_path = os.path.join(assignment_path, repo_type)
-            if not os.path.exists(user_path):
-                os.mkdir(user_path)
             path = os.path.join(user_path, self.user.name)
         elif repo_type == "group":
             group = self.session.query(Group).get((self.user.name, lecture.id))
             if group is None:
                 self.error_message = "Not Found"
                 raise HTTPError(404)
-            group_path = os.path.join(assignment_path, "group")
-            if not os.path.exists(group_path):
-                os.mkdir(group_path)
+            group_path = os.path.join(assignment_path, repo_type)
             path = os.path.join(group_path, group.name)
         else:
             return None
-
+        
+        os.makedirs(path, exist_ok=True)
         # return git repo
-        if os.path.exists(path):
+        if os.path.exists(os.path.dirname(path)):
             return path
         else:
             os.mkdir(path)
@@ -137,6 +149,11 @@ class GitBaseHandler(GraderBaseHandler):
             except subprocess.CalledProcessError:
                 return None
             return path
+
+    @staticmethod
+    def _create_path(path):
+        if not os.path.exists(path):
+            os.mkdir(path)
 
     def get_gitdir(self, rpc: str):
         """Determine the git repository for this request"""

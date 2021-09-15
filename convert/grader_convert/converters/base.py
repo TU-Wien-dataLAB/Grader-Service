@@ -103,7 +103,7 @@ class BaseConverter(LoggingConfigurable):
 
     @default("permissions")
     def _permissions_default(self) -> int:
-        return 444
+        return 664
 
     @validate("pre_convert_hook")
     def _validate_pre_convert_hook(self, proposal):
