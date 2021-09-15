@@ -145,9 +145,12 @@ class PushHandler(ExtensionBaseHandler):
             generator.start()
             self.log.info("GenerateAssignment conversion done")
 
-            gradebook_path = os.path.join(git_service.path, "gradebook.json")
-            with open(gradebook_path, "r") as f:
-                gradebook_json: dict = json.load(f)
+            try:
+                gradebook_path = os.path.join(git_service.path, "gradebook.json")
+                with open(gradebook_path, "r") as f:
+                    gradebook_json: dict = json.load(f)
+            except FileNotFoundError:
+                return
 
             self.log.info(f"Setting properties of assignment from {gradebook_path}")
             response: HTTPResponse = await self.request_service.request(

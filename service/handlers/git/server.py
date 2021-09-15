@@ -137,9 +137,9 @@ class GitBaseHandler(GraderBaseHandler):
         else:
             return None
         
-        os.makedirs(path, exist_ok=True)
+        os.makedirs(os.path.dirname(path), exist_ok=True)
         # return git repo
-        if os.path.exists(os.path.dirname(path)):
+        if os.path.exists(path):
             return path
         else:
             os.mkdir(path)
