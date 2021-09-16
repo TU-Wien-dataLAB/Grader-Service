@@ -18,6 +18,7 @@ from tornado.process import  Subprocess
 from orm.assignment import Assignment
 from subprocess import CalledProcessError, PIPE
 import stat
+from grader_convert.converters.autograde import Autograde
 
 
 def rm_error(func, path, exc_info):
@@ -52,7 +53,6 @@ class LocalAutogradeExecutor(LoggingConfigurable):
         self.autograding_status: str = None
 
     async def start(self):
-        self._write_gradebook()
         await self._pull_submission()
         self.autograding_start = datetime.now()
         await self._run_autograde()
@@ -112,33 +112,24 @@ class LocalAutogradeExecutor(LoggingConfigurable):
 
         command = f'{self.git_executable} init'
         self.log.info(f"Running {command}")
-        process = Subprocess(shlex.split(command), stdout=PIPE, stderr=PIPE, cwd=self.input_path)
         try:
-            await process.wait_for_exit()
+            await self._run_subprocess(command, self.input_path)
         except CalledProcessError:
-            error = process.stderr.read().decode("utf-8")
-            self.log.error(error)
             pass
 
         command = f'{self.git_executable} pull "{git_repo_path}" main'
         self.log.info(f"Running {command}")
-        process = Subprocess(shlex.split(command), stdout=PIPE, stderr=PIPE, cwd=self.input_path)
         try:
-            await process.wait_for_exit()
+            await self._run_subprocess(command, self.input_path)
         except CalledProcessError:
-            error = process.stderr.read().decode("utf-8")
-            self.log.error(error)
             pass
         self.log.info("Successfully cloned repo")
 
         command = f"{self.git_executable} checkout {self.submission.commit_hash}"
         self.log.info(f"Running {command}")
-        process = Subprocess(shlex.split(command), stdout=PIPE, stderr=PIPE, cwd=self.input_path)
         try:
-            await process.wait_for_exit()
+            await self._run_subprocess(command, self.input_path)
         except CalledProcessError:
-            error = process.stderr.read().decode("utf-8")
-            self.log.error(error)
             pass
         self.log.info(f"Now at commit {self.submission.commit_hash}")
 
@@ -148,19 +139,21 @@ class LocalAutogradeExecutor(LoggingConfigurable):
     async def _run_autograde(self):
         if os.path.exists(self.output_path):
             shutil.rmtree(self.output_path, onerror=rm_error)
-        os.mkdir(self.output_path)
+            os.mkdir(self.output_path)
+            self._write_gradebook()
 
-        command = f'{self.convert_executable} autograde -i "{self.input_path}" -o "{self.output_path}" -p "*.ipynb"'
-        self.log.info(f"Running {command}")
-        process = Subprocess(shlex.split(command), stdout=PIPE, stderr=PIPE)
-        try:
-            await process.wait_for_exit()
-        except CalledProcessError:
-            error = process.stderr.read().decode("utf-8")
-            self.log.error(error)
-            raise # TODO: exit gracefully
-        output = process.stderr.read().decode("utf-8")
-        self.log.info(output)
+        # command = f'{self.convert_executable} autograde -i "{self.input_path}" -o "{self.output_path}" -p "*.ipynb"'
+        # self.log.info(f"Running {command}")
+        # try:
+        #     process = await self._run_subprocess(command, None)
+        # except CalledProcessError:
+        #     raise # TODO: exit gracefully
+        # output = process.stderr.read().decode("utf-8")
+        # self.log.info(output)
+        autograder = Autograde(self.input_path, self.output_path, "*.ipynb")
+        autograder.force = True
+        autograder.start()
+
 
     async def _push_results(self):
         assignment: Assignment = self.submission.assignment
@@ -186,38 +179,44 @@ class LocalAutogradeExecutor(LoggingConfigurable):
             repo_name,
         )
 
+        if not os.path.exists(git_repo_path):
+            os.makedirs(git_repo_path, exist_ok=True)
+            try:
+                await self._run_subprocess(f'git init --bare "{git_repo_path}"', self.output_path)
+            except CalledProcessError:
+                raise
+
         command = f'{self.git_executable} init'
-        self.log.info(f"Running {command}")
-        process = Subprocess(shlex.split(command), stdout=PIPE, stderr=PIPE, cwd=self.input_path)
+        self.log.info(f"Running {command} at {self.output_path}")
         try:
-            await process.wait_for_exit()
+            await self._run_subprocess(command, self.output_path)
         except CalledProcessError:
-            error = process.stderr.read().decode("utf-8")
-            self.log.error(error)
             pass
         
         self.log.info(f"Creating new branch {self.submission.commit_hash}")
         command = f"{self.git_executable} switch -c {self.submission.commit_hash}"
-        process = Subprocess(shlex.split(command), stdout=PIPE, stderr=PIPE, cwd=self.input_path)
         try:
-            await process.wait_for_exit()
+            await self._run_subprocess(command, self.output_path)
         except CalledProcessError:
-            error = process.stderr.read().decode("utf-8")
-            self.log.error(error)
             pass
         self.log.info(f"Now at branch {self.submission.commit_hash}")
+
+        self.log.info(f"Commiting all files in {self.output_path}")
+        try:
+            await self._run_subprocess(f"{self.git_executable} add -A", self.output_path)
+            await self._run_subprocess(f'{self.git_executable} commit -m "{self.submission.commit_hash}"', self.output_path)
+        except CalledProcessError:
+            pass # TODO: exit gracefully
+
 
         self.log.info(
             f"Pushing to {git_repo_path} at branch {self.submission.commit_hash}"
         )
-        command = f"{self.git_executable} push -uf {git_repo_path} {self.submission.commit_hash}"
-        process = Subprocess(shlex.split(command), stdout=PIPE, stderr=PIPE, cwd=self.output_path)
+        command = f'{self.git_executable} push -uf "{git_repo_path}" {self.submission.commit_hash}'
         try:
-            await process.wait_for_exit()
+            await self._run_subprocess(command, self.output_path)
         except CalledProcessError:
-            error = process.stderr.read().decode("utf-8")
-            self.log.error(error)
-            pass
+            pass # TODO: exit gracefully
         self.log.info("Pushing complete")
 
     def _set_submission_properties(self):
@@ -230,12 +229,22 @@ class LocalAutogradeExecutor(LoggingConfigurable):
     def _cleanup(self):
         shutil.rmtree(self.input_path)
         shutil.rmtree(self.output_path)
+    
+    async def _run_subprocess(self, command: str, cwd: str) -> Subprocess:
+        process = Subprocess(shlex.split(command), stdout=PIPE, stderr=PIPE, cwd=cwd)
+        try:
+            await process.wait_for_exit()
+        except CalledProcessError:
+            error = process.stderr.read().decode("utf-8")
+            self.log.error(error)
+            raise
+        return process
             
     @validate("base_input_path", "base_output_path")
     def _validate_service_dir(self, proposal):
         path: str = proposal["value"]
         if not os.path.isabs(path):
-            raise TraitError("The path is not absolute")
+            raise TraitError("The path specified has to be absolute")
         if not os.path.isdir(path):
             raise TraitError("The path has to be an existing directory")
         return path
