@@ -23,6 +23,8 @@ import { ItemRenderer, Select } from '@blueprintjs/select';
 import { User } from '../../model/user';
 import { MenuItem } from '@blueprintjs/core';
 import { autogradeSubmission } from '../../services/grading.service';
+import { Popup } from '@jupyterlab/statusbar'
+import { ReactWidget } from '@jupyterlab/apputils'
 
 export interface IGradingProps {
   lectureID: number;
@@ -110,7 +112,7 @@ export class GradingComponent extends React.Component<IGradingProps> {
               thisRow[f] = params.getValue(params.id, f);
             });
 
-            return alert(JSON.stringify(thisRow, null, 4));
+            return this.showManualGrade(thisRow);
           };
 
           return (
@@ -244,6 +246,10 @@ export class GradingComponent extends React.Component<IGradingProps> {
         </Button>
       </div>
     );
+  }
+
+  private showManualGrade(rowInfo: object) {
+    console.log(rowInfo);
   }
 
   private handleValueChange = (select: string) => {
