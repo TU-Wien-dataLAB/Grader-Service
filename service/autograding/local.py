@@ -139,8 +139,9 @@ class LocalAutogradeExecutor(LoggingConfigurable):
     async def _run_autograde(self):
         if os.path.exists(self.output_path):
             shutil.rmtree(self.output_path, onerror=rm_error)
-            os.mkdir(self.output_path)
-            self._write_gradebook()
+            
+        os.mkdir(self.output_path)
+        self._write_gradebook()
 
         # command = f'{self.convert_executable} autograde -i "{self.input_path}" -o "{self.output_path}" -p "*.ipynb"'
         # self.log.info(f"Running {command}")
@@ -224,6 +225,7 @@ class LocalAutogradeExecutor(LoggingConfigurable):
             gradebook_str = f.read()
         self.submission.properties = gradebook_str
         self.submission.auto_status = "automatically_graded"
+
         self.session.commit()
 
     def _cleanup(self):
