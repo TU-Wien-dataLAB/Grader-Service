@@ -17,6 +17,7 @@ from nbconvert.writers import FilesWriter
 from ..utils import find_all_files, rmtree, remove
 from ..preprocessors.execute import UnresponsiveKernelError
 from ..nbgraderformat import SchemaTooOldError, SchemaTooNewError
+from ..nbgraderformat.common import ValidationError
 import typing
 from nbconvert.exporters.exporter import ResourcesDict
 
@@ -324,6 +325,11 @@ class BaseConverter(LoggingConfigurable):
             _handle_failure(e)
             self.log.error("Canceled")
             raise
+        
+        except ValidationError as e:
+            _handle_failure(e)
+            self.log.error(e.message)
+            raise GraderConvertException(e.message)
 
         except Exception as e:
             self.log.error(
