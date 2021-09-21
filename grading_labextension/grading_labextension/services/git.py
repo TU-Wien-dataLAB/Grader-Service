@@ -65,6 +65,10 @@ class GitService(Configurable):
     def delete_remote(self, origin: str):
         raise NotImplementedError()
 
+    def switch_branch(self,branch: str):
+        self.log.info(f"Switching to branch {branch} at path {self.path}")
+        self._run_command(f"git checkout {branch}")
+
     def pull(self, origin: str, force=False):
         if force:
             self.log.info(f"Pulling remote {origin}")
