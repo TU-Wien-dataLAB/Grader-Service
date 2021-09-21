@@ -123,8 +123,10 @@ const extension: JupyterFrontEndPlugin<void> = {
       tracker.activeCellChanged.connect(() => {
         const notebookPanel: NotebookPanel = tracker.currentWidget;
         const notebook: Notebook = tracker.currentWidget.content;
+        const notebookPaths: string[] = notebookPanel.context.contentsModel.path.split("/")
+        if (notebookPaths[0] == "manualgrade") return;
         const switcher: any = (notebookPanel.toolbar.layout as PanelLayout)
-          .widgets[10];
+          .widgets[10]; // TODO: instead of indexing use search for instance of CreationmodeSwitch; maybe other plugins change index
         // Remove the existing play button from
         // the previously active cell. This may
         // well introduce bugs down the road and

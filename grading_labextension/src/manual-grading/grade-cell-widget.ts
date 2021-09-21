@@ -5,7 +5,7 @@ import { IObservableJSON, IObservableMap } from '@jupyterlab/observables';
 import { ReadonlyPartialJSONValue } from '@lumino/coreutils';
 import { ISignal, Signal } from '@lumino/signaling';
 import { Panel } from '@lumino/widgets';
-import { CellModel, CellType, ToolData } from './model';
+import { CellModel, CellType, ToolData } from '../create-assignment/model';
 
 const CSS_CELL_HEADER = 'cellHeader';
 const CSS_CELL_ID = 'cellId';
@@ -20,7 +20,7 @@ const CSS_MOD_UNEDITABLE = 'nbgrader-mod-uneditable';
 /**
  * Shows a cell's assignment data.
  */
-export class CellWidget extends Panel {
+export class GradeCellWidget extends Panel {
   private _cell: Cell;
   private _click = new Signal<this, void>(this);
   private metadataChangedHandler: (
