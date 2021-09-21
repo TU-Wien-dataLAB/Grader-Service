@@ -11,9 +11,9 @@ class CheckCellMetadata(NbGraderPreprocessor):
     def preprocess(self, nb: NotebookNode, resources: Dict) -> Tuple[NotebookNode, Dict]:
         try:
             MetadataValidator().validate_nb(nb)
-        except ValidationError:
+        except ValidationError as e:
             self.log.error(traceback.format_exc())
-            msg = "Notebook failed to validate; the nbgrader metadata may be corrupted."
+            msg = "Notebook failed to validate: " + e.message
             self.log.error(msg)
             raise ValidationError(msg)
 

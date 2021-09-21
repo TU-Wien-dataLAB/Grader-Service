@@ -1,5 +1,5 @@
 import json
-import logging
+import sys
 import os
 from grading_labextension.registry import register_handler
 from grading_labextension.handlers.base_handler import ExtensionBaseHandler
@@ -40,7 +40,13 @@ class GenerateHandler(ExtensionBaseHandler):
         )
         generator.force = True
         self.log.info("Starting GenerateAssignment converter")
-        generator.start()
+        try:
+            generator.start()
+        except:
+            e = sys.exc_info()[0]
+            self.log.error(e)
+            self.set_status(400)
+            self.write_error("Could not generate assignment")
         try:
             gradebook_path = os.path.join(generator._output_directory, "gradebook.json")
             os.remove(gradebook_path)
