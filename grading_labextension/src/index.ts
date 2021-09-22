@@ -33,6 +33,7 @@ import { IDocumentManager } from '@jupyterlab/docmanager';
 import { IFileBrowserFactory } from '@jupyterlab/filebrowser';
 import { UserPermissions } from './services/permission.service';
 import { CellPlayButton } from './create-assignment/widget';
+import { ManualGradingView } from './widgets/manualgrading';
 
 namespace AssignmentsCommandIDs {
   export const create = 'assignments:create';
@@ -50,6 +51,12 @@ namespace GradingCommandIDs {
   export const create = 'grading:create';
 
   export const open = 'grading:open';
+}
+
+namespace ManualGradeCommandIDs {
+  export const create = 'manualgrade:create';
+
+  export const open = 'manualgrade:open'
 }
 
 /*namespace CreateAssignmentIDs {
@@ -303,6 +310,52 @@ const extension: JupyterFrontEndPlugin<void> = {
       execute: async (args: any) => {
         const gradingView: MainAreaWidget<GradingView> = await app.commands.execute(
           GradingCommandIDs.create,
+          args
+        );
+
+        if (!gradingView.isAttached) {
+          // Attach the widget to the main work area if it's not there
+          app.shell.add(gradingView, 'main');
+        }
+        // Activate the widget
+        app.shell.activateById(gradingView.id);
+      },
+      icon: editIcon
+    });
+
+    command = ManualGradeCommandIDs.create;
+    app.commands.addCommand(command, {
+      execute: (args: any) => {
+        const lectureID: number =
+          typeof args['lectureID'] === 'undefined'
+            ? null
+            : (args['lectureID'] as number);
+        const assignmentID: number =
+          typeof args['assignmentID'] === 'undefined'
+            ? null
+            : (args['assignmentID'] as number);
+        const subID: number =
+          typeof args['subID'] === 'undefined'
+          ? null
+          : (args['subID'] as number);
+        const manualgradingView = new ManualGradingView({ lectureID, assignmentID, subID });
+        const manualgradingWidget = new MainAreaWidget<ManualGradingView>({
+          content: manualgradingView
+        });
+        manualgradingWidget.id = 'grading-jupyterlab';
+        manualgradingWidget.title.label = 'Manualgrading';
+        manualgradingWidget.title.closable = true;
+
+        return manualgradingWidget;
+      }
+    });
+
+    command = ManualGradeCommandIDs.open;
+    app.commands.addCommand(command, {
+      label: 'ManualGrading',
+      execute: async (args: any) => {
+        const gradingView: MainAreaWidget<ManualGradingView> = await app.commands.execute(
+          ManualGradeCommandIDs.create,
           args
         );
 

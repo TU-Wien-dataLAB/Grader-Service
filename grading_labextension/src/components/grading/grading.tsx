@@ -11,6 +11,7 @@ import { Submission } from '../../model/submission';
 import { fetchAssignment } from '../../services/assignments.service';
 import { getLecture } from '../../services/lectures.service';
 import { getAllSubmissions } from '../../services/submissions.service';
+import { showErrorMessage } from '@jupyterlab/apputils';
 
 import {
   DataGrid,
@@ -25,6 +26,7 @@ import { MenuItem } from '@blueprintjs/core';
 import { autogradeSubmission } from '../../services/grading.service';
 import { Popup } from '@jupyterlab/statusbar'
 import { ReactWidget } from '@jupyterlab/apputils'
+import { GlobalObjects } from '../..';
 
 export interface IGradingProps {
   lectureID: number;
@@ -111,6 +113,7 @@ export class GradingComponent extends React.Component<IGradingProps> {
             fields.forEach(f => {
               thisRow[f] = params.getValue(params.id, f);
             });
+            this.openManualGrading(this.lectureId,this.assignmentId,+thisRow.id);
 
             return this.showManualGrade(thisRow);
           };
@@ -145,6 +148,17 @@ export class GradingComponent extends React.Component<IGradingProps> {
     this.setState({ assignment, lecture });
     this.getSubmissions();
     
+  }
+  private openManualGrading(lectureID: number, assignmentID: number, subID: number) {
+    GlobalObjects.commands
+      .execute('manualgrade:open', {
+        lectureID,
+        assignmentID,
+        subID
+      })
+      .catch(error => {
+        showErrorMessage('Error Opening Manualgrade View', error);
+      });
   }
 
   public getSubmissions() {
