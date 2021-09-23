@@ -46,8 +46,8 @@ export class GradingComponent extends React.Component<IGradingProps> {
   public assignmentId: number;
   public columns: GridColDef[];
   public state = {
-    assignment: {},
-    lecture: {},
+    assignment: {id:-1},
+    lecture: {id:-1},
     submissions: new Array<{ user: User; submissions: Submission[] }>(),
     option: 'latest',
     rows: new Array(),
@@ -113,7 +113,7 @@ export class GradingComponent extends React.Component<IGradingProps> {
             fields.forEach(f => {
               thisRow[f] = params.getValue(params.id, f);
             });
-            this.openManualGrading(this.lectureId,this.assignmentId,+thisRow.id);
+            this.openManualGrading(this.state.lecture.id,this.state.assignment.id,+thisRow.id);
 
             return this.showManualGrade(thisRow);
           };

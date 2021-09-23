@@ -12,6 +12,8 @@ import { Lecture } from '../model/lecture';
 import { getLecture } from '../services/lectures.service';
 import { Assignment } from '../model/assignment';
 import { fetchAssignment } from '../services/assignments.service';
+import { Submission } from '../model/submission';
+import { getSubmissions } from '../services/submissions.service';
 
 
 export interface ManualGradingProps {
@@ -28,6 +30,7 @@ export class ManualGradingComponent extends React.Component<ManualGradingProps> 
   private sourceChangeTimestamp: any;
   private lectureID: number;
   private assignmentID: number;
+  private subID: number;
   private title: Title<Widget>;
 
   constructor(props : ManualGradingProps) {
@@ -35,6 +38,7 @@ export class ManualGradingComponent extends React.Component<ManualGradingProps> 
     this.lectureID = props.lectureID;
     this.assignmentID = props.assignmentID;
     this.title = props.title;
+    this.subID = props.subID;
   }
   public async componentDidMount() {
     const assignment: Assignment = await fetchAssignment(
@@ -45,7 +49,8 @@ export class ManualGradingComponent extends React.Component<ManualGradingProps> 
     ).toPromise();
     
     const lecture: Lecture = await getLecture(this.lectureID).toPromise();
-    this.title.label = "Manualgrade"
+
+    this.title.label = `Manualgrade ${assignment.name}`;
     const renderer = new ExistingNodeRenderer(this.dirListingNode);
     const model = new FilterFileBrowserModel({
         auto: true,
@@ -113,7 +118,18 @@ export class ManualGradingComponent extends React.Component<ManualGradingProps> 
     
 
     public render() {
-        return (<div><p>Hello Manual</p></div>)
+        return (
+        <div>
+          <h1>
+            <p style={{textAlign:'center'}}>Manualgrade</p>
+          </h1>
+          <div
+          className="assignment-dir-listing"
+          ref={_element => (this.dirListingNode = _element)}
+          >  
+          </div>
+        </div>
+        )
     }
 
 }
