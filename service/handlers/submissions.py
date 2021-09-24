@@ -150,3 +150,14 @@ class SubmissionPropertiesHandler(GraderBaseHandler):
         properties_string: str = self.request.body.decode("utf-8")
         submission.properties = properties_string
         self.session.commit()
+
+
+@register_handler(
+    path=r"\/lectures\/(?P<lecture_id>\d*)\/assignments\/(?P<assignment_id>\d*)\/submissions\/(?P<submission_id>\d*)\/?",
+    version_specifier=VersionSpecifier.ALL,
+)
+class SubmissionPropertiesHandler(GraderBaseHandler):
+    @authorize([Scope.tutor, Scope.instructor])
+    async def get(self, lecture_id: int, assignment_id: int, submission_id: int):
+        submission = self.session.query(Submission).get(submission_id)      
+        self.write_json(submission)

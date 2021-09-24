@@ -8,8 +8,8 @@ import {request, HTTPMethod} from './request.service'
 import { Feedback } from '../model/feedback';
 import { Submission } from '../model/submission';
 
-export function createManualFeedback(lecture: Lecture, assignment : Assignment, student: User, manual: ManualGradingContent): Observable<Feedback> {
-    return request<Feedback>(HTTPMethod.POST, `/lectures/${lecture.id}/assignments/${assignment.id}/grading/${student.name}/manual`, manual)
+export function createManualFeedback(lectid: number, assignid : number, subid: number): Observable<any> {
+    return request<any>(HTTPMethod.GET, `/lectures/${lectid}/assignments/${assignid}/grading/${subid}/manual`)
   }
 
 export function autogradeSubmission(lecture: Lecture, assignment : Assignment, submission : Submission): Observable<any> {

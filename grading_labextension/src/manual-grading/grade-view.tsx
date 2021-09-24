@@ -14,7 +14,7 @@ import { Assignment } from '../model/assignment';
 import { fetchAssignment } from '../services/assignments.service';
 import { Submission } from '../model/submission';
 import { getSubmissions } from '../services/submissions.service';
-
+import { Button } from '@blueprintjs/core';
 
 export interface ManualGradingProps {
   lectureID: number;
@@ -60,7 +60,7 @@ export class ManualGradingComponent extends React.Component<ManualGradingProps> 
     const LISTING_CLASS = 'jp-FileBrowser-listing';
     this.dirListing = new DirListing({ model, renderer });
     this.dirListing.addClass(LISTING_CLASS);
-    const manualPath = `manualgrade/${lecture.code}/${assignment.name}`
+    const manualPath = `manualgrade/${lecture.code}/${assignment.name}/${this.subID}`
     await model.cd(manualPath);
     this.dirListingNode.onclick = async ev => {
       const model = this.dirListing.modelForClick(ev);
@@ -128,6 +128,7 @@ export class ManualGradingComponent extends React.Component<ManualGradingProps> 
           ref={_element => (this.dirListingNode = _element)}
           >  
           </div>
+          <Button>Check Grading Status</Button>
         </div>
         )
     }
