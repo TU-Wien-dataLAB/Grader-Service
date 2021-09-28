@@ -10,7 +10,7 @@ from traitlets.config.configurable import LoggingConfigurable
 from dataclasses import dataclass
 from datetime import datetime
 from traitlets.traitlets import TraitError, Unicode, validate
-import asyncio
+import asyncio, json
 import os
 import shutil
 import shlex
@@ -19,6 +19,7 @@ from orm.assignment import Assignment
 from subprocess import CalledProcessError, PIPE
 import stat
 from grader_convert.converters.autograde import Autograde
+from grader_convert.gradebook.models import GradeBookModel, Notebook
 
 
 def rm_error(func, path, exc_info):
@@ -225,7 +226,12 @@ class LocalAutogradeExecutor(LoggingConfigurable):
             gradebook_str = f.read()
         self.submission.properties = gradebook_str
         self.submission.auto_status = "automatically_graded"
-
+        gradebook_dict = json.loads(gradebook_str)
+        book = GradeBookModel.from_dict(gradebook_dict)
+        score = 0
+        for id,n in book.notebooks.items():
+            score += n.score
+        self.submission.score = score
         self.session.commit()
 
     def _cleanup(self):
