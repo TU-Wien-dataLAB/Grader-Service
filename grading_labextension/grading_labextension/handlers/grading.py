@@ -1,3 +1,4 @@
+from genericpath import exists
 from grading_labextension.registry import register_handler
 from grading_labextension.handlers.base_handler import ExtensionBaseHandler
 from jupyter_server.utils import url_path_join
@@ -64,18 +65,18 @@ class GradingManualHandler(ExtensionBaseHandler):
         git_service = GitService(
             lecture_code=lecture["code"],
             assignment_name=assignment["name"],
-            repo_type="manualgrade",
+            repo_type="autograde",
             config=self.config,
         )
-        git_service.path = os.path.join(git_service.path, sub_id)
-        os.mkdir(git_service.path)
+        git_service.path = os.path.join(git_service.git_root_dir, "manualgrade", git_service.lecture_code, git_service.assignment_name,sub_id)
+        self.log.info(f"Path: {git_service.path}")
+        if not os.path.exists(git_service.path):
+            os.makedirs(git_service.path, exist_ok=True)
 
         if not git_service.is_git():
           git_service.init()
           git_service.set_remote("autograde")
-        git_service.pull("autograde")
-        git_service.switch_branch(submission["commit_hash"])
-
+        git_service.pull("autograde",branch=f"submission_{submission['commit_hash']}")
 
 
 @register_handler(

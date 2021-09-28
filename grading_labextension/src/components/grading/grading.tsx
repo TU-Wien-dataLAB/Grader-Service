@@ -85,6 +85,7 @@ export class GradingComponent extends React.Component<IGradingProps> {
             });
             const response = await autogradeSubmission(this.state.lecture,this.state.assignment,thisRow).toPromise();
             this.getSubmissions()
+
             return console.log(response);
           };
 
@@ -123,7 +124,7 @@ export class GradingComponent extends React.Component<IGradingProps> {
             <Button
               icon="highlight"
               onClick={onClick}
-              disabled={params.getValue(params.id, 'status') === 'not_graded'}
+              disabled={params.getValue(params.id, 'auto_status') !== 'automatically_graded'}
               outlined
             >
               Manualgrade
@@ -148,7 +149,9 @@ export class GradingComponent extends React.Component<IGradingProps> {
 
     this.setState({ assignment, lecture });
     this.getSubmissions();
-    
+    setInterval(() => {this.getSubmissions(); 
+                      console.log("Updatin");}
+                      ,5000)
   }
   private openManualGrading(lectureID: number, assignmentID: number, subID: number) {
     GlobalObjects.commands

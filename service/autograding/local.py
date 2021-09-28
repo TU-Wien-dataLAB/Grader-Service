@@ -194,13 +194,13 @@ class LocalAutogradeExecutor(LoggingConfigurable):
         except CalledProcessError:
             pass
         
-        self.log.info(f"Creating new branch {self.submission.commit_hash}")
-        command = f"{self.git_executable} switch -c {self.submission.commit_hash}"
+        self.log.info(f"Creating new branch submission_{self.submission.commit_hash}")
+        command = f"{self.git_executable} switch -c submission_{self.submission.commit_hash}"
         try:
             await self._run_subprocess(command, self.output_path)
         except CalledProcessError:
             pass
-        self.log.info(f"Now at branch {self.submission.commit_hash}")
+        self.log.info(f"Now at branch submission_{self.submission.commit_hash}")
 
         self.log.info(f"Commiting all files in {self.output_path}")
         try:
@@ -211,9 +211,9 @@ class LocalAutogradeExecutor(LoggingConfigurable):
 
 
         self.log.info(
-            f"Pushing to {git_repo_path} at branch {self.submission.commit_hash}"
+            f"Pushing to {git_repo_path} at branch submission_{self.submission.commit_hash}"
         )
-        command = f'{self.git_executable} push -uf "{git_repo_path}" {self.submission.commit_hash}'
+        command = f'{self.git_executable} push -uf "{git_repo_path}" submission_{self.submission.commit_hash}'
         try:
             await self._run_subprocess(command, self.output_path)
         except CalledProcessError:

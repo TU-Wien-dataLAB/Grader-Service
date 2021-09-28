@@ -69,14 +69,14 @@ class GitService(Configurable):
         self.log.info(f"Switching to branch {branch} at path {self.path}")
         self._run_command(f"git checkout {branch}")
 
-    def pull(self, origin: str, force=False):
+    def pull(self, origin: str, branch="main", force=False):
         if force:
             self.log.info(f"Pulling remote {origin}")
-            out = self._run_command(f'sh -c "git clean -fd && git fetch {origin} && git reset --hard {origin}/main"', cwd=self.path, capture_output=True)
+            out = self._run_command(f'sh -c "git clean -fd && git fetch {origin} && git reset --hard {origin}/{branch}"', cwd=self.path, capture_output=True)
             self.log.info(out)
             #self._run_command(f'sh -c "git fetch --all && git reset --mixed {origin}/main"',cwd=self.path)
         else:
-            self._run_command(f"git pull {origin} main", cwd=self.path)
+            self._run_command(f"git pull {origin} {branch}", cwd=self.path)
 
     def init(self, force=False):
         if not self.is_git() or force:
