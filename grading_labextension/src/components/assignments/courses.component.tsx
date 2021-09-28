@@ -28,7 +28,7 @@ export class CoursesComponent extends React.Component<CoursesProps> {
 
   public async getLectures() {
     getAllLectures().subscribe(
-      lectures => this.setState({lectures}),
+      lectures => this.setState({ lectures }),
       error => showErrorMessage('Error Fetching Lectures', error)
     );
     await UserPermissions.loadPermissions();
@@ -55,7 +55,7 @@ export class CoursesComponent extends React.Component<CoursesProps> {
           <Button id="reload-button" className="assignment-button" onClick={() => this.reload()} icon={IconNames.REFRESH} outlined intent={Intent.SUCCESS}>Reload</Button>
         </div>
         {this.state.lectures.map((el, index) => (
-          <AssignmentsComponent lecture={el} open={index == 0} ref={(r) => this.assignmentComponents.push(r)}/>
+          <AssignmentsComponent lecture={el} open={index == 0} ref={(r) => this.assignmentComponents.push(r)} />
         ))}
       </div>
     );

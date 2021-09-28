@@ -31,7 +31,7 @@ export class AssignmentsComponent extends React.Component<AssignmentListProps> {
   private toggleOpen = () => {
     this.setState({ isOpen: !this.state.isOpen });
   }
-  
+
   public componentDidMount() {
     this.loadAssignments();
   }
@@ -43,26 +43,24 @@ export class AssignmentsComponent extends React.Component<AssignmentListProps> {
   }
 
   public render() {
-    console.log("Assignments:")
-    console.log(this.state.assignments)
     return <div className="assignment-list">
       <Card elevation={Elevation.TWO}>
-      <div onClick={this.toggleOpen} className="collapse-header">
-        <Icon icon={IconNames.LEARNING} className="flavor-icon"></Icon>
-        {this.lecture.name}
-        { this.state.assignments.length == 0 && <Tag icon="warning-sign" intent="primary" className="assignment-tag" style={{marginLeft: '10px'}}>No assignments released yet</Tag>}
-        <Icon iconSize={IconSize.LARGE} icon={IconNames.CHEVRON_DOWN} className={`collapse-icon ${this.state.isOpen ? 'collapse-icon-open' : ''}`}></Icon> 
+        <div onClick={this.toggleOpen} className="collapse-header">
+          <Icon icon={IconNames.LEARNING} className="flavor-icon"></Icon>
+          {this.lecture.name}
+          {this.state.assignments.length == 0 && <Tag icon="warning-sign" intent="primary" className="assignment-tag" style={{ marginLeft: '10px' }}>No assignments released yet</Tag>}
+          <Icon iconSize={IconSize.LARGE} icon={IconNames.CHEVRON_DOWN} className={`collapse-icon ${this.state.isOpen ? 'collapse-icon-open' : ''}`}></Icon>
         </div>
-      <Collapse isOpen={this.state.isOpen} className="collapse-body" transitionDuration={300} keepChildrenMounted={true}>
-        <ul>
-          {this.state.assignments.filter(v => {
-            return v.status == 'released' || UserPermissions.getScope(this.lecture) > Scope.student
-          }).map((el, index) =>
-            <AssignmentComponent index={index} lecture={this.lecture} assignment={el} />
+        <Collapse isOpen={this.state.isOpen} className="collapse-body" transitionDuration={300} keepChildrenMounted={true}>
+          <ul>
+            {this.state.assignments.filter(v => {
+              return v.status == 'released' || UserPermissions.getScope(this.lecture) > Scope.student
+            }).map((el, index) =>
+              <AssignmentComponent index={index} lecture={this.lecture} assignment={el} />
             )}
 
-        </ul>
-      </Collapse>
+          </ul>
+        </Collapse>
       </Card>
     </div>;
   }
