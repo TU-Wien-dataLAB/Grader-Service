@@ -8,6 +8,7 @@ import { Card, Elevation, Icon, Tag } from '@blueprintjs/core';
 import { IconNames } from '@blueprintjs/icons';
 import { Lecture } from '../../model/lecture';
 import { Scope, UserPermissions } from '../../services/permission.service';
+import { IconSize } from '@blueprintjs/core/lib/cjs/components/icon/icon';
 
 export interface AssignmentListProps {
   lecture: Lecture;
@@ -30,21 +31,27 @@ export class AssignmentsComponent extends React.Component<AssignmentListProps> {
   private toggleOpen = () => {
     this.setState({ isOpen: !this.state.isOpen });
   }
-
+  
   public componentDidMount() {
+    this.loadAssignments();
+  }
+
+  public loadAssignments() {
     getAllAssignments(this.lecture.id).subscribe(assignments => {
       this.setState(this.state.assignments = assignments)
     })
   }
 
   public render() {
+    console.log("Assignments:")
+    console.log(this.state.assignments)
     return <div className="assignment-list">
       <Card elevation={Elevation.TWO}>
       <div onClick={this.toggleOpen} className="collapse-header">
         <Icon icon={IconNames.LEARNING} className="flavor-icon"></Icon>
         {this.lecture.name}
         { this.state.assignments.length == 0 && <Tag icon="warning-sign" intent="primary" className="assignment-tag" style={{marginLeft: '10px'}}>No assignments released yet</Tag>}
-        <Icon iconSize={Icon.SIZE_LARGE} icon={IconNames.CHEVRON_DOWN} className={`collapse-icon ${this.state.isOpen ? 'collapse-icon-open' : ''}`}></Icon> 
+        <Icon iconSize={IconSize.LARGE} icon={IconNames.CHEVRON_DOWN} className={`collapse-icon ${this.state.isOpen ? 'collapse-icon-open' : ''}`}></Icon> 
         </div>
       <Collapse isOpen={this.state.isOpen} className="collapse-body" transitionDuration={300} keepChildrenMounted={true}>
         <ul>

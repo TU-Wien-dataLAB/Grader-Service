@@ -2,3 +2,17 @@
   overflow: scroll;
   height: 100%;
 }
+
+#assignment-header {
+  text-align: center;
+}
+
+#assignment-header h1 {
+  display: inline-block;
+}
+
+#reload-button {
+  float: right;
+  margin-top: 20px;
+  margin-right: 20px;
+}

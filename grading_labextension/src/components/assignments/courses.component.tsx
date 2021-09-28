@@ -4,7 +4,8 @@ import { Lecture } from '../../model/lecture';
 import { getAllLectures } from '../../services/lectures.service';
 import { showErrorMessage } from '@jupyterlab/apputils';
 import { UserPermissions } from '../../services/permission.service';
-import { Button } from '@blueprintjs/core';
+import { Button, Intent } from '@blueprintjs/core';
+import { IconNames } from '@blueprintjs/icons';
 
 export interface CoursesProps {
   // lectures: Array<Lecture>;
@@ -15,10 +16,10 @@ export class CoursesComponent extends React.Component<CoursesProps> {
   public state = {
     lectures: new Array<Lecture>()
   };
+  public assignmentComponents: Array<AssignmentsComponent> = [];
 
   constructor(props: CoursesProps) {
     super(props);
-    // this.state = {"lectures": props.lectures};
   }
 
   public async componentDidMount() {
@@ -27,7 +28,7 @@ export class CoursesComponent extends React.Component<CoursesProps> {
 
   public async getLectures() {
     getAllLectures().subscribe(
-      lectures => this.setState((this.state.lectures = lectures)),
+      lectures => this.setState({lectures}),
       error => showErrorMessage('Error Fetching Lectures', error)
     );
     await UserPermissions.loadPermissions();
@@ -35,16 +36,26 @@ export class CoursesComponent extends React.Component<CoursesProps> {
     console.log(UserPermissions.getPermissions());
   }
 
+
+  private reload() {
+    this.assignmentComponents.map(v => {
+      v?.loadAssignments();
+    })
+  }
+
+
   public render() {
+    console.log(this.assignmentComponents)
     return (
       <div className="course-list">
-        <div>
+        <div id="assignment-header">
           <h1>
-            <p style={{ textAlign: 'center' }}>Assignments</p>
+            <p>Assignments</p>
           </h1>
+          <Button id="reload-button" className="assignment-button" onClick={() => this.reload()} icon={IconNames.REFRESH} outlined intent={Intent.SUCCESS}>Reload</Button>
         </div>
         {this.state.lectures.map((el, index) => (
-          <AssignmentsComponent lecture={el} open={index == 0} />
+          <AssignmentsComponent lecture={el} open={index == 0} ref={(r) => this.assignmentComponents.push(r)}/>
         ))}
       </div>
     );
