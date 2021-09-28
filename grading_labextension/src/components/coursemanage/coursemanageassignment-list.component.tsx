@@ -221,6 +221,7 @@ export class CourseManageAssignmentsComponent extends React.Component<Assignment
             <ul>
               {this.state.assignments.map((el, index) => (
                 <CourseManageAssignmentComponent
+                  parentUpdate={this.getAssignments}
                   index={index}
                   lectureName={this.title}
                   lecture={this.lecture}

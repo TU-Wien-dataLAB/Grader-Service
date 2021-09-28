@@ -27,6 +27,7 @@ import { Contents } from '@jupyterlab/services';
 import moment from 'moment';
 
 export interface AssignmentProps {
+  parentUpdate: () => void;
   index: number;
   lectureName: string;
   assignment: Assignment;
@@ -46,6 +47,7 @@ export class CourseManageAssignmentComponent extends React.Component<
   AssignmentProps,
   AssignmentState
 > {
+  public parentUpdate: () => void;
   public lectureName: string;
   public lecture: Lecture;
   public index: number;
@@ -66,6 +68,7 @@ export class CourseManageAssignmentComponent extends React.Component<
 
   constructor(props: AssignmentProps) {
     super(props);
+    this.parentUpdate = props.parentUpdate;
     this.state.assignment = props.assignment;
     this.index = props.assignment.id;
     this.lectureName = props.lectureName;
@@ -339,8 +342,9 @@ export class CourseManageAssignmentComponent extends React.Component<
       return;
     }
 
-    deleteAssignment(this.lecture.id, this.state.assignment.id);
+    await deleteAssignment(this.lecture.id, this.state.assignment.id).toPromise();
     this.props.assignments.filter(a => a.id != this.state.assignment.id);
+    this.parentUpdate();
   }
 
   private async editAssignment() {

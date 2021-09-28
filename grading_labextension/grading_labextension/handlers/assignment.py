@@ -148,6 +148,7 @@ class AssignmentObjectHandler(ExtensionBaseHandler):
                 method="DELETE",
                 endpoint=f"{self.base_url}/lectures/{lecture_id}/assignments/{assignment_id}",
                 header=self.grader_authentication_header,
+                decode_response=False
             )
         except HTTPError as e:
             self.set_status(e.code)
@@ -155,4 +156,4 @@ class AssignmentObjectHandler(ExtensionBaseHandler):
             return
         self.log.warn(f'Deleting directory ~/{lecture["code"]}/{assignment["name"]}')
         shutil.rmtree(os.path.expanduser(f'~/{lecture["code"]}/{assignment["name"]}'), ignore_errors=True)
-        self.write(json.dumps(response))
+        self.write("OK")
