@@ -16,6 +16,7 @@ interface TimeSpec {
 
 // 2021-06-06 23:59:00
 export class DeadlineComponent extends React.Component<DeadlineProps> {
+    public interval: number = null;
     public state = {
         date: null as Date,
         display_date: ""
@@ -40,9 +41,10 @@ export class DeadlineComponent extends React.Component<DeadlineProps> {
     }
 
     private updateTimeoutInterval() {
+        if (this.interval) clearInterval(this.interval);
         let time: TimeSpec = this.calculateTimeLeft();
         let timeout = (time.weeks == 0 && time.days == 0) ? 1000 : 10000;
-        setInterval(() => {
+        this.interval = setInterval(() => {
             this.setState({ display_date: this.getDisplayDate() });
         }, timeout);
     }

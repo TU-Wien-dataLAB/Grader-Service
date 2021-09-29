@@ -16,7 +16,6 @@ export class CoursesComponent extends React.Component<CoursesProps> {
   public state = {
     lectures: new Array<Lecture>()
   };
-  public assignmentComponents: Array<AssignmentsComponent> = [];
 
   constructor(props: CoursesProps) {
     super(props);
@@ -50,7 +49,7 @@ export class CoursesComponent extends React.Component<CoursesProps> {
           <Button id="reload-button" className="assignment-button" onClick={() => this.getLectures()} icon={IconNames.REFRESH} outlined intent={Intent.SUCCESS}>Reload</Button>
         </div>
         {this.state.lectures.map((el, index) => (
-          <AssignmentsComponent lecture={el} open={index == 0} ref={(r) => this.assignmentComponents.push(r)} />
+          <AssignmentsComponent lecture={el} open={index == 0} />
         ))}
       </div>
     );

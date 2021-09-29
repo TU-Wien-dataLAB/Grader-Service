@@ -38,6 +38,7 @@ export class AssignmentsComponent extends React.Component<AssignmentListProps> {
   }
 
   public componentWillReceiveProps(nextProps: AssignmentListProps) {
+    this.lecture = nextProps.lecture;
     this.loadAssignments();
   }
 
