@@ -82,11 +82,10 @@ export class CourseManageAssignmentComponent extends React.Component<
         this.state.assignment,
         false,
         true
-      ).subscribe(userSubmissions => {
-        this.setState({ submissions: userSubmissions });
-        console.log(this.state.submissions);
-        console.log(this.state.submissions.length);
-      });
+      ).subscribe(
+        userSubmissions => this.setState({ submissions: userSubmissions }),
+        error => showErrorMessage("Error Loading Submissions", error)
+      );
     }
     console.log('dirListingNode: ' + this.dirListingNode);
     const renderer = new ExistingNodeRenderer(this.dirListingNode);
@@ -171,7 +170,7 @@ export class CourseManageAssignmentComponent extends React.Component<
         content: ['cd ' + path.replace(' ', '\\ ') + '\n']
       });
     } catch (e) {
-      console.error(e);
+      showErrorMessage('Error Opening Terminal', e);
       main.dispose();
     }
   }
@@ -194,7 +193,11 @@ export class CourseManageAssignmentComponent extends React.Component<
       // TODO: check if source files have actually changed before generating
       if (this.generationTimestamp === null || this.generationTimestamp < this.sourceChangeTimestamp) {
         // switching to release
-        await generateAssignment(this.lecture.id, this.state.assignment).toPromise();
+        try {
+          await generateAssignment(this.lecture.id, this.state.assignment).toPromise();
+        } catch (err) {
+          showErrorMessage('Error Generating Assignment', err);
+        }
         this.generationTimestamp = moment().valueOf();
       }
     }
@@ -242,9 +245,12 @@ export class CourseManageAssignmentComponent extends React.Component<
     if (!result.button.accept) {
       return;
     }
-
-    await pushAssignment(this.lecture.id, this.state.assignment.id, 'source').toPromise();
-    pushAssignment(this.lecture.id, this.state.assignment.id, 'release');
+    try {
+      await pushAssignment(this.lecture.id, this.state.assignment.id, 'source').toPromise();
+      pushAssignment(this.lecture.id, this.state.assignment.id, 'release');
+    } catch (err) {
+      showErrorMessage('Error Pushing Assignment', err);
+    }
   }
 
   private async pullAssignment() {
@@ -256,8 +262,11 @@ export class CourseManageAssignmentComponent extends React.Component<
     if (!result.button.accept) {
       return;
     }
-
-    await pullAssignment(this.lecture.id, this.state.assignment.id, 'source').toPromise();
+    try {
+      await pullAssignment(this.lecture.id, this.state.assignment.id, 'source').toPromise();
+    } catch (err) {
+      showErrorMessage('Error Pulling Assignment', err);
+    }
     this.dirListing.update();
   }
 
@@ -280,10 +289,13 @@ export class CourseManageAssignmentComponent extends React.Component<
       return;
     }
 
-    this.state.assignment.status = 'released';
-    updateAssignment(this.lecture.id, this.state.assignment).subscribe(a =>
+    try {
+      let a = await updateAssignment(this.lecture.id, this.state.assignment).toPromise();
       this.setState({ assignment: a })
-    );
+      this.state.assignment.status = 'released';
+    } catch (err) {
+      showErrorMessage('Error Releasing Assignment', err);
+    }
   }
 
   private async withholdAssignment() {
@@ -305,10 +317,14 @@ export class CourseManageAssignmentComponent extends React.Component<
       return;
     }
 
-    this.state.assignment.status = 'created';
-    updateAssignment(this.lecture.id, this.state.assignment).subscribe(a =>
+    try {
+      let a = await updateAssignment(this.lecture.id, this.state.assignment).toPromise()
       this.setState({ assignment: a })
-    );
+      this.state.assignment.status = 'created';
+    } catch (err) {
+      showErrorMessage('Error Withholding Assignment', err);
+    }
+
   }
 
   private async createFile(notebook = true) {
@@ -342,9 +358,13 @@ export class CourseManageAssignmentComponent extends React.Component<
       return;
     }
 
-    await deleteAssignment(this.lecture.id, this.state.assignment.id).toPromise();
-    this.props.assignments.filter(a => a.id != this.state.assignment.id);
-    this.parentUpdate();
+    try {
+      await deleteAssignment(this.lecture.id, this.state.assignment.id).toPromise();
+      this.props.assignments.filter(a => a.id != this.state.assignment.id);
+      this.parentUpdate();
+    } catch (err) {
+      showErrorMessage("Error Deleting Assignment", err);
+    }
   }
 
   private async editAssignment() {
@@ -387,25 +407,10 @@ export class CourseManageAssignmentComponent extends React.Component<
     }
 
     updateAssignment(this.lecture.id, this.state.assignment).subscribe(
-      assignment => {
-        this.setState({ assignment });
-      }
+      assignment => this.setState({ assignment }),
+      error => showErrorMessage('Error Updating Assignment', error)
     );
   }
-
-  private async generateAssignment() {
-    const result = await showDialog({
-      title: 'Generate Assignment',
-      body: `Do you want to generate ${this.state.assignment.name}? This create a local student-version preview in the release folder.`,
-      buttons: [Dialog.cancelButton(), Dialog.okButton({ label: 'Generate' })]
-    });
-    if (!result.button.accept) {
-      return;
-    }
-    generateAssignment(this.lecture.id, this.state.assignment)
-    this.dirListing.update()
-  }
-
 
   public assignment() {
     return (
@@ -440,14 +445,6 @@ export class CourseManageAssignmentComponent extends React.Component<
                 Edit
               </Button>
               <Button
-                icon="map-create"
-                outlined
-                className="assignment-button"
-                onClick={() => this.generateAssignment()}
-              >
-                Generate
-              </Button>
-              <Button
                 icon="git-push"
                 intent={'success'}
                 outlined
@@ -472,14 +469,14 @@ export class CourseManageAssignmentComponent extends React.Component<
                 outlined
                 className="assignment-button"
                 intent={this.state.assignment.status == "released" ? "danger" : "none"}
-                onClick={this.state.assignment.status == "released" ? 
-                 () => this.withholdAssignment()
-                 : () => this.releaseAssignment()}>
-                  {this.state.assignment.status == "released" ? "Withhold" : "Release"}
-                </Button> 
-                  
+                onClick={this.state.assignment.status == "released" ?
+                  () => this.withholdAssignment()
+                  : () => this.releaseAssignment()}>
+                {this.state.assignment.status == "released" ? "Withhold" : "Release"}
+              </Button>
 
-              
+
+
               <Button
                 icon="arrow-top-right"
                 intent="primary"

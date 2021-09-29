@@ -10,7 +10,6 @@ import {
   Divider
 } from '@blueprintjs/core';
 import { IconNames } from '@blueprintjs/icons';
-
 import { GlobalObjects } from '../../index';
 import { showErrorMessage, showDialog, Dialog } from '@jupyterlab/apputils';
 import { Submission } from '../../model/submission';

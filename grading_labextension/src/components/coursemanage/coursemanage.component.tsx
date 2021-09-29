@@ -3,6 +3,7 @@ import { Lecture } from '../../model/lecture';
 import { getAllLectures } from '../../services/lectures.service'
 import { Scope, UserPermissions } from '../../services/permission.service';
 import { CourseManageAssignmentsComponent } from './coursemanageassignment-list.component';
+import { showErrorMessage } from '@jupyterlab/apputils';
 
 
 export interface CourseManageProps {
@@ -21,20 +22,23 @@ export class CourseManageComponent extends React.Component<CourseManageProps> {
   }
 
   public async componentWillMount() {
-    await UserPermissions.loadPermissions();
-    getAllLectures().subscribe(lectures => {
-      console.log(lectures)
-      this.setState(this.state.lectures = lectures)
-    })
+    try {
+      await UserPermissions.loadPermissions();
+    } catch (err) {
+      showErrorMessage('Error Loading Permissions', err);
+    }
+    getAllLectures().subscribe(
+      lectures => this.setState(this.state.lectures = lectures),
+      error => showErrorMessage('Error Fetching Lectures', error)
+    )
   }
 
   public render() {
     return <div className="course-list">
       <h1>
-        <p style={{textAlign:'center'}}>Course Management</p>
+        <p style={{ textAlign: 'center' }}>Course Management</p>
       </h1>
-    {this.state.lectures.filter(el => UserPermissions.getScope(el) > Scope.student).map((el, index) => <CourseManageAssignmentsComponent lecture={el} title={el.name} open={index==0} />)}
+      {this.state.lectures.filter(el => UserPermissions.getScope(el) > Scope.student).map((el, index) => <CourseManageAssignmentsComponent lecture={el} title={el.name} open={index == 0} />)}
     </div>
-   
   }
 }

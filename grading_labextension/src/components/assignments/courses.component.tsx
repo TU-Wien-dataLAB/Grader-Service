@@ -31,7 +31,11 @@ export class CoursesComponent extends React.Component<CoursesProps> {
       lectures => this.setState({ lectures }),
       error => showErrorMessage('Error Fetching Lectures', error)
     );
-    await UserPermissions.loadPermissions();
+    try {
+      await UserPermissions.loadPermissions();
+    } catch (err) {
+      showErrorMessage('Error Loading Permissions', err);
+    }
     console.log('User permissions:');
     console.log(UserPermissions.getPermissions());
   }
@@ -40,12 +44,11 @@ export class CoursesComponent extends React.Component<CoursesProps> {
   private reload() {
     this.assignmentComponents.map(v => {
       v?.loadAssignments();
-    })
+    });
   }
 
 
   public render() {
-    console.log(this.assignmentComponents)
     return (
       <div className="course-list">
         <div id="assignment-header">
