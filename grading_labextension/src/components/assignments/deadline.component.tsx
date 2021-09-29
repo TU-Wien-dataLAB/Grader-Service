@@ -17,17 +17,30 @@ interface TimeSpec {
 // 2021-06-06 23:59:00
 export class DeadlineComponent extends React.Component<DeadlineProps> {
     public state = {
+        date: null as Date,
         display_date: ""
     };
-    public date: Date;
 
     constructor(props: DeadlineProps) {
         super(props);
-        this.date = moment.utc(props.due_date).local().toDate();
-        this.state = { display_date: this.getDisplayDate() };
+        this.state.date = moment.utc(props.due_date).local().toDate();
+        this.state.display_date = this.getDisplayDate();
+    }
+
+    componentWillReceiveProps(nextProps: DeadlineProps) {
+        console.log("props updated for deadline component " + nextProps.due_date)
+        this.setState({
+            display_date: this.getDisplayDate(),
+            date: moment.utc(nextProps.due_date).local().toDate()
+        });
+        this.updateTimeoutInterval();
     }
 
     public componentDidMount() {
+        this.updateTimeoutInterval();
+    }
+
+    private updateTimeoutInterval() {
         let time: TimeSpec = this.calculateTimeLeft();
         let timeout = (time.weeks == 0 && time.days == 0) ? 1000 : 10000;
         setInterval(() => {
@@ -36,7 +49,7 @@ export class DeadlineComponent extends React.Component<DeadlineProps> {
     }
 
     public calculateTimeLeft = () => {
-        let difference = +this.date - +new Date();
+        let difference = +this.state.date - +new Date();
         let timeLeft: TimeSpec = {
             weeks: Math.floor(difference / (1000 * 60 * 60 * 24 * 7)),
             days: Math.floor(difference / (1000 * 60 * 60 * 24) % 7),
@@ -55,8 +68,8 @@ export class DeadlineComponent extends React.Component<DeadlineProps> {
             } else {
                 return `Deadline in ${this.getTimeUnit("Day", time.days)} ${this.getTimeUnit("Hour", time.hours)} ${this.getTimeUnit("Minute", time.minutes)}`;
             }
-            
-        } else if(time.weeks > 0) {
+
+        } else if (time.weeks > 0) {
             return `Deadline in ${this.getTimeUnit("Week", time.weeks)} ${this.getTimeUnit("Day", time.days)} ${this.getTimeUnit("Hour", time.hours)}`;
         } else {
             return "Deadline over!";
@@ -69,6 +82,6 @@ export class DeadlineComponent extends React.Component<DeadlineProps> {
     }
 
     public render() {
-        return <Tag intent="warning" htmlTitle={"Date: " + this.date.toLocaleDateString() + " " + this.date.toLocaleTimeString()} style={{ marginLeft: "10px" }} >{this.state.display_date}</Tag>
+        return <Tag intent="warning" htmlTitle={"Date: " + this.state.date.toLocaleDateString() + " " + this.state.date.toLocaleTimeString()} style={{ marginLeft: "10px" }} >{this.state.display_date}</Tag>
     }
 }
