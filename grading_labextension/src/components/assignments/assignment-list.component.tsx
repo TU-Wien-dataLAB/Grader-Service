@@ -37,6 +37,10 @@ export class AssignmentsComponent extends React.Component<AssignmentListProps> {
     this.loadAssignments();
   }
 
+  public componentWillReceiveProps(nextProps: AssignmentListProps) {
+    this.loadAssignments();
+  }
+
   public loadAssignments() {
     getAllAssignments(this.lecture.id).subscribe(
       assignments => this.setState(this.state.assignments = assignments),

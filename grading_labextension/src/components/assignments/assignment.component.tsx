@@ -82,8 +82,7 @@ export class AssignmentComponent extends React.Component<AssignmentProps> {
     this.getSubmissions = this.getSubmissions.bind(this);
   }
 
-  componentWillReceiveProps(nextProps: AssignmentProps) {
-    console.log("props updated for assignment component " + nextProps.assignment.name)
+  public componentWillReceiveProps(nextProps: AssignmentProps) {
     this.setState({ assignment: nextProps.assignment });  
   }
 

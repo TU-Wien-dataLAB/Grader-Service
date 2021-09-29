@@ -27,8 +27,7 @@ export class DeadlineComponent extends React.Component<DeadlineProps> {
         this.state.display_date = this.getDisplayDate();
     }
 
-    componentWillReceiveProps(nextProps: DeadlineProps) {
-        console.log("props updated for deadline component " + nextProps.due_date)
+    public componentWillReceiveProps(nextProps: DeadlineProps) {
         this.setState({
             display_date: this.getDisplayDate(),
             date: moment.utc(nextProps.due_date).local().toDate()

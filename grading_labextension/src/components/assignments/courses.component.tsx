@@ -40,14 +40,6 @@ export class CoursesComponent extends React.Component<CoursesProps> {
     console.log(UserPermissions.getPermissions());
   }
 
-
-  private reload() {
-    this.assignmentComponents.map(v => {
-      v?.loadAssignments();
-    });
-  }
-
-
   public render() {
     return (
       <div className="course-list">
@@ -55,7 +47,7 @@ export class CoursesComponent extends React.Component<CoursesProps> {
           <h1>
             <p>Assignments</p>
           </h1>
-          <Button id="reload-button" className="assignment-button" onClick={() => this.reload()} icon={IconNames.REFRESH} outlined intent={Intent.SUCCESS}>Reload</Button>
+          <Button id="reload-button" className="assignment-button" onClick={() => this.getLectures()} icon={IconNames.REFRESH} outlined intent={Intent.SUCCESS}>Reload</Button>
         </div>
         {this.state.lectures.map((el, index) => (
           <AssignmentsComponent lecture={el} open={index == 0} ref={(r) => this.assignmentComponents.push(r)} />
