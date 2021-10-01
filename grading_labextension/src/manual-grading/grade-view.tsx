@@ -27,13 +27,12 @@ export class ManualGradingComponent extends React.Component<ManualGradingProps> 
 
   public dirListingNode: HTMLElement;
   public dirListing: DirListing;
-  private sourceChangeTimestamp: any;
   private lectureID: number;
   private assignmentID: number;
   private subID: number;
   private title: Title<Widget>;
 
-  constructor(props : ManualGradingProps) {
+  constructor(props: ManualGradingProps) {
     super(props);
     this.lectureID = props.lectureID;
     this.assignmentID = props.assignmentID;
@@ -47,15 +46,15 @@ export class ManualGradingComponent extends React.Component<ManualGradingProps> 
       false,
       true
     ).toPromise();
-    
+
     const lecture: Lecture = await getLecture(this.lectureID).toPromise();
 
     this.title.label = `Manualgrade ${assignment.name}`;
     const renderer = new ExistingNodeRenderer(this.dirListingNode);
     const model = new FilterFileBrowserModel({
-        auto: true,
-        manager: GlobalObjects.docManager
-        });
+      auto: true,
+      manager: GlobalObjects.docManager
+    });
 
     const LISTING_CLASS = 'jp-FileBrowser-listing';
     this.dirListing = new DirListing({ model, renderer });
@@ -83,54 +82,36 @@ export class ManualGradingComponent extends React.Component<ManualGradingProps> 
       ev.preventDefault();
       ev.stopPropagation();
     };
+  }
 
-    GlobalObjects.docManager.services.contents.fileChanged.connect((
-      sender: Contents.IManager,
-      change: Contents.IChangedArgs
-    ) => {
-      const { oldValue, newValue } = change;
-      if (!newValue.path.includes(manualPath)) {
-        return;
-      }
+  private openFile(path: string) {
+    console.log('Opening file: ' + path);
+    GlobalObjects.commands
+      .execute('docmanager:open', {
+        path: path,
+        options: {
+          mode: 'tab-after' // tab-after tab-before split-bottom split-right split-left split-top
+        }
+      })
+      .catch(error => {
+        showErrorMessage('Error Opening File', error);
+      });
+  }
 
-      const modified = moment(newValue.last_modified).valueOf()
-      if (this.sourceChangeTimestamp === null || this.sourceChangeTimestamp < modified) {
-        this.sourceChangeTimestamp = modified
-      }
-      console.log("New source file changed timestamp: " + this.sourceChangeTimestamp)
-    }, this)
-    }
-
-    private openFile(path: string) {
-        console.log('Opening file: ' + path);
-        GlobalObjects.commands
-          .execute('docmanager:open', {
-            path: path,
-            options: {
-              mode: 'tab-after' // tab-after tab-before split-bottom split-right split-left split-top
-            }
-          })
-          .catch(error => {
-            showErrorMessage('Error Opening File', error);
-          });
-      }
-
-    
-
-    public render() {
-        return (
-        <div>
-          <h1>
-            <p style={{textAlign:'center'}}>Manualgrade</p>
-          </h1>
-          <div
+  public render() {
+    return (
+      <div>
+        <h1>
+          <p style={{ textAlign: 'center' }}>Manualgrade</p>
+        </h1>
+        <div
           className="assignment-dir-listing"
           ref={_element => (this.dirListingNode = _element)}
-          >  
-          </div>
-          <Button>Check Grading Status</Button>
+        >
         </div>
-        )
-    }
+        <Button>Check Grading Status</Button>
+      </div>
+    )
+  }
 
 }

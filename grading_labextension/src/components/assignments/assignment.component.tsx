@@ -10,7 +10,6 @@ import {
   Divider
 } from '@blueprintjs/core';
 import { IconNames } from '@blueprintjs/icons';
-
 import { GlobalObjects } from '../../index';
 import { showErrorMessage, showDialog, Dialog } from '@jupyterlab/apputils';
 import { Submission } from '../../model/submission';
@@ -58,21 +57,21 @@ export class ExistingNodeRenderer extends DirListing.Renderer {
 }
 
 export class AssignmentComponent extends React.Component<AssignmentProps> {
-  public assignment: Assignment;
   public lecture: Lecture;
   public index: number;
   public iconSize: number = 14;
   public state = {
     filesOpen: false,
     submissionsOpen: false,
-    submissions: new Array<Submission>()
+    submissions: new Array<Submission>(),
+    assignment: {} as Assignment
   };
   public dirListingNode: HTMLElement;
   public dirListing: DirListing;
 
   constructor(props: AssignmentProps) {
     super(props);
-    this.assignment = props.assignment;
+    this.state.assignment = props.assignment;
     this.index = props.index;
     this.lecture = props.lecture;
 
@@ -81,6 +80,10 @@ export class AssignmentComponent extends React.Component<AssignmentProps> {
     this.fetchAssignment = this.fetchAssignment.bind(this);
     this.submitAssignment = this.submitAssignment.bind(this);
     this.getSubmissions = this.getSubmissions.bind(this);
+  }
+
+  public componentWillReceiveProps(nextProps: AssignmentProps) {
+    this.setState({ assignment: nextProps.assignment });  
   }
 
   public async componentDidMount() {
@@ -96,7 +99,7 @@ export class AssignmentComponent extends React.Component<AssignmentProps> {
     this.dirListing.addClass(LISTING_CLASS);
     try {
       await model.cd(this.lecture.code);
-      await model.cd(this.assignment.name);
+      await model.cd(this.state.assignment.name);
     } catch (error) {
       console.log(error);
       return;
@@ -151,14 +154,14 @@ export class AssignmentComponent extends React.Component<AssignmentProps> {
     try {
       let result = await showDialog({
         title: 'Fetch Assignment',
-        body: `Do you want to fetch ${this.assignment.name}?`,
+        body: `Do you want to fetch ${this.state.assignment.name}?`,
         buttons: [Dialog.cancelButton(), Dialog.okButton({ label: 'Fetch' })]
       });
       if (result.button.accept) {
         // update assignment
         await pullAssignment(
           this.lecture.id,
-          this.assignment.id,
+          this.state.assignment.id,
           'release'
         ).toPromise();
         await this.updateDirListing();
@@ -172,11 +175,11 @@ export class AssignmentComponent extends React.Component<AssignmentProps> {
     try {
       let result = await showDialog({
         title: 'Submit Assignment',
-        body: `Do you want to submit ${this.assignment.name}? You can always re-submit the assignment before the due date.`,
+        body: `Do you want to submit ${this.state.assignment.name}? You can always re-submit the assignment before the due date.`,
         buttons: [Dialog.cancelButton(), Dialog.okButton({ label: 'Submit' })]
       });
       if (result.button.accept) {
-        await submitAssignment(this.lecture, this.assignment).toPromise();
+        await submitAssignment(this.lecture, this.state.assignment).toPromise();
         await this.getSubmissions();
       }
     } catch (e) {
@@ -185,7 +188,7 @@ export class AssignmentComponent extends React.Component<AssignmentProps> {
   }
 
   private getSubmissions() {
-    getSubmissions(this.lecture, this.assignment).subscribe(
+    getSubmissions(this.lecture, this.state.assignment).subscribe(
       userSubmissions =>
         this.setState({ submissions: userSubmissions.submissions }),
       error => showErrorMessage('Error Loading Submissions', error)
@@ -238,7 +241,7 @@ export class AssignmentComponent extends React.Component<AssignmentProps> {
     this.dirListing.addClass(LISTING_CLASS);
     try {
       await model.cd(this.lecture.code);
-      await model.cd(this.assignment.name);
+      await model.cd(this.state.assignment.name);
     } catch (error) {
       console.log(error);
       return;
@@ -255,8 +258,8 @@ export class AssignmentComponent extends React.Component<AssignmentProps> {
               iconSize={this.iconSize}
               className="flavor-icon"
             ></Icon>
-            {this.assignment.name}
-            {this.assignment.status != 'released' && (
+            {this.state.assignment.name}
+            {this.state.assignment.status != 'released' && (
               <Tag
                 icon="warning-sign"
                 intent="danger"
@@ -272,7 +275,7 @@ export class AssignmentComponent extends React.Component<AssignmentProps> {
                 className="assignment-button"
                 onClick={this.fetchAssignment}
                 icon={IconNames.CLOUD_DOWNLOAD}
-                disabled={this.assignment.status != 'released'}
+                disabled={this.state.assignment.status != 'released'}
                 outlined
                 intent={Intent.PRIMARY}
               >
@@ -282,14 +285,14 @@ export class AssignmentComponent extends React.Component<AssignmentProps> {
                 className="assignment-button"
                 onClick={this.submitAssignment}
                 icon={IconNames.SEND_MESSAGE}
-                disabled={this.assignment.status == 'created'}
+                disabled={this.state.assignment.status == 'created'}
                 outlined
                 intent={Intent.SUCCESS}
               >
                 Submit
               </Button>
-              {this.assignment.due_date ? (
-                <DeadlineComponent due_date={this.assignment.due_date} />
+              {this.state.assignment.due_date ? (
+                <DeadlineComponent due_date={this.state.assignment.due_date} />
               ) : (
                 <Tag intent="primary" style={{ marginLeft: '10px' }}>
                   No Deadline 😀

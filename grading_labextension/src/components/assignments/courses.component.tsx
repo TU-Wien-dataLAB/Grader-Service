@@ -16,7 +16,6 @@ export class CoursesComponent extends React.Component<CoursesProps> {
   public state = {
     lectures: new Array<Lecture>()
   };
-  public assignmentComponents: Array<AssignmentsComponent> = [];
 
   constructor(props: CoursesProps) {
     super(props);
@@ -31,31 +30,26 @@ export class CoursesComponent extends React.Component<CoursesProps> {
       lectures => this.setState({ lectures }),
       error => showErrorMessage('Error Fetching Lectures', error)
     );
-    await UserPermissions.loadPermissions();
+    try {
+      await UserPermissions.loadPermissions();
+    } catch (err) {
+      showErrorMessage('Error Loading Permissions', err);
+    }
     console.log('User permissions:');
     console.log(UserPermissions.getPermissions());
   }
 
-
-  private reload() {
-    this.assignmentComponents.map(v => {
-      v?.loadAssignments();
-    })
-  }
-
-
   public render() {
-    console.log(this.assignmentComponents)
     return (
       <div className="course-list">
         <div id="assignment-header">
           <h1>
             <p>Assignments</p>
           </h1>
-          <Button id="reload-button" className="assignment-button" onClick={() => this.reload()} icon={IconNames.REFRESH} outlined intent={Intent.SUCCESS}>Reload</Button>
+          <Button id="reload-button" className="assignment-button" onClick={() => this.getLectures()} icon={IconNames.REFRESH} outlined intent={Intent.SUCCESS}>Reload</Button>
         </div>
         {this.state.lectures.map((el, index) => (
-          <AssignmentsComponent lecture={el} open={index == 0} ref={(r) => this.assignmentComponents.push(r)} />
+          <AssignmentsComponent lecture={el} open={index == 0} />
         ))}
       </div>
     );

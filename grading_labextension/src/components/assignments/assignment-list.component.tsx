@@ -9,6 +9,7 @@ import { IconNames } from '@blueprintjs/icons';
 import { Lecture } from '../../model/lecture';
 import { Scope, UserPermissions } from '../../services/permission.service';
 import { IconSize } from '@blueprintjs/core/lib/cjs/components/icon/icon';
+import { showErrorMessage } from '@jupyterlab/apputils';
 
 export interface AssignmentListProps {
   lecture: Lecture;
@@ -36,10 +37,15 @@ export class AssignmentsComponent extends React.Component<AssignmentListProps> {
     this.loadAssignments();
   }
 
+  public componentWillReceiveProps(nextProps: AssignmentListProps) {
+    this.lecture = nextProps.lecture;
+    this.loadAssignments();
+  }
+
   public loadAssignments() {
-    getAllAssignments(this.lecture.id).subscribe(assignments => {
-      this.setState(this.state.assignments = assignments)
-    })
+    getAllAssignments(this.lecture.id).subscribe(
+      assignments => this.setState(this.state.assignments = assignments),
+      error => showErrorMessage(`Error Loading Assignments for ${this.lecture.name}`, error));
   }
 
   public render() {
