@@ -414,7 +414,7 @@ export class CourseManageAssignmentComponent extends React.Component<
           'assignment'    //bp3-card bp3-elevation-2
         }>
           <div className="assignment-header">
-            <span onClick={this.toggleOpen} className="flex-item">
+            <span onClick={this.toggleOpen} className="assignment-title flex-item">
               <Icon
                 icon="chevron-right"
                 iconSize={this.iconSize}

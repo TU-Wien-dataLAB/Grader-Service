@@ -12,7 +12,7 @@ import { fetchAssignment } from '../../services/assignments.service';
 import { getLecture } from '../../services/lectures.service';
 import { getAllSubmissions } from '../../services/submissions.service';
 import { showErrorMessage } from '@jupyterlab/apputils';
-
+import { utcToLocalFormat } from '../../services/datetime.service';
 import {
   DataGrid,
   GridApi,
@@ -190,7 +190,7 @@ export class GradingComponent extends React.Component<IGradingProps> {
         rows.push({
           id: latest.id,
           name: sub.user.name,
-          date: latest.submitted_at,
+          date: utcToLocalFormat(latest.submitted_at),
           auto_status: latest.auto_status,
           manual_status: latest.manual_status,
           score: latest.score
@@ -202,7 +202,7 @@ export class GradingComponent extends React.Component<IGradingProps> {
           rows.push({
             id: s.id,
             name: sub.user.name,
-            date: s.submitted_at,
+            date: utcToLocalFormat(s.submitted_at),
             auto_status: s.auto_status,
             manual_status: s.manual_status,
             score: s.score
