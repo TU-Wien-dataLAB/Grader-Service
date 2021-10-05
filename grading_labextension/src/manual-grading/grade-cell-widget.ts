@@ -38,7 +38,6 @@ export class GradeCellWidget extends Panel {
 
   private initLayout(): void {
     const bodyElement = document.createElement('div');
-    const headerElement = this.newHeaderElement();
     const taskElement = this.newTaskElement();
     const idElement = this.newIdElement();
     const elements = [taskElement, idElement];
@@ -52,12 +51,6 @@ export class GradeCellWidget extends Panel {
     }
     bodyElement.appendChild(fragment);
     this.node.appendChild(bodyElement);
-  }
-
-  private newHeaderElement(): HTMLDivElement {
-    const element = document.createElement('div');
-    element.className = CSS_CELL_HEADER;
-    return element;
   }
 
   private newIdElement(): HTMLDivElement {

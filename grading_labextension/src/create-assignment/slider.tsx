@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/explicit-module-boundary-types */
-import { Switch } from '@blueprintjs/core';
+import { Button, Switch } from '@blueprintjs/core';
 import React from 'react';
 import { ReactWidget } from '@jupyterlab/apputils';
 import { Notebook, NotebookPanel } from '@jupyterlab/notebook';
@@ -10,7 +10,10 @@ import { CellPlayButton } from './widget';
 import { UserPermissions, Scope } from '../services/permission.service';
 import { GradeCellWidget } from '../manual-grading/grade-cell-widget';
 import { GradeCommentCellWidget } from '../manual-grading/grade-comment-cell-widget';
-
+import { getProperties } from '../services/submissions.service';
+import { getAllLectures } from '../services/lectures.service';
+import { getAllAssignments } from '../services/assignments.service';
+import { GradeBook } from '../services/gradebook';
 export class CreationmodeSwitch extends ReactWidget {
   public ref: React.RefObject<CreationmodeSwitchComponent>;
   public component: JSX.Element;
@@ -60,25 +63,29 @@ export class CreationmodeSwitchComponent extends React.Component<ICreationmodeSw
   public isSourceNotebook: boolean;
   public hasPermissions: boolean;
   public isManualgradeNotebook: boolean;
+  public subID: number;
+  private notebookPaths: string[];
 
   public constructor(props: ICreationmodeSwitchProps) {
     super(props);
     this.state.creationmode = props.creationmode || false;
     this.notebook = props.notebook;
     this.notebookpanel = props.notebookpanel;
-    const notebookPaths: string[] = this.notebookpanel.context.contentsModel.path.split("/")
+    this.notebookPaths = this.notebookpanel.context.contentsModel.path.split("/")
     console.log("Notebook path: " + this.notebookpanel.context.contentsModel.path)
-    this.isSourceNotebook = notebookPaths[0] === "source";
-    this.isManualgradeNotebook = notebookPaths[0] === "manualgrade";
+    this.isSourceNotebook = this.notebookPaths[0] === "source";
+    this.isManualgradeNotebook = this.notebookPaths[0] === "manualgrade";
     this.hasPermissions = false;
     if (this.isManualgradeNotebook) {
-      const lectureCode = notebookPaths[1]
+      const lectureCode = this.notebookPaths[1]
       if (UserPermissions.getPermissions().hasOwnProperty(lectureCode)) {
         this.hasPermissions = UserPermissions.getPermissions()[lectureCode] !== Scope.student;
+        this.subID = +this.notebookPaths[3]
+        
       }
     }
     if (this.isSourceNotebook) {
-      const lectureCode = notebookPaths[1]
+      const lectureCode = this.notebookPaths[1]
       if (UserPermissions.getPermissions().hasOwnProperty(lectureCode)) {
         this.hasPermissions = UserPermissions.getPermissions()[lectureCode] !== Scope.student;
       }
@@ -115,14 +122,23 @@ export class CreationmodeSwitchComponent extends React.Component<ICreationmodeSw
     });
   };
 
-  public handleSwitchGrading = () => {
+  public handleSwitchGrading = async () => {
+    //TODO: Bad calls that are switching everytime the switch is getting triggered
+    //Move somewhere else
+    const lectures = await getAllLectures().toPromise()
+    const lecture = lectures.find(l => l.code === this.notebookPaths[1])
+    const assignments = await getAllAssignments(lecture.id).toPromise()
+    const assignment = assignments.find(a => a.name === this.notebookPaths[2])
+
+    const properties = await getProperties(lecture.id,assignment.id,this.subID).toPromise()
+    const gradebook = new GradeBook(properties);
     this.setState({ gradingmode: !this.state.gradingmode }, () => {
       this.onChange(this.state.gradingmode);
       this.notebook.widgets.map((c: Cell) => {
         const currentLayout = c.layout as PanelLayout;
         if (this.state.gradingmode) {
           currentLayout.insertWidget(0, new GradeCellWidget(c));
-          currentLayout.addWidget(new GradeCommentCellWidget(c))
+          currentLayout.addWidget(new GradeCommentCellWidget(c,gradebook,this.notebookPaths[4].split(".").slice(0,-1).join(".")))
         } else {
           currentLayout.widgets.map(w => {
             if (w instanceof GradeCellWidget || w instanceof GradeCommentCellWidget) {
@@ -145,11 +161,14 @@ export class CreationmodeSwitchComponent extends React.Component<ICreationmodeSw
       );
     } else if (this.isManualgradeNotebook && this.hasPermissions) {
       return (
+        <div>
         <Switch
           checked={this.state.gradingmode}
           label="Gradingmode"
           onChange={this.handleSwitchGrading}
         />
+        <Button intent="success">Save</Button>
+        </div>
       );
     }
     return null;
