@@ -30,17 +30,19 @@ class RequestService(LoggingConfigurable):
         self,
         method: str,
         endpoint: str,
-        body: dict = None,
+        body: Union[dict, str] = None,
         header: Dict[str, str] = None,
         decode_response: bool = True,
     ) -> Union[dict, list, HTTPResponse]:
         logging.getLogger(str(self.__class__)).info(self.url + endpoint)
         if body:
+            if isinstance(body, dict):
+                body = json.dumps(body)
             response: HTTPResponse = await self.http_client.fetch(
                 self.url + endpoint,
                 method=method,
                 headers=header,
-                body=json.dumps(body),
+                body=body,
             )
         else:
             response: HTTPResponse = await self.http_client.fetch(

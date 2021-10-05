@@ -31,6 +31,38 @@ class SubmissionHandler(ExtensionBaseHandler):
 
 
 @register_handler(
+    path=r"\/lectures\/(?P<lecture_id>\d*)\/assignments\/(?P<assignment_id>\d*)\/submissions\/(?P<submission_id>\d*)\/properties\/?"
+)
+class SubmissionPropertiesHandler(ExtensionBaseHandler):
+    async def get(self, lecture_id: int, assignment_id: int, submission_id: int):
+        try:
+            response = await self.request_service.request(
+                method="GET",
+                endpoint=f"{self.base_url}/lectures/{lecture_id}/assignments/{assignment_id}/submissions/{submission_id}/properties",
+                header=self.grader_authentication_header,
+            )
+        except HTTPError as e:
+            self.set_status(e.code)
+            self.write_error(e.code)
+            return
+        self.write(json.dumps(response))
+
+    async def put(self, lecture_id: int, assignment_id: int, submission_id: int):
+        try:
+            response = await self.request_service.request(
+                method="GET",
+                endpoint=f"{self.base_url}/lectures/{lecture_id}/assignments/{assignment_id}/submissions/{submission_id}/properties",
+                header=self.grader_authentication_header,
+                body=self.request.body.decode("utf-8")
+            )
+        except HTTPError as e:
+            self.set_status(e.code)
+            self.write_error(e.code)
+            return
+        self.write(json.dumps(response))
+
+
+@register_handler(
     path=r"\/lectures\/(?P<lecture_id>\d*)\/assignments\/(?P<assignment_id>\d*)\/feedback\/?"
 )
 class FeedbackHandler(ExtensionBaseHandler):
