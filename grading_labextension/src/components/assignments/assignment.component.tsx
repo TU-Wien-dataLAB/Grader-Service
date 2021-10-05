@@ -252,6 +252,7 @@ export class AssignmentComponent extends React.Component<AssignmentProps> {
       <li key={this.index}>
         <div className="assignment">
           <div className="assignment-header">
+            <span className="assignment-title">
             <Icon
               icon={IconNames.INBOX}
               iconSize={this.iconSize}
@@ -268,6 +269,7 @@ export class AssignmentComponent extends React.Component<AssignmentProps> {
                 Not released for students
               </Tag>
             )}
+            </span>
             <span className="button-list">
               <Button
                 className="assignment-button"

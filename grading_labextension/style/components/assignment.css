@@ -11,6 +11,12 @@
   cursor: pointer;
 }
 
+.assignment-title {
+  min-width: 500px;
+  flex-grow: 0;
+	flex-shrink: 0;
+}
+
 .assignment-dir-listing {
   margin-bottom: 20px;
   margin-left: 25px;
