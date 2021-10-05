@@ -20,9 +20,9 @@ export class GradeCommentCellWidget extends Panel {
     const metadata = this.cell.model.metadata
     this.nbgraderData = CellModel.getNbgraderData(metadata);
     this.toolData = CellModel.newToolData(
-        this.nbgraderData,
-        this.cell.model.type
-      );
+      this.nbgraderData,
+      this.cell.model.type
+    );
     this.initLayout();
     this.addClass(CSS_CELL_WIDGET);
 
@@ -36,21 +36,23 @@ export class GradeCommentCellWidget extends Panel {
   }
 
   private initLayout(): void {
-    const bodyElement = document.createElement('div');
-    const headerElement = this.newHeaderElement();
-    const commentElement = this.newCommentElement();
-    const elements = [];
-    if (this.toolData.type !== "readonly") elements[0] = commentElement;
-    if (this.toolData.type !== "solution" && this.toolData.type !== "readonly") {
-      const pointsElement = this.newPointsElement();
-      elements[1] = pointsElement;
+    if (this.toolData.type !== "readonly") {
+      const bodyElement = document.createElement('div');
+      const headerElement = this.newHeaderElement();
+      const commentElement = this.newCommentElement();
+      const elements = [commentElement];
+
+      if (this.toolData.type !== "solution") {
+        const pointsElement = this.newPointsElement();
+        elements[1] = pointsElement;
+      }
+      const fragment = document.createDocumentFragment();
+      for (const element of elements) {
+        fragment.appendChild(element);
+      }
+      bodyElement.appendChild(fragment);
+      this.node.appendChild(bodyElement);
     }
-    const fragment = document.createDocumentFragment();
-    for (const element of elements) {
-      fragment.appendChild(element);
-    }
-    bodyElement.appendChild(fragment);
-    this.node.appendChild(bodyElement);
   }
 
   private newHeaderElement(): HTMLDivElement {
@@ -62,8 +64,11 @@ export class GradeCommentCellWidget extends Panel {
   private newCommentElement(): HTMLDivElement {
     const element = document.createElement('div');
     element.className = CSS_CELL_COMMENT;
+    const label = document.createElement('label');
+    label.textContent = 'Comment: ';
     const comment = document.createElement('input');
     comment.type = 'text';
+    element.appendChild(label)
     element.appendChild(comment);
     return element;
   }
