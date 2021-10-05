@@ -43,9 +43,6 @@ export class ManualGradingComponent extends React.Component<ManualGradingProps> 
   }
 
   public async componentDidMount() {
-    this.submissionProperties = await getProperties(this.lectureID, this.assignmentID, this.subID).toPromise();
-    console.log("submissionProperties")
-    console.log(this.submissionProperties)
     const assignment: Assignment = await fetchAssignment(
       this.lectureID,
       this.assignmentID,
