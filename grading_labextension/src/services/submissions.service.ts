@@ -48,3 +48,13 @@ import { request, HTTPMethod } from "./request.service";
     }
     return request<Feedback>(HTTPMethod.GET, url)
   }
+
+  export function getProperties(lectureId: number, assignmentId: number, submissionId: number): Observable<object> {
+    let url = `/lectures/${lectureId}/assignments/${assignmentId}/submissions/${submissionId}/properties`;
+    return request<object>(HTTPMethod.GET, url);
+  }
+
+  export function updateProperties(lectureId: number, assignmentId: number, submissionId: number, properties: object): Observable<void> {
+    let url = `/lectures/${lectureId}/assignments/${assignmentId}/submissions/${submissionId}/properties`;
+    return request<void>(HTTPMethod.PUT, url, properties);
+  }

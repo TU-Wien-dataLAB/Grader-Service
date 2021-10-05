@@ -13,7 +13,7 @@ import { getLecture } from '../services/lectures.service';
 import { Assignment } from '../model/assignment';
 import { fetchAssignment } from '../services/assignments.service';
 import { Submission } from '../model/submission';
-import { getSubmissions } from '../services/submissions.service';
+import { getProperties } from '../services/submissions.service';
 import { Button } from '@blueprintjs/core';
 
 export interface ManualGradingProps {
@@ -31,6 +31,7 @@ export class ManualGradingComponent extends React.Component<ManualGradingProps> 
   private assignmentID: number;
   private subID: number;
   private title: Title<Widget>;
+  private submissionProperties: object;
 
   constructor(props: ManualGradingProps) {
     super(props);
@@ -38,8 +39,13 @@ export class ManualGradingComponent extends React.Component<ManualGradingProps> 
     this.assignmentID = props.assignmentID;
     this.title = props.title;
     this.subID = props.subID;
+    this.submissionProperties = null;
   }
+
   public async componentDidMount() {
+    this.submissionProperties = await getProperties(this.lectureID, this.assignmentID, this.subID).toPromise();
+    console.log("submissionProperties")
+    console.log(this.submissionProperties)
     const assignment: Assignment = await fetchAssignment(
       this.lectureID,
       this.assignmentID,
