@@ -191,18 +191,19 @@
     opacity: 1;
   }
   
-  .cellPoints input {
-      width: 3.5em;
+  .cellPoints {
       height: 22px;
       text-align: right;
-      line-height: 10px;
   }
   
-  .cellId input {
+  .cellId {
       height: 22px;
       text-align: left;
-  }Points, .cellHeader, .cellType, .cellPoints, .cellId {
+  } 
+  
+  .cellHeader, .cellType, .cellPoints, .cellId {
     margin-bottom: 12px;
+    margin-right: 12px;
   }
   
   .cellWidget>label {

@@ -8,6 +8,7 @@ import { PanelLayout } from '@lumino/widgets';
 import { CellWidget } from './cellwidget';
 import { CellPlayButton } from './widget';
 import { UserPermissions, Scope } from '../services/permission.service';
+import { GradeCellWidget } from '../manual-grading/grade-cell-widget';
 
 export class CreationmodeSwitch extends ReactWidget {
   public ref: React.RefObject<CreationmodeSwitchComponent>;
@@ -49,13 +50,15 @@ export interface ICreationmodeSwitchProps {
 
 export class CreationmodeSwitchComponent extends React.Component<ICreationmodeSwitchProps> {
   public state = {
-    creationmode: false
+    creationmode: false,
+    gradingmode: false,
   };
   public notebook: Notebook;
   public notebookpanel: NotebookPanel;
   public onChange: any;
   public isSourceNotebook: boolean;
-  public hasCreationModePermissions: boolean;
+  public hasPermissions: boolean;
+  public isManualgradeNotebook: boolean;
 
   public constructor(props: ICreationmodeSwitchProps) {
     super(props);
@@ -64,22 +67,30 @@ export class CreationmodeSwitchComponent extends React.Component<ICreationmodeSw
     this.notebookpanel = props.notebookpanel;
     const notebookPaths: string[] = this.notebookpanel.context.contentsModel.path.split("/")
     console.log("Notebook path: " + this.notebookpanel.context.contentsModel.path)
-    this.isSourceNotebook = notebookPaths[0] === "source"
-    this.hasCreationModePermissions = false;
+    this.isSourceNotebook = notebookPaths[0] === "source";
+    this.isManualgradeNotebook = notebookPaths[0] === "manualgrade";
+    this.hasPermissions = false;
+    if (this.isManualgradeNotebook) {
+      const lectureCode = notebookPaths[1]
+      if (UserPermissions.getPermissions().hasOwnProperty(lectureCode)) {
+        this.hasPermissions = UserPermissions.getPermissions()[lectureCode] !== Scope.student;
+      }
+    }
     if (this.isSourceNotebook) {
       const lectureCode = notebookPaths[1]
       if (UserPermissions.getPermissions().hasOwnProperty(lectureCode)) {
-          this.hasCreationModePermissions = UserPermissions.getPermissions()[lectureCode] !== Scope.student;
+        this.hasPermissions = UserPermissions.getPermissions()[lectureCode] !== Scope.student;
       }
     }
-    
+
     console.log("Source notebook: " + this.isSourceNotebook);
-    console.log("Creation mode permissions: " + this.hasCreationModePermissions);
+    console.log("Creation mode permissions: " + this.hasPermissions);
     this.onChange = this.props.onChange;
-    this.handleSwitch = this.handleSwitch.bind(this);
+    this.handleSwitchCreation = this.handleSwitchCreation.bind(this);
+    this.handleSwitchGrading = this.handleSwitchGrading.bind(this);
   }
 
-  public handleSwitch = () => {
+  public handleSwitchCreation = () => {
     this.setState({ creationmode: !this.state.creationmode }, () => {
       this.onChange(this.state.creationmode);
       this.notebook.widgets.map((c: Cell) => {
@@ -103,18 +114,44 @@ export class CreationmodeSwitchComponent extends React.Component<ICreationmodeSw
     });
   };
 
-  public render() {
-    if (!this.hasCreationModePermissions) {
-      return null;
-    }
+  public handleSwitchGrading = () => {
+    this.setState({ gradingmode: !this.state.gradingmode }, () => {
+      this.onChange(this.state.gradingmode);
+      this.notebook.widgets.map((c: Cell) => {
+        const currentLayout = c.layout as PanelLayout;
+        if (this.state.gradingmode) {
+          currentLayout.insertWidget(0, new GradeCellWidget(c));
+        } else {
+          currentLayout.widgets.map(w => {
+            if (w instanceof GradeCellWidget) {
+              currentLayout.removeWidget(w);
+            }
+          });
+        }
+      });
+    });
+  }
 
+  public render() {
+    if (this.isSourceNotebook && this.hasPermissions) {
+      return (
+        <Switch
+          checked={this.state.creationmode}
+          label="Creationmode"
+          onChange={this.handleSwitchCreation}
+        />
+      );
+    } else if (this.isManualgradeNotebook && this.hasPermissions) {
+      return (
+        <Switch
+          checked={this.state.gradingmode}
+          label="Gradingmode"
+          onChange={this.handleSwitchGrading}
+        />
+      );
+    }
+    return null;
     // if the user has permissions it is also a source notebook
-    return (
-      <Switch
-        checked={this.state.creationmode}
-        label="Creationmode"
-        onChange={this.handleSwitch}
-      />
-    );
+
   }
 }
