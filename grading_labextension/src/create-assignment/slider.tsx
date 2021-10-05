@@ -9,6 +9,7 @@ import { CellWidget } from './cellwidget';
 import { CellPlayButton } from './widget';
 import { UserPermissions, Scope } from '../services/permission.service';
 import { GradeCellWidget } from '../manual-grading/grade-cell-widget';
+import { GradeCommentCellWidget } from '../manual-grading/grade-comment-cell-widget';
 
 export class CreationmodeSwitch extends ReactWidget {
   public ref: React.RefObject<CreationmodeSwitchComponent>;
@@ -121,9 +122,10 @@ export class CreationmodeSwitchComponent extends React.Component<ICreationmodeSw
         const currentLayout = c.layout as PanelLayout;
         if (this.state.gradingmode) {
           currentLayout.insertWidget(0, new GradeCellWidget(c));
+          currentLayout.addWidget(new GradeCommentCellWidget(c))
         } else {
           currentLayout.widgets.map(w => {
-            if (w instanceof GradeCellWidget) {
+            if (w instanceof GradeCellWidget || w instanceof GradeCommentCellWidget) {
               currentLayout.removeWidget(w);
             }
           });
