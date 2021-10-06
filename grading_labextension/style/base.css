@@ -3,6 +3,7 @@
 @import url('components/courses.css');
 @import url('components/createassignment.css');
 @import url('components/cellwidget.css');
+@import url('components/manual-grade.css');
 
 :root {
   --text-color: #2e373d;

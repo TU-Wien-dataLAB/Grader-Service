@@ -18,6 +18,8 @@
 }
 
 .assignment-dir-listing {
+  border: 1px solid #cacaca;
+  border-radius: 4px;
   margin-bottom: 20px;
   margin-left: 25px;
 }

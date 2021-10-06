@@ -336,13 +336,17 @@ const extension: JupyterFrontEndPlugin<void> = {
             : (args['assignmentID'] as number);
         const subID: number =
           typeof args['subID'] === 'undefined'
-          ? null
-          : (args['subID'] as number);
-        const manualgradingView = new ManualGradingView({ lectureID, assignmentID, subID });
+            ? null
+            : (args['subID'] as number);
+        const username: string =
+          typeof args['username'] === 'undefined'
+            ? null
+            : (args['username'] as string);
+        const manualgradingView = new ManualGradingView({ lectureID, assignmentID, subID, username });
         const manualgradingWidget = new MainAreaWidget<ManualGradingView>({
           content: manualgradingView
         });
-        manualgradingWidget.id = 'grading-jupyterlab';
+        manualgradingWidget.id = 'manual-grading-jupyterlab';
         manualgradingWidget.title.label = 'Manualgrading';
         manualgradingWidget.title.closable = true;
 

@@ -8,6 +8,7 @@ export class ManualGradingView extends ReactWidget {
   public lectureID: number;
   public assignmentID: number;
   public subID: number;
+  public username: string;
 
   /**
    * Construct a new grading widget
@@ -17,12 +18,12 @@ export class ManualGradingView extends ReactWidget {
     this.lectureID = options.lectureID;
     this.assignmentID = options.assignmentID;
     this.subID = options.subID;
+    this.username = options.username;
     this.addClass('ManualGradingWidget');
   }
 
   render() {
-    return <ManualGradingComponent lectureID={this.lectureID} assignmentID={this.assignmentID} title={this.title} subID={this.subID}/>
-
+    return <ManualGradingComponent lectureID={this.lectureID} assignmentID={this.assignmentID} title={this.title} subID={this.subID} username={this.username} />
   }
 
 }
@@ -35,5 +36,6 @@ export namespace ManualGradingView {
     lectureID: number;
     assignmentID: number;
     subID: number;
+    username: string;
   }
 }

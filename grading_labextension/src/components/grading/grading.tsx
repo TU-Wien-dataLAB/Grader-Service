@@ -114,8 +114,8 @@ export class GradingComponent extends React.Component<IGradingProps> {
             fields.forEach(f => {
               thisRow[f] = params.getValue(params.id, f);
             });
-            const response = await createManualFeedback(this.state.lecture.id,this.state.assignment.id,+thisRow.id)
-            this.openManualGrading(this.state.lecture.id,this.state.assignment.id,+thisRow.id);
+            await createManualFeedback(this.state.lecture.id,this.state.assignment.id,+thisRow.id);
+            this.openManualGrading(this.state.lecture.id,this.state.assignment.id,+thisRow.id, thisRow.name as string);
 
             return this.showManualGrade(thisRow);
           };
@@ -153,12 +153,13 @@ export class GradingComponent extends React.Component<IGradingProps> {
                       console.log("Updatin");}
                       ,5000)
   }
-  private openManualGrading(lectureID: number, assignmentID: number, subID: number) {
+  private openManualGrading(lectureID: number, assignmentID: number, subID: number, username: string) {
     GlobalObjects.commands
       .execute('manualgrade:open', {
         lectureID,
         assignmentID,
-        subID
+        subID,
+        username
       })
       .catch(error => {
         showErrorMessage('Error Opening Manualgrade View', error);

@@ -1,0 +1,12 @@
+#manual-grade-container {
+    margin-left: 30px;
+    margin-right: 30px;
+}
+
+#info-container {
+  margin-bottom: 30px;
+}
+
+.manual-grading-list {
+  list-style: none;
+}
