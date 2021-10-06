@@ -41,16 +41,22 @@ export class GradeCommentCellWidget extends Panel {
   }
 
   private initLayout(): void {
-    if (this.toolData.type !== "readonly") {
+    if (this.toolData.type !== "readonly" && this.toolData.type !== "") {
       const bodyElement = document.createElement('div');
       const commentElement = this.newCommentElement();
-      const elements = [commentElement];
+      const pointsElement = this.newPointsElement();
+      const extraCreditElement = this.newExtraCreditElement();
+      const elements = [];
 
-      if (this.toolData.type !== "solution") {
-        const pointsElement = this.newPointsElement();
+      if (this.toolData.type === "manual" || this.toolData.type === "task") {
+        elements[0] = commentElement;
         elements[1] = pointsElement;
-        const extraCreditElement = this.newExtraCreditElement();
         elements[2] = extraCreditElement;
+      } else  if(this.toolData.type === "tests") {
+        elements[0] = pointsElement;
+        elements[1] = extraCreditElement;
+      } else {
+        elements[0] = commentElement;
       }
       const fragment = document.createDocumentFragment();
       for (const element of elements) {
@@ -85,6 +91,8 @@ export class GradeCommentCellWidget extends Panel {
     input.min = '0';
     input.defaultValue = '0'
     input.max = String(this.toolData.points)
+    input.onchange = () => {this.gradebook.setManualScore(this.notebookName,this.toolData.id,+input.value)
+      console.log(this.gradebook.properties)}
     label.appendChild(input);
     element.appendChild(label);
     return element;
