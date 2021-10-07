@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/explicit-module-boundary-types */
-import { Button, Switch } from '@blueprintjs/core';
+import { Button, Intent, Divider, Switch } from '@blueprintjs/core';
+import { IconNames } from '@blueprintjs/icons';
 import React from 'react';
 import { ReactWidget } from '@jupyterlab/apputils';
 import { Notebook, NotebookPanel } from '@jupyterlab/notebook';
@@ -14,9 +15,8 @@ import { getProperties, updateProperties } from '../services/submissions.service
 import { getAllLectures } from '../services/lectures.service';
 import { getAllAssignments } from '../services/assignments.service';
 import { GradeBook } from '../services/gradebook';
+import { Lecture } from '../model/lecture';
 import { Assignment } from '../model/assignment';
-import { showErrorMessage, showDialog, Dialog } from '@jupyterlab/apputils';
-
 export class CreationmodeSwitch extends ReactWidget {
   public ref: React.RefObject<CreationmodeSwitchComponent>;
   public component: JSX.Element;
@@ -62,6 +62,9 @@ export class CreationmodeSwitchComponent extends React.Component<ICreationmodeSw
   };
   public notebook: Notebook;
   public notebookpanel: NotebookPanel;
+  public lecture: Lecture;
+  public assignment: Assignment;
+  public gradeBook: GradeBook;
   public onChange: any;
   public isSourceNotebook: boolean;
   public hasPermissions: boolean;
@@ -85,7 +88,7 @@ export class CreationmodeSwitchComponent extends React.Component<ICreationmodeSw
       if (UserPermissions.getPermissions().hasOwnProperty(lectureCode)) {
         this.hasPermissions = UserPermissions.getPermissions()[lectureCode] !== Scope.student;
         this.subID = +this.notebookPaths[3]
-        
+
       }
     }
     if (this.isSourceNotebook) {
@@ -100,7 +103,6 @@ export class CreationmodeSwitchComponent extends React.Component<ICreationmodeSw
     this.onChange = this.props.onChange;
     this.handleSwitchCreation = this.handleSwitchCreation.bind(this);
     this.handleSwitchGrading = this.handleSwitchGrading.bind(this);
-    this.setProperties = this.setProperties.bind(this);
   }
 
   public handleSwitchCreation = () => {
@@ -131,19 +133,19 @@ export class CreationmodeSwitchComponent extends React.Component<ICreationmodeSw
     //TODO: Bad calls that are switching everytime the switch is getting triggered
     //Move somewhere else
     const lectures = await getAllLectures().toPromise()
-    const lecture = lectures.find(l => l.code === this.notebookPaths[1])
-    const assignments = await getAllAssignments(lecture.id).toPromise()
-    const assignment = assignments.find(a => a.name === this.notebookPaths[2])
+    this.lecture = lectures.find(l => l.code === this.notebookPaths[1])
+    const assignments = await getAllAssignments(this.lecture.id).toPromise()
+    this.assignment = assignments.find(a => a.name === this.notebookPaths[2])
 
-    const properties = await getProperties(lecture.id,assignment.id,this.subID).toPromise()
-    this.gradebook = new GradeBook(properties);
+    const properties = await getProperties(this.lecture.id, this.assignment.id, this.subID).toPromise()
+    this.gradeBook = new GradeBook(properties);
     this.setState({ gradingmode: !this.state.gradingmode }, () => {
       this.onChange(this.state.gradingmode);
       this.notebook.widgets.map((c: Cell) => {
         const currentLayout = c.layout as PanelLayout;
         if (this.state.gradingmode) {
           currentLayout.insertWidget(0, new GradeCellWidget(c));
-          currentLayout.addWidget(new GradeCommentCellWidget(c,this.gradebook,this.notebookPaths[4].split(".").slice(0,-1).join(".")))
+          currentLayout.addWidget(new GradeCommentCellWidget(c, this.gradeBook, this.notebookPaths[4].split(".").slice(0, -1).join(".")))
         } else {
           currentLayout.widgets.map(w => {
             if (w instanceof GradeCellWidget || w instanceof GradeCommentCellWidget) {
@@ -155,23 +157,10 @@ export class CreationmodeSwitchComponent extends React.Component<ICreationmodeSw
     });
   }
 
-  private setProperties = async () => {
-    //TODO: redundant call exactly like handleSwitchGrading
-    // lectures and assignments either need to be available through props or a central function
-    const lectures = await getAllLectures().toPromise()
-    const lecture = lectures.find(l => l.code === this.notebookPaths[1])
-    const assignments = await getAllAssignments(lecture.id).toPromise()
-    const assignment = assignments.find(a => a.name === this.notebookPaths[2])
-    try {
-      updateProperties(lecture.id,assignment.id,this.subID,this.gradebook.properties)
-
-    } catch(e) {
-      showErrorMessage("Error Saving Manualgrading",e)
-    }
-    showDialog({
-      title: 'New Grades saved!',
-      buttons: [Dialog.okButton({ label: 'Ok' })]
-    });    
+  private async saveProperties() {
+    console.log("saving properties");
+    await updateProperties(this.lecture.id, this.assignment.id, this.subID, this.gradeBook.properties);
+    console.log("saved");
   }
 
   public render() {
@@ -185,15 +174,14 @@ export class CreationmodeSwitchComponent extends React.Component<ICreationmodeSw
       );
     } else if (this.isManualgradeNotebook && this.hasPermissions) {
       return (
-        <div className="flex-container">
-        <Switch
-          className="flex-item"
-          checked={this.state.gradingmode}
-          label="Gradingmode"
-          onChange={this.handleSwitchGrading}
-        />
-        <Button icon="saved" intent="success" className="flex-item assignment-button" onClick={this.setProperties} outlined>Save</Button>
-        </div>
+        <span id="manual-grade-switch">
+          <Switch
+            checked={this.state.gradingmode}
+            label="Gradingmode"
+            onChange={this.handleSwitchGrading}
+          />
+          <Button className="assignment-button" onClick={() => this.saveProperties()} icon={IconNames.FLOPPY_DISK} outlined intent={Intent.SUCCESS}>Save</Button>
+        </span>
       );
     }
     return null;

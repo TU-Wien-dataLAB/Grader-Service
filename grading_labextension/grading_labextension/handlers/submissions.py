@@ -49,17 +49,18 @@ class SubmissionPropertiesHandler(ExtensionBaseHandler):
 
     async def put(self, lecture_id: int, assignment_id: int, submission_id: int):
         try:
-            response = await self.request_service.request(
+            await self.request_service.request(
                 method="PUT",
                 endpoint=f"{self.base_url}/lectures/{lecture_id}/assignments/{assignment_id}/submissions/{submission_id}/properties",
                 header=self.grader_authentication_header,
-                body=self.request.body.decode("utf-8")
+                body=self.request.body.decode("utf-8"),
+                decode_response=False
             )
         except HTTPError as e:
             self.set_status(e.code)
             self.write_error(e.code)
             return
-        self.write(json.dumps(response))
+        self.write("OK")
 
 
 @register_handler(

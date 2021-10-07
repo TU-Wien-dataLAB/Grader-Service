@@ -10,3 +10,11 @@
 .manual-grading-list {
   list-style: none;
 }
+
+#manual-grade-switch {
+  display: inline-flex;
+}
+
+#manual-grade-switch > * {
+  margin-right: 10px;
+}
