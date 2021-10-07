@@ -45,9 +45,10 @@ export class GradingComponent extends React.Component<IGradingProps> {
   public lectureId: number;
   public assignmentId: number;
   public columns: GridColDef[];
+  private reloadInterval: number;
   public state = {
-    assignment: {id:-1},
-    lecture: {id:-1},
+    assignment: { id: -1 },
+    lecture: { id: -1 },
     submissions: new Array<{ user: User; submissions: Submission[] }>(),
     option: 'latest',
     rows: new Array(),
@@ -83,7 +84,7 @@ export class GradingComponent extends React.Component<IGradingProps> {
             fields.forEach(f => {
               thisRow[f] = params.getValue(params.id, f);
             });
-            const response = await autogradeSubmission(this.state.lecture,this.state.assignment,thisRow).toPromise();
+            const response = await autogradeSubmission(this.state.lecture, this.state.assignment, thisRow).toPromise();
             this.getSubmissions()
 
             return console.log(response);
@@ -114,8 +115,8 @@ export class GradingComponent extends React.Component<IGradingProps> {
             fields.forEach(f => {
               thisRow[f] = params.getValue(params.id, f);
             });
-            await createManualFeedback(this.state.lecture.id,this.state.assignment.id,+thisRow.id);
-            this.openManualGrading(this.state.lecture.id,this.state.assignment.id,+thisRow.id, thisRow.name as string);
+            await createManualFeedback(this.state.lecture.id, this.state.assignment.id, +thisRow.id);
+            this.openManualGrading(this.state.lecture.id, this.state.assignment.id, +thisRow.id, thisRow.name as string);
 
             return this.showManualGrade(thisRow);
           };
@@ -143,16 +144,24 @@ export class GradingComponent extends React.Component<IGradingProps> {
       false,
       true
     ).toPromise();
-    
+
     const lecture: Lecture = await getLecture(this.lectureID).toPromise();
     this.title.label = 'Grading: ' + assignment.name;
 
     this.setState({ assignment, lecture });
     this.getSubmissions();
-    setInterval(() => {this.getSubmissions(); 
-                      console.log("Updatin");}
-                      ,5000)
+    this.reloadInterval = setInterval(() => {
+      this.getSubmissions();
+      console.log("Updatin");
+    }
+      , 5000)
   }
+
+  public componentWillUnmount() {
+    clearInterval(this.reloadInterval);
+    console.log("Unmountin");
+  }
+
   private openManualGrading(lectureID: number, assignmentID: number, subID: number, username: string) {
     GlobalObjects.commands
       .execute('manualgrade:open', {
@@ -176,7 +185,7 @@ export class GradingComponent extends React.Component<IGradingProps> {
         console.log(this.state.rows);
       }
     );
-    }
+  }
 
   public generateRows(): any[] {
     //let rows = [{ id: 10, user: "hasdf", date: "asdfadfa" }]
@@ -259,7 +268,7 @@ export class GradingComponent extends React.Component<IGradingProps> {
             marginRight: '20px',
             marginBottom: '20px'
           }}
-          onClick={() => {}}
+          onClick={() => { }}
         >
           Autograde selected
         </Button>
