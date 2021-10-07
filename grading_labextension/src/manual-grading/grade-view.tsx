@@ -117,6 +117,12 @@ export class ManualGradingComponent extends React.Component<ManualGradingProps> 
       });
   }
 
+  private async reload() {
+    const properties = await getProperties(this.lectureID, this.assignmentID, this.subID).toPromise();
+    this.gradeBook = new GradeBook(properties);
+    this.setState({ points: this.gradeBook.getPoints(), maxPoints: this.gradeBook.getMaxPoints(), gradingInfo: this.gradeBook.getGradingInfo() });
+  }
+
   public render() {
     return (
       <div>
@@ -148,7 +154,7 @@ export class ManualGradingComponent extends React.Component<ManualGradingProps> 
             ref={_element => (this.dirListingNode = _element)}
           >
           </div>
-          <Button id="reload-button" className="assignment-button" onClick={() => console.log("reload")} icon={IconNames.REFRESH} outlined intent={Intent.SUCCESS}>Reload</Button>
+          <Button id="reload-button" className="assignment-button" onClick={() => this.reload()} icon={IconNames.REFRESH} outlined intent={Intent.SUCCESS}>Reload</Button>
         </div>
       </div>
     )
