@@ -112,4 +112,21 @@ export class GradeBook {
         }
         return sum;
     }
+
+    public getNotebookExtraCredit(notebook: string): number {
+        let sum: number = 0;
+        const grades_dict = this.properties["notebooks"][notebook]["grades_dict"];
+        for (let cellId of Object.keys(grades_dict)) {
+            sum += this.getExtraCredit(notebook, cellId);
+        }
+        return sum;
+    }
+
+    public getExtraCredits() {
+        let sum: number = 0;
+        for (let notebook of Object.keys(this.properties["notebooks"])) {
+            sum += this.getNotebookExtraCredit(notebook);
+        }
+        return sum;
+    }
 }

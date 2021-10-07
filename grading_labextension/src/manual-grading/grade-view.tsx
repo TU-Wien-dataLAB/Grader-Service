@@ -41,6 +41,7 @@ export class ManualGradingComponent extends React.Component<ManualGradingProps> 
     assignment: {} as Assignment,
     points: 0.0,
     maxPoints: 0.0,
+    extraCredit: 0.0,
     gradingInfo: new Map<string, boolean>(),
   }
 
@@ -66,7 +67,12 @@ export class ManualGradingComponent extends React.Component<ManualGradingProps> 
     this.setState({ lecture: await getLecture(this.lectureID).toPromise() });
     const properties = await getProperties(this.lectureID, this.assignmentID, this.subID).toPromise();
     this.gradeBook = new GradeBook(properties);
-    this.setState({ points: this.gradeBook.getPoints(), maxPoints: this.gradeBook.getMaxPoints(), gradingInfo: this.gradeBook.getGradingInfo() });
+    this.setState({
+      points: this.gradeBook.getPoints(),
+      maxPoints: this.gradeBook.getMaxPoints(),
+      gradingInfo: this.gradeBook.getGradingInfo(),
+      extraCredit: this.gradeBook.getExtraCredits()
+    });
 
     this.title.label = `Manualgrade ${this.username}/${this.subID}`;
     const renderer = new ExistingNodeRenderer(this.dirListingNode);
@@ -120,7 +126,12 @@ export class ManualGradingComponent extends React.Component<ManualGradingProps> 
   private async reload() {
     const properties = await getProperties(this.lectureID, this.assignmentID, this.subID).toPromise();
     this.gradeBook = new GradeBook(properties);
-    this.setState({ points: this.gradeBook.getPoints(), maxPoints: this.gradeBook.getMaxPoints(), gradingInfo: this.gradeBook.getGradingInfo() });
+    this.setState({
+      points: this.gradeBook.getPoints(),
+      maxPoints: this.gradeBook.getMaxPoints(),
+      gradingInfo: this.gradeBook.getGradingInfo(),
+      extraCredit: this.gradeBook.getExtraCredits()
+    });
   }
 
   public render() {
@@ -138,6 +149,7 @@ export class ManualGradingComponent extends React.Component<ManualGradingProps> 
               <li>Assignment: <Tag minimal round>{this.state.assignment.name}</Tag></li><Divider />
               <li>Type: <Tag minimal round>{this.state.assignment.type}</Tag></li><Divider />
               <li>Points: <Tag minimal round>{this.state.points}/{this.state.maxPoints}</Tag></li><Divider />
+              <li>Extra Credit: <Tag minimal round>{this.state.extraCredit}</Tag></li><Divider />
               <li>
                 Needs Manual Grading:
                 <ul className="manual-grading-list">
