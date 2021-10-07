@@ -144,12 +144,13 @@ class SubmissionPropertiesHandler(GraderBaseHandler):
     @authorize([Scope.tutor, Scope.instructor])
     async def put(self, lecture_id: int, assignment_id: int, submission_id: int):
         submission = self.session.query(Submission).get(submission_id)
-        if submission is None or submission.deleted == DeleteState.deleted:
+        if submission is None:
             self.error_message = "Not Found!"
             raise HTTPError(404)
         properties_string: str = self.request.body.decode("utf-8")
         submission.properties = properties_string
         self.session.commit()
+        self.write_json(submission)
 
 
 @register_handler(

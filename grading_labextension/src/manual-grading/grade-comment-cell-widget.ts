@@ -107,6 +107,8 @@ export class GradeCommentCellWidget extends Panel {
     input.type = 'number';
     input.min = '0';
     input.defaultValue = '0'
+
+    
     input.onchange = () => {this.gradebook.setExtraCredit(this.notebookName,this.toolData.id,+input.value)
       console.log(this.gradebook.properties)}
     label.appendChild(input);

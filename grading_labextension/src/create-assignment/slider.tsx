@@ -10,10 +10,13 @@ import { CellPlayButton } from './widget';
 import { UserPermissions, Scope } from '../services/permission.service';
 import { GradeCellWidget } from '../manual-grading/grade-cell-widget';
 import { GradeCommentCellWidget } from '../manual-grading/grade-comment-cell-widget';
-import { getProperties } from '../services/submissions.service';
+import { getProperties, updateProperties } from '../services/submissions.service';
 import { getAllLectures } from '../services/lectures.service';
 import { getAllAssignments } from '../services/assignments.service';
 import { GradeBook } from '../services/gradebook';
+import { Assignment } from '../model/assignment';
+import { showErrorMessage, showDialog, Dialog } from '@jupyterlab/apputils';
+
 export class CreationmodeSwitch extends ReactWidget {
   public ref: React.RefObject<CreationmodeSwitchComponent>;
   public component: JSX.Element;
@@ -65,6 +68,7 @@ export class CreationmodeSwitchComponent extends React.Component<ICreationmodeSw
   public isManualgradeNotebook: boolean;
   public subID: number;
   private notebookPaths: string[];
+  private gradebook: GradeBook;
 
   public constructor(props: ICreationmodeSwitchProps) {
     super(props);
@@ -96,6 +100,7 @@ export class CreationmodeSwitchComponent extends React.Component<ICreationmodeSw
     this.onChange = this.props.onChange;
     this.handleSwitchCreation = this.handleSwitchCreation.bind(this);
     this.handleSwitchGrading = this.handleSwitchGrading.bind(this);
+    this.setProperties = this.setProperties.bind(this);
   }
 
   public handleSwitchCreation = () => {
@@ -131,14 +136,14 @@ export class CreationmodeSwitchComponent extends React.Component<ICreationmodeSw
     const assignment = assignments.find(a => a.name === this.notebookPaths[2])
 
     const properties = await getProperties(lecture.id,assignment.id,this.subID).toPromise()
-    const gradebook = new GradeBook(properties);
+    this.gradebook = new GradeBook(properties);
     this.setState({ gradingmode: !this.state.gradingmode }, () => {
       this.onChange(this.state.gradingmode);
       this.notebook.widgets.map((c: Cell) => {
         const currentLayout = c.layout as PanelLayout;
         if (this.state.gradingmode) {
           currentLayout.insertWidget(0, new GradeCellWidget(c));
-          currentLayout.addWidget(new GradeCommentCellWidget(c,gradebook,this.notebookPaths[4].split(".").slice(0,-1).join(".")))
+          currentLayout.addWidget(new GradeCommentCellWidget(c,this.gradebook,this.notebookPaths[4].split(".").slice(0,-1).join(".")))
         } else {
           currentLayout.widgets.map(w => {
             if (w instanceof GradeCellWidget || w instanceof GradeCommentCellWidget) {
@@ -148,6 +153,25 @@ export class CreationmodeSwitchComponent extends React.Component<ICreationmodeSw
         }
       });
     });
+  }
+
+  private setProperties = async () => {
+    //TODO: redundant call exactly like handleSwitchGrading
+    // lectures and assignments either need to be available through props or a central function
+    const lectures = await getAllLectures().toPromise()
+    const lecture = lectures.find(l => l.code === this.notebookPaths[1])
+    const assignments = await getAllAssignments(lecture.id).toPromise()
+    const assignment = assignments.find(a => a.name === this.notebookPaths[2])
+    try {
+      updateProperties(lecture.id,assignment.id,this.subID,this.gradebook.properties)
+
+    } catch(e) {
+      showErrorMessage("Error Saving Manualgrading",e)
+    }
+    showDialog({
+      title: 'New Grades saved!',
+      buttons: [Dialog.okButton({ label: 'Ok' })]
+    });    
   }
 
   public render() {
@@ -161,13 +185,14 @@ export class CreationmodeSwitchComponent extends React.Component<ICreationmodeSw
       );
     } else if (this.isManualgradeNotebook && this.hasPermissions) {
       return (
-        <div>
+        <div className="flex-container">
         <Switch
+          className="flex-item"
           checked={this.state.gradingmode}
           label="Gradingmode"
           onChange={this.handleSwitchGrading}
         />
-        <Button intent="success">Save</Button>
+        <Button icon="saved" intent="success" className="flex-item assignment-button" onClick={this.setProperties} outlined>Save</Button>
         </div>
       );
     }

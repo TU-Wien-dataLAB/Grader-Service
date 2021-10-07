@@ -50,7 +50,7 @@ class SubmissionPropertiesHandler(ExtensionBaseHandler):
     async def put(self, lecture_id: int, assignment_id: int, submission_id: int):
         try:
             response = await self.request_service.request(
-                method="GET",
+                method="PUT",
                 endpoint=f"{self.base_url}/lectures/{lecture_id}/assignments/{assignment_id}/submissions/{submission_id}/properties",
                 header=self.grader_authentication_header,
                 body=self.request.body.decode("utf-8")
