@@ -26,7 +26,12 @@ export class GradeBook {
     }
 
     public getExtraCredit(notebook: string, cellId: string): number {
-        return this.properties["notebooks"][notebook]["grades_dict"][cellId]["extra_credit"];
+        const extraCredit = this.properties["notebooks"][notebook]["grades_dict"][cellId]["extra_credit"];
+        if (extraCredit) {
+            return extraCredit;
+        } else {
+            return 0.0;
+        }
     }
 
     public setNeedsManualGrading(notebook: string, cellId: string, needsGrading: boolean) {

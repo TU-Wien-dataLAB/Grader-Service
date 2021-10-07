@@ -30,7 +30,6 @@ export class GradeCommentCellWidget extends Panel {
     this.gradebook = gradebook;
     this.initLayout();
     this.addClass(CSS_CELL_WIDGET);
-    console.log(gradebook.properties)
   }
 
   /**
@@ -73,6 +72,11 @@ export class GradeCommentCellWidget extends Panel {
     const label = document.createElement('label');
     label.textContent = 'Comment: ';
     const comment = document.createElement('input');
+    try {
+      comment.value = this.gradebook.getComment(this.notebookName, this.toolData.id);
+    } catch {
+      comment.value = "";
+    }
     comment.onchange = () => {this.gradebook.setComment(this.notebookName,this.toolData.id,comment.value)
                                 console.log(this.gradebook.properties)}
     comment.type = 'text';
@@ -89,7 +93,11 @@ export class GradeCommentCellWidget extends Panel {
     const input = document.createElement('input');
     input.type = 'number';
     input.min = '0';
-    input.defaultValue = '0'
+    try {
+      input.value = String(this.gradebook.getGradeScore(this.notebookName, this.toolData.id));
+    } catch {
+      input.value = "0";
+    }
     input.max = String(this.toolData.points)
     input.onchange = () => {this.gradebook.setManualScore(this.notebookName,this.toolData.id,+input.value)
       console.log(this.gradebook.properties)}
@@ -106,9 +114,12 @@ export class GradeCommentCellWidget extends Panel {
     const input = document.createElement('input');
     input.type = 'number';
     input.min = '0';
-    input.defaultValue = '0'
-    input.onchange = () => {this.gradebook.setExtraCredit(this.notebookName,this.toolData.id,+input.value)
-      console.log(this.gradebook.properties)}
+    try {
+      input.value = String(this.gradebook.getExtraCredit(this.notebookName, this.toolData.id));
+    } catch {
+      input.value = "0";
+    }
+    input.onchange = () => {this.gradebook.setExtraCredit(this.notebookName,this.toolData.id,+input.value)}
     label.appendChild(input);
     element.appendChild(label);
     return element;
