@@ -71,6 +71,7 @@ export class CreationmodeSwitchComponent extends React.Component<ICreationmodeSw
   public isManualgradeNotebook: boolean;
   public subID: number;
   private notebookPaths: string[];
+  private gradebook: GradeBook;
 
   public constructor(props: ICreationmodeSwitchProps) {
     super(props);

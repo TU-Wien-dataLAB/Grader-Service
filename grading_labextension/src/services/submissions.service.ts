@@ -54,7 +54,7 @@ import { request, HTTPMethod } from "./request.service";
     return request<object>(HTTPMethod.GET, url);
   }
 
-  export function updateProperties(lectureId: number, assignmentId: number, submissionId: number, properties: object): Observable<void> {
+  export function updateProperties(lectureId: number, assignmentId: number, submissionId: number, properties: object): Observable<Submission> {
     let url = `/lectures/${lectureId}/assignments/${assignmentId}/submissions/${submissionId}/properties`;
-    return request<void>(HTTPMethod.PUT, url, properties);
+    return request<Submission>(HTTPMethod.PUT, url, properties);
   }

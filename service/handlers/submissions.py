@@ -150,6 +150,7 @@ class SubmissionPropertiesHandler(GraderBaseHandler):
         properties_string: str = self.request.body.decode("utf-8")
         submission.properties = properties_string
         self.session.commit()
+        self.write_json(submission)
 
 
 @register_handler(
