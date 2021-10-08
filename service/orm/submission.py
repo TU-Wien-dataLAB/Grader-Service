@@ -1,3 +1,4 @@
+from sqlalchemy.sql.expression import false
 from .base import Base, Serializable
 from sqlalchemy import Column, Integer, String, ForeignKey, DateTime, Enum, Text, Boolean
 from sqlalchemy.orm import relationship
@@ -19,6 +20,7 @@ class Submission(Base, Serializable):
     username = Column(String(255), ForeignKey("user.name"))
     commit_hash = (Column(String(length=40), nullable=False))
     properties = Column(Text, nullable=True, unique=False)
+    feedback_available = Column(Boolean, nullable=False)
 
     assignment = relationship("Assignment", back_populates="submissions")
     user = relationship("User", back_populates="submissions")
@@ -33,5 +35,6 @@ class Submission(Base, Serializable):
             auto_status=self.auto_status,
             manual_status=self.manual_status,
             score=self.score,
-            commit_hash=self.commit_hash
+            commit_hash=self.commit_hash,
+            feedback_available=self.feedback_available
         )

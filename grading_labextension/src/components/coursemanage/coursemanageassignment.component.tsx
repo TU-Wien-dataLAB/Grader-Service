@@ -290,9 +290,10 @@ export class CourseManageAssignmentComponent extends React.Component<
     }
 
     try {
-      let a = await updateAssignment(this.lecture.id, this.state.assignment).toPromise();
+      let a = this.state.assignment;
+      a.status = 'released';
+      a = await updateAssignment(this.lecture.id, a).toPromise();
       this.setState({ assignment: a })
-      this.state.assignment.status = 'released';
     } catch (err) {
       showErrorMessage('Error Releasing Assignment', err);
     }

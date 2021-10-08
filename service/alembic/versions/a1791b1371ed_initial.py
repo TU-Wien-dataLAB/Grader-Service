@@ -74,6 +74,7 @@ def upgrade():
     sa.Column('username', sa.String(length=255), nullable=True),
     sa.Column('commit_hash', sa.String(length=40), nullable=False),
     sa.Column('properties', sa.Text(), nullable=True, unique=False),
+    sa.Column('feedback_available',sa.Boolean(), nullable=False, server_default="false"),
     sa.ForeignKeyConstraint(['assignid'], ['assignment.id'], ),
     sa.ForeignKeyConstraint(['username'], ['user.name'], ),
     sa.PrimaryKeyConstraint('id')

@@ -63,9 +63,9 @@ export class GradingComponent extends React.Component<IGradingProps> {
     this.columns = [
       { field: 'id', headerName: 'Id', width: 110 },
       { field: 'name', headerName: 'User', width: 130 },
-      { field: 'date', headerName: 'Date', width: 250 },
-      { field: 'auto_status', headerName: 'Autograde-Status', width: 250 },
-      { field: 'manual_status', headerName: 'Manualgrade-Status', width: 250 },
+      { field: 'date', headerName: 'Date', width: 170 },
+      { field: 'auto_status', headerName: 'Autograde-Status', width: 170 },
+      { field: 'manual_status', headerName: 'Manualgrade-Status', width: 170 },
       {
         field: 'Autograde',
         headerName: '',
@@ -129,6 +129,39 @@ export class GradingComponent extends React.Component<IGradingProps> {
               outlined
             >
               Manualgrade
+            </Button>
+          );
+        }
+      } as GridColDef,
+      {
+        field: 'Generate Freeback',
+        headerName: '',
+        sortable: false,
+        width: 230,
+        disableClickEventBubbling: true,
+        renderCell: params => {
+          const onClick = async () => {
+            const api: GridApi = params.api;
+            const fields = api
+              .getAllColumns()
+              .map(c => c.field)
+              .filter(c => c !== '__check__' && !!c);
+            const thisRow: Record<string, GridCellValue> = {};
+
+            fields.forEach(f => {
+              thisRow[f] = params.getValue(params.id, f);
+            });
+            
+          };
+
+          return (
+            <Button
+              icon="highlight"
+              onClick={onClick}
+              disabled={params.getValue(params.id, 'auto_status') !== 'automatically_graded'}
+              outlined
+            >
+              Generate Feedback
             </Button>
           );
         }

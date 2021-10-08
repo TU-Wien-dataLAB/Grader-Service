@@ -176,7 +176,7 @@ export class AssignmentComponent extends React.Component<AssignmentProps> {
       let result = await showDialog({
         title: 'Submit Assignment',
         body: `Do you want to submit ${this.state.assignment.name}? You can always re-submit the assignment before the due date.`,
-        buttons: [Dialog.cancelButton(), Dialog.okButton({ label: 'Submit' })]
+        buttons: [Dialog.okButton({ label: 'Ok' })]
       });
       if (result.button.accept) {
         await submitAssignment(this.lecture, this.state.assignment).toPromise();
