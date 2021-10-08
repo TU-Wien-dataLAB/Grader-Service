@@ -144,7 +144,7 @@ export class CreationmodeSwitchComponent extends React.Component<ICreationmodeSw
       this.notebook.widgets.map((c: Cell) => {
         const currentLayout = c.layout as PanelLayout;
         if (this.state.gradingmode) {
-          currentLayout.insertWidget(0, new GradeCellWidget(c));
+          currentLayout.insertWidget(0, new GradeCellWidget(c,this.gradeBook, this.notebookPaths[4].split(".").slice(0, -1).join(".")));
           currentLayout.addWidget(new GradeCommentCellWidget(c, this.gradeBook, this.notebookPaths[4].split(".").slice(0, -1).join(".")))
         } else {
           currentLayout.widgets.map(w => {

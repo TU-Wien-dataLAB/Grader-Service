@@ -63,6 +63,10 @@ export class GradeBook {
         }
     }
 
+    public getAutoGradeScore(notebook: string, cellId: string): number {
+        return this.properties["notebooks"][notebook]["grades_dict"][cellId]["auto_score"]
+    }
+
     public getGradeMaxScore(notebook: string, cellId: string): number {
         const grade = this.properties["notebooks"][notebook]["grades_dict"][cellId];
         if (grade["max_score_taskcell"] !== null) {
