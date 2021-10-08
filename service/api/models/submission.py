@@ -15,7 +15,7 @@ class Submission(Model):
     Do not edit the class manually.
     """
 
-    def __init__(self, id=None, submitted_at=None, auto_status=None, manual_status=None, score=None, commit_hash=None):  # noqa: E501
+    def __init__(self, id=None, submitted_at=None, auto_status=None, manual_status=None, score=None, commit_hash=None, feedback_available=None):  # noqa: E501
         """Submission - a model defined in OpenAPI
 
         :param id: The id of this Submission.  # noqa: E501
@@ -35,7 +35,8 @@ class Submission(Model):
             'auto_status': str,
             'manual_status': str,
             'score': float,
-            'commit_hash': str
+            'commit_hash': str,
+            'feedback_available': bool
         }
 
         self.attribute_map = {
@@ -43,7 +44,9 @@ class Submission(Model):
             'submitted_at': 'submitted_at',
             'status': 'status',
             'score': 'score',
-            'commit_hash': 'commit_hash'
+            'commit_hash': 'commit_hash',
+            'feedback_available': bool
+
         }
 
         self._id = id
@@ -53,6 +56,7 @@ class Submission(Model):
 
         self._score = score
         self._commit_hash = commit_hash
+        self._feedback_available = feedback_available
 
     @classmethod
     def from_dict(cls, dikt) -> 'Submission':
@@ -203,3 +207,24 @@ class Submission(Model):
         """
 
         self._commit_hash = commit_hash
+
+    @property
+    def feedback_available(self):
+        """Gets the feedback_available of this Submission.
+
+
+        :return: The feedback_available of this Submission.
+        :rtype: str
+        """
+        return self._feedback_available
+
+    @feedback_available.setter
+    def feedback_available(self, feedback_available):
+        """Sets the feedback_available of this Submission.
+
+
+        :param feedback_available: The commit_hash of this Submission.
+        :type feedback_available: str
+        """
+
+        self._feedback_available = feedback_available
