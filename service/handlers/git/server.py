@@ -69,7 +69,7 @@ class GitBaseHandler(GraderBaseHandler):
         assignment_path = os.path.abspath(os.path.join(self.gitbase, pathlets[0], unquote(pathlets[1])))
         
         repo_type = pathlets[2]
-        if repo_type not in {"source", "release", "assignment", "autograde"}:
+        if repo_type not in {"source", "release", "assignment", "autograde", "feedback"}:
             return None
         
         # get lecture and assignment if they exist
@@ -90,7 +90,8 @@ class GitBaseHandler(GraderBaseHandler):
             raise HTTPError(403)
 
         # no push allowed -> the autograder executor can push locally so it will not be affected by this
-        if repo_type == "autograde" and rpc == "send-pack": 
+        # same for feedback
+        if repo_type in ["autograde", "feedback"] and rpc == "send-pack": 
             self.error_message = "Unauthorized"
             raise HTTPError(403)
 
@@ -114,7 +115,7 @@ class GitBaseHandler(GraderBaseHandler):
         # construct final path from repo type
         if repo_type == "source" or repo_type == "release":
             path = os.path.join(assignment_path, repo_type)
-        elif repo_type == "autograde":
+        elif repo_type in ["autograde", "feedback"]:
             type_path = os.path.join(assignment_path, repo_type, assignment.type)
             if assignment.type == "user":
                 path = os.path.join(type_path, self.user.name)

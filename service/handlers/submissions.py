@@ -103,26 +103,14 @@ class SubmissionHandler(GraderBaseHandler):
 
 
 @register_handler(
-    path=r"\/lectures\/(?P<lecture_id>\d*)\/assignments\/(?P<assignment_id>\d*)\/feedback\/?",
+    path=r"\/lectures\/(?P<lecture_id>\d*)\/assignments\/(?P<assignment_id>\d*)\/submissions\/(?P<submission_id>\d*)\/?",
     version_specifier=VersionSpecifier.ALL,
 )
-class FeedbackHandler(GraderBaseHandler):
-    @authorize([Scope.student, Scope.tutor, Scope.instructor])
-    async def get(self, lecture_id: int, assignment_id: int):
-        latest = self.get_argument("latest", False)
-        instructor_version = self.get_argument("instructor-version", False)
-        pass
-
-
-@register_handler(
-    path=r"\/lectures\/(?P<lecture_id>\d*)\/assignments\/(?P<assignment_id>\d*)\/feedback\/(?P<feedback_id>\d*)\/?",
-    version_specifier=VersionSpecifier.ALL,
-)
-class FeedbackObjectHandler(GraderBaseHandler):
-    @authorize([Scope.student, Scope.tutor, Scope.instructor])
-    async def get(self, lecture_id: int, assignment_id: int, feedback_id: int):
-        pass
-
+class SubmissionObjectHandler(GraderBaseHandler):
+    @authorize([Scope.tutor, Scope.instructor])
+    async def get(self, lecture_id: int, assignment_id: int, submission_id: int):
+        submission = self.session.query(Submission).get(submission_id)      
+        self.write_json(submission)
 
 @register_handler(
     path=r"\/lectures\/(?P<lecture_id>\d*)\/assignments\/(?P<assignment_id>\d*)\/submissions\/(?P<submission_id>\d*)\/properties\/?",
@@ -150,15 +138,4 @@ class SubmissionPropertiesHandler(GraderBaseHandler):
         properties_string: str = self.request.body.decode("utf-8")
         submission.properties = properties_string
         self.session.commit()
-        self.write_json(submission)
-
-
-@register_handler(
-    path=r"\/lectures\/(?P<lecture_id>\d*)\/assignments\/(?P<assignment_id>\d*)\/submissions\/(?P<submission_id>\d*)\/?",
-    version_specifier=VersionSpecifier.ALL,
-)
-class SubmissionPropertiesHandler(GraderBaseHandler):
-    @authorize([Scope.tutor, Scope.instructor])
-    async def get(self, lecture_id: int, assignment_id: int, submission_id: int):
-        submission = self.session.query(Submission).get(submission_id)      
         self.write_json(submission)

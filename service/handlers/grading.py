@@ -8,8 +8,7 @@ from orm.submission import Submission
 from server import GraderServer
 from tornado import httputil, web
 from tornado.ioloop import IOLoop
-import tornado_sqlalchemy
-
+from tornado.httpclient import HTTPError
 
 @register_handler(
     path=r"\/lectures\/(?P<lecture_id>\d*)\/assignments\/(?P<assignment_id>\d*)\/grading\/?",
@@ -28,12 +27,16 @@ class GradingBaseHandler(GraderBaseHandler):
 class GradingAutoHandler(GraderBaseHandler):
 
     def on_finish(self):
+        # we do not close the session we just commit because LocalAutogradeExecutor still needs it
         if self.session:
             self.session.commit()
 
     @authorize([Scope.tutor, Scope.instructor])
     async def get(self, lecture_id: int, assignment_id: int, sub_id: int):
         submission = self.session.query(Submission).get(sub_id)
+        if submission is None:
+            self.error_message = "Not Found!"
+            raise HTTPError(404)
         executor = LocalAutogradeExecutor(self.application.grader_service_dir, submission)
         IOLoop.current().spawn_callback(executor.start)
         submission = self.session.query(Submission).get(sub_id)
@@ -41,32 +44,13 @@ class GradingAutoHandler(GraderBaseHandler):
 
 
 @register_handler(
-    path=r"\/lectures\/(?P<lecture_id>\d*)\/assignments\/(?P<assignment_id>\d*)\/grading\/(?P<user_id>\d*)\/manual\/?",
+    path=r"\/lectures\/(?P<lecture_id>\d*)\/assignments\/(?P<assignment_id>\d*)\/grading\/(?P<sub_id>\d*)\/feedback\/?",
     version_specifier=VersionSpecifier.ALL,
 )
-class GradingManualHandler(GraderBaseHandler):
-    @authorize([Scope.tutor, Scope.instructor])
-    async def post(self, lecture_id: int, assignment_id: int, user_id: int):
-        pass
-
-    @authorize([Scope.tutor, Scope.instructor])
-    async def get(self, lecture_id: int, assignment_id: int, user_id: int):
-        pass
-
-    @authorize([Scope.tutor, Scope.instructor])
-    async def put(self, lecture_id: int, assignment_id: int, user_id: int):
-        pass
-
-    @authorize([Scope.instructor])
-    async def delete(self, lecture_id: int, assignment_id: int, user_id: int):
-        pass
-
-
-@register_handler(
-    path=r"\/lectures\/(?P<lecture_id>\d*)\/assignments\/(?P<assignment_id>\d*)\/grading\/(?P<user_id>\d*)\/score\/?",
-    version_specifier=VersionSpecifier.ALL,
-)
-class GradingScoreHandler(GraderBaseHandler):
-    @authorize([Scope.student, Scope.tutor, Scope.instructor])
-    async def get(self, lecture_id: int, assignment_id: int, user_id: int):
-        pass
+class GenerateFeedbackHandler(GraderBaseHandler):
+    async def put(self, lecture_id: int, assignment_id: int, sub_id):
+        submission = self.session.query(Submission).get(sub_id)
+        if submission is None:
+            self.error_message = "Not Found!"
+            raise HTTPError(404)
+        # TODO: clone autograde repo, write gradebook, run generate_feedbakc and push to feedback repo
