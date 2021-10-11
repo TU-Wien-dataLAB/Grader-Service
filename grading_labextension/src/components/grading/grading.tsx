@@ -134,7 +134,7 @@ export class GradingComponent extends React.Component<IGradingProps> {
         }
       } as GridColDef,
       {
-        field: 'Generate Freeback',
+        field: 'Generate Feedback',
         headerName: '',
         sortable: false,
         width: 230,
@@ -304,6 +304,20 @@ export class GradingComponent extends React.Component<IGradingProps> {
           onClick={() => { }}
         >
           Autograde selected
+        </Button>
+
+        <Button
+          icon="highlight"
+          color="primary"
+          outlined
+          style={{
+            alignSelf: 'flex-end',
+            marginRight: '20px',
+            marginBottom: '20px'
+          }}
+          onClick={() => { }}
+        >
+          Generate Feedback selected
         </Button>
       </div>
     );

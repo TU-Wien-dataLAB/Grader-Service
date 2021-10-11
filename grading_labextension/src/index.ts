@@ -34,6 +34,7 @@ import { IFileBrowserFactory } from '@jupyterlab/filebrowser';
 import { UserPermissions } from './services/permission.service';
 import { CellPlayButton } from './create-assignment/widget';
 import { ManualGradingView } from './widgets/manualgrading';
+import { FeedbackView } from './widgets/feedback';
 
 namespace AssignmentsCommandIDs {
   export const create = 'assignments:create';
@@ -57,6 +58,12 @@ namespace ManualGradeCommandIDs {
   export const create = 'manualgrade:create';
 
   export const open = 'manualgrade:open'
+}
+
+namespace FeedbackCommandIDs {
+  export const create = 'feedback:create';
+
+  export const open = 'feedback:open'
 }
 
 /*namespace CreateAssignmentIDs {
@@ -369,6 +376,56 @@ const extension: JupyterFrontEndPlugin<void> = {
         }
         // Activate the widget
         app.shell.activateById(gradingView.id);
+      },
+      icon: editIcon
+    });
+
+    command = FeedbackCommandIDs.create;
+    app.commands.addCommand(command, {
+      execute: (args: any) => {
+        const lectureID: number =
+          typeof args['lectureID'] === 'undefined'
+            ? null
+            : (args['lectureID'] as number);
+        const assignmentID: number =
+          typeof args['assignmentID'] === 'undefined'
+            ? null
+            : (args['assignmentID'] as number);
+        const subID: number =
+          typeof args['subID'] === 'undefined'
+            ? null
+            : (args['subID'] as number);
+        const username: string =
+          typeof args['username'] === 'undefined'
+            ? null
+            : (args['username'] as string);
+        const feedbackView = new FeedbackView({ lectureID, assignmentID, subID, username });
+        const feedbackWidget = new MainAreaWidget<FeedbackView>({
+          content: feedbackView
+        });
+        feedbackWidget.id = 'feedback-jupyterlab';
+        feedbackWidget.title.label = 'Feedback';
+        feedbackWidget.title.closable = true;
+
+        return feedbackWidget;
+      }
+    });
+
+    command = FeedbackCommandIDs.open;
+    app.commands.addCommand(command, {
+      label: 'Feedback',
+      execute: async (args: any) => {
+        const feedbackWidget: MainAreaWidget<FeedbackView> = await app.commands.execute(
+          FeedbackCommandIDs.create,
+          args
+        );
+
+        if (!feedbackWidget.isAttached) {
+          // Attach the widget to the main work area if it's not there
+          app.shell.add(feedbackWidget, 'main');
+        }
+        // Activate the widget
+        app.shell.activateById(feedbackWidget.id);
       },
       icon: editIcon
     });

@@ -15,7 +15,7 @@ class Submission(Model):
     Do not edit the class manually.
     """
 
-    def __init__(self, id=None, submitted_at=None, status=None, score=None, commit_hash=None, feedback_available=None):  # noqa: E501
+    def __init__(self, id=None, submitted_at=None, auto_status=None,manual_status=None, score=None, commit_hash=None, feedback_available=None):  # noqa: E501
         """Submission - a model defined in OpenAPI
 
         :param id: The id of this Submission.  # noqa: E501
@@ -34,7 +34,9 @@ class Submission(Model):
         self.openapi_types = {
             'id': int,
             'submitted_at': datetime,
-            'status': str,
+            'auto_status': str,
+            'manual_status': str,
+
             'score': float,
             'commit_hash': str,
             'feedback_available': bool
@@ -43,7 +45,8 @@ class Submission(Model):
         self.attribute_map = {
             'id': 'id',
             'submitted_at': 'submitted_at',
-            'status': 'status',
+            'auto_status': 'auto_status',
+            'manual_status': 'manual_status',
             'score': 'score',
             'commit_hash': 'commit_hash',
             'feedback_available': 'feedback_available'
@@ -51,7 +54,8 @@ class Submission(Model):
 
         self._id = id
         self._submitted_at = submitted_at
-        self._status = status
+        self._auto_status = auto_status
+        self._manual_status = manual_status
         self._score = score
         self._commit_hash = commit_hash
         self._feedback_available = feedback_available
@@ -110,31 +114,58 @@ class Submission(Model):
         self._submitted_at = submitted_at
 
     @property
-    def status(self):
+    def auto_status(self):
         """Gets the status of this Submission.
 
 
         :return: The status of this Submission.
         :rtype: str
         """
-        return self._status
+        return self._auto_status
 
-    @status.setter
-    def status(self, status):
+    @auto_status.setter
+    def auto_status(self, status):
         """Sets the status of this Submission.
 
 
         :param status: The status of this Submission.
         :type status: str
         """
-        allowed_values = ["submitting", "not_graded", "automatically_graded", "manually_graded"]  # noqa: E501
+        allowed_values = ["not_graded", "automatically_graded", "grading_failed"]  # noqa: E501
         if status not in allowed_values:
             raise ValueError(
-                "Invalid value for `status` ({0}), must be one of {1}"
+                "Invalid value for `auto_status` ({0}), must be one of {1}"
                 .format(status, allowed_values)
             )
 
-        self._status = status
+        self._auto_status = status
+
+    @property
+    def manual_status(self):
+        """Gets the status of this Submission.
+
+
+        :return: The status of this Submission.
+        :rtype: str
+        """
+        return self._manual_status
+
+    @manual_status.setter
+    def manual_status(self, status):
+        """Sets the status of this Submission.
+
+
+        :param status: The status of this Submission.
+        :type status: str
+        """
+        allowed_values = ["not_graded", "manually_graded", "grading_failed"]  # noqa: E501
+        if status not in allowed_values:
+            raise ValueError(
+                "Invalid value for `manual_status` ({0}), must be one of {1}"
+                .format(status, allowed_values)
+            )
+
+        self._manual_status = status
 
     @property
     def score(self):

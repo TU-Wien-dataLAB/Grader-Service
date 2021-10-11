@@ -80,6 +80,7 @@ export class AssignmentComponent extends React.Component<AssignmentProps> {
     this.fetchAssignment = this.fetchAssignment.bind(this);
     this.submitAssignment = this.submitAssignment.bind(this);
     this.getSubmissions = this.getSubmissions.bind(this);
+    this.openFeedback = this.openFeedback.bind(this);
   }
 
   public componentWillReceiveProps(nextProps: AssignmentProps) {
@@ -199,7 +200,7 @@ export class AssignmentComponent extends React.Component<AssignmentProps> {
     if (this.state.submissions.length > 0) {
       return (
         <div className="assignment-content">
-          {this.state.submissions.map((submission, i) => (
+          {this.state.submissions.map((submission : Submission, i) => (
             <div className="submission-element">
               <Icon
                 icon={IconNames.FORM}
@@ -207,7 +208,7 @@ export class AssignmentComponent extends React.Component<AssignmentProps> {
                 className="flavor-icon"
               ></Icon>
               {utcToLocalFormat(submission.submitted_at)}
-              {/* {submission.auto_status != 'not_graded' || submission.manual_status != 'not_graded' ? (
+              { submission.feedback_available ? (
                 <Button
                   className="assignment-button"
                   icon={IconNames.CLOUD_DOWNLOAD}
@@ -215,10 +216,11 @@ export class AssignmentComponent extends React.Component<AssignmentProps> {
                   outlined={true}
                   intent={Intent.PRIMARY}
                   small={true}
+                  onClick={() => {this.openFeedback(this.lecture.id,this.state.assignment.id,submission.id,"fjaeger")}}
                 >
-                  Fetch Feedback
+                  Open Feedback
                 </Button>
-              ) : null} */}
+              ) : null } 
               {i != this.state.submissions.length - 1 ? <Divider /> : null}
             </div>
           ))}
@@ -227,6 +229,19 @@ export class AssignmentComponent extends React.Component<AssignmentProps> {
     } else {
       return <div className="assignment-content">No submissions yet!</div>;
     }
+  }
+
+  private openFeedback(lectureID: number, assignmentID: number, subID: number, username: string) {
+    GlobalObjects.commands
+      .execute('feedback:open', {
+        lectureID,
+        assignmentID,
+        subID,
+        username
+      })
+      .catch(error => {
+        showErrorMessage('Error Opening Feedback View', error);
+      });
   }
 
   public async updateDirListing() {
