@@ -145,6 +145,8 @@ components:
           format: float
         commit_hash:
           type: string
+        feedback_available:
+          type: boolean
       example:
         id: 2
         submitted_at: "2021-07-21T11:53:07Z"

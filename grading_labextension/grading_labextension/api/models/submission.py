@@ -15,7 +15,7 @@ class Submission(Model):
     Do not edit the class manually.
     """
 
-    def __init__(self, id=None, submitted_at=None, status=None, score=None, commit_hash=None):  # noqa: E501
+    def __init__(self, id=None, submitted_at=None, status=None, score=None, commit_hash=None, feedback_available=None):  # noqa: E501
         """Submission - a model defined in OpenAPI
 
         :param id: The id of this Submission.  # noqa: E501
@@ -28,13 +28,16 @@ class Submission(Model):
         :type score: float
         :param commit_hash: The commit_hash of this Submission.  # noqa: E501
         :type commit_hash: str
+        :param feedback_available: The feedback_available of this Submission.  # noqa: E501
+        :type feedback_available: bool
         """
         self.openapi_types = {
             'id': int,
             'submitted_at': datetime,
             'status': str,
             'score': float,
-            'commit_hash': str
+            'commit_hash': str,
+            'feedback_available': bool
         }
 
         self.attribute_map = {
@@ -42,7 +45,8 @@ class Submission(Model):
             'submitted_at': 'submitted_at',
             'status': 'status',
             'score': 'score',
-            'commit_hash': 'commit_hash'
+            'commit_hash': 'commit_hash',
+            'feedback_available': 'feedback_available'
         }
 
         self._id = id
@@ -50,6 +54,7 @@ class Submission(Model):
         self._status = status
         self._score = score
         self._commit_hash = commit_hash
+        self._feedback_available = feedback_available
 
     @classmethod
     def from_dict(cls, dikt) -> 'Submission':
@@ -172,3 +177,24 @@ class Submission(Model):
         """
 
         self._commit_hash = commit_hash
+
+    @property
+    def feedback_available(self):
+        """Gets the feedback_available of this Submission.
+
+
+        :return: The feedback_available of this Submission.
+        :rtype: bool
+        """
+        return self._feedback_available
+
+    @feedback_available.setter
+    def feedback_available(self, feedback_available):
+        """Sets the feedback_available of this Submission.
+
+
+        :param feedback_available: The feedback_available of this Submission.
+        :type feedback_available: bool
+        """
+
+        self._feedback_available = feedback_available

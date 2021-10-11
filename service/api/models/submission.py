@@ -15,7 +15,7 @@ class Submission(Model):
     Do not edit the class manually.
     """
 
-    def __init__(self, id=None, submitted_at=None, auto_status=None, manual_status=None, score=None, commit_hash=None, feedback_available=None):  # noqa: E501
+    def __init__(self, id=None, submitted_at=None, status=None, score=None, commit_hash=None, feedback_available=None):  # noqa: E501
         """Submission - a model defined in OpenAPI
 
         :param id: The id of this Submission.  # noqa: E501
@@ -28,12 +28,13 @@ class Submission(Model):
         :type score: float
         :param commit_hash: The commit_hash of this Submission.  # noqa: E501
         :type commit_hash: str
+        :param feedback_available: The feedback_available of this Submission.  # noqa: E501
+        :type feedback_available: bool
         """
         self.openapi_types = {
             'id': int,
             'submitted_at': datetime,
-            'auto_status': str,
-            'manual_status': str,
+            'status': str,
             'score': float,
             'commit_hash': str,
             'feedback_available': bool
@@ -45,15 +46,12 @@ class Submission(Model):
             'status': 'status',
             'score': 'score',
             'commit_hash': 'commit_hash',
-            'feedback_available': bool
-
+            'feedback_available': 'feedback_available'
         }
 
         self._id = id
         self._submitted_at = submitted_at
-        self._auto_status = auto_status
-        self._manual_status = manual_status
-
+        self._status = status
         self._score = score
         self._commit_hash = commit_hash
         self._feedback_available = feedback_available
@@ -112,59 +110,31 @@ class Submission(Model):
         self._submitted_at = submitted_at
 
     @property
-    def auto_status(self):
+    def status(self):
         """Gets the status of this Submission.
 
 
         :return: The status of this Submission.
         :rtype: str
         """
-        return self._auto_status
+        return self._status
 
-    @auto_status.setter
-    def auto_status(self, auto_status):
+    @status.setter
+    def status(self, status):
         """Sets the status of this Submission.
 
 
         :param status: The status of this Submission.
         :type status: str
         """
-        allowed_values = ["not_graded", "automatically_graded", "pending","grading_failed"]  # noqa: E501
-        if auto_status not in allowed_values:
+        allowed_values = ["submitting", "not_graded", "automatically_graded", "manually_graded"]  # noqa: E501
+        if status not in allowed_values:
             raise ValueError(
                 "Invalid value for `status` ({0}), must be one of {1}"
-                .format(auto_status, allowed_values)
+                .format(status, allowed_values)
             )
 
-        self._auto_status = auto_status
-
-
-    @property
-    def manual_status(self):
-        """Gets the status of this Submission.
-
-
-        :return: The status of this Submission.
-        :rtype: str
-        """
-        return self._manual_status
-
-    @manual_status.setter
-    def manual_status(self, manual_status):
-        """Sets the status of this Submission.
-
-
-        :param status: The status of this Submission.
-        :type status: str
-        """
-        allowed_values = ["not_graded", "manually_graded"]  # noqa: E501
-        if manual_status not in allowed_values:
-            raise ValueError(
-                "Invalid value for `status` ({0}), must be one of {1}"
-                .format(manual_status, allowed_values)
-            )
-
-        self._manual_status = manual_status
+        self._status = status
 
     @property
     def score(self):
@@ -214,7 +184,7 @@ class Submission(Model):
 
 
         :return: The feedback_available of this Submission.
-        :rtype: str
+        :rtype: bool
         """
         return self._feedback_available
 
@@ -223,8 +193,8 @@ class Submission(Model):
         """Sets the feedback_available of this Submission.
 
 
-        :param feedback_available: The commit_hash of this Submission.
-        :type feedback_available: str
+        :param feedback_available: The feedback_available of this Submission.
+        :type feedback_available: bool
         """
 
         self._feedback_available = feedback_available

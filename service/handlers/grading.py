@@ -1,5 +1,6 @@
 from typing import Any
 from autograding.local import LocalAutogradeExecutor
+from autograding.feedback import GenerateFeedbackExecutor
 from registry import VersionSpecifier, register_handler
 from handlers.base_handler import GraderBaseHandler, authorize
 from jupyter_server.utils import url_path_join
@@ -48,9 +49,13 @@ class GradingAutoHandler(GraderBaseHandler):
     version_specifier=VersionSpecifier.ALL,
 )
 class GenerateFeedbackHandler(GraderBaseHandler):
-    async def put(self, lecture_id: int, assignment_id: int, sub_id):
+    async def get(self, lecture_id: int, assignment_id: int, sub_id):
         submission = self.session.query(Submission).get(sub_id)
         if submission is None:
             self.error_message = "Not Found!"
             raise HTTPError(404)
-        # TODO: clone autograde repo, write gradebook, run generate_feedbakc and push to feedback repo
+        executor = GenerateFeedbackExecutor(self.application.grader_service_dir, submission)
+        IOLoop.current().spawn_callback(executor.start)
+        submission = self.session.query(Submission).get(sub_id)
+        self.write_json(submission)
+        

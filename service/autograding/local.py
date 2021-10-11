@@ -56,10 +56,10 @@ class LocalAutogradeExecutor(LoggingConfigurable):
     async def start(self):
         await self._pull_submission()
         self.autograding_start = datetime.now()
-        await self._run_autograde()
+        await self._run()
         self.autograding_finished = datetime.now()
         await self._push_results()
-        self._set_submission_properties()
+        self._set_properties()
         self._cleanup()
 
     @property
@@ -137,7 +137,7 @@ class LocalAutogradeExecutor(LoggingConfigurable):
         self.submission.auto_status = "pending"
         self.session.commit()
 
-    async def _run_autograde(self):
+    async def _run(self):
         if os.path.exists(self.output_path):
             shutil.rmtree(self.output_path, onerror=rm_error)
             
@@ -221,7 +221,7 @@ class LocalAutogradeExecutor(LoggingConfigurable):
             pass # TODO: exit gracefully
         self.log.info("Pushing complete")
 
-    def _set_submission_properties(self):
+    def _set_properties(self):
         with open(os.path.join(self.output_path, "gradebook.json"), "r") as f:
             gradebook_str = f.read()
         self.submission.properties = gradebook_str

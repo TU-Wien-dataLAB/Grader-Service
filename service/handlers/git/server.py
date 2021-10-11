@@ -59,7 +59,6 @@ class GitBaseHandler(GraderBaseHandler):
             pass
 
     def gitlookup(self, rpc: str):
-        # TODO: right now instructors/grader cannot pull from user repo (path is determined by self.user.name) -> make optional path argument username and when given, check auth and set path to user
         pathlets = self.request.path.strip("/").split("/")
         # pathlets = ['services', 'grader', 'git', 'lecture_code', 'assignment_name', 'repo_type', ...]
         if len(pathlets) < 6:
@@ -94,6 +93,12 @@ class GitBaseHandler(GraderBaseHandler):
         if repo_type in ["autograde", "feedback"] and rpc == "send-pack": 
             self.error_message = "Unauthorized"
             raise HTTPError(403)
+        
+        if repo_type == "autograde" and role.role == Scope.student and rpc == "receive-pack":
+            self.error_message = "Unauthorized"
+            raise HTTPError(403)
+        
+        # TODO: students should not be able to pull other submissions -> add query param of sub_id
 
         try:
             assignment = self.session.query(Assignment).filter(Assignment.lectid == lecture.id, Assignment.name == unquote(pathlets[1])).one()
