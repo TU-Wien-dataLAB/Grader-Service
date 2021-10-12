@@ -14,24 +14,25 @@
 export interface Submission { 
     id?: number;
     submitted_at?: string;
-    auto_status?: Submission.Auto_StatusEnum;
-    manual_status?: Submission.Manual_StatusEnum;
+    auto_status?: Submission.AutoStatusEnum;
+    manual_status?: Submission.ManualStatusEnum;
     score?: number;
     commit_hash?: string;
+    feedback_available?: boolean;
 }
 export namespace Submission {
-    export type Auto_StatusEnum = 'not_graded' | 'automatically_graded' | 'pending';
-    export type Manual_StatusEnum = 'not_graded' | 'manually_graded';
-    export const Auto_StatusEnum = {
-        NotGraded: 'not_graded' as Auto_StatusEnum,
-        AutomaticallyGraded: 'automatically_graded' as Auto_StatusEnum,
-        ManuallyGraded: 'pending' as Auto_StatusEnum
+    export type AutoStatusEnum = 'not_graded' | 'automatically_graded' | 'grading_failed';
+    export const AutoStatusEnum = {
+        NotGraded: 'not_graded' as AutoStatusEnum,
+        AutomaticallyGraded: 'automatically_graded' as AutoStatusEnum,
+        GradingFailed: 'grading_failed' as AutoStatusEnum
     };
-    export const Manual_StatusEnum = {
-        NotGraded: 'not_graded' as Manual_StatusEnum,
-        ManuallyGraded: 'manually_graded' as Manual_StatusEnum
+    export type ManualStatusEnum = 'not_graded' | 'manually_graded' | 'grading_failed';
+    export const ManualStatusEnum = {
+        NotGraded: 'not_graded' as ManualStatusEnum,
+        ManuallyGraded: 'manually_graded' as ManualStatusEnum,
+        GradingFailed: 'grading_failed' as ManualStatusEnum
     };
 }
-
 
 

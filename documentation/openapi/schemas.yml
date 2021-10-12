@@ -133,13 +133,18 @@ components:
           type: "string"
           format: "date-time"
           example: "2021-07-21T11:53:07Z"
-        status:
+        auto_status:
           type: string
           enum:
-            - submitting # intermediate state of submitting but the file is not yet uploaded
-            - not_graded
-            - automatically_graded
-            - manually_graded
+            - "not_graded"
+            - "automatically_graded"
+            - "grading_failed"
+        manual_status:
+          type: string
+          enum:
+            - "not_graded"
+            - "manually_graded"
+            - "grading_failed"
         score:
           type: number
           format: float
