@@ -17,6 +17,7 @@ import { getAllAssignments } from '../services/assignments.service';
 import { GradeBook } from '../services/gradebook';
 import { Lecture } from '../model/lecture';
 import { Assignment } from '../model/assignment';
+import { showErrorMessage } from '@jupyterlab/apputils';
 export class CreationmodeSwitch extends ReactWidget {
   public ref: React.RefObject<CreationmodeSwitchComponent>;
   public component: JSX.Element;
@@ -59,6 +60,8 @@ export class CreationmodeSwitchComponent extends React.Component<ICreationmodeSw
   public state = {
     creationmode: false,
     gradingmode: false,
+    saveButtonText: "Save",
+    transition: "show"
   };
   public notebook: Notebook;
   public notebookpanel: NotebookPanel;
@@ -105,6 +108,16 @@ export class CreationmodeSwitchComponent extends React.Component<ICreationmodeSw
     this.handleSwitchGrading = this.handleSwitchGrading.bind(this);
   }
 
+  public async componentDidMount() {
+    const lectures = await getAllLectures().toPromise()
+    this.lecture = lectures.find(l => l.code === this.notebookPaths[1])
+    const assignments = await getAllAssignments(this.lecture.id).toPromise()
+    this.assignment = assignments.find(a => a.name === this.notebookPaths[2])
+
+    const properties = await getProperties(this.lecture.id, this.assignment.id, this.subID).toPromise()
+    this.gradeBook = new GradeBook(properties);
+  }
+
   public handleSwitchCreation = () => {
     this.setState({ creationmode: !this.state.creationmode }, () => {
       this.onChange(this.state.creationmode);
@@ -130,13 +143,6 @@ export class CreationmodeSwitchComponent extends React.Component<ICreationmodeSw
   };
 
   public handleSwitchGrading = async () => {
-    //TODO: Bad calls that are switching everytime the switch is getting triggered
-    //Move somewhere else
-    const lectures = await getAllLectures().toPromise()
-    this.lecture = lectures.find(l => l.code === this.notebookPaths[1])
-    const assignments = await getAllAssignments(this.lecture.id).toPromise()
-    this.assignment = assignments.find(a => a.name === this.notebookPaths[2])
-
     const properties = await getProperties(this.lecture.id, this.assignment.id, this.subID).toPromise()
     this.gradeBook = new GradeBook(properties);
     this.setState({ gradingmode: !this.state.gradingmode }, () => {
@@ -144,7 +150,7 @@ export class CreationmodeSwitchComponent extends React.Component<ICreationmodeSw
       this.notebook.widgets.map((c: Cell) => {
         const currentLayout = c.layout as PanelLayout;
         if (this.state.gradingmode) {
-          currentLayout.insertWidget(0, new GradeCellWidget(c,this.gradeBook, this.notebookPaths[4].split(".").slice(0, -1).join(".")));
+          currentLayout.insertWidget(0, new GradeCellWidget(c, this.gradeBook, this.notebookPaths[4].split(".").slice(0, -1).join(".")));
           currentLayout.addWidget(new GradeCommentCellWidget(c, this.gradeBook, this.notebookPaths[4].split(".").slice(0, -1).join(".")))
         } else {
           currentLayout.widgets.map(w => {
@@ -158,9 +164,18 @@ export class CreationmodeSwitchComponent extends React.Component<ICreationmodeSw
   }
 
   private async saveProperties() {
-    console.log("saving properties");
-    await updateProperties(this.lecture.id, this.assignment.id, this.subID, this.gradeBook.properties);
-    console.log("saved");
+    this.setState({ transition: "" })
+    this.setState({ saveButtonText: "Saving" })
+    try {
+      await updateProperties(this.lecture.id, this.assignment.id, this.subID, this.gradeBook.properties);
+      this.setState({ saveButtonText: "Saved" })
+      //console.log("saved")
+      setTimeout(() => this.setState({ saveButtonText: "Save", transition: "show" }), 2000);
+    } catch (err) {
+      this.setState({ saveButtonText: "Save", transition: "show" });
+      showErrorMessage("Error saving properties", err);
+    }
+
   }
 
   public render() {
@@ -180,7 +195,9 @@ export class CreationmodeSwitchComponent extends React.Component<ICreationmodeSw
             label="Gradingmode"
             onChange={this.handleSwitchGrading}
           />
-          <Button className="assignment-button" onClick={() => this.saveProperties()} icon={IconNames.FLOPPY_DISK} outlined intent={Intent.SUCCESS}>Save</Button>
+          <Button className="assignment-button" onClick={() => this.saveProperties()} icon={IconNames.FLOPPY_DISK} outlined intent={Intent.SUCCESS}>
+            <span className={this.state.transition} >{this.state.saveButtonText}</span>
+          </Button>
         </span>
       );
     }
