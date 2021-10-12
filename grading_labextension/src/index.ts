@@ -395,11 +395,7 @@ const extension: JupyterFrontEndPlugin<void> = {
           typeof args['subID'] === 'undefined'
             ? null
             : (args['subID'] as number);
-        const username: string =
-          typeof args['username'] === 'undefined'
-            ? null
-            : (args['username'] as string);
-        const feedbackView = new FeedbackView({ lectureID, assignmentID, subID, username });
+        const feedbackView = new FeedbackView({ lectureID, assignmentID, subID });
         const feedbackWidget = new MainAreaWidget<FeedbackView>({
           content: feedbackView
         });

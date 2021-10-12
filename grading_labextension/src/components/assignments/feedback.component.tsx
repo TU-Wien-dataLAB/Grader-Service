@@ -22,7 +22,6 @@ export interface FeedbackProps {
   lectureID: number;
   assignmentID: number;
   subID: number;
-  username: string;
   title: Title<Widget>;
 }
 
@@ -34,7 +33,6 @@ export class FeedbackComponent extends React.Component<FeedbackProps> {
   private assignmentID: number;
   private subID: number;
   private title: Title<Widget>;
-  private username: string;
   private gradeBook: GradeBook;
   public state = {
     lecture: {} as Lecture,
@@ -51,7 +49,6 @@ export class FeedbackComponent extends React.Component<FeedbackProps> {
     this.assignmentID = props.assignmentID;
     this.title = props.title;
     this.subID = props.subID;
-    this.username = props.username;
   }
 
   public async componentDidMount() {
@@ -74,7 +71,7 @@ export class FeedbackComponent extends React.Component<FeedbackProps> {
       extraCredit: this.gradeBook.getExtraCredits()
     });
 
-    this.title.label = `Feedback ${this.username}/${this.subID}`;
+    this.title.label = `Feedback ID: ${this.subID}`;
     const renderer = new ExistingNodeRenderer(this.dirListingNode);
     const model = new FilterFileBrowserModel({
       auto: true,
@@ -144,7 +141,6 @@ export class FeedbackComponent extends React.Component<FeedbackProps> {
           <div id="info-container">
             <h2>Information</h2>
             <ul className="manual-grading-list">
-              <li>User: <Tag minimal round>{this.username}</Tag></li><Divider />
               <li>Lecture: <Tag minimal round>{this.state.lecture.name}</Tag></li><Divider />
               <li>Assignment: <Tag minimal round>{this.state.assignment.name}</Tag></li><Divider />
               <li>Type: <Tag minimal round>{this.state.assignment.type}</Tag></li><Divider />
@@ -160,7 +156,7 @@ export class FeedbackComponent extends React.Component<FeedbackProps> {
               </li>
             </ul>
           </div>
-          <h2>Submission</h2>
+          <h2>Feedback</h2>
           <div
             className="assignment-dir-listing"
             ref={_element => (this.dirListingNode = _element)}

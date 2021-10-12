@@ -216,7 +216,7 @@ export class AssignmentComponent extends React.Component<AssignmentProps> {
                   outlined={true}
                   intent={Intent.PRIMARY}
                   small={true}
-                  onClick={() => {this.openFeedback(this.lecture.id,this.state.assignment.id,submission.id,"fjaeger")}}
+                  onClick={() => {this.openFeedback(this.lecture.id,this.state.assignment.id,submission.id)}}
                 >
                   Open Feedback
                 </Button>
@@ -231,13 +231,12 @@ export class AssignmentComponent extends React.Component<AssignmentProps> {
     }
   }
 
-  private openFeedback(lectureID: number, assignmentID: number, subID: number, username: string) {
+  private openFeedback(lectureID: number, assignmentID: number, subID: number) {
     GlobalObjects.commands
       .execute('feedback:open', {
         lectureID,
         assignmentID,
-        subID,
-        username
+        subID
       })
       .catch(error => {
         showErrorMessage('Error Opening Feedback View', error);
