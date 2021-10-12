@@ -98,7 +98,17 @@ class GitBaseHandler(GraderBaseHandler):
             self.error_message = "Unauthorized"
             raise HTTPError(403)
         
-        # TODO: students should not be able to pull other submissions -> add query param of sub_id
+        # students should not be able to pull other submissions -> add query param for sub_id
+        if repo_type == "feedback" and role.role == Scope.student and rpc == "receive-pack":
+            try:
+                sub_id = int(self.get_argument('sub_id', "", strip=True))
+            except ValueError:
+                self.error_message = "Unauthorized"
+                raise HTTPError(403)
+            submission = self.session.query(Submission).get(sub_id)
+            if submission is None or submission.username != self.user.name:
+                self.error_message = "Unauthorized"
+                raise HTTPError(403)
 
         try:
             assignment = self.session.query(Assignment).filter(Assignment.lectid == lecture.id, Assignment.name == unquote(pathlets[1])).one()
