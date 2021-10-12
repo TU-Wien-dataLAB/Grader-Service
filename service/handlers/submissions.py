@@ -35,11 +35,13 @@ class SubmissionHandler(GraderBaseHandler):
                 submissions = (
                     self.session.query(
                         Submission.id,
-                        Submission.status,
+                        Submission.auto_status,
+                        Submission.manual_status,
                         Submission.score,
                         Submission.username,
                         Submission.assignid,
                         Submission.commit_hash,
+                        Submission.feedback_available,
                         func.max(Submission.date),
                     )
                     .filter(Submission.assignid == assignment_id)
@@ -61,11 +63,13 @@ class SubmissionHandler(GraderBaseHandler):
                 submissions = (
                     self.session.query(
                         Submission.id,
-                        Submission.status,
+                        Submission.auto_status,
+                        Submission.manual_status,
                         Submission.score,
                         Submission.username,
                         Submission.assignid,
                         Submission.commit_hash,
+                        Submission.feedback_available,
                         func.max(Submission.date),
                     )
                     .filter(
@@ -96,7 +100,7 @@ class SubmissionHandler(GraderBaseHandler):
         sub.username = self.user.name
         sub.auto_status = sub_model.auto_status
         sub.manual_status = sub_model.manual_status
-
+        sub.feedback_available = sub_model.feedback_available or False
         self.session.add(sub)
         self.session.commit()
         self.write_json(sub)
