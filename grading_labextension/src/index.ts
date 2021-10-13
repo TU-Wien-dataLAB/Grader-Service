@@ -2,11 +2,12 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable no-prototype-builtins */
 import {
+  ILayoutRestorer,
   JupyterFrontEnd,
   JupyterFrontEndPlugin
 } from '@jupyterlab/application';
 
-import { ICommandPalette, MainAreaWidget } from '@jupyterlab/apputils';
+import { ICommandPalette, MainAreaWidget, WidgetTracker, IWidgetTracker } from '@jupyterlab/apputils';
 
 import { ILauncher } from '@jupyterlab/launcher';
 import { INotebookTools, Notebook, NotebookPanel } from '@jupyterlab/notebook';
@@ -93,7 +94,8 @@ const extension: JupyterFrontEndPlugin<void> = {
     INotebookTools,
     IDocumentManager,
     IFileBrowserFactory,
-    INotebookTracker
+    INotebookTracker,
+    ILayoutRestorer
   ],
   activate: (
     app: JupyterFrontEnd,
@@ -102,7 +104,8 @@ const extension: JupyterFrontEndPlugin<void> = {
     nbtools: INotebookTools,
     docManager: IDocumentManager,
     browserFactory: IFileBrowserFactory,
-    tracker: INotebookTracker
+    tracker: INotebookTracker,
+    restorer: ILayoutRestorer
   ) => {
     console.log('JupyterLab extension grading is activated!');
     console.log('JupyterFrontEnd:', app);
@@ -115,6 +118,25 @@ const extension: JupyterFrontEndPlugin<void> = {
     GlobalObjects.docManager = docManager;
     GlobalObjects.browserFactory = browserFactory;
     GlobalObjects.tracker = tracker;
+
+    const assignmentTracker = new WidgetTracker<MainAreaWidget<AssignmentList>>({
+      namespace: 'grader-assignments',
+    });
+
+    restorer.restore(assignmentTracker, {
+      command: AssignmentsCommandIDs.open,
+      name: () => 'grader-assignments',
+    });
+
+    const courseManageTracker = new WidgetTracker<MainAreaWidget<CourseManageView>>({
+      namespace: 'grader-coursemanage',
+    });
+
+    restorer.restore(courseManageTracker, {
+      command: CourseManageCommandIDs.open,
+      name: () => 'grader-coursemanage',
+    });
+
 
     //Creation of in-cell widget for create assignment
     let connectTrackerSignals = (tracker: INotebookTracker) => {
@@ -190,6 +212,8 @@ const extension: JupyterFrontEndPlugin<void> = {
         gradingWidget.title.label = 'Course Management';
         gradingWidget.title.closable = true;
 
+        courseManageTracker.add(gradingWidget);
+
         return gradingWidget;
       }
     });
@@ -256,6 +280,8 @@ const extension: JupyterFrontEndPlugin<void> = {
         assignmentWidget.id = 'assignments-jupyterlab';
         assignmentWidget.title.label = 'Assignments';
         assignmentWidget.title.closable = true;
+
+        assignmentTracker.add(assignmentWidget);
 
         return assignmentWidget;
       }
@@ -356,6 +382,7 @@ const extension: JupyterFrontEndPlugin<void> = {
         manualgradingWidget.id = 'manual-grading-jupyterlab';
         manualgradingWidget.title.label = 'Manualgrading';
         manualgradingWidget.title.closable = true;
+
 
         return manualgradingWidget;
       }
