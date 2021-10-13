@@ -15,7 +15,8 @@ import { showErrorMessage, showDialog, Dialog } from '@jupyterlab/apputils';
 import { Submission } from '../../model/submission';
 import {
   getSubmissions,
-  submitAssignment
+  submitAssignment,
+  fetchFeedback
 } from '../../services/submissions.service';
 import { pullAssignment } from '../../services/assignments.service';
 import { Lecture } from '../../model/lecture';
@@ -216,7 +217,12 @@ export class AssignmentComponent extends React.Component<AssignmentProps> {
                   outlined={true}
                   intent={Intent.PRIMARY}
                   small={true}
-                  onClick={() => {this.openFeedback(this.lecture.id,this.state.assignment.id,submission.id)}}
+                  onClick={ async () => {
+                    (await fetchFeedback(this.lecture,this.state.assignment,submission)).subscribe(
+                      () => {this.openFeedback(this.lecture.id,this.state.assignment.id,submission.id)},
+                      (e) => showErrorMessage("Error Fetching Feedback",e))
+                  }
+                }
                 >
                   Open Feedback
                 </Button>
@@ -265,8 +271,8 @@ export class AssignmentComponent extends React.Component<AssignmentProps> {
     return (
       <li key={this.index}>
         <div className="assignment">
-          <div className="assignment-header">
-            <span className="assignment-title">
+          <div className="assignment-header-container assignment-content">
+            <span className="assignment-header-title">
             <Icon
               icon={IconNames.INBOX}
               iconSize={this.iconSize}
@@ -284,7 +290,7 @@ export class AssignmentComponent extends React.Component<AssignmentProps> {
               </Tag>
             )}
             </span>
-            <span className="button-list">
+            <span className="assignment-header-button">
               <Button
                 className="assignment-button"
                 onClick={this.fetchAssignment}
@@ -316,8 +322,9 @@ export class AssignmentComponent extends React.Component<AssignmentProps> {
           </div>
 
           <div
-            className="assignment-title"
-            onClick={() => this.toggleOpen('files')}
+            className='assignment-content'
+            onClick={() => this.toggleOpen('files')
+          }
           >
             <Icon
               icon={IconNames.CHEVRON_RIGHT}
@@ -341,8 +348,8 @@ export class AssignmentComponent extends React.Component<AssignmentProps> {
           </Collapse>
 
           <div
+            className='assignment-content'
             onClick={() => this.toggleOpen('submissions')}
-            className="assignment-title"
           >
             <Icon
               icon={IconNames.CHEVRON_RIGHT}

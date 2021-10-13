@@ -419,8 +419,8 @@ export class CourseManageAssignmentComponent extends React.Component<
         <div className={
           'assignment'    //bp3-card bp3-elevation-2
         }>
-          <div className="assignment-header">
-            <span onClick={this.toggleOpen} className="assignment-title flex-item">
+          <div className="coursemanage-header-container">
+            <span onClick={this.toggleOpen} className="coursemanage-header-title">
               <Icon
                 icon="chevron-right"
                 iconSize={this.iconSize}
@@ -436,7 +436,7 @@ export class CourseManageAssignmentComponent extends React.Component<
               {this.state.showSource ? 'Source' : 'Release'} Files
             </span>
 
-            <span className="button-list flex-item">
+            <span className="coursemanage-header-button">
               <Button
                 icon="edit"
                 outlined

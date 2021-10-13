@@ -42,12 +42,12 @@ export class CoursesComponent extends React.Component<CoursesProps> {
   public render() {
     return (
       <div className="course-list">
-        <div id="assignment-header">
+        <div className='course-header'>
           <h1>
-            <p>Assignments</p>
+            <p >Assignments</p>
           </h1>
-          <Button id="reload-button" className="assignment-button" onClick={() => this.getLectures()} icon={IconNames.REFRESH} outlined intent={Intent.SUCCESS}>Reload</Button>
-        </div>
+          <Button id="reload-button" onClick={() => this.getLectures()} icon={IconNames.REFRESH} outlined intent={Intent.SUCCESS}>Reload</Button>
+          </div>
         {this.state.lectures.map((el, index) => (
           <AssignmentsComponent lecture={el} open={index == 0} />
         ))}

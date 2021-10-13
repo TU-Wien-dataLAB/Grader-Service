@@ -52,11 +52,15 @@ class GitService(Configurable):
         self.log.info(f"Pushing remote {origin} for {self.path}")
         self._run_command(f"git push {origin} main" + (" --force" if force else ""), cwd=self.path)
     
-    def set_remote(self, origin: str):
+    def set_remote(self, origin: str, sub_id=None):
         self.log.info(f"Setting remote {origin} for {self.path}")
         url = posixpath.join(self.git_remote_url, self.lecture_code, quote(self.assignment_name), self.repo_type)
         try:
-            self._run_command(f"git remote add {origin} {self.git_http_scheme}://oauth:{self.git_access_token}@{url}", cwd=self.path)
+            if sub_id == None:
+                self._run_command(f"git remote add {origin} {self.git_http_scheme}://oauth:{self.git_access_token}@{url}", cwd=self.path)
+            else:
+                self._run_command(f"git remote add {origin} {self.git_http_scheme}://oauth:{self.git_access_token}@{url}?sub_id={sub_id}", cwd=self.path)
+
         except GitError as e:
             self.log.error("GitError:\n" + e.error)
             self.log.info(f"Remote set: Updating remote {origin} for {self.path}")

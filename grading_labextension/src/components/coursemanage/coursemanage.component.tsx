@@ -36,7 +36,7 @@ export class CourseManageComponent extends React.Component<CourseManageProps> {
   public render() {
     return <div className="course-list">
       <h1>
-        <p style={{ textAlign: 'center' }}>Course Management</p>
+        <p className='course-header'>Course Management</p>
       </h1>
       {this.state.lectures.filter(el => UserPermissions.getScope(el) > Scope.student).map((el, index) => <CourseManageAssignmentsComponent lecture={el} title={el.name} open={index == 0} />)}
     </div>
