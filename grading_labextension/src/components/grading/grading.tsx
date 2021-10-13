@@ -23,7 +23,7 @@ import { Button } from '@blueprintjs/core/lib/cjs/components/button/buttons';
 import { ItemRenderer, Select } from '@blueprintjs/select';
 import { User } from '../../model/user';
 import { MenuItem } from '@blueprintjs/core';
-import { autogradeSubmission, createManualFeedback } from '../../services/grading.service';
+import { autogradeSubmission, createManualFeedback, generateFeedback } from '../../services/grading.service';
 import { Popup } from '@jupyterlab/statusbar'
 import { ReactWidget } from '@jupyterlab/apputils'
 import { GlobalObjects } from '../..';
@@ -151,7 +151,8 @@ export class GradingComponent extends React.Component<IGradingProps> {
             fields.forEach(f => {
               thisRow[f] = params.getValue(params.id, f);
             });
-            
+
+            await generateFeedback(this.state.lecture.id, this.state.assignment.id, +thisRow.id); 
           };
 
           return (

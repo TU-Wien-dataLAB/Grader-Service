@@ -1,4 +1,5 @@
 import os
+from typing import Any
 
 from traitlets.config import Config
 from traitlets import List, default
@@ -27,8 +28,12 @@ class GenerateFeedback(BaseConverter):
     def _permissions_default(self):
         return 664
 
-    def __init__(self, coursedir=None, **kwargs):
-        super(GenerateFeedback, self).__init__(coursedir=coursedir, **kwargs)
+    def __init__(
+        self, input_dir: str, output_dir: str, file_pattern: str, **kwargs: Any
+    ):
+        super(GenerateFeedback, self).__init__(
+            input_dir, output_dir, file_pattern, **kwargs
+        )
         c = Config()
         if "template_file" not in self.config.HTMLExporter:
             c.HTMLExporter.template_file = "feedback.tpl"
@@ -42,7 +47,8 @@ class GenerateFeedback(BaseConverter):
             )
             c.HTMLExporter.template_path = [".", template_path]
         self.update_config(c)
-        self.force = True # always overwrite generated assignments
+        self.force = True  # always overwrite generated assignments
+
 
 class GenerateFeedbackApp(ConverterApp):
     version = ConverterApp.__version__

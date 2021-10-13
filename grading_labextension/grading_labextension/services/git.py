@@ -56,16 +56,21 @@ class GitService(Configurable):
         self.log.info(f"Setting remote {origin} for {self.path}")
         url = posixpath.join(self.git_remote_url, self.lecture_code, quote(self.assignment_name), self.repo_type)
         try:
-            if sub_id == None:
+            if sub_id is None:
                 self._run_command(f"git remote add {origin} {self.git_http_scheme}://oauth:{self.git_access_token}@{url}", cwd=self.path)
             else:
-                self._run_command(f"git remote add {origin} {self.git_http_scheme}://oauth:{self.git_access_token}@{url}?sub_id={sub_id}", cwd=self.path)
+                self.log.info(f"Setting remote with sub_id {sub_id}")
+                self._run_command(f"git remote add {origin} {self.git_http_scheme}://oauth:{self.git_access_token}@{posixpath.join(url, sub_id)}", cwd=self.path)
 
         except GitError as e:
             self.log.error("GitError:\n" + e.error)
             self.log.info(f"Remote set: Updating remote {origin} for {self.path}")
-            self._run_command(f"git remote set-url {origin} {self.git_http_scheme}://oauth:{self.git_access_token}@{url}", cwd=self.path)
-    
+            if sub_id is None:
+                self._run_command(f"git remote set-url {origin} {self.git_http_scheme}://oauth:{self.git_access_token}@{url}", cwd=self.path)
+            else:
+                self.log.info(f"Setting remote with sub_id {sub_id}")
+                self._run_command(f"git remote set-url {origin} {self.git_http_scheme}://oauth:{self.git_access_token}@{posixpath.join(url, sub_id)}", cwd=self.path)
+
     def delete_remote(self, origin: str):
         raise NotImplementedError()
 

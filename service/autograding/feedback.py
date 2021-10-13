@@ -65,7 +65,7 @@ class GenerateFeedbackExecutor(LocalAutogradeExecutor):
         except CalledProcessError:
             pass
 
-        command = f'{self.git_executable} pull "{git_repo_path}"  feedback_{self.submission.commit_hash}'
+        command = f'{self.git_executable} pull "{git_repo_path}"  submission_{self.submission.commit_hash}'
         self.log.info(f"Running {command}")
         try:
             await self._run_subprocess(command, self.input_path)
@@ -174,5 +174,5 @@ class GenerateFeedbackExecutor(LocalAutogradeExecutor):
         for id,n in book.notebooks.items():
             score += n.score
         self.submission.score = score
-        self.submission.feedback_available = true
+        self.submission.feedback_available = True
         self.session.commit()

@@ -237,6 +237,7 @@ class LocalAutogradeExecutor(LoggingConfigurable):
     def _cleanup(self):
         shutil.rmtree(self.input_path)
         shutil.rmtree(self.output_path)
+        self.session.close()
     
     async def _run_subprocess(self, command: str, cwd: str) -> Subprocess:
         process = Subprocess(shlex.split(command), stdout=PIPE, stderr=PIPE, cwd=cwd)

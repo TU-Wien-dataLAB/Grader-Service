@@ -12,8 +12,8 @@ import { request, HTTPMethod } from "./request.service";
     return request<void>(HTTPMethod.PUT, `/lectures/${lecture.id}/assignments/${assignment.id}/push/assignment`)
   }
 
-  export async function fetchFeedback(lecture: Lecture, assignment: Assignment, submission: Submission) {
-    return request<void>(HTTPMethod.GET,`/lectures/${lecture.id}/assignments/${assignment.id}/grading/${submission.id}/feedback`)
+  export async function pullFeedback(lecture: Lecture, assignment: Assignment, submission: Submission) {
+    return request<void>(HTTPMethod.GET,`/lectures/${lecture.id}/assignments/${assignment.id}/grading/${submission.id}/pull/feedback`)
   }
 
   export function getSubmissions(lecture: Lecture, assignment : Assignment, latest: boolean = false): Observable<{user: User, submissions: Submission[]}> {

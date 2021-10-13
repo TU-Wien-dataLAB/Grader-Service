@@ -94,15 +94,15 @@ class GitBaseHandler(GraderBaseHandler):
             self.error_message = "Unauthorized"
             raise HTTPError(403)
         
-        if repo_type == "autograde" and role.role == Scope.student and rpc == "receive-pack":
+        if repo_type == "autograde" and role.role == Scope.student and rpc == "upload-pack":
             self.error_message = "Unauthorized"
             raise HTTPError(403)
         
         # students should not be able to pull other submissions -> add query param for sub_id
-        if repo_type == "feedback" and role.role == Scope.student and rpc == "receive-pack":
+        if repo_type == "feedback" and role.role == Scope.student and rpc == "upload-pack":
             try:
-                sub_id = int(self.get_argument('sub_id', "", strip=True))
-            except ValueError:
+                sub_id = int(pathlets[3])
+            except (ValueError, IndexError):
                 self.error_message = "Unauthorized"
                 raise HTTPError(403)
             submission = self.session.query(Submission).get(sub_id)

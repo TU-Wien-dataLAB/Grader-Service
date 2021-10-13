@@ -16,7 +16,7 @@ import { Submission } from '../../model/submission';
 import {
   getSubmissions,
   submitAssignment,
-  fetchFeedback
+  pullFeedback
 } from '../../services/submissions.service';
 import { pullAssignment } from '../../services/assignments.service';
 import { Lecture } from '../../model/lecture';
@@ -218,7 +218,7 @@ export class AssignmentComponent extends React.Component<AssignmentProps> {
                   intent={Intent.PRIMARY}
                   small={true}
                   onClick={ async () => {
-                    (await fetchFeedback(this.lecture,this.state.assignment,submission)).subscribe(
+                    (await pullFeedback(this.lecture,this.state.assignment,submission)).subscribe(
                       () => {this.openFeedback(this.lecture.id,this.state.assignment.id,submission.id)},
                       (e) => showErrorMessage("Error Fetching Feedback",e))
                   }

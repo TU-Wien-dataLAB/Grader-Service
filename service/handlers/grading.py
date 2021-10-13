@@ -49,6 +49,12 @@ class GradingAutoHandler(GraderBaseHandler):
     version_specifier=VersionSpecifier.ALL,
 )
 class GenerateFeedbackHandler(GraderBaseHandler):
+
+    def on_finish(self):
+        # we do not close the session we just commit because GenerateFeedbackHandler still needs it
+        if self.session:
+            self.session.commit()
+
     async def get(self, lecture_id: int, assignment_id: int, sub_id):
         submission = self.session.query(Submission).get(sub_id)
         if submission is None:

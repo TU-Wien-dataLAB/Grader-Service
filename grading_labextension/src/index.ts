@@ -137,6 +137,20 @@ const extension: JupyterFrontEndPlugin<void> = {
       name: () => 'grader-coursemanage',
     });
 
+    const manualGradingTracker = new WidgetTracker<MainAreaWidget<ManualGradingView>>({
+      namespace: 'grader-manual-grading',
+    });
+
+    restorer.restore(manualGradingTracker, {
+      command: ManualGradeCommandIDs.open,
+      args: (widget) => ({ 
+        lectureID: widget.content.lectureID, 
+        assignmentID: widget.content.assignmentID,
+        subID: widget.content.subID,
+        username: widget.content.username 
+      }),
+      name: () => 'grader-manual-grading',
+    });
 
     //Creation of in-cell widget for create assignment
     let connectTrackerSignals = (tracker: INotebookTracker) => {
@@ -383,6 +397,7 @@ const extension: JupyterFrontEndPlugin<void> = {
         manualgradingWidget.title.label = 'Manualgrading';
         manualgradingWidget.title.closable = true;
 
+        manualGradingTracker.add(manualgradingWidget);
 
         return manualgradingWidget;
       }
