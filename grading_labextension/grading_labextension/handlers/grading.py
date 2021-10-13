@@ -79,7 +79,7 @@ class GradingManualHandler(ExtensionBaseHandler):
         git_service.pull("autograde",branch=f"submission_{submission['commit_hash']}")
 
 @register_handler(
-    path=r"\/lectures\/(?P<lecture_id>\d*)\/assignments\/(?P<assignment_id>\d*)\/grading\/(?P<sub_id>\d*)\/feedback\/?"
+    path=r"\/lectures\/(?P<lecture_id>\d*)\/assignments\/(?P<assignment_id>\d*)\/grading\/(?P<sub_id>\d*)\/pull\/feedback\/?"
 )
 class GradingFeedbackHandler(ExtensionBaseHandler):
     async def get(self, lecture_id: int, assignment_id: int, sub_id: int):
@@ -109,7 +109,7 @@ class GradingFeedbackHandler(ExtensionBaseHandler):
         git_service = GitService(
             lecture_code=lecture["code"],
             assignment_name=assignment["name"],
-            repo_type="autograde",
+            repo_type="feedback",
             config=self.config,
         )
         git_service.path = os.path.join(git_service.git_root_dir, "feedback", git_service.lecture_code, git_service.assignment_name,sub_id)
