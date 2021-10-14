@@ -84,16 +84,17 @@ class GitBaseHandler(GraderBaseHandler):
             self.error_message = "Unauthorized"
             raise HTTPError(403)
         
-        if repo_type == "release" and role.role == Scope.student and rpc == "send-pack":
+        # no push to release allowed for students
+        if repo_type == "release" and role.role == Scope.student and rpc in ["send-pack", "receive-pack"]:
             self.error_message = "Unauthorized"
             raise HTTPError(403)
 
-        # no push allowed -> the autograder executor can push locally so it will not be affected by this
-        # same for feedback
-        if repo_type in ["autograde", "feedback"] and rpc == "send-pack": 
+        # no push allowed for autograde and feedback -> the autograder executor can push locally so it will not be affected by this
+        if repo_type in ["autograde", "feedback"] and rpc in ["send-pack", "receive-pack"]: 
             self.error_message = "Unauthorized"
             raise HTTPError(403)
         
+        # no pull allowed for autograde for students
         if repo_type == "autograde" and role.role == Scope.student and rpc == "upload-pack":
             self.error_message = "Unauthorized"
             raise HTTPError(403)
