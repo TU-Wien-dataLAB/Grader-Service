@@ -75,8 +75,10 @@ class GitService(Configurable):
         raise NotImplementedError()
 
     def switch_branch(self,branch: str):
+        self.log.info(f"Fetching all at path {self.path}")
+        self._run_command(f"git fetch --all", cwd=self.path)
         self.log.info(f"Switching to branch {branch} at path {self.path}")
-        self._run_command(f"git checkout {branch}")
+        self._run_command(f"git checkout {branch}", cwd=self.path)
 
     def pull(self, origin: str, branch="main", force=False):
         if force:
