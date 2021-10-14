@@ -433,7 +433,7 @@ export class CourseManageAssignmentComponent extends React.Component<
                 className="flavor-icon"
               ></Icon>
               {this.state.assignment.name}{' '}
-              {this.state.showSource ? 'Source' : 'Release'} Files
+              <Tag intent={this.state.showSource ? "success" : "primary"}>{this.state.showSource ? 'Source' : 'Release'}</Tag>
             </span>
 
             <span className="coursemanage-header-button">
