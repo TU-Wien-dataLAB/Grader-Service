@@ -1,5 +1,4 @@
 import json
-import logging
 from grading_labextension.registry import register_handler
 from grading_labextension.handlers.base_handler import ExtensionBaseHandler
 import tornado
@@ -12,6 +11,8 @@ from tornado.httpclient import HTTPError
 class LectureBaseHandler(ExtensionBaseHandler):
     @web.authenticated
     async def get(self):
+        """Sends a GET-request to the grader service and returns the autorized lectures
+        """
         query_params = RequestService.get_query_string(
             {"semester": self.get_argument("semester", None)}
         )
@@ -29,6 +30,8 @@ class LectureBaseHandler(ExtensionBaseHandler):
 
     @web.authenticated
     async def post(self):
+        """Sends a POST-request to the grader service to create a lecture
+        """
         try:
             response = await self.request_service.request(
                 "POST",
@@ -46,6 +49,11 @@ class LectureBaseHandler(ExtensionBaseHandler):
 class LectureObjectHandler(ExtensionBaseHandler):
     @web.authenticated
     async def put(self, lecture_id: int):
+        """ Sends a PUT-request to the grader service to update a lecture
+
+        Args:
+            lecture_id (int): id of the lecture
+        """
         data = tornado.escape.json_decode(self.request.body)
         try:
             response_data: dict = await self.request_service.request(
@@ -62,6 +70,11 @@ class LectureObjectHandler(ExtensionBaseHandler):
 
     @web.authenticated
     async def get(self, lecture_id: int):
+        """ Sends a GET-request to the grader service and returns the lecture
+
+        Args:
+            lecture_id (int): id of the lecture
+        """
         try:
             response_data: dict = await self.request_service.request(
                 "GET",
@@ -76,6 +89,11 @@ class LectureObjectHandler(ExtensionBaseHandler):
 
     @web.authenticated
     async def delete(self, lecture_id: int):
+        """ Sends a DELETE-request to the grader service to delete a lecture
+
+        Args:
+            lecture_id (int): id of the lecture
+        """
         try:
             await self.request_service.request(
                 "DELETE",

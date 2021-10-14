@@ -1,25 +1,21 @@
-from genericpath import exists
 from grading_labextension.registry import register_handler
 from grading_labextension.handlers.base_handler import ExtensionBaseHandler
-from jupyter_server.utils import url_path_join
 from tornado.httpclient import HTTPError
-import json
-from grading_labextension.services.git import GitError, GitService
+from grading_labextension.services.git import GitService
 import os
-
-
-@register_handler(
-    path=r"\/lectures\/(?P<lecture_id>\d*)\/assignments\/(?P<assignment_id>\d*)\/grading\/?"
-)
-class GradingBaseHandler(ExtensionBaseHandler):
-    pass
-
 
 @register_handler(
     path=r"\/lectures\/(?P<lecture_id>\d*)\/assignments\/(?P<assignment_id>\d*)\/grading\/(?P<sub_id>\d*)\/auto\/?"
 )
 class GradingAutoHandler(ExtensionBaseHandler):
     async def get(self, lecture_id: int, assignment_id: int, sub_id: int):
+        """Sends a GET-request to the grader service to autograde a submission
+
+        Args:
+            lecture_id (int): id of the lecture
+            assignment_id (int): id of the assignment
+            sub_id (int): id of the submission
+        """
         try:
             response = await self.request_service.request(
                 method="GET",
@@ -38,6 +34,13 @@ class GradingAutoHandler(ExtensionBaseHandler):
 )
 class GradingManualHandler(ExtensionBaseHandler):
     async def get(self, lecture_id: int, assignment_id: int, sub_id: int):
+        """Generates a local git repository and pulls autograded files of a submission in the user directory 
+
+        Args:
+            lecture_id (int): id of the lecture
+            assignment_id (int): id of the assignment
+            sub_id (int): id of the submission
+        """
         try:
             lecture = await self.request_service.request(
                 "GET",
@@ -90,6 +93,13 @@ class GradingManualHandler(ExtensionBaseHandler):
 )
 class GenerateFeedbackHandler(ExtensionBaseHandler):
     async def get(self, lecture_id: int, assignment_id: int, sub_id: int):
+        """Sends a GET-request to the grader service to generate feedback for a graded submission
+
+        Args:
+            lecture_id (int): id of the lecture
+            assignment_id (int): id of the assignment
+            sub_id (int): id of the submission
+        """
         try:
             response = await self.request_service.request(
                 method="GET",
@@ -108,6 +118,13 @@ class GenerateFeedbackHandler(ExtensionBaseHandler):
 )
 class PullFeedbackHandler(ExtensionBaseHandler):
     async def get(self, lecture_id: int, assignment_id: int, sub_id: int):
+        """Generates a local git repository and pulls the feedback files of a submission in the user directory 
+
+        Args:
+            lecture_id (int): id of the lecture
+            assignment_id (int): id of the assignment
+            sub_id (int): id of the submission
+        """
         try:
             lecture = await self.request_service.request(
                 "GET",
@@ -154,10 +171,3 @@ class PullFeedbackHandler(ExtensionBaseHandler):
         # we just need to fetch --all and switch branch (otherwise for pull we get "fatal: refusing to merge unrelated histories")
         git_service.switch_branch(branch=f"feedback_{submission['commit_hash']}")
         self.write("Pulled Feedback")
-
-
-@register_handler(
-    path=r"\/lectures\/(?P<lecture_id>\d*)\/assignments\/(?P<assignment_id>\d*)\/grading\/(?P<sub_id>\d*)\/score\/?"
-)
-class GradingScoreHandler(ExtensionBaseHandler):
-    pass

@@ -2,7 +2,6 @@ import json
 import shutil
 from grading_labextension.registry import register_handler
 from grading_labextension.handlers.base_handler import ExtensionBaseHandler
-from jupyter_server.utils import url_path_join
 from grading_labextension.services.request import RequestService
 import tornado
 import os
@@ -13,6 +12,11 @@ from tornado.httpclient import HTTPError
 @register_handler(path=r"\/lectures\/(?P<lecture_id>\d*)\/assignments\/?")
 class AssignmentBaseHandler(ExtensionBaseHandler):
     async def get(self, lecture_id: int):
+        """Sends a get request to the grader service and returns assignments of the lecture
+
+        Args:
+            lecture_id (int): id of the lecture
+        """
         try:
             response = await self.request_service.request(
                 method="GET",
@@ -49,6 +53,11 @@ class AssignmentBaseHandler(ExtensionBaseHandler):
         self.write(json.dumps(response))
 
     async def post(self, lecture_id: int):
+        """Sends post-request to the grader service to create an assignment
+
+        Args:
+            lecture_id (int): id of the lecture in which the new assignment is
+        """
         data = tornado.escape.json_decode(self.request.body)
         try:
             response = await self.request_service.request(
@@ -88,6 +97,12 @@ class AssignmentBaseHandler(ExtensionBaseHandler):
 )
 class AssignmentObjectHandler(ExtensionBaseHandler):
     async def put(self, lecture_id: int, assignment_id: int):
+        """ Sends a PUT-request to the grader service to update a assignment
+
+        Args:
+            lecture_id (int): id of the lecture
+            assignment_id (int): id of the assignment
+        """
         data = tornado.escape.json_decode(self.request.body)
         try:
             response = await self.request_service.request(
@@ -103,6 +118,12 @@ class AssignmentObjectHandler(ExtensionBaseHandler):
         self.write(json.dumps(response))
 
     async def get(self, lecture_id: int, assignment_id: int):
+        """ Sends a GET-request to the grader service to get a specific assignment
+
+        Args:
+            lecture_id (int): id of the lecture
+            assignment_id (int): id of the specific assignment
+        """
         query_params = RequestService.get_query_string(
             {
                 "instructor-version": self.get_argument("instructor-version", None),
@@ -133,6 +154,12 @@ class AssignmentObjectHandler(ExtensionBaseHandler):
         self.write(json.dumps(response))
 
     async def delete(self, lecture_id: int, assignment_id: int):
+        """Sends a DELETE-request to the grader service to "soft"-delete a assignment
+
+        Args:
+            lecture_id (int): id of the lecture
+            assignment_id (int): id of the assignment
+        """
         try:
             assignment = await self.request_service.request(
                 method="GET",

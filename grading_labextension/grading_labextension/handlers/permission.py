@@ -6,9 +6,11 @@ from tornado.httpclient import HTTPError
 
 
 @register_handler(path=r"\/permissions\/?")
-class LectureBaseHandler(ExtensionBaseHandler):
+class PermissionBaseHandler(ExtensionBaseHandler):
     @web.authenticated
     async def get(self):
+        """ Sends a GET-request to the grader service and returns the permissions of a user
+        """
         try:
             response = await self.request_service.request(
                 "GET",

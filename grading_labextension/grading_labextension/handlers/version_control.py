@@ -5,7 +5,6 @@ from grading_labextension.registry import register_handler
 from grading_labextension.handlers.base_handler import ExtensionBaseHandler
 from grading_labextension.services.git import GitError, GitService
 from tornado.httpclient import HTTPError, HTTPResponse
-from distutils.dir_util import copy_tree, remove_tree
 from grader_convert.converters.generate_assignment import GenerateAssignment
 
 
@@ -14,7 +13,12 @@ from grader_convert.converters.generate_assignment import GenerateAssignment
 )
 class GenerateHandler(ExtensionBaseHandler):
     async def put(self, lecture_id: int, assignment_id: int):
+        """ Generates the release files from the source files of a assignment
 
+        Args:
+            lecture_id (int): id of the lecture
+            assignment_id (int): id of the assignment
+        """
         try:
             lecture = await self.request_service.request(
                 "GET",
@@ -62,6 +66,13 @@ class GenerateHandler(ExtensionBaseHandler):
 )
 class PullHandler(ExtensionBaseHandler):
     async def get(self, lecture_id: int, assignment_id: int, repo: str):
+        """ Creates a local repository and pulls the specified repo type
+
+        Args:
+            lecture_id (int): id of the lecture
+            assignment_id (int): id of the assignment
+            repo (str): type of the repository
+        """
         if repo not in {"assignment", "source", "release"}:
             self.write_error(404)
         try:
@@ -107,6 +118,14 @@ class PullHandler(ExtensionBaseHandler):
 )
 class PushHandler(ExtensionBaseHandler):
     async def put(self, lecture_id: int, assignment_id: int, repo: str):
+        """ Pushes from the local repositories to remote
+            If the repo type is release, it also generate the release files and updates the assignmentproperties in the grader service
+
+        Args:
+            lecture_id (int): id of the lecture
+            assignment_id (int): id of the assignment
+            repo (str): type of the repository
+        """
         if repo not in {"assignment", "source", "release"}:
             self.write_error(404)
         try:
