@@ -146,14 +146,6 @@ export class FeedbackComponent extends React.Component<FeedbackProps> {
               <li>Type: <Tag minimal round>{this.state.assignment.type}</Tag></li><Divider />
               <li>Points: <Tag minimal round>{this.state.points}/{this.state.maxPoints}</Tag></li><Divider />
               <li>Extra Credit: <Tag minimal round>{this.state.extraCredit}</Tag></li><Divider />
-              <li>
-                Needs Manual Grading:
-                <ul className="manual-grading-list">
-                  {[...this.state.gradingInfo.keys()].map(n =>
-                    <li>{n}: <Tag minimal round>{this.state.gradingInfo.get(n).toString()}</Tag></li>
-                  )}
-                </ul>
-              </li>
             </ul>
           </div>
           <h2>Feedback</h2>
