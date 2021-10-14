@@ -1,18 +1,18 @@
-from ..converters.baseapp import ConverterApp
 from textwrap import dedent
+from typing import Any
 
-from traitlets import List, Bool, default
+from traitlets import Bool, List, default
+from traitlets.config.loader import Config
 
-from .base import BaseConverter, GraderConvertException
+from ..converters.baseapp import ConverterApp
 from ..preprocessors import (
+    ClearMarkScheme,
+    ClearOutput,
+    Execute,
     IncludeHeaderFooter,
     LockCells,
-    ClearOutput,
-    ClearMarkScheme,
-    Execute,
 )
-from traitlets.config.loader import Config
-from typing import Any
+from .base import BaseConverter
 
 
 class GenerateSolution(BaseConverter):

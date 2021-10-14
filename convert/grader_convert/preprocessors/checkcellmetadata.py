@@ -1,14 +1,18 @@
 import traceback
+from typing import Dict, Tuple
+
+from nbformat.notebooknode import NotebookNode
 
 from ..nbgraderformat import MetadataValidator, ValidationError
 from . import NbGraderPreprocessor
-from nbformat.notebooknode import NotebookNode
-from typing import Dict, Tuple
+
 
 class CheckCellMetadata(NbGraderPreprocessor):
     """A preprocessor for checking that grade ids are unique."""
 
-    def preprocess(self, nb: NotebookNode, resources: Dict) -> Tuple[NotebookNode, Dict]:
+    def preprocess(
+        self, nb: NotebookNode, resources: Dict
+    ) -> Tuple[NotebookNode, Dict]:
         try:
             MetadataValidator().validate_nb(nb)
         except ValidationError as e:

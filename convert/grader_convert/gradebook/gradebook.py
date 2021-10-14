@@ -1,10 +1,21 @@
-import logging
-from nbconvert.exporters import notebook
-from .models import BaseCell, GradeBookModel, Notebook, GradeCell, TaskCell, SolutionCell, SourceCell, Grade, Comment
-from typing import Optional, Any, Union
-import os
 import json
+import logging
+import os
 from functools import wraps
+from typing import Any, Optional, Union
+
+from nbconvert.exporters import notebook
+
+from .models import (
+    Comment,
+    Grade,
+    GradeBookModel,
+    GradeCell,
+    Notebook,
+    SolutionCell,
+    SourceCell,
+    TaskCell,
+)
 
 
 class InvalidEntry(ValueError):
@@ -13,6 +24,7 @@ class InvalidEntry(ValueError):
 
 class MissingEntry(ValueError):
     pass
+
 
 # TODO: add decorator to functions that sets dirty flag for methods and checks on __enter__
 class Gradebook:
@@ -24,6 +36,7 @@ class Gradebook:
     def __init__(self, dest_json: str, log: logging.Logger = None) -> None:
         if log is None:
             from traitlets import log as l
+
             self.log = l.get_logger()
         else:
             self.log = log
@@ -58,32 +71,39 @@ class Gradebook:
         if self.dirty and exc_type is None:
             self.write_model()
             self.dirty = False
-    
+
     @property
     def is_in_context(self) -> bool:
         return self.in_context > 0
-    
+
     def write_model(self):
         with open(self.json_file, "w") as f:
             json_str = json.dumps(self.model.to_dict())
-            self.log.info(f"Writing {len(json_str.encode('utf-8'))} bytes to {self.json_file}")
+            self.log.info(
+                f"Writing {len(json_str.encode('utf-8'))} bytes to {self.json_file}"
+            )
             f.write(json_str)
-    
+
     def write_access(fn):
         @wraps(fn)
         def wrapper(*args, **kwargs):
             try:
                 self = args[0]
                 if not isinstance(self, Gradebook):
-                    raise RuntimeError("This decorator can only be used on methods inside Gradebook instances!")
+                    raise RuntimeError(
+                        "This decorator can only be used on methods inside Gradebook instances!"
+                    )
             except IndexError:
-                raise RuntimeError("This decorator can only be used on methods inside Gradebook instances!")
+                raise RuntimeError(
+                    "This decorator can only be used on methods inside Gradebook instances!"
+                )
             self.dirty = True
             result = fn(*args, **kwargs)
             if not self.is_in_context:
                 self.write_model()
                 self.dirty = False
             return result
+
         return wrapper
 
     # Notebooks
@@ -100,7 +120,9 @@ class Gradebook:
         -------
         notebook : :class:`~Notebook`
         """
-        kwargs = {k:v for k,v in kwargs.items() if k in set(Notebook.empty_dict().keys())}
+        kwargs = {
+            k: v for k, v in kwargs.items() if k in set(Notebook.empty_dict().keys())
+        }
         kwargs["name"] = name
         self.model.notebooks[name] = Notebook.from_dict(kwargs)
 
@@ -161,7 +183,9 @@ class Gradebook:
         -------
         grade_cell
         """
-        kwargs = {k:v for k,v in kwargs.items() if k in set(GradeCell.empty_dict().keys())}
+        kwargs = {
+            k: v for k, v in kwargs.items() if k in set(GradeCell.empty_dict().keys())
+        }
         kwargs["name"] = name
         nb = self.find_notebook(notebook)
         nb.grade_cells_dict[name] = GradeCell.from_dict(kwargs)
@@ -248,7 +272,11 @@ class Gradebook:
         -------
         solution_cell : :class:`~SolutionCell`
         """
-        kwargs = {k:v for k,v in kwargs.items() if k in set(SolutionCell.empty_dict().keys())}
+        kwargs = {
+            k: v
+            for k, v in kwargs.items()
+            if k in set(SolutionCell.empty_dict().keys())
+        }
         kwargs["name"] = name
         nb = self.find_notebook(notebook)
         nb.solution_cells_dict[name] = SolutionCell.from_dict(kwargs)
@@ -295,9 +323,9 @@ class Gradebook:
             solution_cell = self.add_solution_cell(name, notebook, **kwargs)
         else:
             for attr in kwargs:
-                setattr(solution_cell, attr, kwargs[attr])        
+                setattr(solution_cell, attr, kwargs[attr])
         return solution_cell
-    
+
     # Task cells
 
     @write_access
@@ -315,12 +343,14 @@ class Gradebook:
         -------
         task_cell
         """
-        kwargs = {k:v for k,v in kwargs.items() if k in set(TaskCell.empty_dict().keys())}
+        kwargs = {
+            k: v for k, v in kwargs.items() if k in set(TaskCell.empty_dict().keys())
+        }
         kwargs["name"] = name
         nb = self.find_notebook(notebook)
         nb.task_cells_dict[name] = TaskCell.from_dict(kwargs)
         return nb.task_cells_dict[name]
-    
+
     def find_task_cell(self, name: str, notebook: str) -> TaskCell:
         """Find a task cell in a particular notebook.
         Parameters
@@ -338,9 +368,11 @@ class Gradebook:
             return nb.task_cells_dict[name]
         except KeyError:
             raise MissingEntry()
-    
+
     @write_access
-    def update_or_create_task_cell(self, name: str, notebook: str, **kwargs) -> TaskCell:
+    def update_or_create_task_cell(
+        self, name: str, notebook: str, **kwargs
+    ) -> TaskCell:
         """Update an existing task cell in a notebook, or create the task cell if it does not exist.
         Parameters
         ----------
@@ -362,7 +394,7 @@ class Gradebook:
             for attr in kwargs:
                 setattr(task_cell, attr, kwargs[attr])
         return task_cell
-    
+
     # Source cell
 
     @write_access
@@ -380,12 +412,14 @@ class Gradebook:
         -------
         source_cell : :class:`~SourceCell`
         """
-        kwargs = {k:v for k,v in kwargs.items() if k in set(SourceCell.empty_dict().keys())}
+        kwargs = {
+            k: v for k, v in kwargs.items() if k in set(SourceCell.empty_dict().keys())
+        }
         kwargs["name"] = name
         nb = self.find_notebook(notebook)
         nb.source_cells_dict[name] = SourceCell.from_dict(kwargs)
         return nb.source_cells_dict[name]
-    
+
     def find_source_cell(self, name: str, notebook: str) -> SourceCell:
         """Find a source cell in a particular notebook.
         Parameters
@@ -403,9 +437,11 @@ class Gradebook:
             return nb.source_cells_dict[name]
         except KeyError:
             raise MissingEntry()
-    
+
     @write_access
-    def update_or_create_source_cell(self, name: str, notebook: str, **kwargs: dict) -> SourceCell:
+    def update_or_create_source_cell(
+        self, name: str, notebook: str, **kwargs: dict
+    ) -> SourceCell:
         """Update an existing source cell in a notebook of an assignment, or
         create the source cell if it does not exist.
         Parameters
@@ -428,7 +464,7 @@ class Gradebook:
             for attr in kwargs:
                 setattr(source_cell, attr, kwargs[attr])
         return source_cell
-    
+
     # Grades
 
     @write_access
@@ -468,7 +504,7 @@ class Gradebook:
         return grade
 
     def find_grade(self, grade_cell: str, notebook: str) -> Grade:
-        """Find a particular grade in a notebook. 
+        """Find a particular grade in a notebook.
         If the grade does not exists an empty grade object is returned.
         Parameters
         ----------
@@ -485,9 +521,11 @@ class Gradebook:
             return nb.grades_dict[grade_cell]
         except KeyError:
             return Grade.from_dict(Grade.empty_dict())
-    
+
     @write_access
-    def add_comment(self, solution_cell: str, notebook: str, comment: Comment) -> Comment:
+    def add_comment(
+        self, solution_cell: str, notebook: str, comment: Comment
+    ) -> Comment:
         """Add a comment to a notebook.
         Parameters
         ----------
@@ -519,7 +557,6 @@ class Gradebook:
             solution_c.comment_id = comment.id
         nb.comments_dict[comment.id] = comment
         return comment
-        
 
     def find_comment(self, solution_cell: str, notebook: str) -> Comment:
         """Find a particular comment in a notebook.
@@ -538,5 +575,3 @@ class Gradebook:
             return nb.comments_dict[solution_cell]
         except KeyError:
             return Comment.from_dict(Comment.empty_dict())
-    
-    

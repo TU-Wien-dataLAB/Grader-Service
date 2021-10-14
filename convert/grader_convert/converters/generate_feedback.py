@@ -1,14 +1,14 @@
 import os
 from typing import Any
 
-from traitlets.config import Config
-from traitlets import List, default
 from nbconvert.exporters import HTMLExporter
 from nbconvert.preprocessors import CSSHTMLHeaderPreprocessor
+from traitlets import List, default
+from traitlets.config import Config
 
-from .base import BaseConverter
-from ..preprocessors import GetGrades
 from ..converters.baseapp import ConverterApp
+from ..preprocessors import GetGrades
+from .base import BaseConverter
 
 
 class GenerateFeedback(BaseConverter):

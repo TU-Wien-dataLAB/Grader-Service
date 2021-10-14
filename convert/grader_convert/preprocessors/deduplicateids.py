@@ -1,14 +1,18 @@
-from .. import utils
-from . import NbGraderPreprocessor
+from typing import Tuple
+
 from nbconvert.exporters.exporter import ResourcesDict
 from nbformat.notebooknode import NotebookNode
-from typing import Tuple
+
+from .. import utils
+from . import NbGraderPreprocessor
 
 
 class DeduplicateIds(NbGraderPreprocessor):
     """A preprocessor to overwrite information about grade and solution cells."""
 
-    def preprocess(self, nb: NotebookNode, resources: ResourcesDict) -> Tuple[NotebookNode, ResourcesDict]:
+    def preprocess(
+        self, nb: NotebookNode, resources: ResourcesDict
+    ) -> Tuple[NotebookNode, ResourcesDict]:
         # keep track of grade ids encountered so far
         self.grade_ids = set([])
 
@@ -23,14 +27,15 @@ class DeduplicateIds(NbGraderPreprocessor):
 
         return nb, resources
 
-    def preprocess_cell(self,
-                        cell: NotebookNode,
-                        resources: ResourcesDict,
-                        cell_index: int) -> Tuple[NotebookNode, ResourcesDict]:
-        if not (utils.is_grade(cell) or utils.is_solution(cell) or utils.is_locked(cell)):
+    def preprocess_cell(
+        self, cell: NotebookNode, resources: ResourcesDict, cell_index: int
+    ) -> Tuple[NotebookNode, ResourcesDict]:
+        if not (
+            utils.is_grade(cell) or utils.is_solution(cell) or utils.is_locked(cell)
+        ):
             return cell, resources
 
-        grade_id = cell.metadata.nbgrader['grade_id']
+        grade_id = cell.metadata.nbgrader["grade_id"]
         if grade_id in self.grade_ids:
             self.log.warning("Cell with id '%s' exists multiple times!", grade_id)
             cell.metadata.nbgrader = {}

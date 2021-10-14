@@ -1,5 +1,6 @@
+from textwrap import dedent
+
 from .converters.autograde import AutogradeApp
-from .converters.generate_solution import GenerateSolutionApp
 from .converters.baseapp import (
     ConverterApp,
     base_converter_aliases,
@@ -7,10 +8,9 @@ from .converters.baseapp import (
 )
 from .converters.generate_assignment import GenerateAssignmentApp
 from .converters.generate_feedback import GenerateFeedbackApp
-from .converters.validateapp import ValidateApp
+from .converters.generate_solution import GenerateSolutionApp
 from .converters.updateapp import UpdateApp
-from textwrap import dedent
-
+from .converters.validateapp import ValidateApp
 
 aliases = {}
 aliases.update(base_converter_aliases)
