@@ -1,7 +1,7 @@
-from .base import Base, Serializable
+from sqlalchemy import Column, ForeignKey, Integer, String
 from sqlalchemy.orm import relationship
-from sqlalchemy import Column, Integer, String, ForeignKey
 
+from .base import Base, Serializable
 
 
 class Group(Base, Serializable):
@@ -10,7 +10,5 @@ class Group(Base, Serializable):
     username = Column(String(255), ForeignKey("user.name"), primary_key=True)
     lectid = Column(Integer, ForeignKey("lecture.id"), primary_key=True)
 
-
     lecture = relationship("Lecture", back_populates="groups")
     user = relationship("User", back_populates="groups")
-

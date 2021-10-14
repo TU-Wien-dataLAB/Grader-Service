@@ -1,22 +1,21 @@
-from . import NbGraderPreprocessor
-
-from traitlets import Integer
-from nbformat.notebooknode import NotebookNode
-from nbconvert.exporters.exporter import ResourcesDict
 from typing import Tuple
+
+from nbconvert.exporters.exporter import ResourcesDict
+from nbformat.notebooknode import NotebookNode
+from traitlets import Integer
+
+from . import NbGraderPreprocessor
 
 
 class LimitOutput(NbGraderPreprocessor):
     """Preprocessor for limiting cell output"""
 
     max_lines = Integer(
-        1000,
-        help="maximum number of lines of output (-1 means no limit)"
+        1000, help="maximum number of lines of output (-1 means no limit)"
     ).tag(config=True)
 
     max_traceback = Integer(
-        100,
-        help="maximum number of traceback lines (-1 means no limit)"
+        100, help="maximum number of traceback lines (-1 means no limit)"
     ).tag(config=True)
 
     def _limit_stream_output(self, cell: NotebookNode) -> NotebookNode:
@@ -26,13 +25,13 @@ class LimitOutput(NbGraderPreprocessor):
         length = 0
         new_outputs = []
         for output in cell.outputs:
-            if output.output_type == 'stream':
+            if output.output_type == "stream":
                 if length == self.max_lines:
                     continue
 
                 text = output.text.split("\n")
                 if (len(text) + length) > self.max_lines:
-                    text = text[:(self.max_lines - length - 1)]
+                    text = text[: (self.max_lines - length - 1)]
                     text.append("... Output truncated ...")
 
                 length += len(text)
@@ -59,11 +58,9 @@ class LimitOutput(NbGraderPreprocessor):
 
         return cell
 
-    def preprocess_cell(self,
-                        cell: NotebookNode,
-                        resources: ResourcesDict,
-                        cell_index: int
-                        ) -> Tuple[NotebookNode, ResourcesDict]:
+    def preprocess_cell(
+        self, cell: NotebookNode, resources: ResourcesDict, cell_index: int
+    ) -> Tuple[NotebookNode, ResourcesDict]:
         cell = self._limit_stream_output(cell)
         cell = self._limit_traceback(cell)
         return cell, resources

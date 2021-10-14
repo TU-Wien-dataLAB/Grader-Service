@@ -1,6 +1,7 @@
-from registry import VersionSpecifier, register_handler
-from handlers.base_handler import GraderBaseHandler, authorize
 from orm.takepart import Role, Scope
+from registry import VersionSpecifier, register_handler
+
+from handlers.base_handler import GraderBaseHandler, authorize
 
 
 @register_handler(path=r"\/permissions\/?", version_specifier=VersionSpecifier.ALL)

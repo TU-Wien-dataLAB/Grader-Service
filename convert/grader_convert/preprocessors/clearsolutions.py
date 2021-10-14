@@ -1,40 +1,39 @@
 import re
-
-from traitlets import Dict, Unicode, Bool, observe
-from traitlets.config.loader import Config
 from textwrap import dedent
+from typing import Any, Tuple
+
+from nbconvert.exporters.exporter import ResourcesDict
+from nbformat.notebooknode import NotebookNode
+from traitlets import Bool, Dict, Unicode
+from traitlets.config.loader import Config
 
 from .. import utils
 from . import NbGraderPreprocessor
-from typing import Any, Tuple
-from nbformat.notebooknode import NotebookNode
-from nbconvert.exporters.exporter import ResourcesDict
 
 
 class ClearSolutions(NbGraderPreprocessor):
 
     code_stub = Dict(
-        dict(python="# YOUR CODE HERE\nraise NotImplementedError()",
-             matlab="% YOUR CODE HERE\nerror('No Answer Given!')",
-             octave="% YOUR CODE HERE\nerror('No Answer Given!')",
-             sas="/* YOUR CODE HERE */\n %notImplemented;",
-             java="// YOUR CODE HERE"),
-        help="The code snippet that will replace code solutions"
+        dict(
+            python="# YOUR CODE HERE\nraise NotImplementedError()",
+            matlab="% YOUR CODE HERE\nerror('No Answer Given!')",
+            octave="% YOUR CODE HERE\nerror('No Answer Given!')",
+            sas="/* YOUR CODE HERE */\n %notImplemented;",
+            java="// YOUR CODE HERE",
+        ),
+        help="The code snippet that will replace code solutions",
     ).tag(config=True)
 
     text_stub = Unicode(
-        "YOUR ANSWER HERE",
-        help="The text snippet that will replace written solutions"
+        "YOUR ANSWER HERE", help="The text snippet that will replace written solutions"
     ).tag(config=True)
 
     begin_solution_delimeter = Unicode(
-        "BEGIN SOLUTION",
-        help="The delimiter marking the beginning of a solution"
+        "BEGIN SOLUTION", help="The delimiter marking the beginning of a solution"
     ).tag(config=True)
 
     end_solution_delimeter = Unicode(
-        "END SOLUTION",
-        help="The delimiter marking the end of a solution"
+        "END SOLUTION", help="The delimiter marking the end of a solution"
     ).tag(config=True)
 
     enforce_metadata = Bool(
@@ -47,25 +46,27 @@ class ClearSolutions(NbGraderPreprocessor):
             disable this option if you are only ever planning to use nbgrader
             assign.
             """
-        )
+        ),
     ).tag(config=True)
 
     def _load_config(self, cfg: Config, **kwargs: Any) -> None:
-        if 'code_stub' in cfg.ClearSolutions:
+        if "code_stub" in cfg.ClearSolutions:
             if not isinstance(cfg.ClearSolutions.code_stub, dict):
                 self.log.warning(
                     "The ClearSolutions.code_stub option must now be given as a "
                     "dictionary with keys for the language of the notebook. I will "
                     "automatically convert ClearSolutions.code_stub to a dictionary "
                     "with a key for 'python', but note that this functionality may "
-                    "be removed in future releases.")
+                    "be removed in future releases."
+                )
                 cfg.ClearSolutions.code_stub = dict(python=cfg.ClearSolutions.code_stub)
 
-        if 'comment_mark' in cfg.ClearSolutions:
+        if "comment_mark" in cfg.ClearSolutions:
             self.log.warning(
                 "The ClearSolutions.comment_mark config option is deprecated. "
                 "Please include the comment mark in ClearSolutions.begin_solution_delimeter "
-                "and ClearSolutions.end_solution_delimeter instead.")
+                "and ClearSolutions.end_solution_delimeter instead."
+            )
             del cfg.ClearSolutions.comment_mark
 
         super(ClearSolutions, self)._load_config(cfg, **kwargs)
@@ -98,8 +99,7 @@ class ClearSolutions(NbGraderPreprocessor):
                 # check to make sure this isn't a nested BEGIN
                 # SOLUTION region
                 if in_solution:
-                    raise RuntimeError(
-                        "encountered nested begin solution statements")
+                    raise RuntimeError("encountered nested begin solution statements")
 
                 in_solution = True
                 replaced_solution = True
@@ -127,24 +127,25 @@ class ClearSolutions(NbGraderPreprocessor):
 
         return replaced_solution
 
-    def preprocess(self, nb: NotebookNode, resources: ResourcesDict) -> Tuple[NotebookNode, ResourcesDict]:
+    def preprocess(
+        self, nb: NotebookNode, resources: ResourcesDict
+    ) -> Tuple[NotebookNode, ResourcesDict]:
         language = nb.metadata.get("kernelspec", {}).get("language", "python")
         if language not in self.code_stub:
             raise ValueError(
                 "language '{}' has not been specified in "
-                "ClearSolutions.code_stub".format(language))
+                "ClearSolutions.code_stub".format(language)
+            )
 
         resources["language"] = language
         nb, resources = super(ClearSolutions, self).preprocess(nb, resources)
-        if 'celltoolbar' in nb.metadata:
-            del nb.metadata['celltoolbar']
+        if "celltoolbar" in nb.metadata:
+            del nb.metadata["celltoolbar"]
         return nb, resources
 
-    def preprocess_cell(self,
-                        cell: NotebookNode,
-                        resources: ResourcesDict,
-                        cell_index: int
-                        ) -> Tuple[NotebookNode, ResourcesDict]:
+    def preprocess_cell(
+        self, cell: NotebookNode, resources: ResourcesDict, cell_index: int
+    ) -> Tuple[NotebookNode, ResourcesDict]:
         # replace solution regions with the relevant stubs
         language = resources["language"]
         replaced_solution = self._replace_solution_region(cell, language)
@@ -166,7 +167,7 @@ class ClearSolutions(NbGraderPreprocessor):
         # we already replaced a solution region, because that means
         # there are parts of the cells that should be preserved
         if is_solution and not replaced_solution:
-            if cell.cell_type == 'code':
+            if cell.cell_type == "code":
                 cell.source = self.code_stub[language]
             else:
                 cell.source = self.text_stub

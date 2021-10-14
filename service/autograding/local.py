@@ -1,25 +1,23 @@
-import glob
+import json
+import os
+import shlex
+import shutil
+import stat
+from dataclasses import dataclass
+from datetime import datetime
 from re import S
-from api.models import assignment
+from subprocess import PIPE, CalledProcessError
+
+from grader_convert.converters.autograde import Autograde
+from grader_convert.gradebook.models import GradeBookModel
+from orm.assignment import Assignment
 from orm.group import Group
 from orm.lecture import Lecture
 from orm.submission import Submission
 from sqlalchemy.orm import Session
-from tornado.iostream import PipeIOStream
-from traitlets.config.configurable import LoggingConfigurable
-from dataclasses import dataclass
-from datetime import datetime
-from traitlets.traitlets import TraitError, Unicode, validate
-import asyncio, json
-import os
-import shutil
-import shlex
 from tornado.process import Subprocess
-from orm.assignment import Assignment
-from subprocess import CalledProcessError, PIPE
-import stat
-from grader_convert.converters.autograde import Autograde
-from grader_convert.gradebook.models import GradeBookModel, Notebook
+from traitlets.config.configurable import LoggingConfigurable
+from traitlets.traitlets import TraitError, Unicode, validate
 
 
 def rm_error(func, path, exc_info):

@@ -1,23 +1,22 @@
 from sys import path
-from grader_convert.converters.baseapp import ConverterApp
 from textwrap import dedent
+from typing import Any
 
-from traitlets import List, Bool, default
-
-from grader_convert.converters.base import BaseConverter, GraderConvertException
+from grader_convert.converters.base import BaseConverter
+from grader_convert.converters.baseapp import ConverterApp
 from grader_convert.preprocessors import (
-    IncludeHeaderFooter,
-    ClearSolutions,
-    LockCells,
-    ComputeChecksums,
-    SaveCells,
     CheckCellMetadata,
-    ClearOutput,
     ClearHiddenTests,
     ClearMarkScheme,
+    ClearOutput,
+    ClearSolutions,
+    ComputeChecksums,
+    IncludeHeaderFooter,
+    LockCells,
+    SaveCells,
 )
+from traitlets import Bool, List, default
 from traitlets.config.loader import Config
-from typing import Any
 
 
 class GenerateAssignment(BaseConverter):
@@ -63,7 +62,7 @@ class GenerateAssignment(BaseConverter):
         super(GenerateAssignment, self).__init__(
             input_dir, output_dir, file_pattern, **kwargs
         )
-        self.force = True # always overwrite generated assignments
+        self.force = True  # always overwrite generated assignments
 
     def start(self) -> None:
         super(GenerateAssignment, self).start()

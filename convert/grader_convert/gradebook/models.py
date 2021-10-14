@@ -1,6 +1,6 @@
 from dataclasses import asdict, dataclass
-from typing import Any, Dict, Optional, Set, Type, List, Union
 from enum import Enum
+from typing import Dict, List, Optional, Set, Type, Union
 
 
 @dataclass
@@ -250,7 +250,13 @@ class Notebook(BaseModel, IDMixin, NameMixin):
 
     @property
     def score(self) -> float:
-        return sum([self.grades_dict[g.grade_id].score for g in self.graded_cells if g is not None and g.grade_id is not None])
+        return sum(
+            [
+                self.grades_dict[g.grade_id].score
+                for g in self.graded_cells
+                if g is not None and g.grade_id is not None
+            ]
+        )
 
     @property
     def code_score(self) -> float:

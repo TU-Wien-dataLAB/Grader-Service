@@ -1,15 +1,15 @@
 from typing import Any
-from autograding.local import LocalAutogradeExecutor
+
 from autograding.feedback import GenerateFeedbackExecutor
-from registry import VersionSpecifier, register_handler
-from handlers.base_handler import GraderBaseHandler, authorize
-from jupyter_server.utils import url_path_join
-from orm.takepart import Scope
+from autograding.local import LocalAutogradeExecutor
 from orm.submission import Submission
-from server import GraderServer
-from tornado import httputil, web
-from tornado.ioloop import IOLoop
+from orm.takepart import Scope
+from registry import VersionSpecifier, register_handler
 from tornado.httpclient import HTTPError
+from tornado.ioloop import IOLoop
+
+from handlers.base_handler import GraderBaseHandler, authorize
+
 
 @register_handler(
     path=r"\/lectures\/(?P<lecture_id>\d*)\/assignments\/(?P<assignment_id>\d*)\/grading\/?",
@@ -26,7 +26,6 @@ class GradingBaseHandler(GraderBaseHandler):
     version_specifier=VersionSpecifier.ALL,
 )
 class GradingAutoHandler(GraderBaseHandler):
-
     def on_finish(self):
         # we do not close the session we just commit because LocalAutogradeExecutor still needs it
         if self.session:
@@ -38,7 +37,9 @@ class GradingAutoHandler(GraderBaseHandler):
         if submission is None:
             self.error_message = "Not Found!"
             raise HTTPError(404)
-        executor = LocalAutogradeExecutor(self.application.grader_service_dir, submission)
+        executor = LocalAutogradeExecutor(
+            self.application.grader_service_dir, submission
+        )
         IOLoop.current().spawn_callback(executor.start)
         submission = self.session.query(Submission).get(sub_id)
         self.write_json(submission)
@@ -49,7 +50,6 @@ class GradingAutoHandler(GraderBaseHandler):
     version_specifier=VersionSpecifier.ALL,
 )
 class GenerateFeedbackHandler(GraderBaseHandler):
-
     def on_finish(self):
         # we do not close the session we just commit because GenerateFeedbackHandler still needs it
         if self.session:
@@ -60,8 +60,9 @@ class GenerateFeedbackHandler(GraderBaseHandler):
         if submission is None:
             self.error_message = "Not Found!"
             raise HTTPError(404)
-        executor = GenerateFeedbackExecutor(self.application.grader_service_dir, submission)
+        executor = GenerateFeedbackExecutor(
+            self.application.grader_service_dir, submission
+        )
         IOLoop.current().spawn_callback(executor.start)
         submission = self.session.query(Submission).get(sub_id)
         self.write_json(submission)
-        

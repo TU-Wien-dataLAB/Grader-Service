@@ -1,14 +1,17 @@
-from sqlalchemy.sql.schema import UniqueConstraint
-from .base import Base, Serializable, DeleteState
-from sqlalchemy import Column, Integer, String, ForeignKey, DateTime, Enum, Boolean
-from sqlalchemy.orm import relationship
-from api.models import lecture
 import enum
+
+from api.models import lecture
+from sqlalchemy import Column, Enum, Integer, String
+from sqlalchemy.orm import relationship
+
+from .base import Base, DeleteState, Serializable
+
 
 class LectureState(enum.IntEnum):
     inactive = 0
     active = 1
     complete = 2
+
 
 class Lecture(Base, Serializable):
     __tablename__ = "lecture"
@@ -19,10 +22,9 @@ class Lecture(Base, Serializable):
     state = Column(Enum(LectureState), nullable=False, unique=False)
     deleted = Column(Enum(DeleteState), nullable=False, unique=False)
 
-
     assignments = relationship("Assignment", back_populates="lecture")
     roles = relationship("Role", back_populates="lecture")
-    groups = relationship("Group",back_populates="lecture")
+    groups = relationship("Group", back_populates="lecture")
 
     @property
     def model(self) -> lecture.Lecture:
@@ -33,4 +35,3 @@ class Lecture(Base, Serializable):
             complete=self.state == LectureState.complete,
             semester=self.semester,
         )
-

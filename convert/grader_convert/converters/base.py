@@ -1,25 +1,33 @@
-import os
 import glob
-import re
-import shutil
-import sqlalchemy
-import traceback
 import importlib
-
-from rapidfuzz import fuzz
-from traitlets.config import LoggingConfigurable, Config
-from traitlets import Bool, List, Dict, Integer, Instance, Type, Any, TraitError
-from traitlets import default, validate
-from textwrap import dedent
-from nbconvert.exporters import Exporter, NotebookExporter
-from nbconvert.writers import FilesWriter
-
-from ..utils import find_all_files, rmtree, remove
-from ..preprocessors.execute import UnresponsiveKernelError
-from ..nbgraderformat import SchemaTooOldError, SchemaTooNewError
-from ..nbgraderformat.common import ValidationError
+import os
+import re
+import traceback
 import typing
+from textwrap import dedent
+
+import sqlalchemy
+from nbconvert.exporters import Exporter, NotebookExporter
 from nbconvert.exporters.exporter import ResourcesDict
+from nbconvert.writers import FilesWriter
+from traitlets import (
+    Any,
+    Bool,
+    Dict,
+    Instance,
+    Integer,
+    List,
+    TraitError,
+    Type,
+    default,
+    validate,
+)
+from traitlets.config import Config, LoggingConfigurable
+
+from ..nbgraderformat import SchemaTooNewError, SchemaTooOldError
+from ..nbgraderformat.common import ValidationError
+from ..preprocessors.execute import UnresponsiveKernelError
+from ..utils import find_all_files, remove, rmtree
 
 
 class GraderConvertException(Exception):
@@ -187,13 +195,15 @@ class BaseConverter(LoggingConfigurable):
         self, notebook_filename: str
     ) -> typing.Dict[str, typing.Any]:
         resources = {}
-        resources["unique_key"] = os.path.splitext(os.path.basename(notebook_filename))[0]
+        resources["unique_key"] = os.path.splitext(os.path.basename(notebook_filename))[
+            0
+        ]
         resources["output_files_dir"] = "%s_files" % os.path.basename(notebook_filename)
         resources["output_json_file"] = "gradebook.json"
         resources["output_json_path"] = os.path.join(
             self._output_directory, resources["output_json_file"]
         )
-        resources['nbgrader'] = dict() # support nbgrader pre-processors
+        resources["nbgrader"] = dict()  # support nbgrader pre-processors
         return resources
 
     def write_single_notebook(self, output: str, resources: ResourcesDict) -> None:
@@ -325,7 +335,7 @@ class BaseConverter(LoggingConfigurable):
             _handle_failure(e)
             self.log.error("Canceled")
             raise
-        
+
         except ValidationError as e:
             _handle_failure(e)
             self.log.error(e.message)

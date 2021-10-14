@@ -1,25 +1,23 @@
-import re
-
-from traitlets import Bool, Unicode
 from textwrap import dedent
-
-from . import NbGraderPreprocessor
-from .. import utils
-from nbformat.notebooknode import NotebookNode
-from nbconvert.exporters.exporter import ResourcesDict
 from typing import Tuple
+
+from nbconvert.exporters.exporter import ResourcesDict
+from nbformat.notebooknode import NotebookNode
+from traitlets import Bool, Unicode
+
+from .. import utils
+from . import NbGraderPreprocessor
 
 
 class ClearMarkScheme(NbGraderPreprocessor):
 
     begin_mark_scheme_delimeter = Unicode(
         "BEGIN MARK SCHEME",
-        help="The delimiter marking the beginning of hidden tests cases"
+        help="The delimiter marking the beginning of hidden tests cases",
     ).tag(config=True)
 
     end_mark_scheme_delimeter = Unicode(
-        "END MARK SCHEME",
-        help="The delimiter marking the end of hidden tests cases"
+        "END MARK SCHEME", help="The delimiter marking the end of hidden tests cases"
     ).tag(config=True)
 
     enforce_metadata = Bool(
@@ -32,7 +30,7 @@ class ClearMarkScheme(NbGraderPreprocessor):
             disable this option if you are only ever planning to use nbgrader
             assign.
             """
-        )
+        ),
     ).tag(config=True)
 
     def _remove_mark_scheme_region(self, cell: NotebookNode) -> bool:
@@ -59,7 +57,8 @@ class ClearMarkScheme(NbGraderPreprocessor):
                 # region
                 if in_ms:
                     raise RuntimeError(
-                        "Encountered nested begin mark scheme statements")
+                        "Encountered nested begin mark scheme statements"
+                    )
                 in_ms = True
                 removed_ms = True
 
@@ -81,17 +80,17 @@ class ClearMarkScheme(NbGraderPreprocessor):
 
         return removed_ms
 
-    def preprocess(self, nb: NotebookNode, resources: ResourcesDict) -> Tuple[NotebookNode, ResourcesDict]:
+    def preprocess(
+        self, nb: NotebookNode, resources: ResourcesDict
+    ) -> Tuple[NotebookNode, ResourcesDict]:
         nb, resources = super(ClearMarkScheme, self).preprocess(nb, resources)
-        if 'celltoolbar' in nb.metadata:
-            del nb.metadata['celltoolbar']
+        if "celltoolbar" in nb.metadata:
+            del nb.metadata["celltoolbar"]
         return nb, resources
 
-    def preprocess_cell(self,
-                        cell: NotebookNode,
-                        resources: ResourcesDict,
-                        cell_index: int
-                        ) -> Tuple[NotebookNode, ResourcesDict]:
+    def preprocess_cell(
+        self, cell: NotebookNode, resources: ResourcesDict, cell_index: int
+    ) -> Tuple[NotebookNode, ResourcesDict]:
         # remove hidden test regions
         removed_ms = self._remove_mark_scheme_region(cell)
 

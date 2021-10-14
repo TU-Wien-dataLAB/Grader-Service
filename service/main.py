@@ -1,22 +1,22 @@
-import logging
-import sys
-from registry import HandlerPathRegistry
-import os
 import asyncio
+import logging
+import os
+import secrets
 import signal
-from persistence.database import DataBaseManager
-from autograding.local import LocalAutogradeExecutor
+import sys
+
 import tornado
-from tornado import web
 from tornado.httpserver import HTTPServer
 from tornado_sqlalchemy import SQLAlchemy
 from traitlets import config
 from traitlets import log as traitlets_log
-import secrets
+from traitlets.traitlets import Enum, Int, TraitError, Unicode, observe, validate
 
 # run __init__.py to register handlers
 import handlers
-from traitlets.traitlets import Enum, Int, TraitError, Unicode, observe, validate
+from autograding.local import LocalAutogradeExecutor
+from persistence.database import DataBaseManager
+from registry import HandlerPathRegistry
 from server import GraderServer
 
 
@@ -102,9 +102,11 @@ class GraderService(config.Application):
         stream_handler = logging.StreamHandler
         root_logger = logging.getLogger()
         root_logger.setLevel(log_level)
-        root_logger.removeHandler(root_logger.handlers[0]) # remove root handler to prevent duplicate logging
-        for log in ('access', 'application', 'general'):
-            logger = logging.getLogger('tornado.{}'.format(log))
+        root_logger.removeHandler(
+            root_logger.handlers[0]
+        )  # remove root handler to prevent duplicate logging
+        for log in ("access", "application", "general"):
+            logger = logging.getLogger("tornado.{}".format(log))
             if len(logger.handlers) > 0:
                 logger.removeHandler(logger.handlers[0])
             logger.setLevel(log_level)
@@ -112,23 +114,25 @@ class GraderService(config.Application):
             formatter = tornado.log.LogFormatter(color=True, datefmt=None)
             handler.setFormatter(formatter)
             logger.addHandler(handler)
-        sql_logger = logging.getLogger('sqlalchemy')
+        sql_logger = logging.getLogger("sqlalchemy")
         sql_logger.propagate = False
         sql_logger.setLevel("WARN")
         sql_handler = stream_handler(stream=sys.stdout)
         sql_handler.setLevel("WARN")
-        sql_handler.setFormatter(logging.Formatter(
-            '[%(asctime)s] %(levelname)-8s sqlalchemy %(message)s'
-        ))
+        sql_handler.setFormatter(
+            logging.Formatter("[%(asctime)s] %(levelname)-8s sqlalchemy %(message)s")
+        )
         sql_logger.addHandler(sql_handler)
 
         traitlet_logger = traitlets_log.get_logger()
         traitlet_logger.removeHandler(traitlet_logger.handlers[0])
         traitlet_logger.setLevel(log_level)
         traitlets_handler = stream_handler(stream=sys.stdout)
-        traitlets_handler.setFormatter(logging.Formatter(
-            '[%(asctime)s] %(levelname)-8s %(name)-13s %(module)-15s %(message)s'
-        ))
+        traitlets_handler.setFormatter(
+            logging.Formatter(
+                "[%(asctime)s] %(levelname)-8s %(name)-13s %(module)-15s %(message)s"
+            )
+        )
         traitlet_logger.addHandler(traitlets_handler)
 
     def initialize(self, argv, *args, **kwargs):
@@ -155,10 +159,12 @@ class GraderService(config.Application):
             GraderServer(
                 grader_service_dir=self.grader_service_dir,
                 handlers=handlers,
-                cookie_secret=secrets.token_hex(nbytes=32), # generate new cookie secret at startup
+                cookie_secret=secrets.token_hex(
+                    nbytes=32
+                ),  # generate new cookie secret at startup
                 config=self.config,
                 db=SQLAlchemy(DataBaseManager.instance().get_database_url()),
-                parent=self
+                parent=self,
             ),
             # ssl_options=ssl_context,
             xheaders=True,

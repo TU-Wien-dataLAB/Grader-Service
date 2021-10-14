@@ -1,7 +1,9 @@
-from .base import Base, Serializable
-from sqlalchemy import Column, Integer, String, ForeignKey, DateTime, Enum, Boolean
-from sqlalchemy.orm import relationship
 import enum
+
+from sqlalchemy import Column, Enum, ForeignKey, Integer
+from sqlalchemy.orm import relationship
+
+from .base import Base, Serializable
 
 
 class Scope(enum.IntEnum):

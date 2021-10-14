@@ -1,30 +1,26 @@
+import base64
+import datetime
 import functools
-import re
-from typing import Any, Awaitable, Callable, List, Optional
-from urllib.parse import ParseResult, urlparse
 import json
 import logging
+from typing import Any, Awaitable, Callable, List, Optional
+from urllib.parse import ParseResult, urlparse
+
+from api.models.base_model_ import Model
 from api.models.error_message import ErrorMessage
+from orm.base import DeleteState, Serializable
 from orm.lecture import Lecture, LectureState
-from orm.assignment import Assignment
 from orm.takepart import Role, Scope
 from orm.user import User
 from registry import VersionSpecifier, register_handler
 from request import RequestService
-from main import GraderService
 from server import GraderServer
-from jupyterhub.services.auth import HubAuthenticated
-from sqlalchemy.sql.expression import select
-from tornado import httputil, web
-from tornado.httpclient import HTTPClientError
-from tornado.web import HTTPError, RequestHandler
-from orm.base import DeleteState, Serializable
-from api.models.base_model_ import Model
-from tornado_sqlalchemy import SessionMixin
-from tornado.escape import json_decode
 from sqlalchemy.orm.exc import MultipleResultsFound, NoResultFound
-import datetime
-import base64
+from tornado import httputil, web
+from tornado.escape import json_decode
+from tornado.httpclient import HTTPClientError
+from tornado.web import HTTPError
+from tornado_sqlalchemy import SessionMixin
 
 
 def authorize(scopes: List[Scope]):
@@ -34,15 +30,24 @@ def authorize(scopes: List[Scope]):
 
     def wrapper(handler_method):
         @functools.wraps(handler_method)
-        async def request_handler_wrapper(self: 'GraderBaseHandler', *args, **kwargs):
+        async def request_handler_wrapper(self: "GraderBaseHandler", *args, **kwargs):
             lect_id = self.path_kwargs.get("lecture_id", None)
             if "/permissions" in self.request.path:
                 return await handler_method(self, *args, **kwargs)
-            if lect_id is None and "/lectures" in self.request.path and self.request.method == "POST":
+            if (
+                lect_id is None
+                and "/lectures" in self.request.path
+                and self.request.method == "POST"
+            ):
                 # lecture name and semester is in post body
                 try:
                     data = json_decode(self.request.body)
-                    lect_id = self.session.query(Lecture).filter(Lecture.code == data["code"]).one().id
+                    lect_id = (
+                        self.session.query(Lecture)
+                        .filter(Lecture.code == data["code"])
+                        .one()
+                        .id
+                    )
                 except MultipleResultsFound:
                     self.error_message = "Unauthorized"
                     raise HTTPError(403)
@@ -52,17 +57,26 @@ def authorize(scopes: List[Scope]):
                 except json.decoder.JSONDecodeError:
                     self.error_message = "Unauthorized"
                     raise HTTPError(403)
-            elif lect_id is None and  "/lectures" in self.request.path and self.request.method == "GET":
+            elif (
+                lect_id is None
+                and "/lectures" in self.request.path
+                and self.request.method == "GET"
+            ):
                 return await handler_method(self, *args, **kwargs)
 
             role = self.session.query(Role).get((self.user.name, lect_id))
             if role is None or not role.role in scopes:
-                    self.log.warn(f'User {self.user.name} tried to access {self.request.path} with insufficient privileges')
-                    self.error_message = "Unauthorized"
-                    raise HTTPError(403)
+                self.log.warn(
+                    f"User {self.user.name} tried to access {self.request.path} with insufficient privileges"
+                )
+                self.error_message = "Unauthorized"
+                raise HTTPError(403)
             return await handler_method(self, *args, **kwargs)
+
         return request_handler_wrapper
+
     return wrapper
+
 
 class GraderBaseHandler(SessionMixin, web.RequestHandler):
     request_service = RequestService()
@@ -76,7 +90,9 @@ class GraderBaseHandler(SessionMixin, web.RequestHandler):
     ) -> None:
         super().__init__(application, request, **kwargs)
 
-        self.application: GraderServer = self.application # add type hint for application
+        self.application: GraderServer = (
+            self.application
+        )  # add type hint for application
         hub_api_parsed: ParseResult = urlparse(self.application.hub_api_url)
         self.hub_request_service.scheme = hub_api_parsed.scheme
         (
@@ -92,7 +108,6 @@ class GraderBaseHandler(SessionMixin, web.RequestHandler):
     async def prepare(self) -> Optional[Awaitable[None]]:
         await self.authenticate_user()
 
-
     async def authenticate_user(self):
         """
         This is a workaround for async authentication. `get_current_user` cannot be asynchronous and a request cannot be made in a blocking manner.
@@ -104,8 +119,8 @@ class GraderBaseHandler(SessionMixin, web.RequestHandler):
             self.write_error(403)
             self.finish()
             return
-            #raise HTTPError(403)
-        
+            # raise HTTPError(403)
+
         user = await self.authenticate_token_user(token)
         if user is None:
             self.log.warn("Request from unauthenticated user")
@@ -121,30 +136,48 @@ class GraderBaseHandler(SessionMixin, web.RequestHandler):
             user_model = User(name=user["name"])
             self.session.add(user_model)
             self.session.commit()
-        
+
         # user is authenticated by the cookie and the user exists in the database
         if self.authenticate_cookie_user(user):
             self.current_user = user_model
-            return 
-        
-        lecture_roles = {code:{"role": role} for code, role in [tuple(g.split("__", 1)) for g in  user["groups"]]}
+            return
+
+        lecture_roles = {
+            code: {"role": role}
+            for code, role in [tuple(g.split("__", 1)) for g in user["groups"]]
+        }
 
         for lecture_code in lecture_roles.keys():
-            lecture = self.session.query(Lecture).filter(Lecture.code == lecture_code).one_or_none()
-            if lecture is None: # create inactive lecture if no lecture with that name exists yet (code is set in create)
-                self.log.info(f"Adding inactive lecture with lecture_code {lecture_code}")
+            lecture = (
+                self.session.query(Lecture)
+                .filter(Lecture.code == lecture_code)
+                .one_or_none()
+            )
+            if (
+                lecture is None
+            ):  # create inactive lecture if no lecture with that name exists yet (code is set in create)
+                self.log.info(
+                    f"Adding inactive lecture with lecture_code {lecture_code}"
+                )
                 lecture = Lecture()
                 lecture.code = lecture_code
                 lecture.state = LectureState.inactive
                 lecture.deleted = DeleteState.active
                 self.session.add(lecture)
         self.session.commit()
-        
+
         self.session.query(Role).filter(Role.username == user["name"]).delete()
         for lecture_code, obj in lecture_roles.items():
-            lecture = self.session.query(Lecture).filter(Lecture.code == lecture_code).one_or_none()
+            lecture = (
+                self.session.query(Lecture)
+                .filter(Lecture.code == lecture_code)
+                .one_or_none()
+            )
             if lecture is None:
-                raise HTTPError(500, f'Could not find lecture with code: {lecture_code}. Inconsistent database state!')
+                raise HTTPError(
+                    500,
+                    f"Could not find lecture with code: {lecture_code}. Inconsistent database state!",
+                )
             role = Role()
             role.username = user["name"]
             role.lectid = lecture.id
@@ -173,7 +206,9 @@ class GraderBaseHandler(SessionMixin, web.RequestHandler):
         else:
             equal = user == json.loads(cookie_user)
             if not equal:
-                self.set_secure_cookie(user["name"], json.dumps(user), expires_days=max_age)
+                self.set_secure_cookie(
+                    user["name"], json.dumps(user), expires_days=max_age
+                )
             return equal
 
     def get_request_token(self) -> Optional[str]:
@@ -185,8 +220,12 @@ class GraderBaseHandler(SessionMixin, web.RequestHandler):
                     token = value
                     self.has_auth = True
                 elif name == "Basic":
-                    auth_decoded = base64.decodebytes(value.encode('ascii')).decode('ascii')
-                    _, token = auth_decoded.split(':', 2) # we interpret the password as the token and ignore the username
+                    auth_decoded = base64.decodebytes(value.encode("ascii")).decode(
+                        "ascii"
+                    )
+                    _, token = auth_decoded.split(
+                        ":", 2
+                    )  # we interpret the password as the token and ignore the username
                     self.has_auth = True
                 else:
                     token = None
@@ -208,12 +247,12 @@ class GraderBaseHandler(SessionMixin, web.RequestHandler):
             logging.getLogger(str(self.__class__)).error(e.response.error)
             return None
         return user
-    
+
     def write_json(self, obj) -> None:
-        self.set_header('Content-Type', 'application/json')
+        self.set_header("Content-Type", "application/json")
         chunk = GraderBaseHandler._serialize(obj)
         self.write(json.dumps(chunk))
-    
+
     def write_error(self, status_code: int, **kwargs) -> None:
         self.clear()
         if status_code == 403 and not self.has_auth:
@@ -262,10 +301,12 @@ def authenticated(
 
     return wrapper
 
+
 @register_handler(r"\/", VersionSpecifier.NONE)
 class VersionHandler(GraderBaseHandler):
     async def get(self):
         self.write("1.0")
+
 
 @register_handler(r"\/", VersionSpecifier.V1)
 class VersionHandlerV1(GraderBaseHandler):

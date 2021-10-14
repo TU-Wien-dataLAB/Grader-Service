@@ -1,16 +1,13 @@
-from api.models.error_message import ErrorMessage
-from registry import VersionSpecifier, register_handler
-from orm.lecture import Lecture, LectureState
-from orm.user import User
-from orm.takepart import Role, Scope
-from orm.base import DeleteState
-from handlers.base_handler import GraderBaseHandler, authorize
-from jupyter_server.utils import url_path_join
-from sqlalchemy.orm import exc
 import tornado
 from api.models.lecture import Lecture as LectureModel
-from tornado.httpclient import HTTPError
+from orm.base import DeleteState
+from orm.lecture import Lecture, LectureState
+from orm.takepart import Role, Scope
+from registry import VersionSpecifier, register_handler
 from sqlalchemy.orm.exc import MultipleResultsFound, NoResultFound, ObjectDeletedError
+from tornado.httpclient import HTTPError
+
+from handlers.base_handler import GraderBaseHandler, authorize
 
 
 @register_handler(r"\/lectures\/?", VersionSpecifier.ALL)
@@ -28,8 +25,8 @@ class LectureBaseHandler(GraderBaseHandler):
             lectures = [
                 role.lecture
                 for role in self.user.roles
-                if role.lecture.state == LectureState.active 
-                and role.lecture.deleted == DeleteState.active 
+                if role.lecture.state == LectureState.active
+                and role.lecture.deleted == DeleteState.active
                 and role.lecture.semester == semester
             ]
         self.write_json(lectures)
@@ -39,17 +36,23 @@ class LectureBaseHandler(GraderBaseHandler):
         body = tornado.escape.json_decode(self.request.body)
         lecture_model = LectureModel.from_dict(body)
         try:
-            lecture = self.session.query(Lecture).filter(Lecture.code == lecture_model.code).one_or_none()
+            lecture = (
+                self.session.query(Lecture)
+                .filter(Lecture.code == lecture_model.code)
+                .one_or_none()
+            )
         except NoResultFound:
             self.error_message = "Not found"
             raise HTTPError(404)
         except MultipleResultsFound:
             self.error_message = "Error"
             raise HTTPError(400)
-        
+
         lecture.name = lecture_model.name
         lecture.code = lecture_model.code
-        lecture.state = LectureState.complete if lecture_model.complete else LectureState.active
+        lecture.state = (
+            LectureState.complete if lecture_model.complete else LectureState.active
+        )
         lecture.semester = lecture_model.semester
         lecture.deleted = DeleteState.active
 
@@ -67,7 +70,9 @@ class LectureObjectHandler(GraderBaseHandler):
 
         lecture.name = lecture_model.name
         lecture.code = lecture_model.code
-        lecture.state = LectureState.complete if lecture_model.complete else LectureState.active
+        lecture.state = (
+            LectureState.complete if lecture_model.complete else LectureState.active
+        )
         lecture.semester = lecture_model.semester
 
         self.session.commit()

@@ -1,13 +1,13 @@
-from registry import VersionSpecifier, register_handler
-from handlers.base_handler import GraderBaseHandler, authorize
+import tornado
+from api.models.assignment import Assignment as AssignmentModel
 from orm.assignment import Assignment
 from orm.base import DeleteState
 from orm.takepart import Role, Scope
-from server import GraderServer
-from api.models.assignment import Assignment as AssignmentModel
+from registry import VersionSpecifier, register_handler
 from sqlalchemy.orm.exc import ObjectDeletedError
-import tornado
 from tornado.web import HTTPError
+
+from handlers.base_handler import GraderBaseHandler, authorize
 
 
 @register_handler(
