@@ -1,13 +1,14 @@
-from registry import VersionSpecifier, register_handler
-from handlers.base_handler import GraderBaseHandler, authorize
+import tornado
+from api.models.submission import Submission as SubmissionModel
 from orm.assignment import Assignment
 from orm.base import DeleteState
 from orm.submission import Submission
 from orm.takepart import Role, Scope
-from api.models.submission import Submission as SubmissionModel
+from registry import VersionSpecifier, register_handler
 from sqlalchemy.sql.expression import func
-import tornado
 from tornado.httpclient import HTTPError
+
+from handlers.base_handler import GraderBaseHandler, authorize
 
 
 @register_handler(
@@ -113,8 +114,9 @@ class SubmissionHandler(GraderBaseHandler):
 class SubmissionObjectHandler(GraderBaseHandler):
     @authorize([Scope.tutor, Scope.instructor])
     async def get(self, lecture_id: int, assignment_id: int, submission_id: int):
-        submission = self.session.query(Submission).get(submission_id)      
+        submission = self.session.query(Submission).get(submission_id)
         self.write_json(submission)
+
 
 @register_handler(
     path=r"\/lectures\/(?P<lecture_id>\d*)\/assignments\/(?P<assignment_id>\d*)\/submissions\/(?P<submission_id>\d*)\/properties\/?",

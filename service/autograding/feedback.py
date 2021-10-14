@@ -9,7 +9,6 @@ from orm.group import Group
 from orm.lecture import Lecture
 from orm.submission import Submission
 from grader_convert.converters.generate_feedback import GenerateFeedback
-from sqlalchemy.sql.expression import true
 
 
 class GenerateFeedbackExecutor(LocalAutogradeExecutor):

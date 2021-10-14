@@ -1,7 +1,7 @@
 import os
 from tornado import web
 from traitlets import config
-from traitlets.traitlets import Enum, Int, Integer, Unicode, validate
+from traitlets.traitlets import Integer, Unicode
 
 
 class GraderServer(config.LoggingConfigurable, web.Application):

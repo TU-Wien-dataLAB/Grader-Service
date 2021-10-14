@@ -1,26 +1,23 @@
-import json
-from orm.assignment import Assignment
-from orm.submission import Submission
-from orm.lecture import Lecture
-from orm.takepart import Role, Scope
-from orm.group import Group
-from sqlalchemy.orm.exc import MultipleResultsFound, NoResultFound
-from tornado.web import RequestHandler, stream_request_body, HTTPError, Application
-from tornado.options import define, options, parse_command_line
-from tornado.process import Subprocess
-from tornado.ioloop import IOLoop
-from tornado.httpserver import HTTPServer
-import shlex
-from registry import VersionSpecifier, register_handler
-from handlers.base_handler import GraderBaseHandler, authenticated
-import os
-import subprocess
-from server import GraderServer
-from urllib.parse import unquote
 import datetime
-
-
 import logging
+import os
+import shlex
+import subprocess
+from urllib.parse import unquote
+
+from handlers.base_handler import GraderBaseHandler
+from orm.assignment import Assignment
+from orm.group import Group
+from orm.lecture import Lecture
+from orm.submission import Submission
+from orm.takepart import Role, Scope
+from registry import VersionSpecifier, register_handler
+from sqlalchemy.orm.exc import MultipleResultsFound, NoResultFound
+from tornado.ioloop import IOLoop
+from tornado.process import Subprocess
+from tornado.web import HTTPError, stream_request_body
+
+from server import GraderServer
 
 logger = logging.getLogger(__name__)
 
@@ -37,11 +34,13 @@ class GitBaseHandler(GraderBaseHandler):
         self.clear()
         if status_code == 403 and not self.has_auth:
             status_code = 401
-            self.set_header('WWW-Authenticate', 'Basic realm="User Visible Realm"')
+            self.set_header("WWW-Authenticate", 'Basic realm="User Visible Realm"')
         self.set_status(status_code)
 
     def on_finish(self):
-        if hasattr(self, 'process'): # if we exit from super prepare (authentication) the process is not created
+        if hasattr(
+            self, "process"
+        ):  # if we exit from super prepare (authentication) the process is not created
             if self.process.stdin is not None:
                 self.process.stdin.close()
             if self.process.stdout is not None:
@@ -65,15 +64,25 @@ class GitBaseHandler(GraderBaseHandler):
             return None
         pathlets = pathlets[3:]
         lecture_path = os.path.abspath(os.path.join(self.gitbase, pathlets[0]))
-        assignment_path = os.path.abspath(os.path.join(self.gitbase, pathlets[0], unquote(pathlets[1])))
-        
+        assignment_path = os.path.abspath(
+            os.path.join(self.gitbase, pathlets[0], unquote(pathlets[1]))
+        )
+
         repo_type = pathlets[2]
-        if repo_type not in {"source", "release", "assignment", "autograde", "feedback"}:
+        if repo_type not in {
+            "source",
+            "release",
+            "assignment",
+            "autograde",
+            "feedback",
+        }:
             return None
-        
+
         # get lecture and assignment if they exist
         try:
-            lecture = self.session.query(Lecture).filter(Lecture.code == pathlets[0]).one()
+            lecture = (
+                self.session.query(Lecture).filter(Lecture.code == pathlets[0]).one()
+            )
         except NoResultFound:
             self.error_message = "Not Found"
             raise HTTPError(404)
@@ -83,24 +92,39 @@ class GitBaseHandler(GraderBaseHandler):
         if repo_type == "source" and role.role == Scope.student:
             self.error_message = "Unauthorized"
             raise HTTPError(403)
-        
+
         # no push to release allowed for students
-        if repo_type == "release" and role.role == Scope.student and rpc in ["send-pack", "receive-pack"]:
+        if (
+            repo_type == "release"
+            and role.role == Scope.student
+            and rpc in ["send-pack", "receive-pack"]
+        ):
             self.error_message = "Unauthorized"
             raise HTTPError(403)
 
         # no push allowed for autograde and feedback -> the autograder executor can push locally so it will not be affected by this
-        if repo_type in ["autograde", "feedback"] and rpc in ["send-pack", "receive-pack"]: 
+        if repo_type in ["autograde", "feedback"] and rpc in [
+            "send-pack",
+            "receive-pack",
+        ]:
             self.error_message = "Unauthorized"
             raise HTTPError(403)
-        
+
         # no pull allowed for autograde for students
-        if repo_type == "autograde" and role.role == Scope.student and rpc == "upload-pack":
+        if (
+            repo_type == "autograde"
+            and role.role == Scope.student
+            and rpc == "upload-pack"
+        ):
             self.error_message = "Unauthorized"
             raise HTTPError(403)
-        
+
         # students should not be able to pull other submissions -> add query param for sub_id
-        if repo_type == "feedback" and role.role == Scope.student and rpc == "upload-pack":
+        if (
+            repo_type == "feedback"
+            and role.role == Scope.student
+            and rpc == "upload-pack"
+        ):
             try:
                 sub_id = int(pathlets[3])
             except (ValueError, IndexError):
@@ -112,7 +136,14 @@ class GitBaseHandler(GraderBaseHandler):
                 raise HTTPError(403)
 
         try:
-            assignment = self.session.query(Assignment).filter(Assignment.lectid == lecture.id, Assignment.name == unquote(pathlets[1])).one()
+            assignment = (
+                self.session.query(Assignment)
+                .filter(
+                    Assignment.lectid == lecture.id,
+                    Assignment.name == unquote(pathlets[1]),
+                )
+                .one()
+            )
         except NoResultFound:
             self.error_message = "Not Found"
             raise HTTPError(404)
@@ -121,7 +152,7 @@ class GitBaseHandler(GraderBaseHandler):
 
         if repo_type == "assignment":
             repo_type: str = assignment.type
-        
+
         # create directories once we know they exist in the database
         if not os.path.exists(lecture_path):
             os.mkdir(lecture_path)
@@ -153,7 +184,7 @@ class GitBaseHandler(GraderBaseHandler):
             path = os.path.join(group_path, group.name)
         else:
             return None
-        
+
         os.makedirs(os.path.dirname(path), exist_ok=True)
         # return git repo
         if os.path.exists(path):
@@ -209,8 +240,19 @@ class RPCHandler(GitBaseHandler):
         if pathlets[-1] == "git-receive-pack" and pathlets[-2] == "assignment":
             # get lecture and assignment if they exist
             try:
-                lecture = self.session.query(Lecture).filter(Lecture.code == pathlets[0]).one()
-                assignment = self.session.query(Assignment).filter(Assignment.lectid == lecture.id, Assignment.name == unquote(pathlets[1])).one()
+                lecture = (
+                    self.session.query(Lecture)
+                    .filter(Lecture.code == pathlets[0])
+                    .one()
+                )
+                assignment = (
+                    self.session.query(Assignment)
+                    .filter(
+                        Assignment.lectid == lecture.id,
+                        Assignment.name == unquote(pathlets[1]),
+                    )
+                    .one()
+                )
             except NoResultFound:
                 self.error_message = "Not Found"
                 raise HTTPError(404)
@@ -230,8 +272,12 @@ class RPCHandler(GitBaseHandler):
             await self.git_response()
 
             try:
-                ret = subprocess.run(shlex.split("git rev-parse main"), capture_output=True, cwd=self.gitdir)
-                submission.commit_hash = str(ret.stdout, 'utf-8').strip()
+                ret = subprocess.run(
+                    shlex.split("git rev-parse main"),
+                    capture_output=True,
+                    cwd=self.gitdir,
+                )
+                submission.commit_hash = str(ret.stdout, "utf-8").strip()
                 submission.auto_status = "not_graded"
                 submission.manual_status = "not_graded"
             except subprocess.CalledProcessError as e:

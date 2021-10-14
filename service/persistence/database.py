@@ -1,9 +1,10 @@
-from traitlets.config.configurable import SingletonConfigurable
-from traitlets.traitlets import Int, Unicode
-from sqlalchemy import create_engine
-from sqlalchemy.orm import Session
 import os
 import urllib.parse
+
+from sqlalchemy import create_engine
+from sqlalchemy.orm import Session
+from traitlets.config.configurable import SingletonConfigurable
+from traitlets.traitlets import Int, Unicode
 
 
 class DataBaseManager(SingletonConfigurable):
@@ -12,7 +13,9 @@ class DataBaseManager(SingletonConfigurable):
     db_dialect = Unicode("sqlite").tag(config=True)
     db_driver = Unicode(None, allow_none=True).tag(config=True)
     db_username = Unicode(None, allow_none=True).tag(config=True)
-    db_password = Unicode(os.environ.get("GRADER_DB_PASSWORD"), allow_none=True).tag(config=True)
+    db_password = Unicode(os.environ.get("GRADER_DB_PASSWORD"), allow_none=True).tag(
+        config=True
+    )
     db_host = Unicode("").tag(config=True)
     db_port = Int(None, allow_none=True).tag(config=True)
     db_path = Unicode("").tag(config=True)
@@ -37,7 +40,7 @@ class DataBaseManager(SingletonConfigurable):
         if self.db_port is not None:
             url += ":" + str(self.db_port)
         url += self.db_path
-        return  url
+        return url
 
     def create_session(self):
         return Session(bind=self.engine)

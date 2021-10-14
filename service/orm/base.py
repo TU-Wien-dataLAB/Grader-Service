@@ -1,8 +1,10 @@
-from sqlalchemy.ext.declarative import declarative_base
-from api.models.base_model_ import Model
 import enum
 
+from api.models.base_model_ import Model
+from sqlalchemy.ext.declarative import declarative_base
+
 Base = declarative_base()
+
 
 class Serializable(object):
     @property
@@ -12,20 +14,7 @@ class Serializable(object):
     def serialize(self) -> dict:
         return self.model.to_dict()
 
+
 class DeleteState(enum.IntEnum):
     active = 0
     deleted = 1
-    
-
-    
-
-
-
-
-
-
-
-  
-
-
-
