@@ -14,7 +14,7 @@ import asyncio, json
 import os
 import shutil
 import shlex
-from tornado.process import  Subprocess
+from tornado.process import Subprocess
 from orm.assignment import Assignment
 from subprocess import CalledProcessError, PIPE
 import stat
@@ -29,11 +29,14 @@ def rm_error(func, path, exc_info):
         func(path)
     else:
         raise
+
+
 @dataclass
 class AutogradingStatus:
     status: str
     started_at: datetime
     finished_at: datetime
+
 
 class LocalAutogradeExecutor(LoggingConfigurable):
 
@@ -58,8 +61,9 @@ class LocalAutogradeExecutor(LoggingConfigurable):
         self.autograding_start = datetime.now()
         await self._run()
         self.autograding_finished = datetime.now()
-        await self._push_results()
         self._set_properties()
+        await self._push_results()
+        self._set_db_state()
         self._cleanup()
 
     @property
@@ -111,7 +115,7 @@ class LocalAutogradeExecutor(LoggingConfigurable):
 
         self.log.info(f"Pulling repo {git_repo_path} into input directory")
 
-        command = f'{self.git_executable} init'
+        command = f"{self.git_executable} init"
         self.log.info(f"Running {command}")
         try:
             await self._run_subprocess(command, self.input_path)
@@ -140,7 +144,7 @@ class LocalAutogradeExecutor(LoggingConfigurable):
     async def _run(self):
         if os.path.exists(self.output_path):
             shutil.rmtree(self.output_path, onerror=rm_error)
-            
+
         os.mkdir(self.output_path)
         self._write_gradebook()
 
@@ -156,8 +160,9 @@ class LocalAutogradeExecutor(LoggingConfigurable):
         autograder.force = True
         autograder.start()
 
-
     async def _push_results(self):
+        os.unlink(os.path.join(self.output_path, "gradebook.json"))
+
         assignment: Assignment = self.submission.assignment
         lecture: Lecture = assignment.lecture
 
@@ -184,19 +189,23 @@ class LocalAutogradeExecutor(LoggingConfigurable):
         if not os.path.exists(git_repo_path):
             os.makedirs(git_repo_path, exist_ok=True)
             try:
-                await self._run_subprocess(f'git init --bare "{git_repo_path}"', self.output_path)
+                await self._run_subprocess(
+                    f'git init --bare "{git_repo_path}"', self.output_path
+                )
             except CalledProcessError:
                 raise
 
-        command = f'{self.git_executable} init'
+        command = f"{self.git_executable} init"
         self.log.info(f"Running {command} at {self.output_path}")
         try:
             await self._run_subprocess(command, self.output_path)
         except CalledProcessError:
             pass
-        
+
         self.log.info(f"Creating new branch submission_{self.submission.commit_hash}")
-        command = f"{self.git_executable} switch -c submission_{self.submission.commit_hash}"
+        command = (
+            f"{self.git_executable} switch -c submission_{self.submission.commit_hash}"
+        )
         try:
             await self._run_subprocess(command, self.output_path)
         except CalledProcessError:
@@ -205,11 +214,15 @@ class LocalAutogradeExecutor(LoggingConfigurable):
 
         self.log.info(f"Commiting all files in {self.output_path}")
         try:
-            await self._run_subprocess(f"{self.git_executable} add -A", self.output_path)
-            await self._run_subprocess(f'{self.git_executable} commit -m "{self.submission.commit_hash}"', self.output_path)
+            await self._run_subprocess(
+                f"{self.git_executable} add -A", self.output_path
+            )
+            await self._run_subprocess(
+                f'{self.git_executable} commit -m "{self.submission.commit_hash}"',
+                self.output_path,
+            )
         except CalledProcessError:
-            pass # TODO: exit gracefully
-
+            pass  # TODO: exit gracefully
 
         self.log.info(
             f"Pushing to {git_repo_path} at branch submission_{self.submission.commit_hash}"
@@ -218,27 +231,30 @@ class LocalAutogradeExecutor(LoggingConfigurable):
         try:
             await self._run_subprocess(command, self.output_path)
         except CalledProcessError:
-            pass # TODO: exit gracefully
+            pass  # TODO: exit gracefully
         self.log.info("Pushing complete")
 
     def _set_properties(self):
         with open(os.path.join(self.output_path, "gradebook.json"), "r") as f:
             gradebook_str = f.read()
         self.submission.properties = gradebook_str
-        self.submission.auto_status = "automatically_graded"
         gradebook_dict = json.loads(gradebook_str)
         book = GradeBookModel.from_dict(gradebook_dict)
         score = 0
-        for id,n in book.notebooks.items():
+        for id, n in book.notebooks.items():
             score += n.score
         self.submission.score = score
+        self.session.commit()
+
+    def _set_db_state(self):
+        self.submission.auto_status = "automatically_graded"
         self.session.commit()
 
     def _cleanup(self):
         shutil.rmtree(self.input_path)
         shutil.rmtree(self.output_path)
         self.session.close()
-    
+
     async def _run_subprocess(self, command: str, cwd: str) -> Subprocess:
         process = Subprocess(shlex.split(command), stdout=PIPE, stderr=PIPE, cwd=cwd)
         try:
@@ -248,7 +264,7 @@ class LocalAutogradeExecutor(LoggingConfigurable):
             self.log.error(error)
             raise
         return process
-            
+
     @validate("base_input_path", "base_output_path")
     def _validate_service_dir(self, proposal):
         path: str = proposal["value"]
