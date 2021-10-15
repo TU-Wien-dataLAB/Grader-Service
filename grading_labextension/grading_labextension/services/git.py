@@ -49,10 +49,22 @@ class GitService(Configurable):
 
 
     def push(self, origin: str, force=False):
+        """Pushes commits on the remote
+
+        Args:
+            origin (str): the remote
+            force (bool, optional): states if the operation should be forced. Defaults to False.
+        """
         self.log.info(f"Pushing remote {origin} for {self.path}")
         self._run_command(f"git push {origin} main" + (" --force" if force else ""), cwd=self.path)
     
     def set_remote(self, origin: str, sub_id=None):
+        """Set a remote in the local repository
+
+        Args:
+            origin (str): the remote
+            sub_id ([type], optional): a query param for the feedback pull. Defaults to None.
+        """
         self.log.info(f"Setting remote {origin} for {self.path}")
         url = posixpath.join(self.git_remote_url, self.lecture_code, quote(self.assignment_name), self.repo_type)
         try:
@@ -75,12 +87,24 @@ class GitService(Configurable):
         raise NotImplementedError()
 
     def switch_branch(self,branch: str):
+        """Switches into another branch
+
+        Args:
+            branch (str): the branch name
+        """
         self.log.info(f"Fetching all at path {self.path}")
         self._run_command(f"git fetch --all", cwd=self.path)
         self.log.info(f"Switching to branch {branch} at path {self.path}")
         self._run_command(f"git checkout {branch}", cwd=self.path)
 
     def pull(self, origin: str, branch="main", force=False):
+        """Pulls a repository
+
+        Args:
+            origin (str): the remote
+            branch (str, optional): the branch name. Defaults to "main".
+            force (bool, optional): states if the operation should be forced. Defaults to False.
+        """
         if force:
             self.log.info(f"Pulling remote {origin}")
             out = self._run_command(f'sh -c "git clean -fd && git fetch {origin} && git reset --hard {origin}/{branch}"', cwd=self.path, capture_output=True)
@@ -90,6 +114,11 @@ class GitService(Configurable):
             self._run_command(f"git pull {origin} {branch}", cwd=self.path)
 
     def init(self, force=False):
+        """Initiates a local repository
+
+        Args:
+            force (bool, optional): states if the operation should be forced. Defaults to False.
+        """
         if not self.is_git() or force:
             self.log.info(f"Calling init for {self.path}")
             if self.git_version < (2,28):
@@ -99,10 +128,20 @@ class GitService(Configurable):
                 self._run_command(f"git init -b main", cwd=self.path)
     
     def is_git(self):
+        """Checks if the directory is a local repository
+
+        Returns:
+            bool: states if the directory is a repository
+        """
         return os.path.exists(os.path.join(self.path, ".git"))
     
 
     def commit(self, m=str(datetime.now())):
+        """Commits the staged changes
+
+        Args:
+            m (str, optional): the commit message. Defaults to str(datetime.now()).
+        """
         # self.log.info("Adding all files")
         # self._run_command(f'git add -A', cwd=self.path)
         # self.log.info("Committing repository")
@@ -114,12 +153,23 @@ class GitService(Configurable):
         self._run_command(f'git config user.name "{author}"', cwd=self.path)
     
     def clone(self,origin: str, force=False):
+        """Clones the repository
+
+        Args:
+            origin (str): the remote
+            force (bool, optional): states if the operation should be forced. Defaults to False.
+        """
         self.init(force=force)
         self.set_remote(origin=origin)
         self.pull(origin=origin,force=force)
     
 
     def delete_repo_contents(self, include_git=False):
+        """Deletes the contents of the git service
+
+        Args:
+            include_git (bool, optional): states if the .git directory should also be deleted. Defaults to False.
+        """
         for root, dirs, files in os.walk(self.path):
             for f in files:
                 os.unlink(os.path.join(root, f))
@@ -132,6 +182,11 @@ class GitService(Configurable):
 
     # ATTENTION: dirs_exist_ok was only added in Python 3.8
     def copy_repo_contents(self, src: str):
+        """copies repo contents from src to the git path
+
+        Args:
+            src (str): path where the to be copied files reside
+        """
         ignore = shutil.ignore_patterns(".git", "__pycache__")
         if sys.version_info.major == 3 and sys.version_info.minor >= 8:
             shutil.copytree(src, self.path, ignore=ignore, dirs_exist_ok=True)
@@ -148,6 +203,11 @@ class GitService(Configurable):
 
     @property
     def git_version(self):
+        """Return the git version
+
+        Returns:
+            tuple: the git version
+        """
         if self._git_version is None:
             try:
                 version = self._run_command("git --version", capture_output=True)
@@ -158,6 +218,19 @@ class GitService(Configurable):
         return self._git_version
     
     def _run_command(self, command, cwd=None, capture_output=False):
+        """Starts a sub process and runs an cmd command
+
+        Args:
+            command str: command that is getting run.
+            cwd (str, optional): states where the command is getting run. Defaults to None.
+            capture_output (bool, optional): states if output is getting saved. Defaults to False.
+
+        Raises:
+            GitError: returns appropriate git error 
+
+        Returns:
+            str: command output
+        """
         try:
             self.log.info(f"Running: {command}")
             ret = subprocess.run(shlex.split(command), check=True, cwd=cwd, capture_output=True)
