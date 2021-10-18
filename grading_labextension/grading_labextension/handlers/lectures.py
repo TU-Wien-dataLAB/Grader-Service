@@ -49,11 +49,12 @@ class LectureBaseHandler(ExtensionBaseHandler):
 class LectureObjectHandler(ExtensionBaseHandler):
     @web.authenticated
     async def put(self, lecture_id: int):
-        """ Sends a PUT-request to the grader service to update a lecture
+        """Sends a PUT-request to the grader service to update a lecture
 
-        Args:
-            lecture_id (int): id of the lecture
-        """
+        :param lecture_id: id of the lecture
+        :type lecture_id: int
+        """        
+
         data = tornado.escape.json_decode(self.request.body)
         try:
             response_data: dict = await self.request_service.request(
@@ -70,11 +71,11 @@ class LectureObjectHandler(ExtensionBaseHandler):
 
     @web.authenticated
     async def get(self, lecture_id: int):
-        """ Sends a GET-request to the grader service and returns the lecture
+        """Sends a GET-request to the grader service and returns the lecture
 
-        Args:
-            lecture_id (int): id of the lecture
-        """
+        :param lecture_id: id of the lecture
+        :type lecture_id: int
+        """        
         try:
             response_data: dict = await self.request_service.request(
                 "GET",
@@ -89,11 +90,12 @@ class LectureObjectHandler(ExtensionBaseHandler):
 
     @web.authenticated
     async def delete(self, lecture_id: int):
-        """ Sends a DELETE-request to the grader service to delete a lecture
+        """Sends a DELETE-request to the grader service to delete a lecture
 
-        Args:
-            lecture_id (int): id of the lecture
-        """
+        :param lecture_id: id of the lecture
+        :type lecture_id: int
+        """        
+        
         try:
             await self.request_service.request(
                 "DELETE",

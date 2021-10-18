@@ -26,7 +26,8 @@ class ExtensionBaseHandler(APIHandler):
   def grader_authentication_header(self):
     """Returns the authentication header
 
-    Returns:
-        dict: authentication header
-    """
+    :return: authentication header
+    :rtype: dict
+    """    
+
     return dict(Authorization="Token " + HandlerConfig.instance().hub_api_token)

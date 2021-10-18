@@ -15,9 +15,10 @@ class GenerateHandler(ExtensionBaseHandler):
     async def put(self, lecture_id: int, assignment_id: int):
         """ Generates the release files from the source files of a assignment
 
-        Args:
-            lecture_id (int): id of the lecture
-            assignment_id (int): id of the assignment
+        :param lecture_id: id of the lecture
+        :type lecture_id: int
+        :param assignment_id: id of the assignment
+        :type assignment_id: int
         """
         try:
             lecture = await self.request_service.request(
@@ -68,10 +69,12 @@ class PullHandler(ExtensionBaseHandler):
     async def get(self, lecture_id: int, assignment_id: int, repo: str):
         """ Creates a local repository and pulls the specified repo type
 
-        Args:
-            lecture_id (int): id of the lecture
-            assignment_id (int): id of the assignment
-            repo (str): type of the repository
+        :param lecture_id: id of the lecture
+        :type lecture_id: int
+        :param assignment_id: id of the assignment
+        :type assignment_id: int
+        :param repo: type of the repository
+        :type repo: str
         """
         if repo not in {"assignment", "source", "release"}:
             self.write_error(404)
@@ -119,12 +122,14 @@ class PullHandler(ExtensionBaseHandler):
 class PushHandler(ExtensionBaseHandler):
     async def put(self, lecture_id: int, assignment_id: int, repo: str):
         """ Pushes from the local repositories to remote
-            If the repo type is release, it also generate the release files and updates the assignmentproperties in the grader service
+            If the repo type is release, it also generate the release files and updates the assignment properties in the grader service
 
-        Args:
-            lecture_id (int): id of the lecture
-            assignment_id (int): id of the assignment
-            repo (str): type of the repository
+        :param lecture_id: id of the lecture
+        :type lecture_id: int
+        :param assignment_id: id of the assignment
+        :type assignment_id: int
+        :param repo: type of the repository
+        :type repo: str
         """
         if repo not in {"assignment", "source", "release"}:
             self.write_error(404)

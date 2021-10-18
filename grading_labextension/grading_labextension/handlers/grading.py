@@ -11,11 +11,13 @@ class GradingAutoHandler(ExtensionBaseHandler):
     async def get(self, lecture_id: int, assignment_id: int, sub_id: int):
         """Sends a GET-request to the grader service to autograde a submission
 
-        Args:
-            lecture_id (int): id of the lecture
-            assignment_id (int): id of the assignment
-            sub_id (int): id of the submission
-        """
+        :param lecture_id: id of the lecture
+        :type lecture_id: int
+        :param assignment_id: id of the assignment
+        :type assignment_id: int
+        :param sub_id: id of the submission
+        :type sub_id: int
+        """        
         try:
             response = await self.request_service.request(
                 method="GET",
@@ -34,13 +36,16 @@ class GradingAutoHandler(ExtensionBaseHandler):
 )
 class GradingManualHandler(ExtensionBaseHandler):
     async def get(self, lecture_id: int, assignment_id: int, sub_id: int):
-        """Generates a local git repository and pulls autograded files of a submission in the user directory 
+        """Generates a local git repository and pulls autograded files of a submission in the user directory
 
-        Args:
-            lecture_id (int): id of the lecture
-            assignment_id (int): id of the assignment
-            sub_id (int): id of the submission
-        """
+        :param lecture_id: id of the lecture
+        :type lecture_id: int
+        :param assignment_id: id of the assignment
+        :type assignment_id: int
+        :param sub_id: id of the submission
+        :type sub_id: int
+        """        
+
         try:
             lecture = await self.request_service.request(
                 "GET",
@@ -95,11 +100,14 @@ class GenerateFeedbackHandler(ExtensionBaseHandler):
     async def get(self, lecture_id: int, assignment_id: int, sub_id: int):
         """Sends a GET-request to the grader service to generate feedback for a graded submission
 
-        Args:
-            lecture_id (int): id of the lecture
-            assignment_id (int): id of the assignment
-            sub_id (int): id of the submission
-        """
+        :param lecture_id: id of the lecture
+        :type lecture_id: int
+        :param assignment_id: id of the assignment
+        :type assignment_id: int
+        :param sub_id: id of the submission
+        :type sub_id: int
+        """        
+
         try:
             response = await self.request_service.request(
                 method="GET",
@@ -120,11 +128,13 @@ class PullFeedbackHandler(ExtensionBaseHandler):
     async def get(self, lecture_id: int, assignment_id: int, sub_id: int):
         """Generates a local git repository and pulls the feedback files of a submission in the user directory 
 
-        Args:
-            lecture_id (int): id of the lecture
-            assignment_id (int): id of the assignment
-            sub_id (int): id of the submission
-        """
+        :param lecture_id: id of the lecture
+        :type lecture_id: int
+        :param assignment_id: id of the assignment
+        :type assignment_id: int
+        :param sub_id: id of the submission
+        :type sub_id: int
+        """        
         try:
             lecture = await self.request_service.request(
                 "GET",

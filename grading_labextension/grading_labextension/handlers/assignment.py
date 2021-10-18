@@ -14,8 +14,8 @@ class AssignmentBaseHandler(ExtensionBaseHandler):
     async def get(self, lecture_id: int):
         """Sends a get request to the grader service and returns assignments of the lecture
 
-        Args:
-            lecture_id (int): id of the lecture
+        :param lecture_id: id of the lecture
+        :type lecture_id: int
         """
         try:
             response = await self.request_service.request(
@@ -55,9 +55,10 @@ class AssignmentBaseHandler(ExtensionBaseHandler):
     async def post(self, lecture_id: int):
         """Sends post-request to the grader service to create an assignment
 
-        Args:
-            lecture_id (int): id of the lecture in which the new assignment is
-        """
+        :param lecture_id: id of the lecture in which the new assignment is
+        :type lecture_id: int
+        """        
+
         data = tornado.escape.json_decode(self.request.body)
         try:
             response = await self.request_service.request(
@@ -97,12 +98,14 @@ class AssignmentBaseHandler(ExtensionBaseHandler):
 )
 class AssignmentObjectHandler(ExtensionBaseHandler):
     async def put(self, lecture_id: int, assignment_id: int):
-        """ Sends a PUT-request to the grader service to update a assignment
+        """Sends a PUT-request to the grader service to update a assignment
 
-        Args:
-            lecture_id (int): id of the lecture
-            assignment_id (int): id of the assignment
-        """
+        :param lecture_id: id of the lecture
+        :type lecture_id: int
+        :param assignment_id: id of the assignment
+        :type assignment_id: int
+        """        
+
         data = tornado.escape.json_decode(self.request.body)
         try:
             response = await self.request_service.request(
@@ -118,12 +121,14 @@ class AssignmentObjectHandler(ExtensionBaseHandler):
         self.write(json.dumps(response))
 
     async def get(self, lecture_id: int, assignment_id: int):
-        """ Sends a GET-request to the grader service to get a specific assignment
+        """Sends a GET-request to the grader service to get a specific assignment
 
-        Args:
-            lecture_id (int): id of the lecture
-            assignment_id (int): id of the specific assignment
-        """
+        :param lecture_id: id of the lecture
+        :type lecture_id: int
+        :param assignment_id: id of the specific assignment
+        :type assignment_id: int
+        """        
+
         query_params = RequestService.get_query_string(
             {
                 "instructor-version": self.get_argument("instructor-version", None),
@@ -156,10 +161,12 @@ class AssignmentObjectHandler(ExtensionBaseHandler):
     async def delete(self, lecture_id: int, assignment_id: int):
         """Sends a DELETE-request to the grader service to "soft"-delete a assignment
 
-        Args:
-            lecture_id (int): id of the lecture
-            assignment_id (int): id of the assignment
-        """
+        :param lecture_id: id of the lecture
+        :type lecture_id: int
+        :param assignment_id: id of the assignment
+        :type assignment_id: int
+        """        
+
         try:
             assignment = await self.request_service.request(
                 method="GET",

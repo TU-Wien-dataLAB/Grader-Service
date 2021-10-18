@@ -26,23 +26,12 @@ Table assignment as A {
   points int
 }
 
-Table file as F {
-  id int [pk, increment]
-  name varchar
-  assignid int [ref: > A.id]
-  path varchar
-  exercise boolean
-  points int
-}
-
 Table submission as S {
   id int [pk, increment]
   date datetime
   assignid int [ref: > A.id]
   userid int [ref: > U.id]
-}
-
-Table feedback as Fe {
-  subid int [pk,ref: - S.id]
-  score int
+  commit_hash varchar
+  auto_status varchar
+  manual_status varchar
 }

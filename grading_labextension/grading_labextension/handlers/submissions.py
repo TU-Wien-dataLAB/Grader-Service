@@ -12,9 +12,10 @@ class SubmissionHandler(ExtensionBaseHandler):
     async def get(self, lecture_id: int, assignment_id: int):
         """ Sends a GET-request to the grader service and returns submissions of a assignment
 
-        Args:
-            lecture_id (int): id of the lecture
-            assignment_id (int): id of the assignment
+        :param lecture_id: id of the lecture
+        :type lecture_id: int
+        :param assignment_id: id of the assignment
+        :type assignment_id: int
         """
         query_params = RequestService.get_query_string(
             {
@@ -40,13 +41,16 @@ class SubmissionHandler(ExtensionBaseHandler):
 )
 class SubmissionPropertiesHandler(ExtensionBaseHandler):
     async def get(self, lecture_id: int, assignment_id: int, submission_id: int):
-        """ Sends a GET-request to the grader service and returns the properties of a submission
+        """Sends a GET-request to the grader service and returns the properties of a submission
 
-        Args:
-            lecture_id (int): id of the lecture
-            assignment_id (int): id of the assignment
-            submission_id (int): id of the submission
-        """
+        :param lecture_id: id of the lecture
+        :type lecture_id: int
+        :param assignment_id: id of the assignment
+        :type assignment_id: int
+        :param submission_id: id of the submission
+        :type submission_id: int
+        """        
+
         try:
             response = await self.request_service.request(
                 method="GET",
@@ -62,10 +66,12 @@ class SubmissionPropertiesHandler(ExtensionBaseHandler):
     async def put(self, lecture_id: int, assignment_id: int, submission_id: int):
         """ Sends a PUT-request to the grader service to update the properties of a submission
 
-        Args:
-            lecture_id (int): id of the lecture
-            assignment_id (int): id of the assignment
-            submission_id (int): id of the submission
+        :param lecture_id: id of the lecture
+        :type lecture_id: int
+        :param assignment_id: id of the assignment
+        :type assignment_id: int
+        :param submission_id: id of the submission
+        :type submission_id: int
         """
         try:
             await self.request_service.request(
