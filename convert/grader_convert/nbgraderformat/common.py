@@ -1,6 +1,7 @@
 import json
 import os
 
+import jsonschema
 from jsonschema import ValidationError
 from nbformat.notebooknode import NotebookNode
 from traitlets.config import LoggingConfigurable
