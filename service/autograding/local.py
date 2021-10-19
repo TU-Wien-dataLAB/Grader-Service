@@ -37,7 +37,9 @@ class AutogradingStatus:
 
 
 class LocalAutogradeExecutor(LoggingConfigurable):
-
+    """Runs an autograde job on the local machine with the default Python environment. 
+    Sets up the necessary directories and the gradebook JSON file used by :mod:`grader_convert`.
+    """    
     base_input_path = Unicode(None, allow_none=False).tag(config=True)
     base_output_path = Unicode(None, allow_none=False).tag(config=True)
 
@@ -45,6 +47,15 @@ class LocalAutogradeExecutor(LoggingConfigurable):
     git_executable = Unicode("git", allow_none=False).tag(config=True)
 
     def __init__(self, grader_service_dir: str, submission: Submission, **kwargs):
+        """Creates the executor in the input and output directories that are specified by :attr:`base_input_path` and :attr:`base_output_path`.
+        The grader service directory is used for accessing the git repositories to push the grading results.
+        All the necessary information and database session can be retrieved from the submission object. The associated session of the subission has to be available and must not be closed beforehand.
+
+        :param grader_service_dir: The base directory of the whole grader service specified in the configuration.
+        :type grader_service_dir: str
+        :param submission: The subission object which should be graded by the executor.
+        :type submission: Submission
+        """        
         super().__init__(**kwargs)
         self.grader_service_dir = grader_service_dir
         self.submission = submission
@@ -55,6 +66,8 @@ class LocalAutogradeExecutor(LoggingConfigurable):
         self.autograding_status: str = None
 
     async def start(self):
+        """Starts the autograding job. This is the only method that is exposed to the client.
+        """        
         await self._pull_submission()
         self.autograding_start = datetime.now()
         await self._run()
@@ -73,6 +86,9 @@ class LocalAutogradeExecutor(LoggingConfigurable):
         return os.path.join(self.base_output_path, f"submission_{self.submission.id}")
 
     def _write_gradebook(self):
+        """Writes the gradebook of the submission to the output directory where it will be used by :mod:`grader_convert` to load the data.
+        The name of the written file is gradebook.json.
+        """        
         gradebook_str = self.submission.assignment.properties
         if not os.path.exists(self.output_path):
             os.mkdir(self.output_path)
@@ -82,6 +98,10 @@ class LocalAutogradeExecutor(LoggingConfigurable):
             f.write(gradebook_str)
 
     async def _pull_submission(self):
+        """Pulls the submission repository based on the assignment type.
+
+        :raises ValueError: [description]
+        """        
         if not os.path.exists(self.input_path):
             os.mkdir(self.input_path)
 
