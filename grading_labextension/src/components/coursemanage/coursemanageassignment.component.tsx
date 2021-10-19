@@ -369,19 +369,22 @@ export class CourseManageAssignmentComponent extends React.Component<
   }
 
   private async editAssignment() {
+    if (this.state.assignment.status !== "released") {
     const name: Dialog.IResult<string> = await LabInputDialog.getText({
       title: 'Assignment name',
       placeholder: this.state.assignment.name
     });
     if (!name.button.accept) {
       return;
-    }
+      } 
+    
     const date: Dialog.IResult<string> = await InputDialog.getDate({
       title: 'Input Deadline'
     });
     if (!date.button.accept) {
       return;
     }
+
     const type: Dialog.IResult<string> = await LabInputDialog.getItem({
       title: 'Assignment Type',
       items: ['user', 'group'],
@@ -411,6 +414,7 @@ export class CourseManageAssignmentComponent extends React.Component<
       assignment => this.setState({ assignment }),
       error => showErrorMessage('Error Updating Assignment', error)
     );
+    }
   }
 
   public assignment() {
@@ -441,6 +445,7 @@ export class CourseManageAssignmentComponent extends React.Component<
                 icon="edit"
                 outlined
                 className="assignment-button"
+                disabled={this.state.assignment.status === "released"}
                 onClick={() => this.editAssignment()}
               >
                 Edit
@@ -450,6 +455,7 @@ export class CourseManageAssignmentComponent extends React.Component<
                 intent={'success'}
                 outlined
                 className="assignment-button"
+                disabled={this.state.assignment.status === "released"}
                 onClick={() => this.pushAssignment()}
               >
                 Push
@@ -459,6 +465,7 @@ export class CourseManageAssignmentComponent extends React.Component<
                 intent={'primary'}
                 outlined
                 className="assignment-button"
+                disabled={this.state.assignment.status === "released"}
                 onClick={() => this.pullAssignment()}
               >
                 {' '}
