@@ -378,12 +378,7 @@ export class CourseManageAssignmentComponent extends React.Component<
       return;
       } 
     
-    const date: Dialog.IResult<string> = await InputDialog.getDate({
-      title: 'Input Deadline'
-    });
-    if (!date.button.accept) {
-      return;
-    }
+
 
     const type: Dialog.IResult<string> = await LabInputDialog.getItem({
       title: 'Assignment Type',
@@ -392,12 +387,6 @@ export class CourseManageAssignmentComponent extends React.Component<
     });
     if (!type.button.accept) {
       return;
-    }
-
-    if (date.value === '') {
-      this.state.assignment.due_date = null;
-    } else {
-      this.state.assignment.due_date = localToUTC(date.value);
     }
 
     if (type.value === 'user') {
@@ -410,11 +399,24 @@ export class CourseManageAssignmentComponent extends React.Component<
       this.state.assignment.name = name.value;
     }
 
+  }
+  const date: Dialog.IResult<string> = await InputDialog.getDate({
+      title: 'Input Deadline'
+    });
+    if (!date.button.accept) {
+      return;
+    }
+    if (date.value === '') {
+      this.state.assignment.due_date = null;
+    } else {
+      this.state.assignment.due_date = localToUTC(date.value);
+      }
+    
+  
     updateAssignment(this.lecture.id, this.state.assignment).subscribe(
       assignment => this.setState({ assignment }),
       error => showErrorMessage('Error Updating Assignment', error)
     );
-    }
   }
 
   public assignment() {
