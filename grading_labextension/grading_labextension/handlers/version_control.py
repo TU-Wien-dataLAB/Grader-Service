@@ -1,11 +1,13 @@
 import json
-import sys
 import os
-from grading_labextension.registry import register_handler
+import sys
+from urllib.parse import unquote, quote
+
+from grader_convert.converters.generate_assignment import GenerateAssignment
 from grading_labextension.handlers.base_handler import ExtensionBaseHandler
+from grading_labextension.registry import register_handler
 from grading_labextension.services.git import GitError, GitService
 from tornado.httpclient import HTTPError, HTTPResponse
-from grader_convert.converters.generate_assignment import GenerateAssignment
 
 
 @register_handler(
@@ -13,7 +15,7 @@ from grader_convert.converters.generate_assignment import GenerateAssignment
 )
 class GenerateHandler(ExtensionBaseHandler):
     async def put(self, lecture_id: int, assignment_id: int):
-        """ Generates the release files from the source files of a assignment
+        """Generates the release files from the source files of a assignment
 
         :param lecture_id: id of the lecture
         :type lecture_id: int
@@ -67,7 +69,7 @@ class GenerateHandler(ExtensionBaseHandler):
 )
 class PullHandler(ExtensionBaseHandler):
     async def get(self, lecture_id: int, assignment_id: int, repo: str):
-        """ Creates a local repository and pulls the specified repo type
+        """Creates a local repository and pulls the specified repo type
 
         :param lecture_id: id of the lecture
         :type lecture_id: int
@@ -121,7 +123,7 @@ class PullHandler(ExtensionBaseHandler):
 )
 class PushHandler(ExtensionBaseHandler):
     async def put(self, lecture_id: int, assignment_id: int, repo: str):
-        """ Pushes from the local repositories to remote
+        """Pushes from the local repositories to remote
             If the repo type is release, it also generate the release files and updates the assignment properties in the grader service
 
         :param lecture_id: id of the lecture
@@ -232,3 +234,57 @@ class PushHandler(ExtensionBaseHandler):
             self.write_error(400)
             return
         self.write("OK")
+
+
+@register_handler(
+    path=r"\/(?P<lecture_id>\d*)\/(?P<assignment_id>\d*)\/(?P<notebook_name>.*)"
+)
+class NotebookAccessHandler(ExtensionBaseHandler):
+    async def get(self, lecture_id: int, assignment_id: int, notebook_name: str):
+        notebook_name = unquote(notebook_name)
+
+        try:
+            lecture = await self.request_service.request(
+                "GET",
+                f"{self.base_url}/lectures/{lecture_id}",
+                header=self.grader_authentication_header,
+            )
+            assignment = await self.request_service.request(
+                "GET",
+                f"{self.base_url}/lectures/{lecture_id}/assignments/{assignment_id}",
+                header=self.grader_authentication_header,
+            )
+        except HTTPError as e:
+            self.set_status(e.code)
+            self.write_error(e.code)
+            return
+
+        git_service = GitService(
+            lecture_code=lecture["code"],
+            assignment_name=assignment["name"],
+            repo_type="release",
+            config=self.config,
+            force_user_repo=True,
+        )
+
+        if not git_service.is_git():
+            try:
+                git_service.init()
+                git_service.set_author()
+                git_service.set_remote(f"grader_release")
+                git_service.pull(f"grader_release", force=True)
+                self.write("OK")
+            except GitError as e:
+                self.log.error("GitError:\n" + e.error)
+                self.write_error(400)
+
+        # http://128.130.202.214:8080/user/ubuntu/lab/tree/20wle2/Assignment%201/6%20-%20Truth%20Tables.ipynb
+        try:
+            username = self.get_current_user()["name"]
+        except TypeError as e:
+            self.log.error(e)
+            self.write_error(403)
+            return
+        url = f'/user/{username}/lab/tree/{lecture["code"]}/{quote(assignment["name"])}/{quote(notebook_name)}'
+        self.log.info(f"Redirecting to {url}")
+        self.redirect(url)
