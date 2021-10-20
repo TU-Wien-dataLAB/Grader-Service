@@ -80,6 +80,7 @@ components:
           type: string
           enum:
             - created # another state of an assignment (instructor only)
+            - pushed
             - released
             - fetching
             - fetched

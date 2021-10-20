@@ -251,6 +251,14 @@ export class CourseManageAssignmentComponent extends React.Component<
     } catch (err) {
       showErrorMessage('Error Pushing Assignment', err);
     }
+    //TODO: should be atomar with the pushAssignment function
+    let a = this.state.assignment;
+    a.status = 'pushed';
+    updateAssignment(this.lecture.id, a).subscribe(
+      assignment => this.setState({ assignment }),
+      error => showErrorMessage('Error Updating Assignment', error)
+    );
+    
   }
 
   private async pullAssignment() {
@@ -370,37 +378,37 @@ export class CourseManageAssignmentComponent extends React.Component<
 
   private async editAssignment() {
     if (this.state.assignment.status !== "released") {
-    const name: Dialog.IResult<string> = await LabInputDialog.getText({
-      title: 'Assignment name',
-      placeholder: this.state.assignment.name
-    });
-    if (!name.button.accept) {
-      return;
-      } 
-    
+      const name: Dialog.IResult<string> = await LabInputDialog.getText({
+        title: 'Assignment name',
+        placeholder: this.state.assignment.name
+      });
+      if (!name.button.accept) {
+        return;
+      }
 
 
-    const type: Dialog.IResult<string> = await LabInputDialog.getItem({
-      title: 'Assignment Type',
-      items: ['user', 'group'],
-      current: this.state.assignment.type === Assignment.TypeEnum.User ? 0 : 1
-    });
-    if (!type.button.accept) {
-      return;
+
+      const type: Dialog.IResult<string> = await LabInputDialog.getItem({
+        title: 'Assignment Type',
+        items: ['user', 'group'],
+        current: this.state.assignment.type === Assignment.TypeEnum.User ? 0 : 1
+      });
+      if (!type.button.accept) {
+        return;
+      }
+
+      if (type.value === 'user') {
+        this.state.assignment.type = Assignment.TypeEnum.User;
+      } else {
+        this.state.assignment.type = Assignment.TypeEnum.Group;
+      }
+
+      if (name.value !== '') {
+        this.state.assignment.name = name.value;
+      }
+
     }
-
-    if (type.value === 'user') {
-      this.state.assignment.type = Assignment.TypeEnum.User;
-    } else {
-      this.state.assignment.type = Assignment.TypeEnum.Group;
-    }
-
-    if (name.value !== '') {
-      this.state.assignment.name = name.value;
-    }
-
-  }
-  const date: Dialog.IResult<string> = await InputDialog.getDate({
+    const date: Dialog.IResult<string> = await InputDialog.getDate({
       title: 'Input Deadline'
     });
     if (!date.button.accept) {
@@ -410,9 +418,9 @@ export class CourseManageAssignmentComponent extends React.Component<
       this.state.assignment.due_date = null;
     } else {
       this.state.assignment.due_date = localToUTC(date.value);
-      }
-    
-  
+    }
+
+
     updateAssignment(this.lecture.id, this.state.assignment).subscribe(
       assignment => this.setState({ assignment }),
       error => showErrorMessage('Error Updating Assignment', error)
@@ -478,6 +486,7 @@ export class CourseManageAssignmentComponent extends React.Component<
                 icon="cloud-upload"
                 outlined
                 className="assignment-button"
+                disabled={this.state.assignment.status !== "pushed" && this.state.assignment.status !== "released"}
                 intent={this.state.assignment.status == "released" ? "danger" : "none"}
                 onClick={this.state.assignment.status == "released" ?
                   () => this.withholdAssignment()

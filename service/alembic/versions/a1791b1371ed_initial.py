@@ -40,7 +40,7 @@ def upgrade():
     sa.Column('lectid', sa.Integer(), nullable=True),
     sa.Column('duedate', sa.DateTime(), nullable=True),
     sa.Column('points', sa.Integer(), nullable=False),
-    sa.Column('status', sa.Enum('created', 'released', 'fetching', 'fetched', 'complete'), nullable=True),
+    sa.Column('status', sa.Enum('created','pushed', 'released', 'fetching', 'fetched', 'complete'), nullable=True),
     sa.Column('deleted', sa.Enum('active', 'deleted'), server_default='active', nullable=False),
     sa.Column('properties', sa.Text(), nullable=True, unique=False),
 

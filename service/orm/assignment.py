@@ -14,7 +14,7 @@ class Assignment(Base, Serializable):
     duedate = Column(DateTime, nullable=False)
     points = Column(Integer, nullable=True)
     status = Column(
-        Enum("created", "released", "fetching", "fetched", "complete"),
+        Enum("created","pushed", "released", "fetching", "fetched", "complete"),
         default="created",
     )
     deleted = Column(Enum(DeleteState), nullable=False, unique=False)
