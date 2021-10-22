@@ -1,4 +1,5 @@
+SQLAlchemy==1.4.22
 tornado==6.1
-jupyter_server==1.6.2
-tornado_sqlalchemy==0.7.0
-grader.service
+six==1.16.0
+pytest==6.2.4
+traitlets==5.0.5

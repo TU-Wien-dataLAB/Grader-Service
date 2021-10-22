@@ -301,6 +301,16 @@ export class AssignmentComponent extends React.Component<AssignmentProps> {
               >
                 Fetch
               </Button>
+              {this.state.assignment.type === "group" ? 
+              <span>
+                <Button intent='success' outlined className='assignment-button' icon="git-push">
+                    Push
+                </Button> 
+                <Button intent='primary' outlined className='assignment-button' icon="git-pull">
+                    Pull                  
+                </Button> 
+                </span>
+              : null}
               <Button
                 className="assignment-button"
                 onClick={this.submitAssignment}
