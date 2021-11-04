@@ -116,6 +116,19 @@ class SubmissionObjectHandler(GraderBaseHandler):
     async def get(self, lecture_id: int, assignment_id: int, submission_id: int):
         submission = self.session.query(Submission).get(submission_id)
         self.write_json(submission)
+    
+    async def put(self, lecture_id: int, assignment_id: int, submission_id: int):
+        body = tornado.escape.json_decode(self.request.body)
+        sub_model = SubmissionModel.from_dict(body)
+        sub = self.session.query(Submission).get(submission_id)
+        sub.date = sub_model.submitted_at
+        sub.assignid = assignment_id
+        sub.username = self.user.name
+        sub.auto_status = sub_model.auto_status
+        sub.manual_status = sub_model.manual_status
+        sub.feedback_available = sub_model.feedback_available or False
+        self.session.commit()
+        self.write_json(sub)
 
 
 @register_handler(
@@ -145,3 +158,4 @@ class SubmissionPropertiesHandler(GraderBaseHandler):
         submission.properties = properties_string
         self.session.commit()
         self.write_json(submission)
+
