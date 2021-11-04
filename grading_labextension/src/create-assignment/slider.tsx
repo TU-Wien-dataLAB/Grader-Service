@@ -11,15 +11,16 @@ import { CellPlayButton } from './widget';
 import { UserPermissions, Scope } from '../services/permission.service';
 import { GradeCellWidget } from '../manual-grading/grade-cell-widget';
 import { GradeCommentCellWidget } from '../manual-grading/grade-comment-cell-widget';
-import { getProperties, updateProperties } from '../services/submissions.service';
+import { getProperties, getSubmission, updateProperties, updateSubmission } from '../services/submissions.service';
 import { getAllLectures } from '../services/lectures.service';
 import { getAllAssignments } from '../services/assignments.service';
 import { GradeBook } from '../services/gradebook';
 import { Lecture } from '../model/lecture';
 import { Assignment } from '../model/assignment';
 import { showErrorMessage } from '@jupyterlab/apputils';
+import { request } from '../services/request.service';
 export class CreationmodeSwitch extends ReactWidget {
-  public ref: React.RefObject<CreationmodeSwitchComponent>;
+  public ref: React.RefObject<SwitchComponent>;
   public component: JSX.Element;
   public mode: boolean;
 
@@ -35,7 +36,7 @@ export class CreationmodeSwitch extends ReactWidget {
     };
 
     this.component = (
-      <CreationmodeSwitchComponent
+      <SwitchComponent
         notebook={notebook}
         notebookpanel={notebookpanel}
         creationmode={creationmode}
@@ -56,7 +57,7 @@ export interface ICreationmodeSwitchProps {
   onChange: any;
 }
 
-export class CreationmodeSwitchComponent extends React.Component<ICreationmodeSwitchProps> {
+export class SwitchComponent extends React.Component<ICreationmodeSwitchProps> {
   public state = {
     creationmode: false,
     gradingmode: false,
@@ -171,10 +172,15 @@ export class CreationmodeSwitchComponent extends React.Component<ICreationmodeSw
       this.setState({ saveButtonText: "Saved" })
       //console.log("saved")
       setTimeout(() => this.setState({ saveButtonText: "Save", transition: "show" }), 2000);
+      const submission = await getSubmission(this.lecture.id,this.assignment.id,this.subID).toPromise()
+      console.log(submission)
+      submission.manual_status = "manually_graded"
+      updateSubmission(this.lecture.id,this.assignment.id,this.subID, submission)
     } catch (err) {
       this.setState({ saveButtonText: "Save", transition: "show" });
       showErrorMessage("Error saving properties", err);
     }
+    
 
   }
 

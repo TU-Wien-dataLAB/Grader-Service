@@ -62,3 +62,13 @@ import { request, HTTPMethod } from "./request.service";
     let url = `/lectures/${lectureId}/assignments/${assignmentId}/submissions/${submissionId}/properties`;
     return request<Submission>(HTTPMethod.PUT, url, properties);
   }
+
+  export function getSubmission(lectureId: number, assignmentId: number, submissionId: number): Observable<Submission> {
+    let url = `/lectures/${lectureId}/assignments/${assignmentId}/submissions/${submissionId}`;
+    return request<object>(HTTPMethod.GET, url);
+  }
+
+  export function updateSubmission(lectureId: number, assignmentId: number, submissionId: number, sub: Submission): Observable<Submission> {
+    let url = `/lectures/${lectureId}/assignments/${assignmentId}/submissions/${submissionId}`;
+    return request<Submission>(HTTPMethod.PUT, url, sub);
+  }
