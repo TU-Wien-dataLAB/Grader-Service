@@ -1,7 +1,7 @@
 import { Cell } from '@jupyterlab/cells';
 import { Panel } from '@lumino/widgets';
 import { CellModel, NbgraderData, ToolData } from '../create-assignment/model';
-import { GradeBook } from '../services/gradebook';
+import { GradeBook } from '../../services/gradebook';
 
 const CSS_CELL_HEADER = 'cellHeader';
 const CSS_CELL_ID = 'cellId';

@@ -18,11 +18,11 @@ import { Cell } from '@jupyterlab/cells';
 
 import { INotebookTracker } from '@jupyterlab/notebook';
 
-import { CellWidget } from './create-assignment/cellwidget';
+import { CellWidget } from './components/create-assignment/cellwidget';
 
 import { PanelLayout } from '@lumino/widgets';
 
-import { CreationmodeSwitch } from './create-assignment/slider';
+import { CreationmodeSwitch } from './components/create-assignment/slider';
 
 import { checkIcon, editIcon } from '@jupyterlab/ui-components';
 import { AssignmentList } from './widgets/assignment-list';
@@ -33,7 +33,7 @@ import { ServiceManager } from '@jupyterlab/services';
 import { IDocumentManager } from '@jupyterlab/docmanager';
 import { IFileBrowserFactory } from '@jupyterlab/filebrowser';
 import { UserPermissions } from './services/permission.service';
-import { CellPlayButton } from './create-assignment/widget';
+import { CellPlayButton } from './components/create-assignment/widget';
 import { ManualGradingView } from './widgets/manualgrading';
 import { FeedbackView } from './widgets/feedback';
 
