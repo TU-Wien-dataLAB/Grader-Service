@@ -12,6 +12,7 @@ import {
 import { IconNames } from '@blueprintjs/icons';
 import { GlobalObjects } from '../../index';
 import { showErrorMessage, showDialog, Dialog } from '@jupyterlab/apputils';
+import { InputDialog } from '@jupyterlab/apputils/lib/inputdialog';
 import { Submission } from '../../model/submission';
 import {
   getSubmissions,
@@ -153,18 +154,26 @@ export class AssignmentComponent extends React.Component<AssignmentProps> {
   }
 
   private async fetchAssignment() {
+    const hasFiles = this.dirListing.model.items().next() !== undefined
     try {
-      let result = await showDialog({
+      const type: Dialog.IResult<string> = await InputDialog.getItem({
+        title: 'Select repository to fetch',
+        items: ['release', "assignment"],
+        current: hasFiles ? 1 : 0
+      });
+      if (!type.button.accept) return;
+      const repoType = type.value;
+      const confirm = await showDialog({
         title: 'Fetch Assignment',
-        body: `Do you want to fetch ${this.state.assignment.name}?`,
+        body: `Do you want to fetch ${this.state.assignment.name} from ${repoType}?`,
         buttons: [Dialog.cancelButton(), Dialog.okButton({ label: 'Fetch' })]
       });
-      if (result.button.accept) {
+      if (confirm.button.accept) {
         // update assignment
         await pullAssignment(
           this.lecture.id,
           this.state.assignment.id,
-          'release'
+          repoType
         ).toPromise();
         await this.updateDirListing();
       }
