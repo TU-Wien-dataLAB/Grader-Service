@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { ReactWidget } from '@jupyterlab/apputils';
-import { ManualGradingComponent } from '../components/manual-grading/grade-view';
+import { ManualGradingComponent } from '../components/manualgrade/grade-view';
 
 
 export class ManualGradingView extends ReactWidget {

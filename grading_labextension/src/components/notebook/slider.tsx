@@ -6,11 +6,11 @@ import { ReactWidget } from '@jupyterlab/apputils';
 import { Notebook, NotebookPanel } from '@jupyterlab/notebook';
 import { Cell } from '@jupyterlab/cells';
 import { PanelLayout } from '@lumino/widgets';
-import { CellWidget } from './cellwidget';
-import { CellPlayButton } from './widget';
+import { CellWidget } from './create-assignment/cellwidget';
+import { CellPlayButton } from './create-assignment/widget';
 import { UserPermissions, Scope } from '../../services/permission.service';
-import { GradeCellWidget } from '../manual-grading/grade-cell-widget';
-import { GradeCommentCellWidget } from '../manual-grading/grade-comment-cell-widget';
+import { GradeCellWidget } from './manual-grading/grade-cell-widget';
+import { GradeCommentCellWidget } from './manual-grading/grade-comment-cell-widget';
 import { getProperties, getSubmission, updateProperties, updateSubmission } from '../../services/submissions.service';
 import { getAllLectures } from '../../services/lectures.service';
 import { getAllAssignments } from '../../services/assignments.service';
@@ -19,18 +19,18 @@ import { Lecture } from '../../model/lecture';
 import { Assignment } from '../../model/assignment';
 import { showErrorMessage } from '@jupyterlab/apputils';
 import { request } from '../../services/request.service';
-export class CreationmodeSwitch extends ReactWidget {
+export class NotebookModeSwitch extends ReactWidget {
   public ref: React.RefObject<SwitchComponent>;
   public component: JSX.Element;
   public mode: boolean;
 
   constructor(
-    creationmode: boolean,
+    mode: boolean,
     notebookpanel: NotebookPanel,
     notebook: Notebook
   ) {
     super();
-    this.mode = creationmode;
+    this.mode = mode;
     const onChange = (m: boolean) => {
       this.mode = m;
     };
@@ -39,7 +39,7 @@ export class CreationmodeSwitch extends ReactWidget {
       <SwitchComponent
         notebook={notebook}
         notebookpanel={notebookpanel}
-        creationmode={creationmode}
+        mode={mode}
         onChange={onChange}
       />
     );
@@ -50,17 +50,16 @@ export class CreationmodeSwitch extends ReactWidget {
   }
 }
 
-export interface ICreationmodeSwitchProps {
-  creationmode: boolean;
+export interface ImodeSwitchProps {
+  mode: boolean;
   notebookpanel: NotebookPanel;
   notebook: Notebook;
   onChange: any;
 }
 
-export class SwitchComponent extends React.Component<ICreationmodeSwitchProps> {
+export class SwitchComponent extends React.Component<ImodeSwitchProps> {
   public state = {
-    creationmode: false,
-    gradingmode: false,
+    mode: false,
     saveButtonText: "Save",
     transition: "show"
   };
@@ -77,9 +76,9 @@ export class SwitchComponent extends React.Component<ICreationmodeSwitchProps> {
   private notebookPaths: string[];
   private gradebook: GradeBook;
 
-  public constructor(props: ICreationmodeSwitchProps) {
+  public constructor(props: ImodeSwitchProps) {
     super(props);
-    this.state.creationmode = props.creationmode || false;
+    this.state.mode = props.mode || false;
     this.notebook = props.notebook;
     this.notebookpanel = props.notebookpanel;
     this.notebookPaths = this.notebookpanel.context.contentsModel.path.split("/")
@@ -120,11 +119,11 @@ export class SwitchComponent extends React.Component<ICreationmodeSwitchProps> {
   }
 
   public handleSwitchCreation = () => {
-    this.setState({ creationmode: !this.state.creationmode }, () => {
-      this.onChange(this.state.creationmode);
+    this.setState({ mode: !this.state.mode }, () => {
+      this.onChange(this.state.mode);
       this.notebook.widgets.map((c: Cell) => {
         const currentLayout = c.layout as PanelLayout;
-        if (this.state.creationmode) {
+        if (this.state.mode) {
           currentLayout.insertWidget(0, new CellWidget(c));
         } else {
           currentLayout.widgets.map(w => {
@@ -146,11 +145,11 @@ export class SwitchComponent extends React.Component<ICreationmodeSwitchProps> {
   public handleSwitchGrading = async () => {
     const properties = await getProperties(this.lecture.id, this.assignment.id, this.subID).toPromise()
     this.gradeBook = new GradeBook(properties);
-    this.setState({ gradingmode: !this.state.gradingmode }, () => {
-      this.onChange(this.state.gradingmode);
+    this.setState({ mode: !this.state.mode }, () => {
+      this.onChange(this.state.mode);
       this.notebook.widgets.map((c: Cell) => {
         const currentLayout = c.layout as PanelLayout;
-        if (this.state.gradingmode) {
+        if (this.state.mode) {
           currentLayout.insertWidget(0, new GradeCellWidget(c, this.gradeBook, this.notebookPaths[4].split(".").slice(0, -1).join(".")));
           currentLayout.addWidget(new GradeCommentCellWidget(c, this.gradeBook, this.notebookPaths[4].split(".").slice(0, -1).join(".")))
         } else {
@@ -188,7 +187,7 @@ export class SwitchComponent extends React.Component<ICreationmodeSwitchProps> {
     if (this.isSourceNotebook && this.hasPermissions) {
       return (
         <Switch
-          checked={this.state.creationmode}
+          checked={this.state.mode}
           label="Creationmode"
           onChange={this.handleSwitchCreation}
         />
@@ -197,7 +196,7 @@ export class SwitchComponent extends React.Component<ICreationmodeSwitchProps> {
       return (
         <span id="manual-grade-switch">
           <Switch
-            checked={this.state.gradingmode}
+            checked={this.state.mode}
             label="Gradingmode"
             onChange={this.handleSwitchGrading}
           />
