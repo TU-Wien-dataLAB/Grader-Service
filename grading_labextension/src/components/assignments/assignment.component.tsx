@@ -288,6 +288,16 @@ export class AssignmentComponent extends React.Component<AssignmentProps> {
               className="flavor-icon"
             ></Icon>
             {this.state.assignment.name}
+            {this.state.assignment.type === 'group' && (
+              <Tag
+                icon="people"
+                intent="primary"
+                className="assignment-tag"
+                style={{ marginLeft: '10px' }}
+              >
+                Group
+              </Tag>
+            )}
             {this.state.assignment.status != 'released' && (
               <Tag
                 icon="warning-sign"
@@ -298,6 +308,7 @@ export class AssignmentComponent extends React.Component<AssignmentProps> {
                 Not released for students
               </Tag>
             )}
+
             </span>
             <span className="assignment-header-button">
               <Button
