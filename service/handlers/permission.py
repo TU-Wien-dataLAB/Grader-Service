@@ -8,6 +8,9 @@ from handlers.base_handler import GraderBaseHandler, authorize
 class PermissionHandler(GraderBaseHandler):
     @authorize([Scope.student, Scope.tutor, Scope.instructor])
     async def get(self):
+        """
+        Returns the premissions of a user
+        """
         response = []
         role: Role
         for role in self.user.roles:

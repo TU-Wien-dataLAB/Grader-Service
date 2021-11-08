@@ -17,6 +17,12 @@ from handlers.base_handler import GraderBaseHandler, authorize
 class AssignmentBaseHandler(GraderBaseHandler):
     @authorize([Scope.student, Scope.tutor, Scope.instructor])
     async def get(self, lecture_id: int):
+        """ Returns all assignments of a lecture
+
+        :param lecture_id: id of the lecture
+        :type lecture_id: int
+        :raises HTTPError: throws err if lecture is deleted
+        """
         role = self.session.query(Role).get((self.user.name, lecture_id))
         if role.lecture.deleted == DeleteState.deleted:
             self.error_message = "Not Found"
@@ -42,6 +48,11 @@ class AssignmentBaseHandler(GraderBaseHandler):
 
     @authorize([Scope.instructor])
     async def post(self, lecture_id: int):
+        """Creates a new assignment
+
+        :param lecture_id: id of the lecture
+        :type lecture_id: int
+        """
         body = tornado.escape.json_decode(self.request.body)
         assignment_model = AssignmentModel.from_dict(body)
         assignment = Assignment()
@@ -65,6 +76,14 @@ class AssignmentBaseHandler(GraderBaseHandler):
 class AssignmentObjectHandler(GraderBaseHandler):
     @authorize([Scope.instructor])
     async def put(self, lecture_id: int, assignment_id: int):
+        """Updates an assignment
+
+        :param lecture_id: id of the lecture
+        :type lecture_id: int
+        :param assignment_id: id of the assignment
+        :type assignment_id: int
+        :raises HTTPError: throws err if assignment was not found
+        """
         body = tornado.escape.json_decode(self.request.body)
         assignment_model = AssignmentModel.from_dict(body)
         assignment = self.session.query(Assignment).get(assignment_id)
@@ -81,6 +100,15 @@ class AssignmentObjectHandler(GraderBaseHandler):
 
     @authorize([Scope.student, Scope.tutor, Scope.instructor])
     async def get(self, lecture_id: int, assignment_id: int):
+        """Returns a specific assignment of a lecture
+
+        :param lecture_id: id of the lecture
+        :type lecture_id: int
+        :param assignment_id: id of the assignment
+        :type assignment_id: int
+        :raises HTTPError: throws err if assignment was not found
+        """
+
         instructor_version = self.get_argument("instructor-version", "false") == "true"
         metadata_only = self.get_argument("metadata-only", "false") == "true"
 
@@ -99,6 +127,14 @@ class AssignmentObjectHandler(GraderBaseHandler):
 
     @authorize([Scope.instructor])
     async def delete(self, lecture_id: int, assignment_id: int):
+        """Soft-Deletes a specific assignment
+
+        :param lecture_id: id of the lecture
+        :type lecture_id: int
+        :param assignment_id: id of the assignment
+        :type assignment_id: int
+        :raises HTTPError: throws err if assignment was not found or deleted
+        """
         try:
             assignment = self.session.query(Assignment).get(assignment_id)
             if assignment is None:
@@ -118,6 +154,14 @@ class AssignmentObjectHandler(GraderBaseHandler):
 class AssignmentPropertiesHandler(GraderBaseHandler):
     @authorize([Scope.tutor, Scope.instructor])
     async def get(self, lecture_id: int, assignment_id: int):
+        """Returns the properties of a specific assignment
+
+        :param lecture_id: id of the lecture
+        :type lecture_id: int
+        :param assignment_id: id of the assignment
+        :type assignment_id: int
+        :raises HTTPError: throws err if the assignment or their properties were not found
+        """
         assignment = self.session.query(Assignment).get(assignment_id)
         if assignment is None or assignment.deleted == DeleteState.deleted:
             self.error_message = "Not Found!"
@@ -130,6 +174,14 @@ class AssignmentPropertiesHandler(GraderBaseHandler):
 
     @authorize([Scope.tutor, Scope.instructor])
     async def put(self, lecture_id: int, assignment_id: int):
+        """Updates the properties of a specific assignment
+
+        :param lecture_id: id of the lecture
+        :type lecture_id: int
+        :param assignment_id: id of the assignment
+        :type assignment_id: int
+        :raises HTTPError: throws err if the assignment was not found
+        """
         assignment = self.session.query(Assignment).get(assignment_id)
         if assignment is None or assignment.deleted == DeleteState.deleted:
             self.error_message = "Not Found!"

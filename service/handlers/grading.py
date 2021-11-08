@@ -33,6 +33,16 @@ class GradingAutoHandler(GraderBaseHandler):
 
     @authorize([Scope.tutor, Scope.instructor])
     async def get(self, lecture_id: int, assignment_id: int, sub_id: int):
+        """Starts the autograding process of a submission
+
+        :param lecture_id: id of the lecture
+        :type lecture_id: int
+        :param assignment_id: id of the assignment
+        :type assignment_id: int
+        :param sub_id: id of the submission
+        :type sub_id: int
+        :raises HTTPError: throws err if the submission was not found
+        """
         submission = self.session.query(Submission).get(sub_id)
         if submission is None:
             self.error_message = "Not Found!"
@@ -56,6 +66,16 @@ class GenerateFeedbackHandler(GraderBaseHandler):
             self.session.commit()
 
     async def get(self, lecture_id: int, assignment_id: int, sub_id):
+        """Starts the process of generating feedback for a submission
+
+        :param lecture_id: id of the lecture
+        :type lecture_id: int
+        :param assignment_id: id of the assignment
+        :type assignment_id: int
+        :param sub_id: id of the submission
+        :type sub_id: int
+        :raises HTTPError: throws err if the submission was not found
+        """
         submission = self.session.query(Submission).get(sub_id)
         if submission is None:
             self.error_message = "Not Found!"
