@@ -18,6 +18,20 @@ from handlers.base_handler import GraderBaseHandler, authorize
 class SubmissionHandler(GraderBaseHandler):
     @authorize([Scope.student, Scope.tutor, Scope.instructor])
     async def get(self, lecture_id: int, assignment_id: int):
+        """ Return the submissions of an assignment
+
+        Two query parameter: latest, instructor-version
+
+        latest: only get the latest submissions of users
+        instructor-version: if true, get the submissions of all users in lecture
+                            if false, get own submissions
+
+        :param lecture_id: id of the lecture
+        :type lecture_id: int
+        :param assignment_id: id of the assignment
+        :type assignment_id: int
+        :raises HTTPError: throws err if user is not authorized or the assignment was not found
+        """
         latest = self.get_argument("latest", None) == "true"
         instructor_version = self.get_argument("instructor-version", None) == "true"
 
@@ -93,6 +107,13 @@ class SubmissionHandler(GraderBaseHandler):
 
     @authorize([Scope.student, Scope.tutor, Scope.instructor])
     async def post(self, lecture_id: int, assignment_id: int):
+        """Creates a new submission
+
+        :param lecture_id: id of the lecture
+        :type lecture_id: int
+        :param assignment_id: id of the assignment
+        :type assignment_id: int
+        """
         body = tornado.escape.json_decode(self.request.body)
         sub_model = SubmissionModel.from_dict(body)
         sub = Submission()
@@ -114,10 +135,28 @@ class SubmissionHandler(GraderBaseHandler):
 class SubmissionObjectHandler(GraderBaseHandler):
     @authorize([Scope.tutor, Scope.instructor])
     async def get(self, lecture_id: int, assignment_id: int, submission_id: int):
+        """Returns a specific submission
+
+        :param lecture_id: id of the lecture
+        :type lecture_id: int
+        :param assignment_id: id of the assignment
+        :type assignment_id: int
+        :param submission_id: id of the submission
+        :type submission_id: int
+        """
         submission = self.session.query(Submission).get(submission_id)
         self.write_json(submission)
     
     async def put(self, lecture_id: int, assignment_id: int, submission_id: int):
+        """Updates a specific submission
+
+        :param lecture_id: id of the lecture
+        :type lecture_id: int
+        :param assignment_id: id of the assignment
+        :type assignment_id: int
+        :param submission_id: id of the submission
+        :type submission_id: int
+        """
         body = tornado.escape.json_decode(self.request.body)
         sub_model = SubmissionModel.from_dict(body)
         sub = self.session.query(Submission).get(submission_id)
@@ -138,6 +177,17 @@ class SubmissionObjectHandler(GraderBaseHandler):
 class SubmissionPropertiesHandler(GraderBaseHandler):
     @authorize([Scope.tutor, Scope.instructor])
     async def get(self, lecture_id: int, assignment_id: int, submission_id: int):
+        """ 
+        Returns the properties of a submission
+        
+        :param lecture_id: id of the lecture
+        :type lecture_id: int
+        :param assignment_id: id of the assignment
+        :type assignment_id: int
+        :param submission_id: id of the submission
+        :type submission_id: int
+        :raises HTTPError: throws err if the submission or their properties are not found
+        """
         submission = self.session.query(Submission).get(submission_id)
         if submission is None:
             self.error_message = "Not Found!"
@@ -150,6 +200,17 @@ class SubmissionPropertiesHandler(GraderBaseHandler):
 
     @authorize([Scope.tutor, Scope.instructor])
     async def put(self, lecture_id: int, assignment_id: int, submission_id: int):
+        """
+        Updates the properties of a submission
+
+        :param lecture_id: id of the lecture
+        :type lecture_id: int
+        :param assignment_id: id of the assignment
+        :type assignment_id: int
+        :param submission_id: id of the submission
+        :type submission_id: int
+        :raises HTTPError: throws err if the submission are not found
+        """
         submission = self.session.query(Submission).get(submission_id)
         if submission is None:
             self.error_message = "Not Found!"

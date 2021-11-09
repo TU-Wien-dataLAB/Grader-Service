@@ -14,6 +14,8 @@ from handlers.base_handler import GraderBaseHandler, authorize
 class LectureBaseHandler(GraderBaseHandler):
     @authorize([Scope.student, Scope.tutor, Scope.instructor])
     async def get(self):
+        """Returns all lectures the user can access
+        """
         semester = self.get_argument("semester", None)
         if semester is None:
             lectures = [
@@ -33,6 +35,10 @@ class LectureBaseHandler(GraderBaseHandler):
 
     @authorize([Scope.instructor])
     async def post(self):
+        """Creates a new lecture from a "ghost"-lecture
+
+        :raises HTTPError: throws err if "ghost"-lecture was not found
+        """
         body = tornado.escape.json_decode(self.request.body)
         lecture_model = LectureModel.from_dict(body)
         try:
@@ -64,6 +70,11 @@ class LectureBaseHandler(GraderBaseHandler):
 class LectureObjectHandler(GraderBaseHandler):
     @authorize([Scope.instructor])
     async def put(self, lecture_id: int):
+        """Updates a lecture
+
+        :param lecture_id: id of the lecture
+        :type lecture_id: int
+        """
         body = tornado.escape.json_decode(self.request.body)
         lecture_model = LectureModel.from_dict(body)
         lecture = self.session.query(Lecture).get(lecture_id)
@@ -89,6 +100,13 @@ class LectureObjectHandler(GraderBaseHandler):
 
     @authorize([Scope.instructor])
     async def delete(self, lecture_id: int):
+        """ "Soft"-delete a lecture
+
+        :param lecture_id: id of the lecture
+        :type lecture_id: int
+        :raises HTTPError: throws err if lecture was already deleted or was not found
+
+        """
         try:
             lecture = self.session.query(Lecture).get(Lecture)
             if lecture is None:

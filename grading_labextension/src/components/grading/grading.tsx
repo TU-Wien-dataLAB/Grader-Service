@@ -10,7 +10,7 @@ import { Lecture } from '../../model/lecture';
 import { Submission } from '../../model/submission';
 import { fetchAssignment } from '../../services/assignments.service';
 import { getLecture } from '../../services/lectures.service';
-import { getAllSubmissions } from '../../services/submissions.service';
+import { getAllSubmissions, getSubmission } from '../../services/submissions.service';
 import { showErrorMessage } from '@jupyterlab/apputils';
 import { utcToLocalFormat } from '../../services/datetime.service';
 import {
@@ -269,7 +269,8 @@ export class GradingComponent extends React.Component<IGradingProps> {
           const selectedRowData = this.state.rows.filter(row =>
             selectedIDs.has(row.id)
           );
-          this.setState({ selected: selectedRowData });
+          
+          this.setState({ selected: selectedRowData }, () => {console.log(this.state.selected)});
         }}
       />
     );
@@ -302,7 +303,9 @@ export class GradingComponent extends React.Component<IGradingProps> {
             marginRight: '20px',
             marginBottom: '20px'
           }}
-          onClick={() => { }}
+          onClick={() => {this.state.selected.forEach(async row => {
+            const sub = await getSubmission(this.state.lecture.id,this.state.assignment.id,row.id).toPromise();
+            autogradeSubmission(this.state.lecture,this.state.assignment,sub)})}}
         >
           Autograde selected
         </Button>
@@ -316,7 +319,7 @@ export class GradingComponent extends React.Component<IGradingProps> {
             marginRight: '20px',
             marginBottom: '20px'
           }}
-          onClick={() => { }}
+          onClick={() => {this.state.selected.forEach(row => {generateFeedback(this.state.lecture.id,this.state.assignment.id,row.id)})}}
         >
           Generate Feedback selected
         </Button>

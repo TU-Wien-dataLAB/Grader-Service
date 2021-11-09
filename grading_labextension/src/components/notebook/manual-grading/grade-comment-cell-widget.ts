@@ -1,9 +1,8 @@
 import { Cell } from '@jupyterlab/cells';
 import { Panel } from '@lumino/widgets';
-import { CellModel, NbgraderData, ToolData } from '../create-assignment/model';
-import { GradeBook } from '../services/gradebook';
+import { CellModel, NbgraderData, ToolData } from '../model';
+import { GradeBook } from '../../../services/gradebook';
 
-const CSS_CELL_HEADER = 'cellHeader';
 const CSS_CELL_COMMENT = 'cellComment';
 const CSS_CELL_POINTS = 'cellPoints';
 const CSS_CELL_WIDGET = 'cellWidget';
