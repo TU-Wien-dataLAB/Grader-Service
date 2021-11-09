@@ -114,6 +114,11 @@ class SubmissionHandler(GraderBaseHandler):
         :param assignment_id: id of the assignment
         :type assignment_id: int
         """
+        role = self.session.query(Role).get((self.user.name, lecture_id))
+        if role.lecture.deleted == DeleteState.deleted or self.session.query(Assignment).get(assignment_id) is None:
+            self.error_message = "Not Found"
+            raise HTTPError(404)
+
         body = tornado.escape.json_decode(self.request.body)
         sub_model = SubmissionModel.from_dict(body)
         sub = Submission()

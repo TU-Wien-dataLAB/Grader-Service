@@ -21,7 +21,6 @@ tags:
 - name: "Version Control"
   description: Pulling and pushing assignments
 
-# TODO: handle "sub-assignments"
 paths:
   /lectures:
     $ref: './openapi/paths.yml#/lectures'
@@ -38,23 +37,17 @@ paths:
   /lectures/{lect_id}/assignments/{a_id}/submissions:
     $ref: './openapi/paths.yml#/submissions'
 
-  /lectures/{lect_id}/assignments/{a_id}/feedback:
-    $ref: './openapi/paths.yml#/feedback'
-  
-  /lectures/{lect_id}/assignments/{a_id}/feedback/{f_id}:
-    $ref: './openapi/paths.yml#/feedbackById'
+  /lectures/{lect_id}/assignments/{a_id}/submissions/{s_id}:
+    $ref: './openapi/paths.yml#/submissionsById'
 
-  /lectures/{lect_id}/assignments/{a_id}/grading:
-    $ref: './openapi/paths.yml#/grading'
+  /lectures/{lect_id}/assignments/{a_id}/submissions/{s_id}/properties:
+    $ref: './openapi/paths_grader.yml#/propertiesSubmission'
 
   /lectures/{lect_id}/assignments/{a_id}/grading/{user_id}/auto:
     $ref: './openapi/paths.yml#/auto'
 
-  /lectures/{lect_id}/assignments/{a_id}/grading/{user_id}/manual:
-    $ref: './openapi/paths.yml#/manual'
-
-  /lectures/{lect_id}/assignments/{a_id}/grading/{user_id}/score:
-    $ref: './openapi/paths.yml#/score'
+  /lectures/{lect_id}/assignments/{a_id}/grading/{s_id}/feedback:
+    $ref: './openapi/paths.yml#/feedback'
   
   /permissions:
     $ref: './openapi/paths.yml#/permissions'

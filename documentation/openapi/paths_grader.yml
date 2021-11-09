@@ -80,6 +80,13 @@ assignmentsById:
       schema:
         type: integer
         format: int64
+    - name: instructor-version
+      in: query
+      description: Whether to fetch the all submissions of students
+      required: false
+      schema:
+        type: boolean
+        default: false
     responses:
       200:
         description: OK
@@ -307,7 +314,7 @@ propertiesAssignment:
         - instructor
         - tutor
         - student
-    summary: "Request the assignment to be fetched"
+    summary: "Get properties of an assignment"
     tags: 
     - "Assignments"
     parameters:
@@ -414,7 +421,7 @@ propertiesSubmission:
         - instructor
         - tutor
         - student
-    summary: "Request the assignment to be fetched"
+    summary: "Get properties of a submission"
     tags: 
     - "Submissions"
     parameters:
