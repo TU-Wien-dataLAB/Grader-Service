@@ -20,5 +20,5 @@
     "target": "es2017",
     "types": []
   },
-  "include": ["src/**/*.ts", "src/*", "src/**/*.tsx","src/**/**/*.tsx", "src/components/manual-grading", "src/components/create-assignment"]
+  "include": ["src/**/*.ts", "src/*", "src/**/*.tsx","src/**/**/*.tsx","src/**/**/**/*.tsx"]
 }
