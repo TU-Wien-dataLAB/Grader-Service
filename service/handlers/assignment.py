@@ -42,6 +42,11 @@ class AssignmentBaseHandler(GraderBaseHandler):
 
     @authorize([Scope.instructor])
     async def post(self, lecture_id: int):
+        role = self.session.query(Role).get((self.user.name, lecture_id))
+        if role.lecture.deleted == DeleteState.deleted:
+            self.error_message = "Not Found"
+            raise HTTPError(404)
+
         body = tornado.escape.json_decode(self.request.body)
         assignment_model = AssignmentModel.from_dict(body)
         assignment = Assignment()
@@ -82,7 +87,6 @@ class AssignmentObjectHandler(GraderBaseHandler):
     @authorize([Scope.student, Scope.tutor, Scope.instructor])
     async def get(self, lecture_id: int, assignment_id: int):
         instructor_version = self.get_argument("instructor-version", "false") == "true"
-        metadata_only = self.get_argument("metadata-only", "false") == "true"
 
         role = self.session.query(Role).get((self.user.name, lecture_id))
         if instructor_version and role.role < Scope.instructor:
