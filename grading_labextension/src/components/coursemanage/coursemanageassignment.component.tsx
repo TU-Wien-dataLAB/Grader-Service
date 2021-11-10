@@ -327,9 +327,9 @@ export class CourseManageAssignmentComponent extends React.Component<
     }
 
     try {
+      this.state.assignment.status = 'created';
       let a = await updateAssignment(this.lecture.id, this.state.assignment).toPromise()
       this.setState({ assignment: a })
-      this.state.assignment.status = 'created';
     } catch (err) {
       showErrorMessage('Error Withholding Assignment', err);
     }

@@ -123,5 +123,4 @@ export class GradeCommentCellWidget extends Panel {
     element.appendChild(label);
     return element;
   }
-
 }
