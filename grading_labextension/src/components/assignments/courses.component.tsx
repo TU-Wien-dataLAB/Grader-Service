@@ -44,7 +44,7 @@ export class CoursesComponent extends React.Component<CoursesProps> {
       <div className="course-list">
         <div className='course-header'>
           <h1>
-            <p >Assignments</p>
+            <p>Assignments</p>
           </h1>
           <Button id="reload-button" onClick={() => this.getLectures()} icon={IconNames.REFRESH} outlined intent={Intent.SUCCESS}>Reload</Button>
           </div>
