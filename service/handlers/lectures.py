@@ -92,7 +92,7 @@ class LectureObjectHandler(GraderBaseHandler):
     @authorize([Scope.student, Scope.tutor, Scope.instructor])
     async def get(self, lecture_id: int):
         role = self.session.query(Role).get((self.user.name, lecture_id))
-        if role is None:
+        if role is None: # raise unauthorized if not found
             self.error_message = "Unauthorized"
             raise HTTPError(403)
 

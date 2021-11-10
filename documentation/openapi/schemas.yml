@@ -91,8 +91,10 @@ components:
       example:
         id: 1
         name: "assignment_1"
+        type: "user"
         due_date: "2021-07-21T23:55:00Z"
         status: "released"
+        points: 10.5
     Exercise:
       type: "object"
       properties:

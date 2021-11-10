@@ -53,6 +53,10 @@ class AssignmentBaseHandler(GraderBaseHandler):
         :param lecture_id: id of the lecture
         :type lecture_id: int
         """
+        role = self.session.query(Role).get((self.user.name, lecture_id))
+        if role.lecture.deleted == DeleteState.deleted:
+            self.error_message = "Not Found"
+            raise HTTPError(404)
         body = tornado.escape.json_decode(self.request.body)
         assignment_model = AssignmentModel.from_dict(body)
         assignment = Assignment()
@@ -110,7 +114,6 @@ class AssignmentObjectHandler(GraderBaseHandler):
         """
 
         instructor_version = self.get_argument("instructor-version", "false") == "true"
-        metadata_only = self.get_argument("metadata-only", "false") == "true"
 
         role = self.session.query(Role).get((self.user.name, lecture_id))
         if instructor_version and role.role < Scope.instructor:
@@ -141,7 +144,25 @@ class AssignmentObjectHandler(GraderBaseHandler):
                 raise HTTPError(404)
             if assignment.deleted == 1:
                 raise HTTPError(404)
-            assignment.deleted = 1
+            
+            if len(assignment.submissions) > 0:
+                self.error_message = 'Cannot delete assignment that has submissions'
+                raise HTTPError(400)
+            
+            if assignment.status in ["released", "complete"]:
+                self.error_message = f'Cannot delete assignment with status "{assignment.status}"'
+                raise HTTPError(400)
+
+            previously_deleted = self.session.query(Assignment).filter(
+                Assignment.lectid == lecture_id,
+                Assignment.name == assignment.name,
+                Assignment.deleted == DeleteState.deleted,
+            ).one_or_none()
+            if previously_deleted is not None:
+                self.session.delete(previously_deleted)
+                self.session.commit()
+
+            assignment.deleted = DeleteState.deleted
             self.session.commit()
         except ObjectDeletedError:
             raise HTTPError(404)
