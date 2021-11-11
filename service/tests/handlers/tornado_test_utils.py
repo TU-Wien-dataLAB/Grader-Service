@@ -6,23 +6,25 @@ from tornado_sqlalchemy import SQLAlchemy
 from alembic.config import Config
 from alembic.command import upgrade
 
-
-@pytest.fixture
-def sql_alchemy_db():
+@pytest.fixture(scope="module")
+def db_test_config():
     cfg = Config(
         os.path.abspath(os.path.dirname(__file__) + "../../../alembic_test.ini")
     )
+    yield cfg
+
+@pytest.fixture(scope="function")
+def sql_alchemy_db(db_test_config):
     db = SQLAlchemy(url="sqlite:///:memory:")
     engine = db.engine
     with engine.begin() as connection:
-        cfg.attributes["connection"] = connection
+        db_test_config.attributes["connection"] = connection
         # downgrade(cfg, "base")
-        upgrade(cfg, "head")
-
+        upgrade(db_test_config, "head")
     yield db
 
 
-@pytest.fixture
+@pytest.fixture(scope="function")
 def app(tmpdir, sql_alchemy_db):
     service_dir = str(tmpdir.mkdir("grader_service"))
     handlers = HandlerPathRegistry.handler_list()
@@ -36,13 +38,18 @@ def app(tmpdir, sql_alchemy_db):
     yield application
 
 
-@pytest.fixture
+@pytest.fixture(scope="module")
 def service_base_url():
     base_url = "/services/grader"
     yield base_url
 
+@pytest.fixture(scope="function")
+def service_url(base_url, service_base_url):
+    url = base_url + service_base_url
+    yield url
 
-@pytest.fixture
+
+@pytest.fixture(scope="function")
 def jupyter_hub_mock_server(httpserver):
     def for_user(login_user: dict, token: str):
         httpserver.expect_request(f"/authorizations/token/{token}").respond_with_json(
@@ -51,9 +58,8 @@ def jupyter_hub_mock_server(httpserver):
         return httpserver
 
     yield for_user
-    httpserver.stop()
 
-@pytest.fixture
+@pytest.fixture(scope="function")
 def default_user():
     user = {
         "kind": "user",
@@ -63,7 +69,7 @@ def default_user():
     }
     yield user
 
-@pytest.fixture
+@pytest.fixture(scope="function")
 def default_token():
     token = "some_token"
     yield token
