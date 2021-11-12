@@ -58,7 +58,11 @@ class AssignmentBaseHandler(GraderBaseHandler):
             self.error_message = "Not Found"
             raise HTTPError(404)
         body = tornado.escape.json_decode(self.request.body)
-        assignment_model = AssignmentModel.from_dict(body)
+        try:
+            assignment_model = AssignmentModel.from_dict(body)
+        except ValueError as e:
+            self.error_message = str(e)
+            raise HTTPError(400)
         assignment = Assignment()
 
         assignment.name = assignment_model.name

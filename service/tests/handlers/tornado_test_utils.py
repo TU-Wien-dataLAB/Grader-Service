@@ -1,10 +1,13 @@
 import os
+from re import S
 import pytest
 from registry import HandlerPathRegistry
 from server import GraderServer
 from tornado_sqlalchemy import SQLAlchemy
 from alembic.config import Config
 from alembic.command import upgrade
+from .db_util import insert_assignments
+from sqlalchemy.orm import sessionmaker
 
 @pytest.fixture(scope="module")
 def db_test_config():
@@ -21,6 +24,8 @@ def sql_alchemy_db(db_test_config):
         db_test_config.attributes["connection"] = connection
         # downgrade(cfg, "base")
         upgrade(db_test_config, "head")
+    engine = db.engine
+    insert_assignments(engine)
     yield db
 
 
@@ -34,7 +39,6 @@ def app(tmpdir, sql_alchemy_db):
         db=sql_alchemy_db,
         cookie_secret="test",
     )
-    application.hub_api_url = "http:local"
     yield application
 
 

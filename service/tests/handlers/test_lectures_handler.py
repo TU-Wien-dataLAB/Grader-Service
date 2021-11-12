@@ -2,24 +2,10 @@ import pytest
 from server import GraderServer
 import json
 from api.models.lecture import Lecture
-from alembic.command import upgrade, downgrade
-from alembic.util.exc import CommandError
 from tornado.httpclient import HTTPClientError
 
 ## Imports are important otherwise they will not be found
 from .tornado_test_utils import *
-
-# @pytest.fixture(autouse=True)
-# def reset_database(db_test_config, sql_alchemy_db):
-#     engine = sql_alchemy_db.engine
-#     with engine.begin() as connection:
-#         db_test_config.attributes["connection"] = connection
-#         try:
-#             downgrade(db_test_config, "base")
-#         except CommandError:
-#             pass
-#         upgrade(db_test_config, "head")
-#     yield
 
 @pytest.mark.gen_test
 def test_get_lectures(
@@ -31,7 +17,7 @@ def test_get_lectures(
     default_token,
 ):
     http_server = jupyter_hub_mock_server(default_user, default_token)
-    app.hub_api_url = http_server.url_for("")
+    app.hub_api_url = http_server.url_for("")[0:-1]
 
     url = service_url + "/lectures"
     response = yield http_client.fetch(

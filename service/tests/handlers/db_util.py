@@ -46,15 +46,10 @@ def insert_lectures(session):
   session.execute('INSERT INTO "takepart" ("username","lectid","role") VALUES ("user2",2,"student")')
 
 
-def insert_assignments(session):
-  session.execute('INSERT INTO "assignment" ("name","lectid","duedate","points","status") VALUES ("assignment_1",1,"2021-06-06 23:59:00.000",20,"created")')
-  session.execute('INSERT INTO "assignment" ("name","lectid","duedate","points","status") VALUES ("assignment_2",1,"2021-07-07 23:59:00.000",10,"created")')
+def insert_assignments(ex):
+  ex.execute('INSERT INTO "assignment" ("name","lectid","duedate","points","status") VALUES ("assignment_1",1,"2021-06-06 23:59:00.000",20,"released")')
+  ex.execute('INSERT INTO "assignment" ("name","lectid","duedate","points","status") VALUES ("assignment_2",1,"2021-07-07 23:59:00.000",10,"created")')
 
-  session.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-05 14:43:35.863","not_graded",1,"user1")')
-  session.execute('INSERT INTO "submission" ("date","status","assignid","username") VALUES ("2021-05-07 14:44:35.863","manually_graded",1,"user1")')
-
-  session.execute('INSERT INTO "file" ("name","assignid","path","exercise","points") VALUES ("exercise1.ipynb",1,"./exercise1.ipynb",true,5)')
-  session.execute('INSERT INTO "file" ("name","assignid","path","exercise") VALUES ("dataset.csv",1,"./dataset.csv",false)')
 
 
 def insert_grading(session):
@@ -79,7 +74,7 @@ def lecture_db(session):
 def full_db(session):
   insert_users(session=session)
   insert_lectures(session=session)
-  insert_assignments(session=session)
+  insert_assignments(ex=session)
   insert_grading(session=session)
   yield session
   session.close()
