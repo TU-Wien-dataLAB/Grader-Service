@@ -1,3 +1,4 @@
+from orm.user import User
 import tornado
 from api.models.submission import Submission as SubmissionModel
 from orm.assignment import Assignment
@@ -6,9 +7,14 @@ from orm.submission import Submission
 from orm.takepart import Role, Scope
 from registry import VersionSpecifier, register_handler
 from sqlalchemy.sql.expression import func
-from tornado.httpclient import HTTPError
+from tornado.web import HTTPError
 
 from handlers.base_handler import GraderBaseHandler, authorize
+
+def tuple_to_submission(t):
+    s = Submission()
+    s.id, s.auto_status, s.manual_status, s.score, s.username, s.assignid, s.commit_hash, s.feedback_available, s.date = t
+    return s
 
 
 @register_handler(
@@ -63,6 +69,7 @@ class SubmissionHandler(GraderBaseHandler):
                     .group_by(Submission.username)
                     .all()
                 )
+                submissions = [tuple_to_submission(t) for t in submissions]
             else:
                 submissions = assignment.submissions
             user_map = {}
@@ -71,7 +78,9 @@ class SubmissionHandler(GraderBaseHandler):
                 if sub.username in user_map:
                     user_map[sub.username]["submissions"].append(sub)
                 else:
-                    user_map[sub.username] = {"user": sub.user, "submissions": [sub]}
+                    u = User() # sub.user is none because submission was created in tuple_to_submission
+                    u.name = sub.username
+                    user_map[sub.username] = {"user": u, "submissions": [sub]}
             response = list(user_map.values())
         else:
             if latest:
@@ -92,7 +101,9 @@ class SubmissionHandler(GraderBaseHandler):
                         Submission.username == role.username,
                     )
                     .group_by(Submission.username)
+                    .all()
                 )
+                submissions = [tuple_to_submission(t) for t in submissions]
             else:
                 submissions = role.user.submissions
             response = [
@@ -104,33 +115,6 @@ class SubmissionHandler(GraderBaseHandler):
                 }
             ]
         self.write_json(response)
-
-    @authorize([Scope.student, Scope.tutor, Scope.instructor])
-    async def post(self, lecture_id: int, assignment_id: int):
-        """Creates a new submission
-
-        :param lecture_id: id of the lecture
-        :type lecture_id: int
-        :param assignment_id: id of the assignment
-        :type assignment_id: int
-        """
-        role = self.session.query(Role).get((self.user.name, lecture_id))
-        if role.lecture.deleted == DeleteState.deleted or self.session.query(Assignment).get(assignment_id) is None:
-            self.error_message = "Not Found"
-            raise HTTPError(404)
-
-        body = tornado.escape.json_decode(self.request.body)
-        sub_model = SubmissionModel.from_dict(body)
-        sub = Submission()
-        sub.date = sub_model.submitted_at
-        sub.assignid = assignment_id
-        sub.username = self.user.name
-        sub.auto_status = sub_model.auto_status
-        sub.manual_status = sub_model.manual_status
-        sub.feedback_available = sub_model.feedback_available or False
-        self.session.add(sub)
-        self.session.commit()
-        self.write_json(sub)
 
 
 @register_handler(
@@ -150,8 +134,12 @@ class SubmissionObjectHandler(GraderBaseHandler):
         :type submission_id: int
         """
         submission = self.session.query(Submission).get(submission_id)
+        if submission is None:
+            self.error_message = "Not Found"
+            raise HTTPError(404)
         self.write_json(submission)
     
+    @authorize([Scope.tutor, Scope.instructor])
     async def put(self, lecture_id: int, assignment_id: int, submission_id: int):
         """Updates a specific submission
 
