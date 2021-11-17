@@ -3,6 +3,7 @@ from server import GraderServer
 import json
 from api.models.assignment import Assignment
 from tornado.httpclient import HTTPClientError
+from .db_util import insert_submission
 
 ## Imports are important otherwise they will not be found
 from .tornado_test_utils import *
@@ -295,4 +296,84 @@ def test_delete_assignment_not_created(
     assert e.code == 404
 
 
-# TODO: add tests for deletion error with submissions
+@pytest.mark.gen_test
+def test_delete_assignment_with_submissions(
+    app: GraderServer,
+    service_url,
+    http_client,
+    jupyter_hub_mock_server,
+    default_user,
+    default_token,
+    sql_alchemy_db
+):
+    http_server = jupyter_hub_mock_server(default_user, default_token)
+    app.hub_api_url = http_server.url_for("")[0:-1]
+
+    a_id = 1
+    url = service_url + f"/lectures/3/assignments/{a_id}"
+
+    engine = sql_alchemy_db.engine
+    insert_submission(engine, assignment_id=a_id, username=default_user["name"])
+
+    with pytest.raises(HTTPClientError) as exc_info:
+        yield http_client.fetch(
+            url,
+            method="DELETE",
+            headers={"Authorization": f"Token {default_token}"},
+        )
+    e = exc_info.value
+    assert e.code == 400
+    
+
+@pytest.mark.gen_test
+def test_delete_assignment(
+    app: GraderServer,
+    service_url,
+    http_client,
+    jupyter_hub_mock_server,
+    default_user,
+    default_token,
+):
+    http_server = jupyter_hub_mock_server(default_user, default_token)
+    app.hub_api_url = http_server.url_for("")[0:-1]
+    url = service_url + "/lectures/3/assignments/"
+
+    pre_assignment = Assignment(id=-1, name="pytest", type="user", due_date=None, status="created", points=None)
+    post_response = yield http_client.fetch(
+        url,
+        method="POST",
+        headers={"Authorization": f"Token {default_token}"},
+        body=json.dumps(pre_assignment.to_dict()),
+    )
+    assert post_response.code == 200
+    post_assignment = Assignment.from_dict(json.loads(post_response.body.decode()))
+
+    url = url + str(post_assignment.id)
+
+    delete_response = yield http_client.fetch(
+        url,
+        method="DELETE",
+        headers={"Authorization": f"Token {default_token}"},
+    )
+    assert delete_response.code == 200
+
+    url = service_url + "/lectures/3/assignments/"
+
+    post_response = yield http_client.fetch(
+        url,
+        method="POST",
+        headers={"Authorization": f"Token {default_token}"},
+        body=json.dumps(pre_assignment.to_dict()),
+    )
+    assert post_response.code == 200
+    post_assignment = Assignment.from_dict(json.loads(post_response.body.decode()))
+
+    url = url + str(post_assignment.id)
+
+    delete_response = yield http_client.fetch(
+        url,
+        method="DELETE",
+        headers={"Authorization": f"Token {default_token}"},
+    )
+    assert delete_response.code == 200
+
