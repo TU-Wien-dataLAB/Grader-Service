@@ -1,12 +1,9 @@
 import { Widget } from "@lumino/widgets";
 import { Assignment } from "../../model/assignment";
 
-/**
- * The UI for the recovery option to redirect to a different workspace.
- */
 export class EditForm extends Widget {
   /**
-   * Create a redirect form.
+   * Create a edit form.
    */
   constructor(assignment : Assignment) {
     super({ node: Private.createNode(assignment) });
@@ -19,8 +16,14 @@ export class EditForm extends Widget {
       let obj = {name: "",date: "",type: ""};
       obj.name = this.node.querySelector("input").value;
       // TODO date reading not working
-      const date : HTMLInputElement = this.node.querySelector('input[type="date"]');
-      obj.date = date.value;
+      const checkbox : HTMLInputElement = this.node.querySelector('input[type="checkbox"]');
+      if(checkbox.checked) {
+        obj.date = "";
+      } else {
+        const date : HTMLInputElement = this.node.querySelector('input[type="datetime-local"]');
+        obj.date = date.value;
+
+      }
       obj.type = this.node.querySelector("select").value;
       return obj;
   }
@@ -46,13 +49,14 @@ namespace Private {
     name.placeholder = assignment.name;
 
     const checklabel = document.createElement('label');
-    checklabel.textContent = "Deadline?";
+    checklabel.textContent = "No Deadline?";
     const checkboxdate = document.createElement('input');
     checkboxdate.type = 'checkbox';
 
     const date = document.createElement('input');
     date.classList.add('jp-mod-styled');
     date.type = 'datetime-local';    
+    date.disabled = checkboxdate.checked;
     date.placeholder = assignment.due_date;
 
     const typelabel = document.createElement('label');
