@@ -103,7 +103,7 @@ def test_get_submissions_instructor_version(
     app.hub_api_url = http_server.url_for("")[0:-1]
 
     l_id = 3
-    a_id = 1
+    a_id = 3
     engine = sql_alchemy_db.engine
     insert_assignments(engine, l_id)
 
@@ -194,7 +194,7 @@ def test_get_submissions_latest_instructor_version(
     app.hub_api_url = http_server.url_for("")[0:-1]
 
     l_id = 3
-    a_id = 1
+    a_id = 3
     engine = sql_alchemy_db.engine
     insert_assignments(engine, l_id)
 
@@ -362,7 +362,7 @@ def test_put_submission(
     app.hub_api_url = http_server.url_for("")[0:-1]
 
     l_id = 3 # default user is student
-    a_id = 1
+    a_id = 3
 
     url = service_url + f"/lectures/{l_id}/assignments/{a_id}/submissions/1/"
 

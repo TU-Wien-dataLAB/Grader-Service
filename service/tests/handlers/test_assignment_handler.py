@@ -322,7 +322,7 @@ def test_delete_assignment_with_submissions(
             headers={"Authorization": f"Token {default_token}"},
         )
     e = exc_info.value
-    assert e.code == 400
+    assert e.code == 404
     
 
 @pytest.mark.gen_test

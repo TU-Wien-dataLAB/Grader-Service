@@ -1,3 +1,4 @@
+from handlers.handler_utils import parse_ids
 from orm.user import User
 import tornado
 from api.models.submission import Submission as SubmissionModel
@@ -11,9 +12,20 @@ from tornado.web import HTTPError
 
 from handlers.base_handler import GraderBaseHandler, authorize
 
+
 def tuple_to_submission(t):
     s = Submission()
-    s.id, s.auto_status, s.manual_status, s.score, s.username, s.assignid, s.commit_hash, s.feedback_available, s.date = t
+    (
+        s.id,
+        s.auto_status,
+        s.manual_status,
+        s.score,
+        s.username,
+        s.assignid,
+        s.commit_hash,
+        s.feedback_available,
+        s.date,
+    ) = t
     return s
 
 
@@ -24,7 +36,7 @@ def tuple_to_submission(t):
 class SubmissionHandler(GraderBaseHandler):
     @authorize([Scope.student, Scope.tutor, Scope.instructor])
     async def get(self, lecture_id: int, assignment_id: int):
-        """ Return the submissions of an assignment
+        """Return the submissions of an assignment
 
         Two query parameter: latest, instructor-version
 
@@ -38,6 +50,7 @@ class SubmissionHandler(GraderBaseHandler):
         :type assignment_id: int
         :raises HTTPError: throws err if user is not authorized or the assignment was not found
         """
+        lecture_id, assignment_id = parse_ids(lecture_id, assignment_id)
         latest = self.get_argument("latest", None) == "true"
         instructor_version = self.get_argument("instructor-version", None) == "true"
 
@@ -48,7 +61,11 @@ class SubmissionHandler(GraderBaseHandler):
 
         if instructor_version:
             assignment = self.session.query(Assignment).get(assignment_id)
-            if assignment is None or assignment.deleted == DeleteState.deleted:
+            if (
+                assignment is None
+                or assignment.deleted == DeleteState.deleted
+                or assignment.lectid != lecture_id
+            ):
                 self.error_message = "Not Found"
                 raise HTTPError(404)
             submissions = []
@@ -78,7 +95,9 @@ class SubmissionHandler(GraderBaseHandler):
                 if sub.username in user_map:
                     user_map[sub.username]["submissions"].append(sub)
                 else:
-                    u = User() # sub.user is none because submission was created in tuple_to_submission
+                    u = (
+                        User()
+                    )  # sub.user is none because submission was created in tuple_to_submission
                     u.name = sub.username
                     user_map[sub.username] = {"user": u, "submissions": [sub]}
             response = list(user_map.values())
@@ -138,7 +157,7 @@ class SubmissionObjectHandler(GraderBaseHandler):
             self.error_message = "Not Found"
             raise HTTPError(404)
         self.write_json(submission)
-    
+
     @authorize([Scope.tutor, Scope.instructor])
     async def put(self, lecture_id: int, assignment_id: int, submission_id: int):
         """Updates a specific submission
@@ -150,9 +169,19 @@ class SubmissionObjectHandler(GraderBaseHandler):
         :param submission_id: id of the submission
         :type submission_id: int
         """
+        lecture_id, assignment_id, submission_id = parse_ids(
+            lecture_id, assignment_id, submission_id
+        )
         body = tornado.escape.json_decode(self.request.body)
         sub_model = SubmissionModel.from_dict(body)
         sub = self.session.query(Submission).get(submission_id)
+        if (
+            sub is None
+            or sub.assignid != assignment_id
+            or sub.assignment.lectid != lecture_id
+        ):
+            self.error_message = "Not Found!"
+            raise HTTPError(404)
         sub.date = sub_model.submitted_at
         sub.assignid = assignment_id
         sub.username = self.user.name
@@ -170,9 +199,9 @@ class SubmissionObjectHandler(GraderBaseHandler):
 class SubmissionPropertiesHandler(GraderBaseHandler):
     @authorize([Scope.tutor, Scope.instructor])
     async def get(self, lecture_id: int, assignment_id: int, submission_id: int):
-        """ 
+        """
         Returns the properties of a submission
-        
+
         :param lecture_id: id of the lecture
         :type lecture_id: int
         :param assignment_id: id of the assignment
@@ -181,8 +210,15 @@ class SubmissionPropertiesHandler(GraderBaseHandler):
         :type submission_id: int
         :raises HTTPError: throws err if the submission or their properties are not found
         """
+        lecture_id, assignment_id, submission_id = parse_ids(
+            lecture_id, assignment_id, submission_id
+        )
         submission = self.session.query(Submission).get(submission_id)
-        if submission is None:
+        if (
+            submission is None
+            or submission.assignid != assignment_id
+            or submission.assignment.lectid != lecture_id
+        ):
             self.error_message = "Not Found!"
             raise HTTPError(404)
         if submission.properties is not None:
@@ -204,12 +240,18 @@ class SubmissionPropertiesHandler(GraderBaseHandler):
         :type submission_id: int
         :raises HTTPError: throws err if the submission are not found
         """
+        lecture_id, assignment_id, submission_id = parse_ids(
+            lecture_id, assignment_id, submission_id
+        )
         submission = self.session.query(Submission).get(submission_id)
-        if submission is None:
+        if (
+            submission is None
+            or submission.assignid != assignment_id
+            or submission.assignment.lectid != lecture_id
+        ):
             self.error_message = "Not Found!"
             raise HTTPError(404)
         properties_string: str = self.request.body.decode("utf-8")
         submission.properties = properties_string
         self.session.commit()
         self.write_json(submission)
-
