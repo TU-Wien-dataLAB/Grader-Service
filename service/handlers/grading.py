@@ -2,6 +2,7 @@ from typing import Any
 
 from autograding.feedback import GenerateFeedbackExecutor
 from autograding.local import LocalAutogradeExecutor
+from handlers.handler_utils import parse_ids
 from orm.submission import Submission
 from orm.takepart import Scope
 from registry import VersionSpecifier, register_handler
@@ -33,8 +34,13 @@ class GradingAutoHandler(GraderBaseHandler):
         :type sub_id: int
         :raises HTTPError: throws err if the submission was not found
         """
+        lecture_id, assignment_id, sub_id = parse_ids(lecture_id, assignment_id, sub_id)
         submission = self.session.query(Submission).get(sub_id)
-        if submission is None:
+        if (
+            submission is None
+            or submission.assignid != assignment_id
+            or submission.assignment.lectid != lecture_id
+        ):
             self.error_message = "Not Found!"
             raise HTTPError(404)
         executor = LocalAutogradeExecutor(
@@ -66,8 +72,13 @@ class GenerateFeedbackHandler(GraderBaseHandler):
         :type sub_id: int
         :raises HTTPError: throws err if the submission was not found
         """
+        lecture_id, assignment_id, sub_id = parse_ids(lecture_id, assignment_id, sub_id)
         submission = self.session.query(Submission).get(sub_id)
-        if submission is None:
+        if (
+            submission is None
+            or submission.assignid != assignment_id
+            or submission.assignment.lectid != lecture_id
+        ):
             self.error_message = "Not Found!"
             raise HTTPError(404)
         executor = GenerateFeedbackExecutor(
