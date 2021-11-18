@@ -152,9 +152,16 @@ class SubmissionObjectHandler(GraderBaseHandler):
         :param submission_id: id of the submission
         :type submission_id: int
         """
+        lecture_id, assignment_id, submission_id = parse_ids(
+            lecture_id, assignment_id, submission_id
+        )
         submission = self.session.query(Submission).get(submission_id)
-        if submission is None:
-            self.error_message = "Not Found"
+        if (
+            submission is None
+            or submission.assignid != assignment_id
+            or submission.assignment.lectid != lecture_id
+        ):
+            self.error_message = "Not Found!"
             raise HTTPError(404)
         self.write_json(submission)
 

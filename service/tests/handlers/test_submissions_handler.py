@@ -300,7 +300,7 @@ def test_get_submission(
     app.hub_api_url = http_server.url_for("")[0:-1]
 
     l_id = 3 # user has to be instructor
-    a_id = 1
+    a_id = 3
     engine = sql_alchemy_db.engine
     insert_assignments(engine, l_id)
 
