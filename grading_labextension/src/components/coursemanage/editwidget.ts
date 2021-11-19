@@ -44,7 +44,7 @@ namespace Private {
     const node = document.createElement('div');
 
     const namelabel = document.createElement('label');
-    namelabel.textContent = "Assignment name:";
+    namelabel.textContent = "Assignment name";
     const name = document.createElement('input');
     name.placeholder = assignment.name;
 
@@ -56,8 +56,11 @@ namespace Private {
     const date = document.createElement('input');
     date.classList.add('jp-mod-styled');
     date.type = 'datetime-local';    
-    date.disabled = checkboxdate.checked;
     date.placeholder = assignment.due_date;
+
+    checkboxdate.addEventListener("change", (event) => {
+      date.hidden = checkboxdate.checked;
+    })
 
     const typelabel = document.createElement('label');
     typelabel.textContent = "Assignment type";
