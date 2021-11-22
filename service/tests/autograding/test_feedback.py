@@ -14,7 +14,7 @@ from ..handlers.tornado_test_utils import *
 from ..handlers.db_util import insert_submission
 
 @pytest.mark.asyncio
-async def test_auto_grading(
+async def test_feedback(
     default_user,
     sql_alchemy_db,
     tmpdir
