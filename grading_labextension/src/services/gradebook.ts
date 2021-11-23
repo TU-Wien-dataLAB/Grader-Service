@@ -14,7 +14,28 @@ export class GradeBook {
     }
 
     public setManualScore(notebook: string, cellId: string, score: number) {
-        this.properties["notebooks"][notebook]["grades_dict"][cellId]["manual_score"] = score;
+        try {
+            this.properties["notebooks"][notebook]["grades_dict"][cellId]["manual_score"] = score;
+        } catch (error) {
+            this.createTaskGrade(notebook, cellId, score)
+        }
+    }
+
+    private createTaskGrade(notebook: string, cellId: string, score: number) {
+        const maxScore = this.properties["notebooks"][notebook]["task_cells_dict"][cellId]["max_score"]
+        const grade: any = {
+            cell_id: cellId,
+            notebook_id: notebook,
+            id: cellId,
+            auto_score: null,
+            manual_score: score,
+            extra_credit: null,
+            needs_manual_grade: false,
+            max_score_gradecell: null,
+            max_score_taskcell: maxScore,
+            failed_tests: null,
+        }
+        this.properties["notebooks"][notebook]["grades_dict"][cellId] = grade
     }
 
     public getManualScore(notebook: string, cellId: string): number {
@@ -102,6 +123,16 @@ export class GradeBook {
 
     public getNotebookMaxPoints(notebook: string): number {
         let sum: number = 0;
+
+        // add task cells to grades dict if they are not there
+        const task_cells_dict = this.properties["notebooks"][notebook]["task_cells_dict"];
+        for (let cellId of Object.keys(task_cells_dict)) {
+            if(this.properties["notebooks"][notebook]["grades_dict"][cellId] === undefined){
+                console.log("Adding grade for task cell: " + cellId)
+                this.createTaskGrade(notebook, cellId, null);
+            }
+        }
+
         const grades_dict = this.properties["notebooks"][notebook]["grades_dict"];
         for (let cellId of Object.keys(grades_dict)) {
             sum += this.getGradeMaxScore(notebook, cellId);

@@ -12,6 +12,7 @@ import {
 import { IconNames } from '@blueprintjs/icons';
 import { GlobalObjects } from '../../index';
 import { showErrorMessage, showDialog, Dialog } from '@jupyterlab/apputils';
+import { InputDialog } from '@jupyterlab/apputils/lib/inputdialog';
 import { Submission } from '../../model/submission';
 import {
   getSubmissions,
@@ -153,18 +154,26 @@ export class AssignmentComponent extends React.Component<AssignmentProps> {
   }
 
   private async fetchAssignment() {
+    const hasFiles = this.dirListing.model.items().next() !== undefined
     try {
-      let result = await showDialog({
+      const type: Dialog.IResult<string> = await InputDialog.getItem({
+        title: 'Select repository to fetch',
+        items: ['release', "assignment"],
+        current: hasFiles ? 1 : 0
+      });
+      if (!type.button.accept) return;
+      const repoType = type.value;
+      const confirm = await showDialog({
         title: 'Fetch Assignment',
-        body: `Do you want to fetch ${this.state.assignment.name}?`,
+        body: `Do you want to fetch ${this.state.assignment.name} from ${repoType}?`,
         buttons: [Dialog.cancelButton(), Dialog.okButton({ label: 'Fetch' })]
       });
-      if (result.button.accept) {
+      if (confirm.button.accept) {
         // update assignment
         await pullAssignment(
           this.lecture.id,
           this.state.assignment.id,
-          'release'
+          repoType
         ).toPromise();
         await this.updateDirListing();
       }
@@ -178,7 +187,7 @@ export class AssignmentComponent extends React.Component<AssignmentProps> {
       let result = await showDialog({
         title: 'Submit Assignment',
         body: `Do you want to submit ${this.state.assignment.name}? You can always re-submit the assignment before the due date.`,
-        buttons: [Dialog.okButton({ label: 'Ok' })]
+        buttons: [Dialog.cancelButton({label: 'Cancel'}),Dialog.okButton({ label: 'Submit' })]
       });
       if (result.button.accept) {
         await submitAssignment(this.lecture, this.state.assignment).toPromise();
@@ -279,6 +288,16 @@ export class AssignmentComponent extends React.Component<AssignmentProps> {
               className="flavor-icon"
             ></Icon>
             {this.state.assignment.name}
+            {this.state.assignment.type === 'group' && (
+              <Tag
+                icon="people"
+                intent="primary"
+                className="assignment-tag"
+                style={{ marginLeft: '10px' }}
+              >
+                Group
+              </Tag>
+            )}
             {this.state.assignment.status != 'released' && (
               <Tag
                 icon="warning-sign"
@@ -289,6 +308,7 @@ export class AssignmentComponent extends React.Component<AssignmentProps> {
                 Not released for students
               </Tag>
             )}
+
             </span>
             <span className="assignment-header-button">
               <Button

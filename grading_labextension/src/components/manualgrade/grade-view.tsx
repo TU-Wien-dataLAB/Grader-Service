@@ -1,22 +1,19 @@
 import * as React from 'react';
 import { DirListing } from '@jupyterlab/filebrowser/lib/listing';
 import { FilterFileBrowserModel } from '@jupyterlab/filebrowser/lib/model';
-import { ExistingNodeRenderer } from '../components/assignments/assignment.component';
-import moment from 'moment';
+import { ExistingNodeRenderer } from '../assignments/assignment.component';
 import { showErrorMessage } from '@jupyterlab/apputils';
 
-import { GlobalObjects } from '../index';
-import { Contents } from '@jupyterlab/services';
+import { GlobalObjects } from '../../index';
 import { Title, Widget } from '@lumino/widgets';
-import { Lecture } from '../model/lecture';
-import { getLecture } from '../services/lectures.service';
-import { Assignment } from '../model/assignment';
-import { fetchAssignment } from '../services/assignments.service';
-import { Submission } from '../model/submission';
-import { getProperties } from '../services/submissions.service';
+import { Lecture } from '../../model/lecture';
+import { getLecture } from '../../services/lectures.service';
+import { Assignment } from '../../model/assignment';
+import { fetchAssignment } from '../../services/assignments.service';
+import { getProperties } from '../../services/submissions.service';
 import { Button, Intent, Divider, Tag } from '@blueprintjs/core';
 import { IconNames } from '@blueprintjs/icons';
-import { GradeBook } from '../services/gradebook';
+import { GradeBook } from '../../services/gradebook';
 
 export interface ManualGradingProps {
   lectureID: number;

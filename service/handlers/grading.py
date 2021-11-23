@@ -2,6 +2,7 @@ from typing import Any
 
 from autograding.feedback import GenerateFeedbackExecutor
 from autograding.local import LocalAutogradeExecutor
+from handlers.handler_utils import parse_ids
 from orm.submission import Submission
 from orm.takepart import Scope
 from registry import VersionSpecifier, register_handler
@@ -9,16 +10,6 @@ from tornado.httpclient import HTTPError
 from tornado.ioloop import IOLoop
 
 from handlers.base_handler import GraderBaseHandler, authorize
-
-
-@register_handler(
-    path=r"\/lectures\/(?P<lecture_id>\d*)\/assignments\/(?P<assignment_id>\d*)\/grading\/?",
-    version_specifier=VersionSpecifier.ALL,
-)
-class GradingBaseHandler(GraderBaseHandler):
-    @authorize([Scope.student, Scope.tutor, Scope.instructor])
-    async def get(self, lecture_id: int, assignment_id: int):
-        pass
 
 
 @register_handler(
@@ -33,8 +24,23 @@ class GradingAutoHandler(GraderBaseHandler):
 
     @authorize([Scope.tutor, Scope.instructor])
     async def get(self, lecture_id: int, assignment_id: int, sub_id: int):
+        """Starts the autograding process of a submission
+
+        :param lecture_id: id of the lecture
+        :type lecture_id: int
+        :param assignment_id: id of the assignment
+        :type assignment_id: int
+        :param sub_id: id of the submission
+        :type sub_id: int
+        :raises HTTPError: throws err if the submission was not found
+        """
+        lecture_id, assignment_id, sub_id = parse_ids(lecture_id, assignment_id, sub_id)
         submission = self.session.query(Submission).get(sub_id)
-        if submission is None:
+        if (
+            submission is None
+            or submission.assignid != assignment_id
+            or submission.assignment.lectid != lecture_id
+        ):
             self.error_message = "Not Found!"
             raise HTTPError(404)
         executor = LocalAutogradeExecutor(
@@ -56,8 +62,23 @@ class GenerateFeedbackHandler(GraderBaseHandler):
             self.session.commit()
 
     async def get(self, lecture_id: int, assignment_id: int, sub_id):
+        """Starts the process of generating feedback for a submission
+
+        :param lecture_id: id of the lecture
+        :type lecture_id: int
+        :param assignment_id: id of the assignment
+        :type assignment_id: int
+        :param sub_id: id of the submission
+        :type sub_id: int
+        :raises HTTPError: throws err if the submission was not found
+        """
+        lecture_id, assignment_id, sub_id = parse_ids(lecture_id, assignment_id, sub_id)
         submission = self.session.query(Submission).get(sub_id)
-        if submission is None:
+        if (
+            submission is None
+            or submission.assignid != assignment_id
+            or submission.assignment.lectid != lecture_id
+        ):
             self.error_message = "Not Found!"
             raise HTTPError(404)
         executor = GenerateFeedbackExecutor(

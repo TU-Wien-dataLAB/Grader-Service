@@ -5,7 +5,7 @@ import { IObservableJSON, IObservableMap } from '@jupyterlab/observables';
 import { ReadonlyPartialJSONValue } from '@lumino/coreutils';
 import { ISignal, Signal } from '@lumino/signaling';
 import { Panel } from '@lumino/widgets';
-import { CellModel, CellType, ToolData } from './model';
+import { CellModel, CellType, ToolData } from '../model';
 
 const CSS_CELL_HEADER = 'cellHeader';
 const CSS_CELL_ID = 'cellId';

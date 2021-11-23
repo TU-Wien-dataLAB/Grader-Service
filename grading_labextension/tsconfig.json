@@ -20,5 +20,5 @@
     "target": "es2017",
     "types": []
   },
-  "include": ["src/**/*.ts", "src/*", "src/**/*.tsx","src/**/**/*.tsx"]
+  "include": ["src/**/*.ts", "src/*", "src/**/*.tsx","src/**/**/*.tsx","src/**/**/**/*.tsx"]
 }

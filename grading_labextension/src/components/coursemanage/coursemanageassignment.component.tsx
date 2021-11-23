@@ -25,6 +25,7 @@ import { MainAreaWidget } from '@jupyterlab/apputils';
 import { localToUTC } from '../../services/datetime.service';
 import { Contents } from '@jupyterlab/services';
 import moment from 'moment';
+import { createEditForm, EditForm } from './editwidget';
 
 export interface AssignmentProps {
   parentUpdate: () => void;
@@ -327,9 +328,9 @@ export class CourseManageAssignmentComponent extends React.Component<
     }
 
     try {
+      this.state.assignment.status = 'created';
       let a = await updateAssignment(this.lecture.id, this.state.assignment).toPromise()
       this.setState({ assignment: a })
-      this.state.assignment.status = 'created';
     } catch (err) {
       showErrorMessage('Error Withholding Assignment', err);
     }
@@ -377,54 +378,29 @@ export class CourseManageAssignmentComponent extends React.Component<
   }
 
   private async editAssignment() {
-    if (this.state.assignment.status !== "released") {
-      const name: Dialog.IResult<string> = await LabInputDialog.getText({
-        title: 'Assignment name',
-        placeholder: this.state.assignment.name
+    const form : EditForm = createEditForm(this.state.assignment);
+      const dialog = new Dialog( {title: 'Edit Assignment', body: form, buttons:[Dialog.cancelButton({label:'Cancel'}),Dialog.okButton({label:'Save'})]})
+      dialog.launch().then(res => {
+        console.log(res) 
+        if(res.value.name !== "") {
+          this.state.assignment.name = res.value.name;
+        }
+        if (res.value.date === '') {
+          this.state.assignment.due_date = null;
+        } else {
+          this.state.assignment.due_date = localToUTC(res.value.date);
+        }
+        if (res.value.type === 'user') {
+          this.state.assignment.type = Assignment.TypeEnum.User;
+        } else {
+          this.state.assignment.type = Assignment.TypeEnum.Group;
+        }
+
+        updateAssignment(this.lecture.id, this.state.assignment).subscribe(
+          assignment => this.setState({ assignment }),
+          error => showErrorMessage('Error Updating Assignment', error)
+        );
       });
-      if (!name.button.accept) {
-        return;
-      }
-
-
-
-      const type: Dialog.IResult<string> = await LabInputDialog.getItem({
-        title: 'Assignment Type',
-        items: ['user', 'group'],
-        current: this.state.assignment.type === Assignment.TypeEnum.User ? 0 : 1
-      });
-      if (!type.button.accept) {
-        return;
-      }
-
-      if (type.value === 'user') {
-        this.state.assignment.type = Assignment.TypeEnum.User;
-      } else {
-        this.state.assignment.type = Assignment.TypeEnum.Group;
-      }
-
-      if (name.value !== '') {
-        this.state.assignment.name = name.value;
-      }
-
-    }
-    const date: Dialog.IResult<string> = await InputDialog.getDate({
-      title: 'Input Deadline'
-    });
-    if (!date.button.accept) {
-      return;
-    }
-    if (date.value === '') {
-      this.state.assignment.due_date = null;
-    } else {
-      this.state.assignment.due_date = localToUTC(date.value);
-    }
-
-
-    updateAssignment(this.lecture.id, this.state.assignment).subscribe(
-      assignment => this.setState({ assignment }),
-      error => showErrorMessage('Error Updating Assignment', error)
-    );
   }
 
   public assignment() {

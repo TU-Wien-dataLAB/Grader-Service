@@ -54,13 +54,6 @@ lectures:
               type: "array"
               items:
                 $ref: "./schemas.yml#/components/schemas/Lecture"
-            example:
-              [
-                $ref: "./schemas.yml#/components/schemas/Lecture/example",
-                $ref: "./schemas.yml#/components/schemas/Lecture/example",
-                $ref: "./schemas.yml#/components/schemas/Lecture/example",
-                $ref: "./schemas.yml#/components/schemas/Lecture/example",
-              ]
       403:
         description: Unautorized
       500:
@@ -175,6 +168,12 @@ lecturesById:
               $ref: "./schemas.yml#/components/schemas/Lecture"
       403:
         description: Unautorized
+      404:
+        description: Not found
+        content: 
+          application/json:
+            schema:
+              $ref: "./schemas.yml#/components/schemas/ErrorMessage"
       500:
         description: Internal server error
         content: 
@@ -217,7 +216,7 @@ assignments:
       403:
         description: Unautorized
       404:
-        description: Lecture id or assignment id not found.
+        description: Lecture id not found.
         content: 
           application/json:
             schema:
@@ -255,12 +254,6 @@ assignments:
               type: "array"
               items:
                 $ref: "./schemas.yml#/components/schemas/Assignment"
-            example:
-              [
-                $ref: "./schemas.yml#/components/schemas/Assignment/example",
-                $ref: "./schemas.yml#/components/schemas/Assignment/example",
-                $ref: "./schemas.yml#/components/schemas/Assignment/example",
-              ]
       403:
         description: Unautorized
       404:
@@ -502,14 +495,14 @@ submissions:
             schema:
               $ref: "./schemas.yml#/components/schemas/ErrorMessage"
 
-feedback:
+submissionsById:
   get:
     security:
       - hub_auth:
         - instructor
         - tutor
         - student
-    summary: Return the feedback of an assignment
+    summary: Get the submission with specified id
     tags:
       - "Submissions"
     parameters:
@@ -529,31 +522,25 @@ feedback:
       schema:
         type: integer
         format: int64
-    - name: latest
-      in: query
-      description: Only return the feedback of the latest submission
-      required: false
+    - name: s_id
+      in: path
+      description: ID of the submission
+      required: true
+      example: 4
       schema:
-        type: boolean
-        default: false
-    - name: instructor-version
-      in: query
-      description: Whether to fetch the all feedback of students
-      required: false
-      schema:
-        type: boolean
-        default: false
+        type: integer
+        format: int64
     responses:
       200:
         description: OK
         content:
           application/json:
             schema:
-              $ref: "./schemas.yml#/components/schemas/UserFeedback"
+              $ref: "./schemas.yml#/components/schemas/Submission"
       403:
         description: Unautorized
       404:
-        description: Lecture id or assignment id not found
+        description: Lecture id or assignment id or submission id not found
         content: 
           application/json:
             schema:
@@ -564,16 +551,13 @@ feedback:
           application/json:
             schema:
               $ref: "./schemas.yml#/components/schemas/ErrorMessage"
-
-
-feedbackById:
-  get:
+  put:
     security:
       - hub_auth:
         - instructor
         - tutor
         - student
-    summary: Return the feedback of an assignment as html
+    summary: Update the submission with specified id
     tags:
       - "Submissions"
     parameters:
@@ -593,11 +577,11 @@ feedbackById:
       schema:
         type: integer
         format: int64
-    - name: f_id
+    - name: s_id
       in: path
-      description: ID of the feedback
+      description: ID of the submission
       required: true
-      example: 2
+      example: 4
       schema:
         type: integer
         format: int64
@@ -605,14 +589,13 @@ feedbackById:
       200:
         description: OK
         content:
-          text/html:
+          application/json:
             schema:
-              type: string
-              example: "<html></html>"
+              $ref: "./schemas.yml#/components/schemas/Submission"
       403:
         description: Unautorized
       404:
-        description: Lecture id or assignment id not found
+        description: Lecture id or assignment id or submission id not found
         content: 
           application/json:
             schema:
@@ -717,12 +700,12 @@ grading:
               $ref: "./schemas.yml#/components/schemas/ErrorMessage"
 
 auto:
-  post:
+  get:
     security:
       - hub_auth:
         - instructor
         - tutor
-    summary: Request the latest submission to be autograded
+    summary: Request the submission to be autograded
     tags:
     - Grading
     parameters:
@@ -742,17 +725,10 @@ auto:
         schema:
           type: integer
           format: int64
-      - name: user_id
+      - name: s_id
         in: path
-        description: ID of the student that is enroled in the lecture
-        required: true
-        example: "12345678"
-        schema:
-          type: "string"
-      - name: submission_id
-        in: query
         description: Specify the submission that should be autograded instead of latest
-        required: false
+        required: true
         example: 2
         schema:
           type: integer
@@ -765,11 +741,11 @@ auto:
             schema:
               type: "array"
               items:
-                $ref: "./schemas.yml#/components/schemas/Assignment"
+                $ref: "./schemas.yml#/components/schemas/Submission"
       403:
         description: Unautorized
       404:
-        description: Lecture id, assignment id, user id or submission id not found
+        description: Lecture id, assignment id or submission id not found
         content: 
           application/json:
             schema:
@@ -781,81 +757,13 @@ auto:
             schema:
               $ref: "./schemas.yml#/components/schemas/ErrorMessage"
 
-manual:
-  post:
-    security:
-      - hub_auth:
-        - instructor
-        - tutor
-    summary: Create new manual feedback for an assignment
-    tags:
-    - Grading
-    parameters:
-      - name: lect_id
-        in: path
-        description: ID of the lecture
-        required: true
-        example: 1
-        schema:
-          type: integer
-          format: int64
-      - name: a_id
-        in: path
-        description: ID of the assignment in the lecture
-        required: true
-        example: 2
-        schema:
-          type: integer
-          format: int64
-      - name: user_id
-        in: path
-        description: ID of the student that is enroled in the lecture
-        required: true
-        example: "12345678"
-        schema:
-          type: "string"
-      - name: submission_id
-        in: query
-        description: Specify the the submission that should be manually graded instead of latest
-        required: false
-        example: 2
-        schema:
-          type: integer
-          format: int64
-    requestBody:
-      description: The content of the manual grading.
-      required: true
-      content:
-        application/json:
-          schema:
-            $ref: './schemas.yml#/components/schemas/ManualGradingContent'
-    responses:
-      200:
-        description: OK
-        content: 
-          application/json:
-            schema:
-              $ref: "./schemas.yml#/components/schemas/ManualGradingContent"
-      403:
-        description: Unautorized
-      404:
-        description: Lecture id, assignment id, user id or submission id not found
-        content: 
-          application/json:
-            schema:
-              $ref: "./schemas.yml#/components/schemas/ErrorMessage"
-      500:
-        description: Internal server error
-        content: 
-          application/json:
-            schema:
-              $ref: "./schemas.yml#/components/schemas/ErrorMessage"
+feedback:
   get:
     security:
       - hub_auth:
         - instructor
         - tutor
-    summary: Return the manual feedback of a graded assignment
+    summary: Request feedback of a submission to be generated
     tags:
     - Grading
     parameters:
@@ -875,206 +783,10 @@ manual:
         schema:
           type: integer
           format: int64
-      - name: user_id
+      - name: s_id
         in: path
-        description: ID of the student that is enroled in the lecture
+        description: Specify the submission for which feedback should be generated
         required: true
-        example: "12345678"
-        schema:
-          type: "string"
-      - name: submission_id
-        in: query
-        description: Specify the the submission that should be manually graded instead of latest
-        required: false
-        example: 2
-        schema:
-          type: integer
-          format: int64
-    responses:
-      200:
-        description: OK
-        content: 
-          application/json:
-            schema:
-              $ref: "./schemas.yml#/components/schemas/ManualGradingContent"
-      403:
-        description: Unautorized
-      404:
-        description: Lecture id, assignment id, user id or submission id not found
-        content: 
-          application/json:
-            schema:
-              $ref: "./schemas.yml#/components/schemas/ErrorMessage"
-      500:
-        description: Internal server error
-        content: 
-          application/json:
-            schema:
-              $ref: "./schemas.yml#/components/schemas/ErrorMessage"
-  put:
-    security:
-      - hub_auth:
-        - instructor
-        - tutor
-    summary: Update the manual feedback for an assignment
-    tags:
-    - Grading
-    parameters:
-      - name: lect_id
-        in: path
-        description: ID of the lecture
-        required: true
-        example: 1
-        schema:
-          type: integer
-          format: int64
-      - name: a_id
-        in: path
-        description: ID of the assignment in the lecture
-        required: true
-        example: 2
-        schema:
-          type: integer
-          format: int64
-      - name: user_id
-        in: path
-        description: ID of the student that is enroled in the lecture
-        required: true
-        example: "12345678"
-        schema:
-          type: "string"
-      - name: submission_id
-        in: query
-        description: Specify the the submission that should be manually graded instead of latest
-        required: false
-        example: 2
-        schema:
-          type: integer
-          format: int64
-    requestBody:
-      description: The content of the manual grading to be updated.
-      required: true
-      content:
-        application/json:
-          schema:
-            $ref: './schemas.yml#/components/schemas/ManualGradingContent'
-    responses:
-      200:
-        description: OK
-        content: 
-          application/json:
-            schema:
-              $ref: "./schemas.yml#/components/schemas/ManualGradingContent"
-      403:
-        description: Unautorized
-      404:
-        description: Lecture id, assignment id, user id or submission id not found
-        content: 
-          application/json:
-            schema:
-              $ref: "./schemas.yml#/components/schemas/ErrorMessage"
-      500:
-        description: Internal server error
-        content: 
-          application/json:
-            schema:
-              $ref: "./schemas.yml#/components/schemas/ErrorMessage"
-  delete:
-    security:
-      - hub_auth:
-        - instructor
-        - tutor
-    summary: Delete the manual feedback for an assignment
-    tags:
-    - Grading
-    parameters:
-      - name: lect_id
-        in: path
-        description: ID of the lecture
-        required: true
-        example: 1
-        schema:
-          type: integer
-          format: int64
-      - name: a_id
-        in: path
-        description: ID of the assignment in the lecture
-        required: true
-        example: 2
-        schema:
-          type: integer
-          format: int64
-      - name: user_id
-        in: path
-        description: ID of the student that is enroled in the lecture
-        required: true
-        example: "12345678"
-        schema:
-          type: "string"
-      - name: submission_id
-        in: query
-        description: Specify the the submission that should be manually graded instead of latest
-        required: false
-        example: 2
-        schema:
-          type: integer
-          format: int64
-    responses:
-      200:
-        description: OK
-      403:
-        description: Unautorized
-      404:
-        description: Lecture id, assignment id, user id or submission id not found
-        content: 
-          application/json:
-            schema:
-              $ref: "./schemas.yml#/components/schemas/ErrorMessage"
-      500:
-        description: Internal server error
-        content: 
-          application/json:
-            schema:
-              $ref: "./schemas.yml#/components/schemas/ErrorMessage"
-            
-score:
-  get:
-    security:
-      - hub_auth:
-        - instructor
-        - tutor
-        - student
-    summary: Return the score of an assignment
-    tags:
-    - Grading
-    parameters:
-      - name: lect_id
-        in: path
-        description: ID of the lecture
-        required: true
-        example: 1
-        schema:
-          type: integer
-          format: int64
-      - name: a_id
-        in: path
-        description: ID of the assignment in the lecture
-        required: true
-        example: 2
-        schema:
-          type: integer
-          format: int64
-      - name: user_id
-        in: path
-        description: ID of the student that is enroled in the lecture
-        required: true
-        example: "12345678"
-        schema:
-          type: "string"
-      - name: submission_id
-        in: query
-        description: Specify the the submission that should be returned instead of latest
-        required: false
         example: 2
         schema:
           type: integer
@@ -1085,11 +797,13 @@ score:
         content:
           application/json:
             schema:
-              $ref: "./schemas.yml#/components/schemas/GradingResult"
+              type: "array"
+              items:
+                $ref: "./schemas.yml#/components/schemas/Submission"
       403:
         description: Unautorized
       404:
-        description: Lecture id, assignment id, user id or submission id not found
+        description: Lecture id, assignment id or submission id not found
         content: 
           application/json:
             schema:

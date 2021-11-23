@@ -80,6 +80,13 @@ assignmentsById:
       schema:
         type: integer
         format: int64
+    - name: instructor-version
+      in: query
+      description: Whether to fetch the all submissions of students
+      required: false
+      schema:
+        type: boolean
+        default: false
     responses:
       200:
         description: OK
@@ -146,49 +153,6 @@ assignmentsById:
 
 
 submissions:
-  post:
-    security:
-      - hub_auth:
-        - instructor
-        - tutor
-        - student
-    summary: "Request assignment to be submitted"
-    tags:
-      - "Submissions"
-    parameters:
-    - name: lect_id
-      in: path
-      description: ID of the lecture
-      required: true
-      example: 1
-      schema:
-        type: integer
-        format: int64
-    - name: a_id
-      in: path
-      description: ID of the assignment in the lecture
-      required: true
-      example: 2
-      schema:
-        type: integer
-        format: int64
-    responses:
-      200:
-        description: OK
-      403:
-        description: Unautorized
-      404:
-        description: Lecture id or assignment id not found.
-        content: 
-          application/json:
-            schema:
-              $ref: "./schemas.yml#/components/schemas/ErrorMessage"
-      500:
-        description: Internal server error
-        content: 
-          application/json:
-            schema:
-              $ref: "./schemas.yml#/components/schemas/ErrorMessage"
   get:
     security:
       - hub_auth:
@@ -307,7 +271,7 @@ propertiesAssignment:
         - instructor
         - tutor
         - student
-    summary: "Request the assignment to be fetched"
+    summary: "Get properties of an assignment"
     tags: 
     - "Assignments"
     parameters:
@@ -414,7 +378,7 @@ propertiesSubmission:
         - instructor
         - tutor
         - student
-    summary: "Request the assignment to be fetched"
+    summary: "Get properties of a submission"
     tags: 
     - "Submissions"
     parameters:
