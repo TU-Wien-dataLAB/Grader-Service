@@ -33,9 +33,6 @@ export class GradingModeSwitch extends React.Component<ImodeSwitchProps> {
       public assignment: Assignment;
       public gradeBook: GradeBook;
       public onChange: any;
-      public isSourceNotebook: boolean;
-      public hasPermissions: boolean;
-      public isManualgradeNotebook: boolean;
       public subID: number;
       public notebookPaths: string[];
     
@@ -44,28 +41,8 @@ export class GradingModeSwitch extends React.Component<ImodeSwitchProps> {
         this.state.mode = props.mode || false;
         this.notebook = props.notebook;
         this.notebookpanel = props.notebookpanel;
-        this.notebookPaths = this.notebookpanel.context.contentsModel.path.split("/")
-        console.log("Notebook path: " + this.notebookpanel.context.contentsModel.path)
-        this.isSourceNotebook = this.notebookPaths[0] === "source";
-        this.isManualgradeNotebook = this.notebookPaths[0] === "manualgrade";
-        this.hasPermissions = false;
-        if (this.isManualgradeNotebook) {
-          const lectureCode = this.notebookPaths[1]
-          if (UserPermissions.getPermissions().hasOwnProperty(lectureCode)) {
-            this.hasPermissions = UserPermissions.getPermissions()[lectureCode] !== Scope.student;
-            this.subID = +this.notebookPaths[3]
-    
-          }
-        }
-        if (this.isSourceNotebook) {
-          const lectureCode = this.notebookPaths[1]
-          if (UserPermissions.getPermissions().hasOwnProperty(lectureCode)) {
-            this.hasPermissions = UserPermissions.getPermissions()[lectureCode] !== Scope.student;
-          }
-        }
-    
-        console.log("Source notebook: " + this.isSourceNotebook);
-        console.log("Creation mode permissions: " + this.hasPermissions);
+        this.notebookPaths = this.notebookpanel.context.contentsModel.path.split("/");
+        this.subID = +this.notebookPaths[3];
         this.onChange = this.props.onChange;
       }
     
@@ -128,7 +105,7 @@ export class GradingModeSwitch extends React.Component<ImodeSwitchProps> {
         <Button className="assignment-button" onClick={() => this.saveProperties()} icon={IconNames.FLOPPY_DISK} outlined intent={Intent.SUCCESS}>
           <span className={this.state.transition} >{this.state.saveButtonText}</span>
         </Button>
-      </span>);;
+      </span>);
     }
 
 }
