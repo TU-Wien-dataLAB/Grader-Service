@@ -41,8 +41,8 @@ class GenerateHandler(ExtensionBaseHandler):
         name = assignment["name"]
 
         generator = GenerateAssignment(
-            input_dir=f"~/source/{code}/{name}",
-            output_dir=f"~/release/{code}/{name}",
+            input_dir=f"{self.root_dir}/source/{code}/{name}",
+            output_dir=f"{self.root_dir}/release/{code}/{name}",
             file_pattern="*.ipynb",
         )
         generator.force = True
@@ -97,6 +97,7 @@ class PullHandler(ExtensionBaseHandler):
             return
 
         git_service = GitService(
+            server_root_dir=self.root_dir,
             lecture_code=lecture["code"],
             assignment_name=assignment["name"],
             repo_type=repo,
@@ -152,6 +153,7 @@ class PushHandler(ExtensionBaseHandler):
             return
 
         git_service = GitService(
+            server_root_dir=self.root_dir,
             lecture_code=lecture["code"],
             assignment_name=assignment["name"],
             repo_type=repo,
@@ -161,6 +163,7 @@ class PushHandler(ExtensionBaseHandler):
         if repo == "release":
             git_service.delete_repo_contents(include_git=True)
             src_path = GitService(
+                self.root_dir,
                 lecture["code"],
                 assignment["name"],
                 repo_type="source",
@@ -179,9 +182,11 @@ class PushHandler(ExtensionBaseHandler):
 
             try:
                 gradebook_path = os.path.join(git_service.path, "gradebook.json")
+                self.log.info(f"Reading gradebook file: {gradebook_path}")
                 with open(gradebook_path, "r") as f:
                     gradebook_json: dict = json.load(f)
             except FileNotFoundError:
+                self.log.error(f"Cannot find gradebook file: {gradebook_path}")
                 return
 
             self.log.info(f"Setting properties of assignment from {gradebook_path}")
@@ -260,6 +265,7 @@ class NotebookAccessHandler(ExtensionBaseHandler):
             return
 
         git_service = GitService(
+            server_root_dir=self.root_dir,
             lecture_code=lecture["code"],
             assignment_name=assignment["name"],
             repo_type="release",

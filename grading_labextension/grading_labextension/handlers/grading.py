@@ -70,6 +70,7 @@ class GradingManualHandler(ExtensionBaseHandler):
             return
 
         git_service = GitService(
+            server_root_dir=self.root_dir,
             lecture_code=lecture["code"],
             assignment_name=assignment["name"],
             repo_type="autograde",
@@ -159,6 +160,7 @@ class PullFeedbackHandler(ExtensionBaseHandler):
             return
 
         git_service = GitService(
+            server_root_dir=self.root_dir,
             lecture_code=lecture["code"],
             assignment_name=assignment["name"],
             repo_type="feedback",

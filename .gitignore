@@ -2,7 +2,7 @@
 # Created by https://www.toptal.com/developers/gitignore/api/python,node,vscode,pycharm,macos,windows,linux
 # Edit at https://www.toptal.com/developers/gitignore?templates=python,node,vscode,pycharm,macos,windows,linux
 
-
+jupyter_hub_config.py
 grading_labextension/grader/grading_labextension/labextension/*
 grading_labextension/grader/grading_labextension/labextension
 grading_labextension/grader/grading_labextension/labextension/build_log.json

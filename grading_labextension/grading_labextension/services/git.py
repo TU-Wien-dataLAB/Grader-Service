@@ -24,15 +24,15 @@ class GitError(Exception):
         return self.__str__()
 
 class GitService(Configurable):
-    git_root_dir = Unicode(os.path.expanduser("~"), allow_none=False).tag(config=False) # is set by application
     git_access_token = Unicode(os.environ.get("JUPYTERHUB_API_TOKEN"), allow_none=False).tag(config=True)
     git_http_scheme = Unicode(os.environ.get("GRADER_HTTP_SCHEME", 'http'), allow_none=False).tag(config=True)
     git_remote_url = Unicode(f'{os.environ.get("GRADER_HOST_URL", "127.0.0.1")}:{os.environ.get("GRADER_HOST_PORT", "4010")}{os.environ.get("GRADER_GIT_BASE_URL", "/services/grader/git")}', allow_none=False).tag(config=True)
 
-    def __init__(self, lecture_code: str, assignment_name: str, repo_type: str, force_user_repo=False, *args, **kwargs):
+    def __init__(self, server_root_dir: str, lecture_code: str, assignment_name: str, repo_type: str, force_user_repo=False, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.log = logging.getLogger(str(self.__class__))
         self._git_version = None
+        self.git_root_dir = server_root_dir
         self.lecture_code = lecture_code
         self.assignment_name = assignment_name
         self.repo_type = repo_type
@@ -187,6 +187,7 @@ class GitService(Configurable):
         Args:
             src (str): path where the to be copied files reside
         """
+        self.log.info(f"Copying repository contents from {src} to {self.path}")
         ignore = shutil.ignore_patterns(".git", "__pycache__")
         if sys.version_info.major == 3 and sys.version_info.minor >= 8:
             shutil.copytree(src, self.path, ignore=ignore, dirs_exist_ok=True)

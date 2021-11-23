@@ -112,7 +112,6 @@ dependencies:
     - jedi==0.17.2
     - pyzmq==20.0.0
     - pylint==2.7.4
-    - icu==68.1
     - krb5==1.19.2
     - tk==8.6.10
     - markupsafe==2.0.1

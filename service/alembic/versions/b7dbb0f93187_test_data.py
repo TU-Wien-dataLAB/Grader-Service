@@ -24,6 +24,7 @@ def upgrade():
     op.execute('INSERT INTO "user" ("name") VALUES ("user4")')
     op.execute('INSERT INTO "user" ("name") VALUES ("fjaeger")')
     op.execute('INSERT INTO "user" ("name") VALUES ("ubuntu")')
+    op.execute('INSERT INTO "user" ("name") VALUES ("matthiasmatt")')
 
     ## Lectures
     op.execute('INSERT INTO "lecture" ("name","semester","code", "state", "deleted") VALUES ("lecture1","WS21","21wle1","active","active")')
@@ -38,8 +39,10 @@ def upgrade():
 
     op.execute('INSERT INTO "takepart" ("username","lectid","role") VALUES ("fjaeger",1,"instructor")')
     op.execute('INSERT INTO "takepart" ("username","lectid","role") VALUES ("ubuntu",1,"instructor")')
+    op.execute('INSERT INTO "takepart" ("username","lectid","role") VALUES ("matthiasmatt",1,"instructor")')
     op.execute('INSERT INTO "takepart" ("username","lectid","role") VALUES ("fjaeger",3,"student")')
     op.execute('INSERT INTO "takepart" ("username","lectid","role") VALUES ("ubuntu",3,"instructor")')
+    op.execute('INSERT INTO "takepart" ("username","lectid","role") VALUES ("matthiasmatt",3,"instructor")')
 
     # ## Assignments
     # op.execute('INSERT INTO "assignment" ("name","lectid","duedate","points","status", "type") VALUES ("assignment_1",1,"2021-09-21 23:59:00.000",20,"released","user")')

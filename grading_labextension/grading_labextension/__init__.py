@@ -1,4 +1,3 @@
-
 import json
 import logging
 from pathlib import Path
@@ -8,11 +7,11 @@ from traitlets.config.loader import Config
 
 from ._version import __version__
 
-
 HERE = Path(__file__).parent.resolve()
 
 with (HERE / "labextension" / "package.json").open() as fid:
     data = json.load(fid)
+
 
 def _jupyter_labextension_paths():
     return [{
@@ -20,10 +19,12 @@ def _jupyter_labextension_paths():
         "dest": data["name"]
     }]
 
+
 # unused import to register handlers
 from grading_labextension import handlers
 
 from grading_labextension.registry import HandlerPathRegistry
+
 
 def setup_handlers(web_app: ServerWebApplication, config: Config):
     host_pattern = ".*$"
@@ -31,11 +32,11 @@ def setup_handlers(web_app: ServerWebApplication, config: Config):
     base_url = web_app.settings["base_url"]
     log = logging.getLogger()
     log.info("#######################################################################")
+    log.info(f'{web_app.settings["server_root_dir"]=}')
     log.info("base_url: " + base_url)
     handlers = HandlerPathRegistry.handler_list(base_url=base_url + "grading_labextension")
     log.info([str(h[0]) for h in handlers])
     web_app.add_handlers(host_pattern, handlers)
-
 
 
 def _jupyter_server_extension_points():
@@ -52,6 +53,6 @@ def _load_jupyter_server_extension(server_app: ServerApp):
     server_app: jupyterlab.labapp.LabApp
         JupyterLab application instance
     """
-    
+
     setup_handlers(server_app.web_app, server_app.config)
     server_app.log.info("Registered grading extension at URL path /grading_labextension")
