@@ -5,8 +5,8 @@ from datetime import date, datetime  # noqa: F401
 
 from typing import List, Dict  # noqa: F401
 
-from .base_model_ import Model
-from .. import util
+from service.api.models.base_model_ import Model
+from service.api import util
 
 
 class Assignment(Model):
@@ -175,7 +175,7 @@ class Assignment(Model):
         :param status: The status of this Assignment.
         :type status: str
         """
-        allowed_values = ["created","pushed", "released", "fetching", "fetched", "complete"]  # noqa: E501
+        allowed_values = ["created", "pushed", "released", "fetching", "fetched", "complete"]  # noqa: E501
         if status not in allowed_values:
             raise ValueError(
                 "Invalid value for `status` ({0}), must be one of {1}"

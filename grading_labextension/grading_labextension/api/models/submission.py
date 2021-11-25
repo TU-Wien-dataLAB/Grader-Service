@@ -5,8 +5,8 @@ from datetime import date, datetime  # noqa: F401
 
 from typing import List, Dict  # noqa: F401
 
-from api.models.base_model_ import Model
-from api import util
+from grading_labextension.api.models.base_model_ import Model
+from grading_labextension.api import util
 
 
 class Submission(Model):

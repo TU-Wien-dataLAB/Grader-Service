@@ -5,8 +5,8 @@ from datetime import date, datetime  # noqa: F401
 
 from typing import List, Dict  # noqa: F401
 
-from .base_model_ import Model
-from .. import util
+from service.api.models.base_model_ import Model
+from service.api import util
 
 
 class ErrorMessage(Model):
