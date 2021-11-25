@@ -1,19 +1,19 @@
 import secrets
-from orm.assignment import Assignment
+from service.orm.assignment import Assignment
 import pytest
-from server import GraderServer
+from service.server import GraderServer
 import json
-from orm.submission import Submission
+from service.orm.submission import Submission
 from unittest.mock import AsyncMock, MagicMock, Mock, patch
-from autograding.feedback import GenerateFeedbackExecutor
+from service.autograding.feedback import GenerateFeedbackExecutor
 from sqlalchemy.engine.base import Engine
 from sqlalchemy.orm.session import Session
 
-## Imports are important otherwise they will not be found
+# Imports are important otherwise they will not be found
 from ..handlers.tornado_test_utils import *
 from ..handlers.db_util import insert_submission
 
-@pytest.mark.asyncio
+
 async def test_feedback(
     default_user,
     sql_alchemy_db,

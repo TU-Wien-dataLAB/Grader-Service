@@ -5,11 +5,11 @@ from service.server import GraderServer
 from .tornado_test_utils import *
 
 
-def test_version_handler(
+# @pytest.mark.asyncio
+async def test_version_handler(
     app: GraderServer,
     service_base_url,
-    sync_http_client,
-    base_url,
+    http_server_client,
     jupyter_hub_mock_server,
     default_user,
     default_token
@@ -17,18 +17,16 @@ def test_version_handler(
     http_server = jupyter_hub_mock_server(default_user, default_token)
     app.hub_api_url = http_server.url_for("")
 
-    url = base_url + service_base_url + "/"
-    response = sync_http_client.fetch(url, headers={"Authorization": f"Token {default_token}"})
+    url = service_base_url + "/"
+    response = await http_server_client.fetch(url, headers={"Authorization": f"Token {default_token}"})
     assert response.code == 200
     assert response.body.decode() == "1.0"
 
 
-@pytest.mark.gen_test
-def test_version_handler_with_specifier(
+async def test_version_handler_with_specifier(
     app: GraderServer,
     service_base_url,
-    http_client,
-    base_url,
+    http_server_client,
     jupyter_hub_mock_server,
     default_user,
     default_token
@@ -36,7 +34,7 @@ def test_version_handler_with_specifier(
     http_server = jupyter_hub_mock_server(default_user, default_token)
     app.hub_api_url = http_server.url_for("")
 
-    url = base_url + service_base_url + "/v1/"
-    response = yield http_client.fetch(url, headers={"Authorization": f"Token {default_token}"})
+    url = service_base_url + "/v1/"
+    response = await http_server_client.fetch(url, headers={"Authorization": f"Token {default_token}"})
     assert response.code == 200
     assert response.body.decode() == "1.0"

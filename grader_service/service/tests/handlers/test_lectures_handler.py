@@ -1,17 +1,17 @@
 import pytest
-from server import GraderServer
+from service.server import GraderServer
 import json
-from api.models.lecture import Lecture
+from service.api.models.lecture import Lecture
 from tornado.httpclient import HTTPClientError
 
-## Imports are important otherwise they will not be found
+# Imports are important otherwise they will not be found
 from .tornado_test_utils import *
 
-@pytest.mark.gen_test
-def test_get_lectures(
+
+async def test_get_lectures(
     app: GraderServer,
-    service_url,
-    http_client,
+    service_base_url,
+    http_server_client,
     jupyter_hub_mock_server,
     default_user,
     default_token,
@@ -19,8 +19,8 @@ def test_get_lectures(
     http_server = jupyter_hub_mock_server(default_user, default_token)
     app.hub_api_url = http_server.url_for("")[0:-1]
 
-    url = service_url + "/lectures"
-    response = yield http_client.fetch(
+    url = service_base_url + "/lectures"
+    response = await http_server_client.fetch(
         url, method="GET", headers={"Authorization": f"Token {default_token}"}
     )
     assert response.code == 200
@@ -30,11 +30,11 @@ def test_get_lectures(
     [Lecture.from_dict(l) for l in lectures]  # assert no errors
 
 
-@pytest.mark.gen_test
-def test_post_lectures(
+
+async def test_post_lectures(
     app: GraderServer,
-    service_url,
-    http_client,
+    service_base_url,
+    http_server_client,
     jupyter_hub_mock_server,
     default_user,
     default_token,
@@ -43,8 +43,8 @@ def test_post_lectures(
     http_server = jupyter_hub_mock_server(default_user, default_token)
     app.hub_api_url = http_server.url_for("")[0:-1]
 
-    url = service_url + "/lectures"
-    get_response = yield http_client.fetch(
+    url = service_base_url + "/lectures"
+    get_response = await http_server_client.fetch(
         url, method="GET", headers={"Authorization": f"Token {default_token}"}
     )
     assert get_response.code == 200
@@ -57,7 +57,7 @@ def test_post_lectures(
     pre_lecture = Lecture(
         id=-1, name="pytest_lecture", code="pt", complete=False, semester=None
     )
-    post_response = yield http_client.fetch(
+    post_response = await http_server_client.fetch(
         url,
         method="POST",
         headers={"Authorization": f"Token {default_token}"},
@@ -71,7 +71,7 @@ def test_post_lectures(
     assert not post_lecture.complete
     assert post_lecture.semester is None
 
-    get_response = yield http_client.fetch(
+    get_response = await http_server_client.fetch(
         url, method="GET", headers={"Authorization": f"Token {default_token}"}
     )
     assert get_response.code == 200
@@ -79,24 +79,24 @@ def test_post_lectures(
     assert len(lectures) == orig_len + 1
 
 
-@pytest.mark.gen_test
-def test_post_not_found(
+
+async def test_post_not_found(
     app: GraderServer,
-    service_url,
-    http_client,
+    service_base_url,
+    http_server_client,
     jupyter_hub_mock_server,
     default_user,
     default_token,
 ):
     http_server = jupyter_hub_mock_server(default_user, default_token)
     app.hub_api_url = http_server.url_for("")[0:-1]
-    url = service_url + "/lectures"
+    url = service_base_url + "/lectures"
     # same code not in user groups
     pre_lecture = Lecture(
         id=-1, name="pytest_lecture", code="pt", complete=False, semester=None
     )
     with pytest.raises(HTTPClientError) as exc_info:
-        yield http_client.fetch(
+        await http_server_client.fetch(
             url,
             method="POST",
             headers={"Authorization": f"Token {default_token}"},
@@ -105,20 +105,20 @@ def test_post_not_found(
     e = exc_info.value
     assert e.code == 404
 
-@pytest.mark.gen_test
-def test_get_lecture(
+
+async def test_get_lecture(
     app: GraderServer,
-    service_url,
-    http_client,
+    service_base_url,
+    http_server_client,
     jupyter_hub_mock_server,
     default_user,
     default_token,
 ):
     http_server = jupyter_hub_mock_server(default_user, default_token)
     app.hub_api_url = http_server.url_for("")[0:-1]
-    url = service_url + "/lectures/1"
+    url = service_base_url + "/lectures/1"
 
-    get_response = yield http_client.fetch(
+    get_response = await http_server_client.fetch(
         url,
         method="GET",
         headers={"Authorization": f"Token {default_token}"},
@@ -127,21 +127,21 @@ def test_get_lecture(
     Lecture.from_dict(json.loads(get_response.body.decode()))
 
 
-@pytest.mark.gen_test
-def test_get_lecture_not_found(
+
+async def test_get_lecture_not_found(
     app: GraderServer,
-    service_url,
-    http_client,
+    service_base_url,
+    http_server_client,
     jupyter_hub_mock_server,
     default_user,
     default_token,
 ):
     http_server = jupyter_hub_mock_server(default_user, default_token)
     app.hub_api_url = http_server.url_for("")[0:-1]
-    url = service_url + "/lectures/999"
+    url = service_base_url + "/lectures/999"
 
     with pytest.raises(HTTPClientError) as exc_info:
-        yield http_client.fetch(
+        await http_server_client.fetch(
             url,
             method="GET",
             headers={"Authorization": f"Token {default_token}"},
@@ -150,20 +150,20 @@ def test_get_lecture_not_found(
     assert e.code == 403
 
 
-@pytest.mark.gen_test
-def test_put_lecture(
+
+async def test_put_lecture(
     app: GraderServer,
-    service_url,
-    http_client,
+    service_base_url,
+    http_server_client,
     jupyter_hub_mock_server,
     default_user,
     default_token,
 ):
     http_server = jupyter_hub_mock_server(default_user, default_token)
     app.hub_api_url = http_server.url_for("")[0:-1]
-    url = service_url + "/lectures/3"
+    url = service_base_url + "/lectures/3"
 
-    get_response = yield http_client.fetch(
+    get_response = await http_server_client.fetch(
         url,
         method="GET",
         headers={"Authorization": f"Token {default_token}"},
@@ -172,7 +172,7 @@ def test_put_lecture(
     lecture = Lecture.from_dict(json.loads(get_response.body.decode()))
     lecture.name = "new name"
 
-    put_response = yield http_client.fetch(
+    put_response = await http_server_client.fetch(
         url,
         method="PUT",
         headers={"Authorization": f"Token {default_token}"},
@@ -184,20 +184,20 @@ def test_put_lecture(
     assert put_lecture.name == lecture.name
 
 
-@pytest.mark.gen_test
-def test_put_lecture_unauthorized(
+
+async def test_put_lecture_unauthorized(
     app: GraderServer,
-    service_url,
-    http_client,
+    service_base_url,
+    http_server_client,
     jupyter_hub_mock_server,
     default_user,
     default_token,
 ):
     http_server = jupyter_hub_mock_server(default_user, default_token)
     app.hub_api_url = http_server.url_for("")[0:-1]
-    url = service_url + "/lectures/1"
+    url = service_base_url + "/lectures/1"
 
-    get_response = yield http_client.fetch(
+    get_response = await http_server_client.fetch(
         url,
         method="GET",
         headers={"Authorization": f"Token {default_token}"},
@@ -207,7 +207,7 @@ def test_put_lecture_unauthorized(
     lecture.name = "new name"
 
     with pytest.raises(HTTPClientError) as exc_info:
-        yield http_client.fetch(
+        await http_server_client.fetch(
             url,
             method="PUT",
             headers={"Authorization": f"Token {default_token}"},
@@ -218,20 +218,20 @@ def test_put_lecture_unauthorized(
     assert e.code == 403
 
 
-@pytest.mark.gen_test
-def test_delete_lecture(
+
+async def test_delete_lecture(
     app: GraderServer,
-    service_url,
-    http_client,
+    service_base_url,
+    http_server_client,
     jupyter_hub_mock_server,
     default_user,
     default_token,
 ):
     http_server = jupyter_hub_mock_server(default_user, default_token)
     app.hub_api_url = http_server.url_for("")[0:-1]
-    url = service_url + "/lectures/3"
+    url = service_base_url + "/lectures/3"
 
-    delete_response = yield http_client.fetch(
+    delete_response = await http_server_client.fetch(
         url,
         method="DELETE",
         headers={"Authorization": f"Token {default_token}"},
@@ -239,7 +239,7 @@ def test_delete_lecture(
     assert delete_response.code == 200
 
     with pytest.raises(HTTPClientError) as exc_info:
-        yield http_client.fetch(
+        await http_server_client.fetch(
             url,
             method="GET",
             headers={"Authorization": f"Token {default_token}"},
@@ -247,21 +247,21 @@ def test_delete_lecture(
     e = exc_info.value
     assert e.code == 404
 
-@pytest.mark.gen_test
-def test_delete_lecture_unauthorized(
+
+async def test_delete_lecture_unauthorized(
     app: GraderServer,
-    service_url,
-    http_client,
+    service_base_url,
+    http_server_client,
     jupyter_hub_mock_server,
     default_user,
     default_token,
 ):
     http_server = jupyter_hub_mock_server(default_user, default_token)
     app.hub_api_url = http_server.url_for("")[0:-1]
-    url = service_url + "/lectures/1"
+    url = service_base_url + "/lectures/1"
 
     with pytest.raises(HTTPClientError) as exc_info:
-        yield http_client.fetch(
+        await http_server_client.fetch(
             url,
             method="DELETE",
             headers={"Authorization": f"Token {default_token}"},

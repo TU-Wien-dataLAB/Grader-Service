@@ -1,11 +1,11 @@
 import secrets
-from orm.assignment import Assignment
+from service.orm.assignment import Assignment
 import pytest
-from server import GraderServer
+from service.server import GraderServer
 import json
-from orm.submission import Submission
+from service.orm.submission import Submission
 from unittest.mock import AsyncMock, MagicMock, Mock, patch
-from autograding.local import LocalAutogradeExecutor
+from service.autograding.local import LocalAutogradeExecutor
 from sqlalchemy.engine.base import Engine
 from sqlalchemy.orm.session import Session
 
@@ -13,7 +13,7 @@ from sqlalchemy.orm.session import Session
 from ..handlers.tornado_test_utils import *
 from ..handlers.db_util import insert_submission
 
-@pytest.mark.asyncio
+
 async def test_auto_grading(
     default_user,
     sql_alchemy_db,
