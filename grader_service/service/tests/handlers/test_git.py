@@ -1,11 +1,11 @@
-from orm.assignment import Assignment
-from orm.group import Group
-from orm.submission import Submission
-from orm.takepart import Role, Scope
+from service.orm.assignment import Assignment
+from service.orm.group import Group
+from service.orm.submission import Submission
+from service.orm.takepart import Role, Scope
 import pytest
 from unittest.mock import Mock
-from handlers.git.server import GitBaseHandler
-from orm.lecture import Lecture
+from service.handlers.git.server import GitBaseHandler
+from service.orm.lecture import Lecture
 from tornado.web import HTTPError
 from .db_util import *
 import os
@@ -39,6 +39,7 @@ def get_query_side_effect(lid=1, code="ivs21s", a_type="user", scope=Scope.stude
             m.filter.return_value.one.return_value = None
         return m
     return query_side_effect
+
 
 def test_git_lookup_student(tmpdir):
     path = "services/grader/git/iv21s/assign_1/assignment"

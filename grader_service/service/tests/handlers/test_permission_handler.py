@@ -2,20 +2,19 @@ from datetime import datetime
 from re import sub
 import secrets
 import pytest
-from server import GraderServer
+from service.server import GraderServer
 import json
 from tornado.httpclient import HTTPClientError
 from .db_util import insert_submission, insert_take_part
 
-## Imports are important otherwise they will not be found
+# Imports are important otherwise they will not be found
 from .tornado_test_utils import *
 
 
-@pytest.mark.gen_test
-def test_get_permission(
+async def test_get_permission(
     app: GraderServer,
-    service_url,
-    http_client,
+    service_base_url,
+    http_server_client,
     jupyter_hub_mock_server,
     default_user,
     default_token,
@@ -24,9 +23,9 @@ def test_get_permission(
 
     http_server = jupyter_hub_mock_server(default_user, default_token)
     app.hub_api_url = http_server.url_for("")[0:-1]
-    url = service_url + f"/permissions/"
+    url = service_base_url + f"/permissions/"
 
-    response = yield http_client.fetch(
+    response = yield http_server_client.fetch(
         url, method="GET", headers={"Authorization": f"Token {default_token}"}
     )
     assert response.code == 200
@@ -45,11 +44,11 @@ def test_get_permission(
         groups.remove(t)
     assert len(groups) == 0
 
-@pytest.mark.gen_test
-def test_get_permission_new_groups(
+
+async def test_get_permission_new_groups(
     app: GraderServer,
-    service_url,
-    http_client,
+    service_base_url,
+    http_server_client,
     jupyter_hub_mock_server,
     default_user,
     default_token,
@@ -58,9 +57,9 @@ def test_get_permission_new_groups(
 
     http_server = jupyter_hub_mock_server(default_user, default_token)
     app.hub_api_url = http_server.url_for("")[0:-1]
-    url = service_url + f"/permissions/"
+    url = service_base_url + f"/permissions/"
 
-    response = yield http_client.fetch(
+    response = yield http_server_client.fetch(
         url, method="GET", headers={"Authorization": f"Token {default_token}"}
     )
     assert response.code == 200

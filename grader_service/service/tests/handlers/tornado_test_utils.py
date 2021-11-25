@@ -11,24 +11,12 @@ import tornado
 from sqlalchemy.orm import sessionmaker
 
 
-@pytest.fixture
-def sync_http_client(request, http_server):
-    """Get an asynchronous HTTP client.
-    """
-    client = tornado.httpclient.HTTPClient()
-
-    def _close():
-        client.close()
-
-    request.addfinalizer(_close)
-    return client
-
-
 @pytest.fixture(scope="module")
 def db_test_config():
     cfg = Config(
         os.path.abspath(os.path.dirname(__file__) + "../../../alembic_test.ini")
     )
+    cfg.set_main_option("script_location", os.path.abspath(os.path.dirname(__file__) + "../../../alembic"))
     yield cfg
 
 @pytest.fixture(scope="function")
@@ -61,11 +49,6 @@ def app(tmpdir, sql_alchemy_db):
 def service_base_url():
     base_url = "/services/grader"
     yield base_url
-
-@pytest.fixture(scope="function")
-def service_url(base_url, service_base_url):
-    url = base_url + service_base_url
-    yield url
 
 
 @pytest.fixture(scope="function")

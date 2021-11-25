@@ -1,14 +1,14 @@
 import json
-from handlers.base_handler import GraderBaseHandler
-from orm.assignment import Assignment
+from service.handlers.base_handler import GraderBaseHandler
+from service.orm.assignment import Assignment
 from datetime import datetime
-from api.models.error_message import ErrorMessage
-from orm.lecture import Lecture
+from service.api.models.error_message import ErrorMessage
+from service.orm.lecture import Lecture
 from .db_util import *
 from unittest.mock import AsyncMock, MagicMock, Mock
 import asyncio
 
-@pytest.mark.asyncio
+
 async def test_authenticate_token_user_None():
     token = "test_token"
     user = {"name": "user99", "groups": ["lecture1__WS21__student", "lecture1__SS21__tutor", "lecture99__SS22__student"]}
@@ -23,7 +23,7 @@ async def test_authenticate_token_user_None():
     await GraderBaseHandler.authenticate_token_user(m, token)
     m.set_secure_cookie.assert_called_with(token, json.dumps(user), expires_days=0.05)
 
-@pytest.mark.asyncio
+
 async def test_authenticate_token_user_Present():
     token = "test_token"
     user = {"name": "user99", "groups": ["lecture1__WS21__student", "lecture1__SS21__tutor", "lecture99__SS22__student"]}
@@ -70,7 +70,7 @@ def test_authenticate_cookie_user_New():
     assert not GraderBaseHandler.authenticate_cookie_user(m, user)
     m.set_secure_cookie.assert_called_with(user["name"], json.dumps(user), expires_days=1)
 
-@pytest.mark.asyncio 
+ 
 async def test_authenticate_user_no_cookies(session):
     token = "test_token"
     user = {"name": "user99", "groups": ["lecture1__WS21__student", "lecture1__SS21__tutor", "lecture99__SS22__student"]} 

@@ -6,6 +6,7 @@ jupyter_hub_config.py
 grading_labextension/grader/grading_labextension/labextension/*
 grading_labextension/grader/grading_labextension/labextension
 grading_labextension/grader/grading_labextension/labextension/build_log.json
+jupyterhub_cookie_secret
 
 ### Linux ###
 *~

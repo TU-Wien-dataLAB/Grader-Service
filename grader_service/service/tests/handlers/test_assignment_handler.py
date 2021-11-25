@@ -5,23 +5,23 @@ from service.api.models.assignment import Assignment
 from tornado.httpclient import HTTPClientError
 from .db_util import insert_submission
 
-## Imports are important otherwise they will not be found
+# Imports are important otherwise they will not be found
 from .tornado_test_utils import *
 
-@pytest.mark.gen_test
-def test_get_assignments(
+
+async def test_get_assignments(
     app: GraderServer,
-    service_url,
-    http_client,
+    service_base_url,
+    http_server_client,
     jupyter_hub_mock_server,
     default_user,
     default_token,
 ):
     http_server = jupyter_hub_mock_server(default_user, default_token)
     app.hub_api_url = http_server.url_for("")[0:-1]
-    url = service_url + "/lectures/1/assignments/"
+    url = service_base_url + "/lectures/1/assignments/"
 
-    response = yield http_client.fetch(
+    response = await http_server_client.fetch(
         url, method="GET", headers={"Authorization": f"Token {default_token}"}
     )
     assert response.code == 200
@@ -31,21 +31,21 @@ def test_get_assignments(
     [Assignment.from_dict(l) for l in assignments]  # assert no errors
 
 
-@pytest.mark.gen_test
-def test_post_assignment(
+
+async def test_post_assignment(
     app: GraderServer,
-    service_url,
-    http_client,
+    service_base_url,
+    http_server_client,
     jupyter_hub_mock_server,
     default_user,
     default_token,
 ):
     http_server = jupyter_hub_mock_server(default_user, default_token)
     app.hub_api_url = http_server.url_for("")[0:-1]
-    url = service_url + "/lectures/3/assignments/"
+    url = service_base_url + "/lectures/3/assignments/"
 
 
-    get_response = yield http_client.fetch(
+    get_response = await http_server_client.fetch(
         url, method="GET", headers={"Authorization": f"Token {default_token}"}
     )
     assert get_response.code == 200
@@ -54,7 +54,7 @@ def test_post_assignment(
     orig_len = len(assignments)
 
     pre_assignment = Assignment(id=-1, name="pytest", type="user", due_date=None, status="created", points=None)
-    post_response = yield http_client.fetch(
+    post_response = await http_server_client.fetch(
         url,
         method="POST",
         headers={"Authorization": f"Token {default_token}"},
@@ -69,7 +69,7 @@ def test_post_assignment(
     assert post_assignment.due_date is None
     assert post_assignment.points == 0.0
 
-    get_response = yield http_client.fetch(
+    get_response = await http_server_client.fetch(
         url, method="GET", headers={"Authorization": f"Token {default_token}"}
     )
     assert get_response.code == 200
@@ -77,22 +77,22 @@ def test_post_assignment(
     assert len(assignments) == orig_len + 1
 
 
-@pytest.mark.gen_test
-def test_post_no_status_error(
+
+async def test_post_no_status_error(
     app: GraderServer,
-    service_url,
-    http_client,
+    service_base_url,
+    http_server_client,
     jupyter_hub_mock_server,
     default_user,
     default_token,
 ):
     http_server = jupyter_hub_mock_server(default_user, default_token)
     app.hub_api_url = http_server.url_for("")[0:-1]
-    url = service_url + "/lectures/3/assignments/"
+    url = service_base_url + "/lectures/3/assignments/"
 
     pre_assignment = Assignment(id=-1, name="pytest", type="user", due_date=None, status=None, points=None)
     with pytest.raises(HTTPClientError) as exc_info:
-        yield http_client.fetch(
+        await http_server_client.fetch(
             url,
             method="POST",
             headers={"Authorization": f"Token {default_token}"},
@@ -102,21 +102,21 @@ def test_post_no_status_error(
     assert e.code == 400
 
 
-@pytest.mark.gen_test
-def test_put_assignment(
+
+async def test_put_assignment(
         app: GraderServer,
-    service_url,
-    http_client,
+    service_base_url,
+    http_server_client,
     jupyter_hub_mock_server,
     default_user,
     default_token,
 ):
     http_server = jupyter_hub_mock_server(default_user, default_token)
     app.hub_api_url = http_server.url_for("")[0:-1]
-    url = service_url + "/lectures/3/assignments/"
+    url = service_base_url + "/lectures/3/assignments/"
 
     pre_assignment = Assignment(id=-1, name="pytest", type="user", due_date=None, status="created", points=None)
-    post_response = yield http_client.fetch(
+    post_response = await http_server_client.fetch(
         url,
         method="POST",
         headers={"Authorization": f"Token {default_token}"},
@@ -131,7 +131,7 @@ def test_put_assignment(
 
     url = url + str(post_assignment.id)
 
-    put_response = yield http_client.fetch(
+    put_response = await http_server_client.fetch(
         url,
         method="PUT",
         headers={"Authorization": f"Token {default_token}"},
@@ -145,21 +145,21 @@ def test_put_assignment(
     assert put_assignment.status == "released"
 
 
-@pytest.mark.gen_test
-def test_put_assignment_no_point_changes(
+
+async def test_put_assignment_no_point_changes(
         app: GraderServer,
-    service_url,
-    http_client,
+    service_base_url,
+    http_server_client,
     jupyter_hub_mock_server,
     default_user,
     default_token,
 ):
     http_server = jupyter_hub_mock_server(default_user, default_token)
     app.hub_api_url = http_server.url_for("")[0:-1]
-    url = service_url + "/lectures/3/assignments/"
+    url = service_base_url + "/lectures/3/assignments/"
 
     pre_assignment = Assignment(id=-1, name="pytest", type="user", due_date=None, status="created", points=None)
-    post_response = yield http_client.fetch(
+    post_response = await http_server_client.fetch(
         url,
         method="POST",
         headers={"Authorization": f"Token {default_token}"},
@@ -175,7 +175,7 @@ def test_put_assignment_no_point_changes(
 
     url = url + str(post_assignment.id)
 
-    put_response = yield http_client.fetch(
+    put_response = await http_server_client.fetch(
         url,
         method="PUT",
         headers={"Authorization": f"Token {default_token}"},
@@ -190,21 +190,21 @@ def test_put_assignment_no_point_changes(
     assert put_assignment.points != 10.0
 
 
-@pytest.mark.gen_test
-def test_get_assignment(
+
+async def test_get_assignment(
     app: GraderServer,
-    service_url,
-    http_client,
+    service_base_url,
+    http_server_client,
     jupyter_hub_mock_server,
     default_user,
     default_token,
 ):
     http_server = jupyter_hub_mock_server(default_user, default_token)
     app.hub_api_url = http_server.url_for("")[0:-1]
-    url = service_url + "/lectures/3/assignments/"
+    url = service_base_url + "/lectures/3/assignments/"
 
     pre_assignment = Assignment(id=-1, name="pytest", type="user", due_date=None, status="created", points=None)
-    post_response = yield http_client.fetch(
+    post_response = await http_server_client.fetch(
         url,
         method="POST",
         headers={"Authorization": f"Token {default_token}"},
@@ -215,7 +215,7 @@ def test_get_assignment(
 
     url = url + str(post_assignment.id)
 
-    get_response = yield http_client.fetch(
+    get_response = await http_server_client.fetch(
         url,
         method="GET",
         headers={"Authorization": f"Token {default_token}"},
@@ -230,21 +230,21 @@ def test_get_assignment(
     assert get_assignment.due_date == post_assignment.due_date
 
 
-@pytest.mark.gen_test
-def test_delete_assignment(
+
+async def test_delete_assignment(
     app: GraderServer,
-    service_url,
-    http_client,
+    service_base_url,
+    http_server_client,
     jupyter_hub_mock_server,
     default_user,
     default_token,
 ):
     http_server = jupyter_hub_mock_server(default_user, default_token)
     app.hub_api_url = http_server.url_for("")[0:-1]
-    url = service_url + "/lectures/3/assignments/"
+    url = service_base_url + "/lectures/3/assignments/"
 
     pre_assignment = Assignment(id=-1, name="pytest", type="user", due_date=None, status="created", points=None)
-    post_response = yield http_client.fetch(
+    post_response = await http_server_client.fetch(
         url,
         method="POST",
         headers={"Authorization": f"Token {default_token}"},
@@ -255,7 +255,7 @@ def test_delete_assignment(
 
     url = url + str(post_assignment.id)
 
-    delete_response = yield http_client.fetch(
+    delete_response = await http_server_client.fetch(
         url,
         method="DELETE",
         headers={"Authorization": f"Token {default_token}"},
@@ -263,7 +263,7 @@ def test_delete_assignment(
     assert delete_response.code == 200
 
     with pytest.raises(HTTPClientError) as exc_info:
-        yield http_client.fetch(
+        await http_server_client.fetch(
             url,
             method="GET",
             headers={"Authorization": f"Token {default_token}"},
@@ -273,21 +273,21 @@ def test_delete_assignment(
     assert e.code == 404
 
 
-@pytest.mark.gen_test
-def test_delete_assignment_not_created(
+
+async def test_delete_assignment_not_created(
     app: GraderServer,
-    service_url,
-    http_client,
+    service_base_url,
+    http_server_client,
     jupyter_hub_mock_server,
     default_user,
     default_token,
 ):
     http_server = jupyter_hub_mock_server(default_user, default_token)
     app.hub_api_url = http_server.url_for("")[0:-1]
-    url = service_url + "/lectures/3/assignments/999"
+    url = service_base_url + "/lectures/3/assignments/999"
 
     with pytest.raises(HTTPClientError) as exc_info:
-        yield http_client.fetch(
+        await http_server_client.fetch(
             url,
             method="DELETE",
             headers={"Authorization": f"Token {default_token}"},
@@ -296,11 +296,11 @@ def test_delete_assignment_not_created(
     assert e.code == 404
 
 
-@pytest.mark.gen_test
-def test_delete_assignment_with_submissions(
+
+async def test_delete_assignment_with_submissions(
     app: GraderServer,
-    service_url,
-    http_client,
+    service_base_url,
+    http_server_client,
     jupyter_hub_mock_server,
     default_user,
     default_token,
@@ -310,13 +310,13 @@ def test_delete_assignment_with_submissions(
     app.hub_api_url = http_server.url_for("")[0:-1]
 
     a_id = 1
-    url = service_url + f"/lectures/3/assignments/{a_id}"
+    url = service_base_url + f"/lectures/3/assignments/{a_id}"
 
     engine = sql_alchemy_db.engine
     insert_submission(engine, assignment_id=a_id, username=default_user["name"])
 
     with pytest.raises(HTTPClientError) as exc_info:
-        yield http_client.fetch(
+        await http_server_client.fetch(
             url,
             method="DELETE",
             headers={"Authorization": f"Token {default_token}"},
@@ -325,21 +325,21 @@ def test_delete_assignment_with_submissions(
     assert e.code == 404
     
 
-@pytest.mark.gen_test
-def test_delete_assignment(
+
+async def test_delete_assignment(
     app: GraderServer,
-    service_url,
-    http_client,
+    service_base_url,
+    http_server_client,
     jupyter_hub_mock_server,
     default_user,
     default_token,
 ):
     http_server = jupyter_hub_mock_server(default_user, default_token)
     app.hub_api_url = http_server.url_for("")[0:-1]
-    url = service_url + "/lectures/3/assignments/"
+    url = service_base_url + "/lectures/3/assignments/"
 
     pre_assignment = Assignment(id=-1, name="pytest", type="user", due_date=None, status="created", points=None)
-    post_response = yield http_client.fetch(
+    post_response = await http_server_client.fetch(
         url,
         method="POST",
         headers={"Authorization": f"Token {default_token}"},
@@ -350,16 +350,16 @@ def test_delete_assignment(
 
     url = url + str(post_assignment.id)
 
-    delete_response = yield http_client.fetch(
+    delete_response = await http_server_client.fetch(
         url,
         method="DELETE",
         headers={"Authorization": f"Token {default_token}"},
     )
     assert delete_response.code == 200
 
-    url = service_url + "/lectures/3/assignments/"
+    url = service_base_url + "/lectures/3/assignments/"
 
-    post_response = yield http_client.fetch(
+    post_response = await http_server_client.fetch(
         url,
         method="POST",
         headers={"Authorization": f"Token {default_token}"},
@@ -370,7 +370,7 @@ def test_delete_assignment(
 
     url = url + str(post_assignment.id)
 
-    delete_response = yield http_client.fetch(
+    delete_response = await http_server_client.fetch(
         url,
         method="DELETE",
         headers={"Authorization": f"Token {default_token}"},
