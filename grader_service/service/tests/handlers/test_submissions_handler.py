@@ -333,3 +333,40 @@ async def test_put_submission(
     assert submission.score is None
 
 
+async def test_submission_properties(
+        app: GraderServer,
+        service_base_url,
+        http_server_client,
+        jupyter_hub_mock_server,
+        default_user,
+        default_token,
+        sql_alchemy_db,
+):
+    http_server = jupyter_hub_mock_server(default_user, default_token)
+    app.hub_api_url = http_server.url_for("")[0:-1]
+
+    l_id = 3 # default user is student
+    a_id = 3
+
+    url = service_base_url + f"/lectures/{l_id}/assignments/{a_id}/submissions/1/properties"
+
+    engine = sql_alchemy_db.engine
+    insert_assignments(engine, l_id)
+    insert_submission(engine, a_id, default_user["name"])
+
+    prop = {"test": "property", "value": 2, "bool": True, "null": None}
+    put_response = await http_server_client.fetch(
+        url,
+        method="PUT",
+        headers={"Authorization": f"Token {default_token}"},
+        body=json.dumps(prop),
+    )
+    assert put_response.code == 200
+    get_response = await http_server_client.fetch(
+        url,
+        method="GET",
+        headers={"Authorization": f"Token {default_token}"},
+    )
+    assert get_response.code == 200
+    assignment_props = json.loads(get_response.body.decode())
+    assert assignment_props == prop

@@ -10,12 +10,12 @@ from .tornado_test_utils import *
 
 
 async def test_get_assignments(
-    app: GraderServer,
-    service_base_url,
-    http_server_client,
-    jupyter_hub_mock_server,
-    default_user,
-    default_token,
+        app: GraderServer,
+        service_base_url,
+        http_server_client,
+        jupyter_hub_mock_server,
+        default_user,
+        default_token,
 ):
     http_server = jupyter_hub_mock_server(default_user, default_token)
     app.hub_api_url = http_server.url_for("")[0:-1]
@@ -31,19 +31,17 @@ async def test_get_assignments(
     [Assignment.from_dict(l) for l in assignments]  # assert no errors
 
 
-
 async def test_post_assignment(
-    app: GraderServer,
-    service_base_url,
-    http_server_client,
-    jupyter_hub_mock_server,
-    default_user,
-    default_token,
+        app: GraderServer,
+        service_base_url,
+        http_server_client,
+        jupyter_hub_mock_server,
+        default_user,
+        default_token,
 ):
     http_server = jupyter_hub_mock_server(default_user, default_token)
     app.hub_api_url = http_server.url_for("")[0:-1]
     url = service_base_url + "/lectures/3/assignments/"
-
 
     get_response = await http_server_client.fetch(
         url, method="GET", headers={"Authorization": f"Token {default_token}"}
@@ -77,14 +75,13 @@ async def test_post_assignment(
     assert len(assignments) == orig_len + 1
 
 
-
 async def test_post_no_status_error(
-    app: GraderServer,
-    service_base_url,
-    http_server_client,
-    jupyter_hub_mock_server,
-    default_user,
-    default_token,
+        app: GraderServer,
+        service_base_url,
+        http_server_client,
+        jupyter_hub_mock_server,
+        default_user,
+        default_token,
 ):
     http_server = jupyter_hub_mock_server(default_user, default_token)
     app.hub_api_url = http_server.url_for("")[0:-1]
@@ -102,14 +99,13 @@ async def test_post_no_status_error(
     assert e.code == 400
 
 
-
 async def test_put_assignment(
         app: GraderServer,
-    service_base_url,
-    http_server_client,
-    jupyter_hub_mock_server,
-    default_user,
-    default_token,
+        service_base_url,
+        http_server_client,
+        jupyter_hub_mock_server,
+        default_user,
+        default_token,
 ):
     http_server = jupyter_hub_mock_server(default_user, default_token)
     app.hub_api_url = http_server.url_for("")[0:-1]
@@ -145,14 +141,13 @@ async def test_put_assignment(
     assert put_assignment.status == "released"
 
 
-
 async def test_put_assignment_no_point_changes(
         app: GraderServer,
-    service_base_url,
-    http_server_client,
-    jupyter_hub_mock_server,
-    default_user,
-    default_token,
+        service_base_url,
+        http_server_client,
+        jupyter_hub_mock_server,
+        default_user,
+        default_token,
 ):
     http_server = jupyter_hub_mock_server(default_user, default_token)
     app.hub_api_url = http_server.url_for("")[0:-1]
@@ -171,7 +166,7 @@ async def test_put_assignment_no_point_changes(
     post_assignment.name = "new name"
     post_assignment.type = "group"
     post_assignment.status = "released"
-    post_assignment.points = 10.0 # this has no effect
+    post_assignment.points = 10.0  # this has no effect
 
     url = url + str(post_assignment.id)
 
@@ -190,14 +185,13 @@ async def test_put_assignment_no_point_changes(
     assert put_assignment.points != 10.0
 
 
-
 async def test_get_assignment(
-    app: GraderServer,
-    service_base_url,
-    http_server_client,
-    jupyter_hub_mock_server,
-    default_user,
-    default_token,
+        app: GraderServer,
+        service_base_url,
+        http_server_client,
+        jupyter_hub_mock_server,
+        default_user,
+        default_token,
 ):
     http_server = jupyter_hub_mock_server(default_user, default_token)
     app.hub_api_url = http_server.url_for("")[0:-1]
@@ -230,14 +224,13 @@ async def test_get_assignment(
     assert get_assignment.due_date == post_assignment.due_date
 
 
-
 async def test_delete_assignment(
-    app: GraderServer,
-    service_base_url,
-    http_server_client,
-    jupyter_hub_mock_server,
-    default_user,
-    default_token,
+        app: GraderServer,
+        service_base_url,
+        http_server_client,
+        jupyter_hub_mock_server,
+        default_user,
+        default_token,
 ):
     http_server = jupyter_hub_mock_server(default_user, default_token)
     app.hub_api_url = http_server.url_for("")[0:-1]
@@ -268,19 +261,18 @@ async def test_delete_assignment(
             method="GET",
             headers={"Authorization": f"Token {default_token}"},
         )
-    
+
     e = exc_info.value
     assert e.code == 404
 
 
-
 async def test_delete_assignment_not_created(
-    app: GraderServer,
-    service_base_url,
-    http_server_client,
-    jupyter_hub_mock_server,
-    default_user,
-    default_token,
+        app: GraderServer,
+        service_base_url,
+        http_server_client,
+        jupyter_hub_mock_server,
+        default_user,
+        default_token,
 ):
     http_server = jupyter_hub_mock_server(default_user, default_token)
     app.hub_api_url = http_server.url_for("")[0:-1]
@@ -296,15 +288,14 @@ async def test_delete_assignment_not_created(
     assert e.code == 404
 
 
-
 async def test_delete_assignment_with_submissions(
-    app: GraderServer,
-    service_base_url,
-    http_server_client,
-    jupyter_hub_mock_server,
-    default_user,
-    default_token,
-    sql_alchemy_db
+        app: GraderServer,
+        service_base_url,
+        http_server_client,
+        jupyter_hub_mock_server,
+        default_user,
+        default_token,
+        sql_alchemy_db
 ):
     http_server = jupyter_hub_mock_server(default_user, default_token)
     app.hub_api_url = http_server.url_for("")[0:-1]
@@ -323,16 +314,15 @@ async def test_delete_assignment_with_submissions(
         )
     e = exc_info.value
     assert e.code == 404
-    
 
 
-async def test_delete_assignment(
-    app: GraderServer,
-    service_base_url,
-    http_server_client,
-    jupyter_hub_mock_server,
-    default_user,
-    default_token,
+async def test_delete_assignment_same_name_twice(
+        app: GraderServer,
+        service_base_url,
+        http_server_client,
+        jupyter_hub_mock_server,
+        default_user,
+        default_token,
 ):
     http_server = jupyter_hub_mock_server(default_user, default_token)
     app.hub_api_url = http_server.url_for("")[0:-1]
@@ -376,4 +366,47 @@ async def test_delete_assignment(
         headers={"Authorization": f"Token {default_token}"},
     )
     assert delete_response.code == 200
+
+
+async def test_assignment_properties(
+        app: GraderServer,
+        service_base_url,
+        http_server_client,
+        jupyter_hub_mock_server,
+        default_user,
+        default_token,
+):
+    http_server = jupyter_hub_mock_server(default_user, default_token)
+    app.hub_api_url = http_server.url_for("")[0:-1]
+    url = service_base_url + "/lectures/3/assignments/"
+
+    pre_assignment = Assignment(id=-1, name="pytest", type="user", due_date=None, status="created", points=None)
+    post_response = await http_server_client.fetch(
+        url,
+        method="POST",
+        headers={"Authorization": f"Token {default_token}"},
+        body=json.dumps(pre_assignment.to_dict()),
+    )
+    assert post_response.code == 200
+    post_assignment = Assignment.from_dict(json.loads(post_response.body.decode()))
+
+    url = service_base_url + f"/lectures/3/assignments/{post_assignment.id}/properties"
+    prop = {"test": "property", "value": 2, "bool": True, "null": None}
+    put_response = await http_server_client.fetch(
+        url,
+        method="PUT",
+        headers={"Authorization": f"Token {default_token}"},
+        body=json.dumps(prop),
+    )
+    assert put_response.code == 200
+    get_response = await http_server_client.fetch(
+        url,
+        method="GET",
+        headers={"Authorization": f"Token {default_token}"},
+    )
+    assert get_response.code == 200
+    assignment_props = json.loads(get_response.body.decode())
+    assert assignment_props == prop
+
+
 
