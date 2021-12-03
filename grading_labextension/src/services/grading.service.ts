@@ -2,10 +2,7 @@ import { Observable } from 'rxjs';
 import { Lecture } from '../model/lecture';
 import { Assignment } from '../model/assignment'
 import { User } from '../model/user'
-import { ManualGradingContent } from '../model/manualGradingContent'
-import { GradingResult } from '../model/gradingResult'
 import { request, HTTPMethod } from './request.service'
-import { Feedback } from '../model/feedback';
 import { Submission } from '../model/submission';
 
 export function createManualFeedback(lectid: number, assignid: number, subid: number): Observable<any> {
@@ -26,22 +23,22 @@ export function getStudentSubmissions(lecture: Lecture, assignment: Assignment):
   return request<any>(HTTPMethod.GET, `/lectures/${lecture.id}/assignements/${assignment.id}/grading`)
 }
 
-export function getManualFeedback(lecture: Lecture, assignment: Assignment, student: User): Observable<ManualGradingContent> {
-  return request<ManualGradingContent>(HTTPMethod.GET, `/lectures/${lecture.id}/assignments/${assignment.id}/grading/${student.name}/manual`)
+export function getManualFeedback(lecture: Lecture, assignment: Assignment, student: User): Observable<object> {
+  return request<object>(HTTPMethod.GET, `/lectures/${lecture.id}/assignments/${assignment.id}/grading/${student.name}/manual`)
 }
 
 
-export function updateManualFeedback(lecture: Lecture, assignment: Assignment, student: User, manual: ManualGradingContent): Observable<ManualGradingContent> {
-  return request<ManualGradingContent>(HTTPMethod.PUT, `/lectures/${lecture.id}/assignements/${assignment.id}/grading/${student.name}/manual`, manual)
+export function updateManualFeedback(lecture: Lecture, assignment: Assignment, student: User, manual: object): Observable<object> {
+  return request<object>(HTTPMethod.PUT, `/lectures/${lecture.id}/assignements/${assignment.id}/grading/${student.name}/manual`, manual)
 }
 
 
-export function deleteManualFeedback(lecture: Lecture, assignment: Assignment, student: User, manual: ManualGradingContent): Observable<any> {
+export function deleteManualFeedback(lecture: Lecture, assignment: Assignment, student: User, manual: object): Observable<any> {
   return request<any>(HTTPMethod.DELETE, `/lectures/${lecture.id}/assignments/${assignment.id}/grading/${student.name}/manual`, manual)
 }
 
-export function getGrade(lecture: Lecture, assignment: Assignment, student: User): Observable<GradingResult> {
-  return request<GradingResult>(HTTPMethod.GET, `/lectures/${lecture.id}/assignments/${assignment.id}/grading/${student.name}/score`)
+export function getGrade(lecture: Lecture, assignment: Assignment, student: User): Observable<object> {
+  return request<object>(HTTPMethod.GET, `/lectures/${lecture.id}/assignments/${assignment.id}/grading/${student.name}/score`)
 }
 
 
