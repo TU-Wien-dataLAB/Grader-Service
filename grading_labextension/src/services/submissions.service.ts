@@ -1,7 +1,6 @@
 import { Observable } from "rxjs";
 import { map } from "rxjs/operators";
 import { Assignment } from "../model/assignment";
-import { Feedback } from "../model/feedback";
 import { Lecture } from "../model/lecture";
 import { Submission } from "../model/submission";
 import { User } from "../model/user";
@@ -41,7 +40,7 @@ import { request, HTTPMethod } from "./request.service";
 
   }
 
-  export function getFeedback(lecture: Lecture, assignment : Assignment, latest: boolean = false, instructor: boolean = false): Observable<Feedback> {
+  export function getFeedback(lecture: Lecture, assignment : Assignment, latest: boolean = false, instructor: boolean = false): Observable<object> {
     let url = `/lectures/${lecture.id}/assignments/${assignment.id}/feedback`;
     if (latest || instructor) {
       let searchParams = new URLSearchParams({
@@ -50,7 +49,7 @@ import { request, HTTPMethod } from "./request.service";
       })
       url += '?' + searchParams;
     }
-    return request<Feedback>(HTTPMethod.GET, url)
+    return request<object>(HTTPMethod.GET, url)
   }
 
   export function getProperties(lectureId: number, assignmentId: number, submissionId: number): Observable<object> {
