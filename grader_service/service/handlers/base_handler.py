@@ -108,6 +108,12 @@ class GraderBaseHandler(SessionMixin, web.RequestHandler):
     async def prepare(self) -> Optional[Awaitable[None]]:
         await self.authenticate_user()
 
+    def validate_parameters(self, *args):
+        if len(self.request.arguments) == 0:
+            return
+        if len(set(self.request.arguments.keys()) - set(self.request.body_arguments) - set(args)) != 0:
+            raise HTTPError(400, "Unknown arguments")
+
     async def authenticate_user(self):
         """
         This is a workaround for async authentication. `get_current_user` cannot be asynchronous and a request cannot be made in a blocking manner.
