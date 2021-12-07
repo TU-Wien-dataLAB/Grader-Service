@@ -4,7 +4,10 @@ from service.orm.assignment import Assignment
 from datetime import datetime
 from service.api.models.error_message import ErrorMessage
 from service.orm.lecture import Lecture
+from sqlalchemy.orm import sessionmaker
+
 from .db_util import *
+from .tornado_test_utils import *
 from unittest.mock import AsyncMock, MagicMock, Mock
 import asyncio
 
@@ -71,12 +74,13 @@ def test_authenticate_cookie_user_New():
     m.set_secure_cookie.assert_called_with(user["name"], json.dumps(user), expires_days=1)
 
  
-async def test_authenticate_user_no_cookies(session):
+async def test_authenticate_user_no_cookies(sql_alchemy_db):
     token = "test_token"
     user = {"name": "user99", "groups": ["lecture1__WS21__student", "lecture1__SS21__tutor", "lecture99__SS22__student"]} 
     async_mock = AsyncMock(return_value=user)
     m = MagicMock()
     m.get_current_user_async = async_mock
+    session = sessionmaker(bind=sql_alchemy_db.engine)()
     m.session = session
     m.authenticate_user = GraderBaseHandler.authenticate_user
     m.get_request_token = Mock(return_value=token)

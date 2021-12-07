@@ -335,6 +335,40 @@ async def test_put_assignment_wrong_lecture_id(
     assert e.code == 404
 
 
+async def test_put_assignment_wrong_assignment_id(
+        app: GraderServer,
+        service_base_url,
+        http_server_client,
+        jupyter_hub_mock_server,
+        default_user,
+        default_token,
+):
+    http_server = jupyter_hub_mock_server(default_user, default_token)
+    app.hub_api_url = http_server.url_for("")[0:-1]
+    url = service_base_url + "/lectures/3/assignments/"
+
+    pre_assignment = Assignment(id=-1, name="pytest", type="user", due_date=None, status="created", points=None)
+    post_response = await http_server_client.fetch(
+        url,
+        method="POST",
+        headers={"Authorization": f"Token {default_token}"},
+        body=json.dumps(pre_assignment.to_dict()),
+    )
+    assert post_response.code == 200
+    post_assignment = Assignment.from_dict(json.loads(post_response.body.decode()))
+
+    url = url + "99"
+    with pytest.raises(HTTPClientError) as exc_info:
+        await http_server_client.fetch(
+            url,
+            method="PUT",
+            headers={"Authorization": f"Token {default_token}"},
+            body=json.dumps(post_assignment.to_dict()),
+        )
+    e = exc_info.value
+    assert e.code == 404
+
+
 async def test_put_assignment_deleted_assignment(
         app: GraderServer,
         service_base_url,
@@ -460,6 +494,97 @@ async def test_get_assignment(
     assert get_assignment.due_date == post_assignment.due_date
 
 
+async def test_get_assignment_created_student(
+        app: GraderServer,
+        service_base_url,
+        http_server_client,
+        jupyter_hub_mock_server,
+        default_user,
+        default_token,
+):
+    http_server = jupyter_hub_mock_server(default_user, default_token)
+    app.hub_api_url = http_server.url_for("")[0:-1]
+    l_id = 1  # default user is student
+    a_id = 2  # assignment is created
+    url = service_base_url + f"/lectures/{l_id}/assignments/{a_id}"
+
+    with pytest.raises(HTTPClientError) as exc_info:
+        await http_server_client.fetch(
+            url,
+            method="GET",
+            headers={"Authorization": f"Token {default_token}"},
+        )
+    assert exc_info.value.code == 404
+
+
+async def test_get_assignment_wrong_lecture_id(
+        app: GraderServer,
+        service_base_url,
+        http_server_client,
+        jupyter_hub_mock_server,
+        default_user,
+        default_token,
+):
+    http_server = jupyter_hub_mock_server(default_user, default_token)
+    app.hub_api_url = http_server.url_for("")[0:-1]
+    l_id = 3
+    url = service_base_url + f"/lectures/{l_id}/assignments/"
+
+    pre_assignment = Assignment(id=-1, name="pytest", type="user", due_date=None, status="created", points=None)
+    post_response = await http_server_client.fetch(
+        url,
+        method="POST",
+        headers={"Authorization": f"Token {default_token}"},
+        body=json.dumps(pre_assignment.to_dict()),
+    )
+    assert post_response.code == 200
+    post_assignment = Assignment.from_dict(json.loads(post_response.body.decode()))
+
+    l_id = 1
+    url = service_base_url + f"/lectures/{l_id}/assignments/{post_assignment.id}"
+
+    with pytest.raises(HTTPClientError) as exc_info:
+        await http_server_client.fetch(
+            url,
+            method="GET",
+            headers={"Authorization": f"Token {default_token}"},
+        )
+    assert exc_info.value.code == 404
+
+
+async def test_get_assignment_wrong_assignment_id(
+        app: GraderServer,
+        service_base_url,
+        http_server_client,
+        jupyter_hub_mock_server,
+        default_user,
+        default_token,
+):
+    http_server = jupyter_hub_mock_server(default_user, default_token)
+    app.hub_api_url = http_server.url_for("")[0:-1]
+    l_id = 3
+    url = service_base_url + f"/lectures/{l_id}/assignments/"
+
+    pre_assignment = Assignment(id=-1, name="pytest", type="user", due_date=None, status="created", points=None)
+    post_response = await http_server_client.fetch(
+        url,
+        method="POST",
+        headers={"Authorization": f"Token {default_token}"},
+        body=json.dumps(pre_assignment.to_dict()),
+    )
+    assert post_response.code == 200
+
+    url = service_base_url + f"/lectures/{l_id}/assignments/99"
+
+    with pytest.raises(HTTPClientError) as exc_info:
+        await http_server_client.fetch(
+            url,
+            method="GET",
+            headers={"Authorization": f"Token {default_token}"},
+        )
+    assert exc_info.value.code == 404
+
+
 async def test_get_assignment_incorrect_param(
         app: GraderServer,
         service_base_url,
@@ -574,6 +699,48 @@ async def test_delete_assignment(
         await http_server_client.fetch(
             url,
             method="GET",
+            headers={"Authorization": f"Token {default_token}"},
+        )
+
+    e = exc_info.value
+    assert e.code == 404
+
+
+async def test_delete_assignment_deleted_assignment(
+        app: GraderServer,
+        service_base_url,
+        http_server_client,
+        jupyter_hub_mock_server,
+        default_user,
+        default_token,
+):
+    http_server = jupyter_hub_mock_server(default_user, default_token)
+    app.hub_api_url = http_server.url_for("")[0:-1]
+    url = service_base_url + "/lectures/3/assignments/"
+
+    pre_assignment = Assignment(id=-1, name="pytest", type="user", due_date=None, status="created", points=None)
+    post_response = await http_server_client.fetch(
+        url,
+        method="POST",
+        headers={"Authorization": f"Token {default_token}"},
+        body=json.dumps(pre_assignment.to_dict()),
+    )
+    assert post_response.code == 200
+    post_assignment = Assignment.from_dict(json.loads(post_response.body.decode()))
+
+    url = url + str(post_assignment.id)
+
+    delete_response = await http_server_client.fetch(
+        url,
+        method="DELETE",
+        headers={"Authorization": f"Token {default_token}"},
+    )
+    assert delete_response.code == 200
+
+    with pytest.raises(HTTPClientError) as exc_info:
+        await http_server_client.fetch(
+            url,
+            method="DELETE",
             headers={"Authorization": f"Token {default_token}"},
         )
 
@@ -792,4 +959,110 @@ async def test_assignment_properties(
     assert assignment_props == prop
 
 
+async def test_assignment_properties_lecture_assignment_missmatch(
+        app: GraderServer,
+        service_base_url,
+        http_server_client,
+        jupyter_hub_mock_server,
+        default_user,
+        default_token,
+        sql_alchemy_db,
+):
+    http_server = jupyter_hub_mock_server(default_user, default_token)
+    app.hub_api_url = http_server.url_for("")[0:-1]
 
+    l_id = 3
+    a_id = 1
+    engine = sql_alchemy_db.engine
+    insert_assignments(engine, l_id)
+
+    url = service_base_url + f"/lectures/{l_id}/assignments/{a_id}/properties"
+    prop = {"test": "property", "value": 2, "bool": True, "null": None}
+
+    with pytest.raises(HTTPClientError) as exc_info:
+        await http_server_client.fetch(
+            url,
+            method="PUT",
+            headers={"Authorization": f"Token {default_token}"},
+            body=json.dumps(prop),
+        )
+    e = exc_info.value
+    assert e.code == 404
+
+    with pytest.raises(HTTPClientError) as exc_info:
+        await http_server_client.fetch(
+            url,
+            method="GET",
+            headers={"Authorization": f"Token {default_token}"},
+        )
+    e = exc_info.value
+    assert e.code == 404
+
+
+async def test_assignment_properties_wrong_assignment_id(
+        app: GraderServer,
+        service_base_url,
+        http_server_client,
+        jupyter_hub_mock_server,
+        default_user,
+        default_token,
+        sql_alchemy_db,
+):
+    http_server = jupyter_hub_mock_server(default_user, default_token)
+    app.hub_api_url = http_server.url_for("")[0:-1]
+
+    l_id = 3
+    a_id = 99
+    engine = sql_alchemy_db.engine
+    insert_assignments(engine, l_id)
+
+    url = service_base_url + f"/lectures/{l_id}/assignments/{a_id}/properties"
+    prop = {"test": "property", "value": 2, "bool": True, "null": None}
+
+    with pytest.raises(HTTPClientError) as exc_info:
+        await http_server_client.fetch(
+            url,
+            method="PUT",
+            headers={"Authorization": f"Token {default_token}"},
+            body=json.dumps(prop),
+        )
+    e = exc_info.value
+    assert e.code == 404
+
+    with pytest.raises(HTTPClientError) as exc_info:
+        await http_server_client.fetch(
+            url,
+            method="GET",
+            headers={"Authorization": f"Token {default_token}"},
+        )
+    e = exc_info.value
+    assert e.code == 404
+
+
+async def test_assignment_properties_not_found(
+        app: GraderServer,
+        service_base_url,
+        http_server_client,
+        jupyter_hub_mock_server,
+        default_user,
+        default_token,
+        sql_alchemy_db,
+):
+    http_server = jupyter_hub_mock_server(default_user, default_token)
+    app.hub_api_url = http_server.url_for("")[0:-1]
+
+    l_id = 3
+    a_id = 3
+    engine = sql_alchemy_db.engine
+    insert_assignments(engine, l_id)
+
+    url = service_base_url + f"/lectures/{l_id}/assignments/{a_id}/properties"
+
+    with pytest.raises(HTTPClientError) as exc_info:
+        await http_server_client.fetch(
+            url,
+            method="GET",
+            headers={"Authorization": f"Token {default_token}"},
+        )
+    e = exc_info.value
+    assert e.code == 404

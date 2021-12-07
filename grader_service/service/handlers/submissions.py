@@ -51,16 +51,21 @@ class SubmissionHandler(GraderBaseHandler):
         :raises HTTPError: throws err if user is not authorized or the assignment was not found
         """
         lecture_id, assignment_id = parse_ids(lecture_id, assignment_id)
+        self.validate_parameters("latest", "instructor-version")
         latest = self.get_argument("latest", None) == "true"
         instructor_version = self.get_argument("instructor-version", None) == "true"
 
-        role = self.session.query(Role).get((self.user.name, lecture_id))
+        role: Role = self.session.query(Role).get((self.user.name, lecture_id))
         if instructor_version and role.role < Scope.tutor:
             self.error_message = "Unauthorized"
             raise HTTPError(403)
 
+        assignment = self.session.query(Assignment).get(assignment_id)
+        if assignment is None or assignment.lectid != lecture_id:
+            self.error_message = "Not Found!"
+            raise HTTPError(404)
+
         if instructor_version:
-            assignment = self.session.query(Assignment).get(assignment_id)
             if (
                 assignment is None
                 or assignment.deleted == DeleteState.deleted
@@ -68,7 +73,6 @@ class SubmissionHandler(GraderBaseHandler):
             ):
                 self.error_message = "Not Found"
                 raise HTTPError(404)
-            submissions = []
             if latest:
                 submissions = (
                     self.session.query(
@@ -95,9 +99,8 @@ class SubmissionHandler(GraderBaseHandler):
                 if sub.username in user_map:
                     user_map[sub.username]["submissions"].append(sub)
                 else:
-                    u = (
-                        User()
-                    )  # sub.user is none because submission was created in tuple_to_submission
+                    # sub.user is none because submission was created in tuple_to_submission (without database conn.)
+                    u = User()
                     u.name = sub.username
                     user_map[sub.username] = {"user": u, "submissions": [sub]}
             response = list(user_map.values())
