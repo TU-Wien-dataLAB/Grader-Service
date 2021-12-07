@@ -5,6 +5,7 @@ from ..orm.base import DeleteState
 from ..orm.takepart import Role, Scope
 from ..registry import VersionSpecifier, register_handler
 from sqlalchemy.orm.exc import ObjectDeletedError
+from sqlalchemy.exc import IntegrityError
 from tornado.web import HTTPError
 from .handler_utils import parse_ids
 
@@ -25,6 +26,7 @@ class AssignmentBaseHandler(GraderBaseHandler):
         :raises HTTPError: throws err if lecture is deleted
         """
         lecture_id = parse_ids(lecture_id)
+        self.validate_parameters()
         role = self.session.query(Role).get((self.user.name, lecture_id))
         if role.lecture.deleted == DeleteState.deleted:
             self.error_message = "Not Found"
@@ -56,6 +58,7 @@ class AssignmentBaseHandler(GraderBaseHandler):
         :type lecture_id: int
         """
         lecture_id = parse_ids(lecture_id)
+        self.validate_parameters()
         role = self.session.query(Role).get((self.user.name, lecture_id))
         if role.lecture.deleted == DeleteState.deleted:
             self.error_message = "Not Found"
@@ -76,7 +79,12 @@ class AssignmentBaseHandler(GraderBaseHandler):
         assignment.points = 0
         assignment.deleted = DeleteState.active
         self.session.add(assignment)
-        self.session.commit()
+        try:
+            self.session.commit()
+        except IntegrityError:
+            self.session.rollback()
+            self.error_message = "Cannot add object to database."
+            raise HTTPError(400)
         self.write_json(assignment)
 
 
@@ -96,6 +104,7 @@ class AssignmentObjectHandler(GraderBaseHandler):
         :raises HTTPError: throws err if assignment was not found
         """
         lecture_id, assignment_id = parse_ids(lecture_id, assignment_id)
+        self.validate_parameters()
         body = tornado.escape.json_decode(self.request.body)
         assignment_model = AssignmentModel.from_dict(body)
         assignment = self.session.query(Assignment).get(assignment_id)
@@ -125,6 +134,7 @@ class AssignmentObjectHandler(GraderBaseHandler):
         :raises HTTPError: throws err if assignment was not found
         """
         lecture_id, assignment_id = parse_ids(lecture_id, assignment_id)
+        self.validate_parameters("instructor-version")
         instructor_version = self.get_argument("instructor-version", "false") == "true"
 
         role = self.session.query(Role).get((self.user.name, lecture_id))
@@ -152,6 +162,7 @@ class AssignmentObjectHandler(GraderBaseHandler):
         :raises HTTPError: throws err if assignment was not found or deleted
         """
         lecture_id, assignment_id = parse_ids(lecture_id, assignment_id)
+        self.validate_parameters()
         try:
             assignment = self.session.query(Assignment).get(assignment_id)
             if assignment is None or assignment.lectid != lecture_id:
@@ -204,6 +215,7 @@ class AssignmentPropertiesHandler(GraderBaseHandler):
         :raises HTTPError: throws err if the assignment or their properties were not found
         """
         lecture_id, assignment_id = parse_ids(lecture_id, assignment_id)
+        self.validate_parameters()
         assignment = self.session.query(Assignment).get(assignment_id)
         if (
             assignment is None
@@ -229,6 +241,7 @@ class AssignmentPropertiesHandler(GraderBaseHandler):
         :raises HTTPError: throws err if the assignment was not found
         """
         lecture_id, assignment_id = parse_ids(lecture_id, assignment_id)
+        self.validate_parameters()
         assignment = self.session.query(Assignment).get(assignment_id)
         if (
             assignment is None
