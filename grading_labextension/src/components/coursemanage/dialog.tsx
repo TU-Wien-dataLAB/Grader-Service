@@ -8,7 +8,7 @@ import AdapterDateFns from "@mui/lab/AdapterDateFns";
 import LocalizationProvider from "@mui/lab/LocalizationProvider";
 import DateTimePicker from "@mui/lab/DateTimePicker";
 import { Dialog } from "@material-ui/core";
-import { Paper, Stack, styled, TextFieldProps } from "@mui/material";
+import { DialogActions, DialogContent, DialogTitle, Paper, Stack, styled, TextFieldProps } from "@mui/material";
 import { Assignment } from "../../model/assignment";
 
 const validationSchema = yup.object({
@@ -24,14 +24,6 @@ const validationSchema = yup.object({
     .required()
 
 });
-
-const Item = styled(Paper)(({ theme }) => ({
-  ...theme.typography.body2,
-  padding: theme.spacing(1),
-  textAlign: 'center',
-  color: theme.palette.text.secondary,
-}));  
-
 
 //TODO: props interface
 export const EditDialog = (props : any) => {
@@ -62,9 +54,9 @@ export const EditDialog = (props : any) => {
         Edit
       </Button>
       <Dialog open={openDialog}>
-        <Stack spacing={6}>
+      <DialogTitle>Edit Assignment</DialogTitle>
         <form onSubmit={formik.handleSubmit}>
-          <Item>
+        <DialogContent>
           <TextField
             variant="outlined"
             fullWidth
@@ -76,10 +68,9 @@ export const EditDialog = (props : any) => {
             error={formik.touched.name && Boolean(formik.errors.name)}
             helperText={formik.touched.name && formik.errors.name}
           />
-          </Item>
           <LocalizationProvider dateAdapter={AdapterDateFns}>
-          <Item>
             <DateTimePicker
+              ampm={false}
               renderInput={(props : TextFieldProps) => {
                 //@ts-ignore
                 return <TextField {...props} helperText={formik.touched.deadline && formik.errors.deadline}
@@ -91,9 +82,9 @@ export const EditDialog = (props : any) => {
                 formik.setFieldValue("deadline", date);
               }}
             />
-            </Item>
           </LocalizationProvider>
-          <Item>
+          </DialogContent>
+          <DialogActions>
           <Button color="primary" variant="contained" type="submit">
             Submit
           </Button>
@@ -106,9 +97,8 @@ export const EditDialog = (props : any) => {
           >
             Cancel
           </Button>
-          </Item>
+          </DialogActions>
         </form>
-        </Stack>
       </Dialog>
     </div>
   );
