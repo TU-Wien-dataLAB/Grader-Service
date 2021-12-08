@@ -4,9 +4,9 @@
 @import url('components/createassignment.css');
 @import url('components/cellwidget.css');
 @import url('components/manual-grade.css');
-
+@import url('components/lecturecard.css');
 :root {
-  --text-color: #2e373d;
-  --accent-color: rgb(243, 114, 0);
-  --submit-color: #0d8050;
+    --text-color: #2e373d;
+    --accent-color: rgb(243, 114, 0);
+    --submit-color: #0d8050;
 }
