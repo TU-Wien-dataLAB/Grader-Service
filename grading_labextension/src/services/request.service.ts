@@ -1,13 +1,13 @@
 import { URLExt } from '@jupyterlab/coreutils';
 import { ServerConnection } from '@jupyterlab/services';
-import { Observable, from, throwError } from 'rxjs';
+import { from, throwError } from 'rxjs';
 import { switchMap } from 'rxjs/operators'
 
 export enum HTTPMethod {
   GET = "GET", POST = "POST", PUT = "PUT", DELETE = "DELETE"
 }
 
-export function request<T>(method: HTTPMethod, endPoint: string, body: object = null, headers: HeadersInit = null): Observable<T> {
+export function request<T>(method: HTTPMethod, endPoint: string, body: object = null, headers: HeadersInit = null): Promise<T> {
   let options: RequestInit = {}
   options.method = method
   if (body) {
@@ -44,6 +44,7 @@ export function request<T>(method: HTTPMethod, endPoint: string, body: object = 
       console.log(data)
       return data
     })
-  )
+      //FIXME: this is only a hotfix to change type to promise
+  ).toPromise()
 
 }

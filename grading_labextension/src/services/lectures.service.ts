@@ -1,20 +1,19 @@
-import { Observable } from 'rxjs';
 import { Lecture } from '../model/lecture';
 import {request, HTTPMethod} from './request.service'
 
-export function createLecture(lecture: Lecture): Observable<Lecture> {
+export function createLecture(lecture: Lecture): Promise<Lecture> {
   return request<Lecture>(HTTPMethod.POST, "/lectures", lecture)
 }
 
-export function getAllLectures(): Observable<Lecture[]> {
+export function getAllLectures(): Promise<Lecture[]> {
   return request<Lecture[]>(HTTPMethod.GET, "/lectures")
 }
 
-export function updateLecture(lecture: Lecture): Observable<Lecture> {
+export function updateLecture(lecture: Lecture): Promise<Lecture> {
   return request<Lecture>(HTTPMethod.PUT, `/lectures/${lecture.id}`, lecture)
 }
 
-export function getLecture(lectureId: number): Observable<Lecture> {
+export function getLecture(lectureId: number): Promise<Lecture> {
   return request<Lecture>(HTTPMethod.GET, `/lectures/${lectureId}`)
 }
 
