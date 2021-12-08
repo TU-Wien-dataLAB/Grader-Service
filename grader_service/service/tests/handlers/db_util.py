@@ -11,22 +11,6 @@ import secrets
 from datetime import datetime
 
 
-@pytest.fixture
-def session():
-    cfg = Config(os.path.abspath(os.path.dirname(__file__) + "../../../alembic_test.ini"))
-    # cfg.set_main_option('script_location', os.path.abspath(os.path.dirname(__file__) + "../../../alembic"))
-    # cfg.set_main_option('sqlalchemy.url', 'sqlite:///:memory:')
-    engine = create_engine("sqlite:///:memory:", echo=True)
-
-    with engine.begin() as connection:
-        cfg.attributes['connection'] = connection
-        # downgrade(cfg, "base")
-        upgrade(cfg, "head")
-
-    yield Session(bind=engine)
-    engine.dispose()
-
-
 def insert_users(session):
     session.execute('INSERT INTO "user" ("name") VALUES ("user1")')
     session.execute('INSERT INTO "user" ("name") VALUES ("user2")')
@@ -72,27 +56,3 @@ def insert_take_part(ex, lecture_id, username="ubuntu", role="student"):
 def insert_grading(session):
     pass
 
-
-@pytest.fixture
-def user_db(session):  # 2
-    insert_users(session=session)
-    yield session
-    session.close()
-
-
-@pytest.fixture
-def lecture_db(session):
-    insert_users(session=session)
-    insert_lectures(session=session)
-    yield session
-    session.close()
-
-
-@pytest.fixture
-def full_db(session):
-    insert_users(session=session)
-    insert_lectures(session=session)
-    insert_assignments(ex=session)
-    insert_grading(session=session)
-    yield session
-    session.close()

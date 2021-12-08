@@ -6,7 +6,7 @@ from .handler_utils import parse_ids
 from ..orm.submission import Submission
 from ..orm.takepart import Scope
 from ..registry import VersionSpecifier, register_handler
-from tornado.httpclient import HTTPError
+from tornado.web import HTTPError
 from tornado.ioloop import IOLoop
 
 from .base_handler import GraderBaseHandler, authorize
@@ -35,6 +35,7 @@ class GradingAutoHandler(GraderBaseHandler):
         :raises HTTPError: throws err if the submission was not found
         """
         lecture_id, assignment_id, sub_id = parse_ids(lecture_id, assignment_id, sub_id)
+        self.validate_parameters()
         submission = self.session.query(Submission).get(sub_id)
         if (
             submission is None
@@ -73,6 +74,7 @@ class GenerateFeedbackHandler(GraderBaseHandler):
         :raises HTTPError: throws err if the submission was not found
         """
         lecture_id, assignment_id, sub_id = parse_ids(lecture_id, assignment_id, sub_id)
+        self.validate_parameters()
         submission = self.session.query(Submission).get(sub_id)
         if (
             submission is None
