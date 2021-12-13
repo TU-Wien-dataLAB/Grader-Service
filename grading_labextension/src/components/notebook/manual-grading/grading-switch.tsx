@@ -47,12 +47,12 @@ export class GradingModeSwitch extends React.Component<ImodeSwitchProps> {
       }
     
       public async componentDidMount() {
-        const lectures = await getAllLectures().toPromise()
-        this.lecture = lectures.find(l => l.code === this.notebookPaths[1])
-        const assignments = await getAllAssignments(this.lecture.id).toPromise()
-        this.assignment = assignments.find(a => a.name === this.notebookPaths[2])
+        const lectures = await getAllLectures();
+        this.lecture = lectures.find(l => l.code === this.notebookPaths[1]);
+        const assignments = await getAllAssignments(this.lecture.id);
+        this.assignment = assignments.find(a => a.name === this.notebookPaths[2]);
     
-        const properties = await getProperties(this.lecture.id, this.assignment.id, this.subID).toPromise()
+        const properties = await getProperties(this.lecture.id, this.assignment.id, this.subID);
         this.gradeBook = new GradeBook(properties);
       }
 
@@ -64,10 +64,10 @@ export class GradingModeSwitch extends React.Component<ImodeSwitchProps> {
           this.setState({ saveButtonText: "Saved" })
           //console.log("saved")
           setTimeout(() => this.setState({ saveButtonText: "Save", transition: "show" }), 2000);
-          const submission = await getSubmission(this.lecture.id,this.assignment.id,this.subID).toPromise()
+          const submission = await getSubmission(this.lecture.id,this.assignment.id,this.subID);
           console.log(submission)
           submission.manual_status = "manually_graded"
-          updateSubmission(this.lecture.id,this.assignment.id,this.subID, submission)
+          updateSubmission(this.lecture.id,this.assignment.id,this.subID, submission);
         } catch (err) {
           this.setState({ saveButtonText: "Save", transition: "show" });
           showErrorMessage("Error saving properties", err);
@@ -75,7 +75,7 @@ export class GradingModeSwitch extends React.Component<ImodeSwitchProps> {
     }
 
     protected handleChange = async () => {
-        const properties = await getProperties(this.lecture.id, this.assignment.id, this.subID).toPromise();
+        const properties = await getProperties(this.lecture.id, this.assignment.id, this.subID);
         this.gradeBook = new GradeBook(properties);
         this.setState({ mode: !this.state.mode }, () => {
             this.onChange(this.state.mode);

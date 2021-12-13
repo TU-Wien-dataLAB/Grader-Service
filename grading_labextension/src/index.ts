@@ -25,17 +25,14 @@ import { PanelLayout } from '@lumino/widgets';
 import { NotebookModeSwitch } from './components/notebook/slider';
 
 import { checkIcon, editIcon } from '@jupyterlab/ui-components';
-import { AssignmentList } from './widgets/assignment-list';
 import { CommandRegistry } from '@lumino/commands';
-import { GradingView } from './widgets/grading';
 import { DocumentRegistry } from '@jupyterlab/docregistry';
 import { ServiceManager } from '@jupyterlab/services';
 import { IDocumentManager } from '@jupyterlab/docmanager';
 import { IFileBrowserFactory } from '@jupyterlab/filebrowser';
 import { UserPermissions } from './services/permission.service';
 import { CellPlayButton } from './components/notebook/create-assignment/widget';
-import { ManualGradingView } from './widgets/manualgrading';
-import { FeedbackView } from './widgets/feedback';
+
 
 namespace AssignmentsCommandIDs {
   export const create = 'assignments:create';
@@ -119,14 +116,7 @@ const extension: JupyterFrontEndPlugin<void> = {
     GlobalObjects.browserFactory = browserFactory;
     GlobalObjects.tracker = tracker;
 
-    const assignmentTracker = new WidgetTracker<MainAreaWidget<AssignmentList>>({
-      namespace: 'grader-assignments',
-    });
 
-    restorer.restore(assignmentTracker, {
-      command: AssignmentsCommandIDs.open,
-      name: () => 'grader-assignments',
-    });
 
     const courseManageTracker = new WidgetTracker<MainAreaWidget<CourseManageView>>({
       namespace: 'grader-coursemanage',
@@ -137,20 +127,6 @@ const extension: JupyterFrontEndPlugin<void> = {
       name: () => 'grader-coursemanage',
     });
 
-    const manualGradingTracker = new WidgetTracker<MainAreaWidget<ManualGradingView>>({
-      namespace: 'grader-manual-grading',
-    });
-
-    restorer.restore(manualGradingTracker, {
-      command: ManualGradeCommandIDs.open,
-      args: (widget) => ({ 
-        lectureID: widget.content.lectureID, 
-        assignmentID: widget.content.assignmentID,
-        subID: widget.content.subID,
-        username: widget.content.username 
-      }),
-      name: () => 'grader-manual-grading',
-    });
 
     //Creation of in-cell widget for create assignment
     let connectTrackerSignals = (tracker: INotebookTracker) => {
@@ -273,199 +249,6 @@ const extension: JupyterFrontEndPlugin<void> = {
           rank: 0
         });
       }
-    });
-
-    // Add the command to the palette.
-    // palette.addItem({ command, category: 'Tutorial' });
-
-    // Add the command to the Sidebar.
-    // TODO: add grading to sidebar like file viewer and plugins etc
-
-    /* ##### Assignment List Widget ##### */
-
-    command = AssignmentsCommandIDs.create;
-    app.commands.addCommand(command, {
-      execute: () => {
-        // Create a blank content widget inside of a MainAreaWidget
-        const assignmentList = new AssignmentList();
-        const assignmentWidget = new MainAreaWidget<AssignmentList>({
-          content: assignmentList
-        });
-        assignmentWidget.id = 'assignments-jupyterlab';
-        assignmentWidget.title.label = 'Assignments';
-        assignmentWidget.title.closable = true;
-
-        assignmentTracker.add(assignmentWidget);
-
-        return assignmentWidget;
-      }
-    });
-
-    command = AssignmentsCommandIDs.open;
-    app.commands.addCommand(command, {
-      label: 'Assignments',
-      execute: async () => {
-        const assignmentWidget: MainAreaWidget<AssignmentList> = await app.commands.execute(
-          AssignmentsCommandIDs.create
-        );
-
-        if (!assignmentWidget.isAttached) {
-          // Attach the widget to the main work area if it's not there
-          app.shell.add(assignmentWidget, 'main');
-        }
-        // Activate the widget
-        app.shell.activateById(assignmentWidget.id);
-      },
-      icon: editIcon
-    });
-
-    // Add the command to the launcher
-    console.log('Add assignment launcher');
-    launcher.add({
-      command: command,
-      category: 'Assignments',
-      rank: 0
-    });
-
-    command = GradingCommandIDs.create;
-    app.commands.addCommand(command, {
-      execute: (args: any) => {
-        const lectureID: number =
-          typeof args['lectureID'] === 'undefined'
-            ? null
-            : (args['lectureID'] as number);
-        const assignmentID: number =
-          typeof args['assignmentID'] === 'undefined'
-            ? null
-            : (args['assignmentID'] as number);
-
-        const gradingView = new GradingView({ lectureID, assignmentID });
-        const gradingWidget = new MainAreaWidget<GradingView>({
-          content: gradingView
-        });
-        gradingWidget.id = 'grading-jupyterlab';
-        gradingWidget.title.label = 'Grading';
-        gradingWidget.title.closable = true;
-
-        return gradingWidget;
-      }
-    });
-
-    command = GradingCommandIDs.open;
-    app.commands.addCommand(command, {
-      label: 'Grading',
-      execute: async (args: any) => {
-        const gradingView: MainAreaWidget<GradingView> = await app.commands.execute(
-          GradingCommandIDs.create,
-          args
-        );
-
-        if (!gradingView.isAttached) {
-          // Attach the widget to the main work area if it's not there
-          app.shell.add(gradingView, 'main');
-        }
-        // Activate the widget
-        app.shell.activateById(gradingView.id);
-      },
-      icon: editIcon
-    });
-
-    command = ManualGradeCommandIDs.create;
-    app.commands.addCommand(command, {
-      execute: (args: any) => {
-        const lectureID: number =
-          typeof args['lectureID'] === 'undefined'
-            ? null
-            : (args['lectureID'] as number);
-        const assignmentID: number =
-          typeof args['assignmentID'] === 'undefined'
-            ? null
-            : (args['assignmentID'] as number);
-        const subID: number =
-          typeof args['subID'] === 'undefined'
-            ? null
-            : (args['subID'] as number);
-        const username: string =
-          typeof args['username'] === 'undefined'
-            ? null
-            : (args['username'] as string);
-        const manualgradingView = new ManualGradingView({ lectureID, assignmentID, subID, username });
-        const manualgradingWidget = new MainAreaWidget<ManualGradingView>({
-          content: manualgradingView
-        });
-        manualgradingWidget.id = 'manual-grading-jupyterlab';
-        manualgradingWidget.title.label = 'Manualgrading';
-        manualgradingWidget.title.closable = true;
-
-        manualGradingTracker.add(manualgradingWidget);
-
-        return manualgradingWidget;
-      }
-    });
-
-    command = ManualGradeCommandIDs.open;
-    app.commands.addCommand(command, {
-      label: 'ManualGrading',
-      execute: async (args: any) => {
-        const gradingView: MainAreaWidget<ManualGradingView> = await app.commands.execute(
-          ManualGradeCommandIDs.create,
-          args
-        );
-
-        if (!gradingView.isAttached) {
-          // Attach the widget to the main work area if it's not there
-          app.shell.add(gradingView, 'main');
-        }
-        // Activate the widget
-        app.shell.activateById(gradingView.id);
-      },
-      icon: editIcon
-    });
-
-    command = FeedbackCommandIDs.create;
-    app.commands.addCommand(command, {
-      execute: (args: any) => {
-        const lectureID: number =
-          typeof args['lectureID'] === 'undefined'
-            ? null
-            : (args['lectureID'] as number);
-        const assignmentID: number =
-          typeof args['assignmentID'] === 'undefined'
-            ? null
-            : (args['assignmentID'] as number);
-        const subID: number =
-          typeof args['subID'] === 'undefined'
-            ? null
-            : (args['subID'] as number);
-        const feedbackView = new FeedbackView({ lectureID, assignmentID, subID });
-        const feedbackWidget = new MainAreaWidget<FeedbackView>({
-          content: feedbackView
-        });
-        feedbackWidget.id = 'feedback-jupyterlab';
-        feedbackWidget.title.label = 'Feedback';
-        feedbackWidget.title.closable = true;
-
-        return feedbackWidget;
-      }
-    });
-
-    command = FeedbackCommandIDs.open;
-    app.commands.addCommand(command, {
-      label: 'Feedback',
-      execute: async (args: any) => {
-        const feedbackWidget: MainAreaWidget<FeedbackView> = await app.commands.execute(
-          FeedbackCommandIDs.create,
-          args
-        );
-
-        if (!feedbackWidget.isAttached) {
-          // Attach the widget to the main work area if it's not there
-          app.shell.add(feedbackWidget, 'main');
-        }
-        // Activate the widget
-        app.shell.activateById(feedbackWidget.id);
-      },
-      icon: editIcon
     });
   }
 };

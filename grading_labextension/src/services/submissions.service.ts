@@ -1,4 +1,3 @@
-import { Observable } from "rxjs";
 import { map } from "rxjs/operators";
 import { Assignment } from "../model/assignment";
 import { Lecture } from "../model/lecture";
@@ -15,7 +14,7 @@ import { request, HTTPMethod } from "./request.service";
     return request<void>(HTTPMethod.GET,`/lectures/${lecture.id}/assignments/${assignment.id}/grading/${submission.id}/pull/feedback`)
   }
 
-  export function getSubmissions(lecture: Lecture, assignment : Assignment, latest: boolean = false): Observable<{user: User, submissions: Submission[]}> {
+  export function getSubmissions(lecture: Lecture, assignment : Assignment, latest: boolean = false): Promise<any> {
     let url = `/lectures/${lecture.id}/assignments/${assignment.id}/submissions`;
     if (latest) {
       let searchParams = new URLSearchParams({
@@ -23,10 +22,10 @@ import { request, HTTPMethod } from "./request.service";
       })
       url += '?' + searchParams;
     }
-    return request<{user: User, submissions: Submission[]}[]>(HTTPMethod.GET, url).pipe(map(array => array[0]))
+    return request<any>(HTTPMethod.GET, url);
   }
 
-  export function getAllSubmissions(lecture: Lecture, assignment : Assignment, latest: boolean = false, instructor: boolean = true): Observable<{user: User, submissions: Submission[]}[]> {
+  export function getAllSubmissions(lecture: Lecture, assignment : Assignment, latest: boolean = false, instructor: boolean = true): Promise<{user: User, submissions: Submission[]}[]> {
     let url = `/lectures/${lecture.id}/assignments/${assignment.id}/submissions`;
 
     if (latest || instructor) {
@@ -40,7 +39,7 @@ import { request, HTTPMethod } from "./request.service";
 
   }
 
-  export function getFeedback(lecture: Lecture, assignment : Assignment, latest: boolean = false, instructor: boolean = false): Observable<object> {
+  export function getFeedback(lecture: Lecture, assignment : Assignment, latest: boolean = false, instructor: boolean = false): Promise<object> {
     let url = `/lectures/${lecture.id}/assignments/${assignment.id}/feedback`;
     if (latest || instructor) {
       let searchParams = new URLSearchParams({
@@ -52,22 +51,22 @@ import { request, HTTPMethod } from "./request.service";
     return request<object>(HTTPMethod.GET, url)
   }
 
-  export function getProperties(lectureId: number, assignmentId: number, submissionId: number): Observable<object> {
+  export function getProperties(lectureId: number, assignmentId: number, submissionId: number): Promise<object> {
     let url = `/lectures/${lectureId}/assignments/${assignmentId}/submissions/${submissionId}/properties`;
     return request<object>(HTTPMethod.GET, url);
   }
 
-  export function updateProperties(lectureId: number, assignmentId: number, submissionId: number, properties: object): Observable<Submission> {
+  export function updateProperties(lectureId: number, assignmentId: number, submissionId: number, properties: object): Promise<Submission> {
     let url = `/lectures/${lectureId}/assignments/${assignmentId}/submissions/${submissionId}/properties`;
     return request<Submission>(HTTPMethod.PUT, url, properties);
   }
 
-  export function getSubmission(lectureId: number, assignmentId: number, submissionId: number): Observable<Submission> {
+  export function getSubmission(lectureId: number, assignmentId: number, submissionId: number): Promise<Submission> {
     let url = `/lectures/${lectureId}/assignments/${assignmentId}/submissions/${submissionId}`;
     return request<object>(HTTPMethod.GET, url);
   }
 
-  export function updateSubmission(lectureId: number, assignmentId: number, submissionId: number, sub: Submission): Observable<Submission> {
+  export function updateSubmission(lectureId: number, assignmentId: number, submissionId: number, sub: Submission): Promise<Submission> {
     let url = `/lectures/${lectureId}/assignments/${assignmentId}/submissions/${submissionId}`;
     return request<Submission>(HTTPMethod.PUT, url, sub);
   }

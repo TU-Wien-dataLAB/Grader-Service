@@ -19,7 +19,7 @@ export namespace UserPermissions {
 
   export async function loadPermissions(): Promise<void> {
     permissions = {};
-    let response = await request<{ lecture_code: string, scope: number }[]>(HTTPMethod.GET, `/permissions`).toPromise();
+    let response = await request<{ lecture_code: string, scope: number }[]>(HTTPMethod.GET, `/permissions`);
     response.forEach(role => {
       permissions[role.lecture_code] = role.scope;
     });

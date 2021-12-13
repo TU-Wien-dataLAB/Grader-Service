@@ -3,7 +3,7 @@ import * as React from "react";
 import { Assignment } from "../../model/assignment";
 import { Lecture } from "../../model/lecture";
 import { getAllAssignments } from "../../services/assignments.service";
-import { CourseManageAssignmentComponent } from "./coursemanageassignment.component";
+import { AssignmentCard } from "./assignmentcard";
 
 
 interface LectureCardProps {
@@ -26,7 +26,9 @@ export const LectureCard = (props: LectureCardProps) => {
     const handleExpandClick = () => {
       setExpanded(!expanded);
     };
-
+    if (assignments === null) {
+        return <div>Loading...</div>;
+      }
     return (
         <div>
             <Card elevation={4} className="lecture-card">
@@ -37,7 +39,7 @@ export const LectureCard = (props: LectureCardProps) => {
                     
                     <Collapse in={expanded} timeout="auto" unmountOnExit>
                     <CardContent>
-                    yo
+                    {assignments.map((el:Assignment) => <AssignmentCard assignment={el}/>)}
                     </CardContent>
                     </Collapse>
                 </Card>
