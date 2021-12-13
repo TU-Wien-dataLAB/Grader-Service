@@ -20,8 +20,7 @@ export const LectureCard = (props: LectureCardProps) => {
 
     React.useEffect( () => {
         getAllAssignments(props.lecture.id).then((result) => {setAssignments(result)});
-    })
-    
+    },[])
 
     const handleExpandClick = () => {
       setExpanded(!expanded);
