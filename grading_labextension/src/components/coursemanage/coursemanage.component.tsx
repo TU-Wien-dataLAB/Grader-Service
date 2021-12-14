@@ -1,10 +1,9 @@
 import * as React from 'react';
 import { Lecture } from '../../model/lecture';
-import { getAllLectures } from '../../services/lectures.service'
+import { getAllLectures } from '../../services/lectures.service';
 import { Scope, UserPermissions } from '../../services/permission.service';
 import { showErrorMessage } from '@jupyterlab/apputils';
-import { LectureCard } from './lecture';
-
+import { LectureComponent } from './lecture';
 
 export interface CourseManageProps {
   // lectures: Array<Lecture>;
@@ -26,15 +25,23 @@ export class CourseManageComponent extends React.Component<CourseManageProps> {
     } catch (err) {
       showErrorMessage('Error Loading Permissions', err);
     }
-    let lectures = getAllLectures().then((l) => {this.setState({lectures: l})});
+    getAllLectures().then(l => {
+      this.setState({ lectures: l });
+    });
   }
 
   public render() {
-    return <div className="course-list">
-      <h1>
-        <p className='course-header'>Course Management</p>
-      </h1>
-      {this.state.lectures.filter(el => UserPermissions.getScope(el) > Scope.student).map((el, index) => <LectureCard lecture={el}/>)}
-    </div>
+    return (
+      <div className="course-list">
+        <h1>
+          <p className="course-header">Course Management</p>
+        </h1>
+        {this.state.lectures
+          .filter(el => UserPermissions.getScope(el) > Scope.student)
+          .map((el, index) => (
+            <LectureComponent lecture={el} />
+          ))}
+      </div>
+    );
   }
 }
