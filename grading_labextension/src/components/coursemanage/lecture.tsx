@@ -1,4 +1,4 @@
-import { Card, CardActionArea, CardActions, CardContent, CardHeader, Collapse, createTheme, IconButton, styled, ThemeProvider } from "@mui/material";
+import { Card, CardActionArea, CardActions, CardContent, CardHeader, CircularProgress, Collapse, createTheme, IconButton, styled, ThemeProvider } from "@mui/material";
 import * as React from "react";
 import { Assignment } from "../../model/assignment";
 import { Lecture } from "../../model/lecture";
@@ -26,7 +26,7 @@ export const LectureCard = (props: LectureCardProps) => {
       setExpanded(!expanded);
     };
     if (assignments === null) {
-        return <div>Loading...</div>;
+        return <div><Card><CircularProgress/></Card></div>;
       }
     return (
         <div>
