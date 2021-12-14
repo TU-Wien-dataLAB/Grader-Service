@@ -21,8 +21,24 @@ interface IFileListProps {
 export const FilesList = (props: IFileListProps) => {
   const [files, setFiles] = React.useState([]);
 
-  const openFile = (path: string) => {
-    console.log(path);
+  React.useEffect(() => {
+    getFiles().then(files => setFiles(files));
+  }, []);
+
+  const openFile = async (path: string) => {
+    console.log('Opening file: ' + path);
+    GlobalObjects.commands
+      .execute('docmanager:open', {
+        path: path,
+        options: {
+          mode: 'tab-after' // tab-after tab-before split-bottom split-right split-left split-top
+        }
+      })
+      .catch(error => {
+        // TODO: refactor showAlert to work in all components
+        // showAlert('error', 'Error Opening File');
+        console.log(error);
+      });
   };
 
   const model = new FilterFileBrowserModel({
@@ -39,7 +55,8 @@ export const FilesList = (props: IFileListProps) => {
       files.push(f);
       f = items.next();
     }
-    setFiles(files);
+    console.log('getting files from path ' + props.path);
+    return files;
   };
 
   // generateItems will be fed using the IIterator from the FilterFileBrowserModel
@@ -50,13 +67,11 @@ export const FilesList = (props: IFileListProps) => {
           <ListItemIcon>
             <InsertDriveFileRoundedIcon />
           </ListItemIcon>
-          <ListItemText primary={value.path} />
+          <ListItemText primary={value.name} />
         </ListItemButton>
       </ListItem>
     ));
   };
-
-  getFiles();
 
   return (
     <Paper elevation={0}>

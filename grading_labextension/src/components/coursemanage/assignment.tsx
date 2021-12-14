@@ -28,9 +28,18 @@ import NewReleasesRoundedIcon from '@mui/icons-material/NewReleasesRounded';
 import CloudDoneRoundedIcon from '@mui/icons-material/CloudDoneRounded';
 import { FilesList } from '../util/file-list';
 import { Assignment } from '../../model/assignment';
+import LoadingOverlay from '../util/overlay';
+import { Lecture } from '../../model/lecture';
+import { GlobalObjects } from '../../index';
+import { MainAreaWidget } from '@jupyterlab/apputils';
+import { ITerminal } from '@jupyterlab/terminal';
+import { Terminal } from '@jupyterlab/services';
+import { PageConfig } from '@jupyterlab/coreutils';
 
 interface IAssignmentComponentProps {
+  lecture: Lecture;
   assignment: Assignment;
+  root: HTMLElement;
 }
 
 export const AssignmentComponent = (props: IAssignmentComponentProps) => {
@@ -39,16 +48,65 @@ export const AssignmentComponent = (props: IAssignmentComponentProps) => {
   const [severity, setSeverity] = React.useState('success');
   const [alertMessage, setAlertMessage] = React.useState('');
   const [selectedDir, setSelectedDir] = React.useState('source');
+  const [displaySubmissions, setDisplaySubmissions] = React.useState(false);
+  const onSubmissionClose = () => setDisplaySubmissions(false);
+
+  const serverRoot = PageConfig.getOption('serverRoot');
+
   const assignment = props.assignment;
+  const lecture = props.lecture;
+  let terminalSession: Terminal.ITerminalConnection = null;
 
   const handleExpandClick = () => {
     setExpanded(!expanded);
   };
 
+  const openTerminal = async () => {
+    const path = `${serverRoot}/${selectedDir}/${lecture.code}/${assignment.name}`;
+    console.log('Opening terminal at: ' + path.replace(' ', '\\ '));
+    let args = {};
+    if (
+      terminalSession !== null &&
+      terminalSession.connectionStatus === 'connected'
+    ) {
+      args = { name: terminalSession.name };
+    }
+    const main = (await GlobalObjects.commands.execute(
+      'terminal:open',
+      args
+    )) as MainAreaWidget<ITerminal.ITerminal>;
+
+    if (main) {
+      const terminal = main.content;
+      terminalSession = terminal.session;
+    }
+
+    try {
+      terminalSession.send({
+        type: 'stdin',
+        content: ['cd ' + path.replace(' ', '\\ ') + '\n']
+      });
+    } catch (e) {
+      showAlert('error', 'Error Opening Terminal');
+      main.dispose();
+    }
+  };
+
+  const openBrowser = async () => {
+    const path = `${selectedDir}/${lecture.code}/${assignment.name}`;
+    GlobalObjects.commands
+      .execute('filebrowser:go-to-path', {
+        path
+      })
+      .catch(error => {
+        showAlert('error', 'Error showing in File Browser');
+      });
+  };
+
   const showAlert = (severity: string, msg: string) => {
-    setAlert(true);
     setSeverity(severity);
     setAlertMessage(msg);
+    setAlert(true);
   };
 
   const handleAlertClose = (
@@ -65,16 +123,15 @@ export const AssignmentComponent = (props: IAssignmentComponentProps) => {
     {
       icon: <FormatListBulletedRoundedIcon />,
       name: 'Show Files',
-      onClick: () => console.log('hello')
+      onClick: () => openBrowser()
     },
     {
       icon: <TerminalRoundedIcon />,
       name: 'Open Terminal',
-      onClick: () => console.log('hello')
+      onClick: () => openTerminal()
     }
   ];
 
-  // TODO: add correct path for file list!
   return (
     <Box sx={{ minWidth: 275 }}>
       <Card variant="outlined">
@@ -111,11 +168,11 @@ export const AssignmentComponent = (props: IAssignmentComponentProps) => {
               <ToggleButton color="primary" value="source">
                 Source
               </ToggleButton>
-              <ToggleButton value="release1">Release 1</ToggleButton>
-              <ToggleButton value="release2">Release 2</ToggleButton>
-              <ToggleButton value="release3">Release 3</ToggleButton>
+              <ToggleButton value="release">Release</ToggleButton>
             </ToggleButtonGroup>
-            <FilesList path={''} />
+            <FilesList
+              path={`${selectedDir}/${props.lecture.code}/${props.assignment.name}`}
+            />
           </CardContent>
           <CardActions>
             <SpeedDial
@@ -170,7 +227,7 @@ export const AssignmentComponent = (props: IAssignmentComponentProps) => {
             >
               <Button
                 sx={{ ml: 'auto' }}
-                onClick={() => showAlert('error', 'Submissions')}
+                onClick={() => setDisplaySubmissions(true)}
                 variant="outlined"
                 size="small"
               >
@@ -178,6 +235,13 @@ export const AssignmentComponent = (props: IAssignmentComponentProps) => {
                 Submissions
               </Button>
             </Badge>
+            <LoadingOverlay
+              onClose={onSubmissionClose}
+              open={displaySubmissions}
+              container={props.root}
+            >
+              <Typography variant={'h2'}>Submissions</Typography>
+            </LoadingOverlay>
           </CardActions>
         </Collapse>
       </Card>

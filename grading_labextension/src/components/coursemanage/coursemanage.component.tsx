@@ -7,6 +7,7 @@ import { LectureComponent } from './lecture';
 
 export interface CourseManageProps {
   // lectures: Array<Lecture>;
+  root: HTMLElement;
 }
 
 export class CourseManageComponent extends React.Component<CourseManageProps> {
@@ -39,7 +40,7 @@ export class CourseManageComponent extends React.Component<CourseManageProps> {
         {this.state.lectures
           .filter(el => UserPermissions.getScope(el) > Scope.student)
           .map((el, index) => (
-            <LectureComponent lecture={el} />
+            <LectureComponent lecture={el} root={this.props.root} />
           ))}
       </div>
     );

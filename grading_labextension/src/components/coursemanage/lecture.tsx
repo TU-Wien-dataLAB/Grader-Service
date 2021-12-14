@@ -19,6 +19,7 @@ import { AssignmentComponent } from './assignment';
 
 interface ILectureComponentProps {
   lecture: Lecture;
+  root: HTMLElement;
 }
 
 export const LectureComponent = (props: ILectureComponentProps) => {
@@ -53,7 +54,7 @@ export const LectureComponent = (props: ILectureComponentProps) => {
         <Collapse in={expanded} timeout="auto" unmountOnExit>
           <CardContent>
             {assignments.map((el: Assignment) => (
-              <AssignmentComponent assignment={el} />
+              <AssignmentComponent lecture={props.lecture} assignment={el} root={props.root} />
             ))}
           </CardContent>
         </Collapse>
