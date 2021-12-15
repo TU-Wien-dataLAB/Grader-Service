@@ -11,6 +11,8 @@ jupyterhub_cookie_secret
 ### Linux ###
 *~
 
+# Pycharm
+.idea
 # temporary files which can be created if a process still has a handle open of a deleted file
 .fuse_hidden*
 
