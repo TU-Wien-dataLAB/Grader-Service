@@ -76,7 +76,7 @@ export default function LoadingOverlay(props: IOverlayProps) {
         <Box sx={style}>
           <IconButton
             size="small"
-            sx={{ position: 'absolute', right: '2%', top: '2%' }}
+            sx={{ position: 'fixed', right: '2%', top: '2%' }}
             onClick={props.onClose} // only use props.onClose here
           >
             <CloseIcon />

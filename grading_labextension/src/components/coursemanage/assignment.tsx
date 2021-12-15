@@ -294,8 +294,8 @@ export const AssignmentComponent = (props: IAssignmentComponentProps) => {
               onClose={onSubmissionClose}
               open={displaySubmissions}
               container={props.root}
+              transition='zoom'
             >
-              <Typography>Grading</Typography>
               <GradingComponent lecture={props.lecture} assignment={props.assignment} latest_submissions={latestSubmissions}/>
             </LoadingOverlay>
             

@@ -48,18 +48,20 @@
     },
     "dependencies": {
         "@date-io/date-fns": "^2.11.0",
-        "@emotion/react": "^11.7.0",
+        "@emotion/react": "^11.7.1",
         "@emotion/styled": "^11.6.0",
-        "@jupyterlab/application": "^3.0.9",
+        "@jupyterlab/application": "^3.2.5",
+        "@jupyterlab/codeeditor": "^3.2.5",
         "@jupyterlab/coreutils": "^5.0.0",
         "@jupyterlab/launcher": "^3.0.5",
         "@jupyterlab/notebook": "^3.0.7",
         "@jupyterlab/services": "^6.0.0",
         "@jupyterlab/terminal": "^3.1.8",
-        "@lumino/widgets": "^1.19.0",
+        "@lumino/widgets": "^1.30.1",
         "@mui/icons-material": "^5.2.1",
         "@mui/lab": "^5.0.0-alpha.59",
-        "@mui/material": "^5.2.3",
+        "@mui/material": "^5.2.4",
+        "@mui/x-data-grid": "^5.1.0",
         "date-fns": "^2.27.0",
         "formik": "^2.2.9",
         "is-plain-object": "^5.0.0",
@@ -69,7 +71,6 @@
         "yup": "^0.32.11"
     },
     "devDependencies": {
-        "@emotion/react": "^11.7.0",
         "@jupyterlab/builder": "^3.0.0",
         "@types/node": "^15.12.5",
         "@types/react-dom": "^17.0.11",
@@ -82,7 +83,7 @@
         "npm-run-all": "^4.1.5",
         "prettier": "^2.1.1",
         "rimraf": "^3.0.2",
-        "typescript": "^4.1.2"
+        "typescript": "^4.5.4"
     },
     "sideEffects": [
         "style/*.css",

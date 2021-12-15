@@ -1,3 +1,4 @@
+import { GridColDef, GridRowsProp } from "@mui/x-data-grid";
 import { DataGrid } from "@mui/x-data-grid";
 import * as React from "react";
 import { Assignment } from "../../model/assignment";
@@ -27,10 +28,11 @@ export const GradingComponent = (props : IGradingProps) => {
               manual_status: latest.manual_status,
               score: latest.score
             });
+            console.log(rows);
           });
         return rows;
     } 
-
+    /*
     const [rows,setRows] = React.useState(generateRows(props.latest_submissions));
 
 
@@ -41,14 +43,24 @@ export const GradingComponent = (props : IGradingProps) => {
         { field: 'auto_status', headerName: 'Autograde-Status', width: 170 },
         { field: 'manual_status', headerName: 'Manualgrade-Status', width: 170 },
         { field: 'score', headerName: 'Score', width: 130 }
+        ];*/
+
+        const rows: GridRowsProp = [
+          { id: 1, col1: 'Hello', col2: 'World' },
+          { id: 2, col1: 'DataGridPro', col2: 'is Awesome' },
+          { id: 3, col1: 'MUI', col2: 'is Amazing' },
+        ];
+        
+        const columns: GridColDef[] = [
+          { field: 'col1', headerName: 'Column 1', width: 150 },
+          { field: 'col2', headerName: 'Column 2', width: 150 },
         ];
     
   
 
     return (
         <div>
-
-            <DataGrid columns={columns} rows={[]}></DataGrid>
+            <DataGrid columns={columns} rows={rows}></DataGrid>
         </div>
     );
 }
