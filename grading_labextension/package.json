@@ -60,7 +60,6 @@
         "@mui/icons-material": "^5.2.1",
         "@mui/lab": "^5.0.0-alpha.59",
         "@mui/material": "^5.2.3",
-        "@mui/x-data-grid": "^5.2.0",
         "date-fns": "^2.27.0",
         "formik": "^2.2.9",
         "is-plain-object": "^5.0.0",
@@ -83,7 +82,7 @@
         "npm-run-all": "^4.1.5",
         "prettier": "^2.1.1",
         "rimraf": "^3.0.2",
-        "typescript": "^4.1.6"
+        "typescript": "^4.1.2"
     },
     "sideEffects": [
         "style/*.css",
