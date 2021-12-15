@@ -13,7 +13,7 @@
     },
     "license": "BSD-3-Clause",
     "author": {
-        "name": "Matthias Matt",
+        "name": "Matthias Matt, Florian Jaeger",
         "email": ""
     },
     "files": [
@@ -46,10 +46,6 @@
         "watch:labextension": "jupyter labextension watch ."
     },
     "dependencies": {
-        "@blueprintjs/core": "^3.42.0",
-        "@blueprintjs/datetime": "^3.23.5",
-        "@blueprintjs/icons": "^3.26.0",
-        "@blueprintjs/table": "^3.8.27",
         "@date-io/date-fns": "^2.11.0",
         "@emotion/react": "^11.7.0",
         "@emotion/styled": "^11.6.0",
@@ -60,12 +56,10 @@
         "@jupyterlab/services": "^6.0.0",
         "@jupyterlab/terminal": "^3.1.8",
         "@lumino/widgets": "^1.19.0",
-        "@material-ui/core": "^4.11.3",
-        "@material-ui/data-grid": "^4.0.0-alpha.34",
-        "@material-ui/pickers": "^3.3.10",
         "@mui/icons-material": "^5.2.1",
         "@mui/lab": "^5.0.0-alpha.59",
         "@mui/material": "^5.2.3",
+        "@mui/x-data-grid": "^5.2.0",
         "date-fns": "^2.27.0",
         "formik": "^2.2.9",
         "is-plain-object": "^5.0.0",

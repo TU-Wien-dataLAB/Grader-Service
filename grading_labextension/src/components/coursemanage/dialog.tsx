@@ -2,13 +2,11 @@ import * as React from "react";
 import ReactDOM from "react-dom";
 import { useFormik } from "formik";
 import * as yup from "yup";
-import Button from "@material-ui/core/Button";
-import TextField from "@material-ui/core/TextField";
+
 import AdapterDateFns from "@mui/lab/AdapterDateFns";
 import LocalizationProvider from "@mui/lab/LocalizationProvider";
 import DateTimePicker from "@mui/lab/DateTimePicker";
-import { Dialog } from "@material-ui/core";
-import { DialogActions, DialogContent, DialogTitle, Paper, Stack, styled, TextFieldProps } from "@mui/material";
+import { Button, TextField, Dialog, DialogActions, DialogContent, DialogTitle, Paper, Stack, styled, TextFieldProps } from "@mui/material";
 import { Assignment } from "../../model/assignment";
 
 const validationSchema = yup.object({
@@ -89,7 +87,7 @@ export const EditDialog = (props : any) => {
             Submit
           </Button>
           <Button
-            color="default"
+            color="primary"
             variant="outlined"
             onClick={() => {
               setOpen(false);
