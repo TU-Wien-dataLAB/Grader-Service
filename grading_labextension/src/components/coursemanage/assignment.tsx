@@ -35,6 +35,8 @@ import { MainAreaWidget } from '@jupyterlab/apputils';
 import { ITerminal } from '@jupyterlab/terminal';
 import { Terminal } from '@jupyterlab/services';
 import { PageConfig } from '@jupyterlab/coreutils';
+import { getAllSubmissions } from '../../services/submissions.service';
+import { GradingComponent } from './grading';
 
 interface IAssignmentComponentProps {
   lecture: Lecture;
@@ -49,6 +51,7 @@ export const AssignmentComponent = (props: IAssignmentComponentProps) => {
   const [alertMessage, setAlertMessage] = React.useState('');
   const [selectedDir, setSelectedDir] = React.useState('source');
   const [displaySubmissions, setDisplaySubmissions] = React.useState(false);
+  const [latestSubmissions, setSubmissions] = React.useState([]);
   const onSubmissionClose = () => setDisplaySubmissions(false);
 
   const serverRoot = PageConfig.getOption('serverRoot');
@@ -56,6 +59,12 @@ export const AssignmentComponent = (props: IAssignmentComponentProps) => {
   const assignment = props.assignment;
   const lecture = props.lecture;
   let terminalSession: Terminal.ITerminalConnection = null;
+
+  React.useEffect(() => {
+    getAllSubmissions(props.lecture,props.assignment,true,true).then((response : any) => {
+        setSubmissions(response);
+    });
+}, []);
 
   const handleExpandClick = () => {
     setExpanded(!expanded);
@@ -222,7 +231,7 @@ export const AssignmentComponent = (props: IAssignmentComponentProps) => {
             <Badge
               sx={{ mt: -1, mr: 2, ml: 1 }}
               color="secondary"
-              badgeContent={0}
+              badgeContent={latestSubmissions.length}
               showZero
             >
               <Button
@@ -235,13 +244,18 @@ export const AssignmentComponent = (props: IAssignmentComponentProps) => {
                 Submissions
               </Button>
             </Badge>
+
+
             <LoadingOverlay
               onClose={onSubmissionClose}
               open={displaySubmissions}
               container={props.root}
             >
-              <Typography variant={'h2'}>Submissions</Typography>
+              <Typography>Grading</Typography>
+              <GradingComponent lecture={props.lecture} assignment={props.assignment} latest_submissions={latestSubmissions}/>
             </LoadingOverlay>
+            
+
           </CardActions>
         </Collapse>
       </Card>
