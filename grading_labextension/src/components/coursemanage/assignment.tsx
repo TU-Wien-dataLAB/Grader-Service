@@ -37,6 +37,11 @@ import { Terminal } from '@jupyterlab/services';
 import { PageConfig } from '@jupyterlab/coreutils';
 import { getAllSubmissions } from '../../services/submissions.service';
 import { GradingComponent } from './grading';
+import { AgreeDialog, IAgreeDialogProps } from './dialog';
+import {
+  pushAssignment,
+  updateAssignment
+} from '../../services/assignments.service';
 
 interface IAssignmentComponentProps {
   lecture: Lecture;
@@ -45,6 +50,7 @@ interface IAssignmentComponentProps {
 }
 
 export const AssignmentComponent = (props: IAssignmentComponentProps) => {
+  const [assignment, setAssignment] = React.useState(props.assignment);
   const [expanded, setExpanded] = React.useState(false);
   const [alert, setAlert] = React.useState(false);
   const [severity, setSeverity] = React.useState('success');
@@ -52,11 +58,18 @@ export const AssignmentComponent = (props: IAssignmentComponentProps) => {
   const [selectedDir, setSelectedDir] = React.useState('source');
   const [displaySubmissions, setDisplaySubmissions] = React.useState(false);
   const [latestSubmissions, setSubmissions] = React.useState([]);
+  const [dialogContent, setDialogContent] = React.useState({
+    open: false,
+    title: '',
+    message: '',
+    handleAgree: null,
+    handleDisagree: null
+  } as IAgreeDialogProps);
+
   const onSubmissionClose = () => setDisplaySubmissions(false);
 
   const serverRoot = PageConfig.getOption('serverRoot');
 
-  const assignment = props.assignment;
   const lecture = props.lecture;
   let terminalSession: Terminal.ITerminalConnection = null;
 
@@ -110,6 +123,37 @@ export const AssignmentComponent = (props: IAssignmentComponentProps) => {
       .catch(error => {
         showAlert('error', 'Error showing in File Browser');
       });
+  };
+
+  const handlePushAssignment = async () => {
+    let result;
+    setDialogContent({
+      open: true,
+      title: 'Push Assignment',
+      message: `Do you want to push ${assignment.name}? This updates the state of the assignment on the server with your local state.`,
+      handleAgree: async () => {
+        try {
+          await pushAssignment(lecture.id, assignment.id, 'source');
+          await pushAssignment(lecture.id, assignment.id, 'release');
+        } catch (err) {
+          showAlert('error', 'Error Pushing Assignment');
+        }
+        //TODO: should be atomar with the pushAssignment function
+        const a = assignment;
+        a.status = 'pushed';
+        updateAssignment(lecture.id, a).then(
+          assignment => setAssignment(assignment),
+          error => showAlert('error', 'Error Updating Assignment')
+        );
+        setDialogContent({ ...dialogContent, ...{ open: false } });
+      },
+      handleDisagree: () => {
+        setDialogContent({ ...dialogContent, ...{ open: false } });
+      }
+    });
+    if (!result) {
+      return;
+    }
   };
 
   const showAlert = (severity: string, msg: string) => {
@@ -203,7 +247,7 @@ export const AssignmentComponent = (props: IAssignmentComponentProps) => {
 
             <Button
               sx={{ mt: -1 }}
-              onClick={() => showAlert('success', 'Push')}
+              onClick={() => handlePushAssignment()}
               variant="outlined"
               size="small"
             >
@@ -260,6 +304,7 @@ export const AssignmentComponent = (props: IAssignmentComponentProps) => {
         </Collapse>
       </Card>
 
+      <AgreeDialog {...dialogContent} />
       <Snackbar open={alert} autoHideDuration={3000} onClose={handleAlertClose}>
         <MuiAlert
           onClose={handleAlertClose}
