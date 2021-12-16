@@ -60,8 +60,6 @@ export default function LoadingOverlay(props: IOverlayProps) {
     content = props.children;
   }
 
-  const modalPos = props.container === undefined ? 'absolute' : 'relative';
-
   return (
     <Modal
       open={props.open}
@@ -72,17 +70,17 @@ export default function LoadingOverlay(props: IOverlayProps) {
       container={props.container}
       keepMounted={props.keepMounted}
       disableEscapeKeyDown={props.disableEscapeKeyDown}
-      sx={{ position: modalPos, width: '100%', height: '100%' }}
+      sx={{ position: 'absolute', width: '100%', height: '100%' }}
     >
       <Transition in={props.open} timeout={props.timeout}>
-        <Box sx={style}>
+        <Box sx={style} className={'.mui-fixed'}>
           <IconButton
             className={'.mui-fixed'}
             size="small"
             sx={{
               position: 'absolute',
-              right: '2%',
-              top: '2%',
+              right: '20px',
+              top: '20px',
               zIndex: 1000000
             }}
             onClick={props.onClose} // only use props.onClose here
