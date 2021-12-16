@@ -39,6 +39,7 @@ import { getAllSubmissions } from '../../services/submissions.service';
 import { GradingComponent } from './grading';
 import { AgreeDialog, IAgreeDialogProps } from './dialog';
 import {
+  pullAssignment,
   pushAssignment,
   updateAssignment
 } from '../../services/assignments.service';
@@ -57,14 +58,14 @@ export const AssignmentComponent = (props: IAssignmentComponentProps) => {
   const [alertMessage, setAlertMessage] = React.useState('');
   const [selectedDir, setSelectedDir] = React.useState('source');
   const [displaySubmissions, setDisplaySubmissions] = React.useState(false);
-  const [latestSubmissions, setSubmissions] = React.useState([]);
+  const [latestSubmissions, setSubmissions] = React.useState(null);
+  const [showDialog, setShowDialog] = React.useState(false);
   const [dialogContent, setDialogContent] = React.useState({
-    open: false,
     title: '',
     message: '',
     handleAgree: null,
     handleDisagree: null
-  } as IAgreeDialogProps);
+  });
 
   const onSubmissionClose = () => setDisplaySubmissions(false);
 
@@ -84,6 +85,8 @@ export const AssignmentComponent = (props: IAssignmentComponentProps) => {
   const handleExpandClick = () => {
     setExpanded(!expanded);
   };
+
+  const closeDialog = () => setShowDialog(false);
 
   const openTerminal = async () => {
     const path = `${serverRoot}/${selectedDir}/${lecture.code}/${assignment.name}`;
@@ -128,9 +131,7 @@ export const AssignmentComponent = (props: IAssignmentComponentProps) => {
   };
 
   const handlePushAssignment = async () => {
-    let result;
     setDialogContent({
-      open: true,
       title: 'Push Assignment',
       message: `Do you want to push ${assignment.name}? This updates the state of the assignment on the server with your local state.`,
       handleAgree: async () => {
@@ -147,15 +148,57 @@ export const AssignmentComponent = (props: IAssignmentComponentProps) => {
           assignment => setAssignment(assignment),
           error => showAlert('error', 'Error Updating Assignment')
         );
-        setDialogContent({ ...dialogContent, ...{ open: false } });
+        closeDialog();
       },
-      handleDisagree: () => {
-        setDialogContent({ ...dialogContent, ...{ open: false } });
-      }
+      handleDisagree: () => closeDialog()
     });
-    if (!result) {
-      return;
-    }
+    setShowDialog(true);
+  };
+
+  const handlePullAssignment = async () => {
+    setDialogContent({
+      title: 'Pull Assignment',
+      message: `Do you want to pull ${assignment.name}? This updates your assignment with the state of the server and overwrites all changes.`,
+      handleAgree: async () => {
+        try {
+          await pullAssignment(lecture.id, assignment.id, 'source');
+        } catch (err) {
+          showAlert('error', 'Error Pulling Assignment');
+        }
+        // TODO: update file list
+        closeDialog();
+      },
+      handleDisagree: () => closeDialog()
+    });
+    setShowDialog(true);
+  };
+
+  const handleReleaseAssignment = async () => {
+    setDialogContent({
+      title: 'Release Assignment',
+      message: `Do you want to release ${assignment.name} for all students?`,
+      handleAgree: () => {
+        setDialogContent({
+          title: 'Confirmation',
+          message: `Are you sure you want to release ${assignment.name}?`,
+          handleAgree: async () => {
+            try {
+              console.log('releasing assignment');
+              let a = assignment;
+              a.status = 'released';
+              a = await updateAssignment(lecture.id, a);
+              setAssignment(a);
+            } catch (err) {
+              showAlert('error', 'Error Releasing Assignment');
+            }
+            closeDialog();
+          },
+          handleDisagree: () => closeDialog()
+        });
+      },
+      handleDisagree: () => closeDialog()
+    });
+    setShowDialog(true);
   };
 
   const showAlert = (severity: string, msg: string) => {
@@ -258,7 +301,7 @@ export const AssignmentComponent = (props: IAssignmentComponentProps) => {
             </Button>
             <Button
               sx={{ mt: -1 }}
-              onClick={() => showAlert('error', 'Pull')}
+              onClick={() => handlePullAssignment()}
               variant="outlined"
               size="small"
             >
@@ -267,7 +310,7 @@ export const AssignmentComponent = (props: IAssignmentComponentProps) => {
             </Button>
             <Button
               sx={{ mt: -1 }}
-              onClick={() => showAlert('error', 'Release')}
+              onClick={() => handleReleaseAssignment()}
               variant="outlined"
               size="small"
             >
@@ -277,8 +320,8 @@ export const AssignmentComponent = (props: IAssignmentComponentProps) => {
             <Badge
               sx={{ mt: -1, mr: 2, ml: 1 }}
               color="secondary"
-              badgeContent={latestSubmissions.length}
-              showZero
+              badgeContent={latestSubmissions?.length}
+              showZero={latestSubmissions !== null}
             >
               <Button
                 sx={{ ml: 'auto' }}
@@ -307,7 +350,7 @@ export const AssignmentComponent = (props: IAssignmentComponentProps) => {
         </Collapse>
       </Card>
 
-      <AgreeDialog {...dialogContent} />
+      <AgreeDialog open={showDialog} {...dialogContent} />
       <Snackbar open={alert} autoHideDuration={3000} onClose={handleAlertClose}>
         <MuiAlert
           onClose={handleAlertClose}

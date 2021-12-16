@@ -20,6 +20,7 @@ import {
   DialogContentText
 } from '@mui/material';
 import { Assignment } from '../../model/assignment';
+import { LoadingButton } from '@mui/lab';
 
 const validationSchema = yup.object({
   name: yup
@@ -131,10 +132,19 @@ export interface IAgreeDialogProps {
 }
 
 export const AgreeDialog = (props: IAgreeDialogProps) => {
+  const [loading, setLoading] = React.useState(false);
+
+  const executeAction = async (action: () => void) => {
+    setLoading(true);
+    await action();
+    setLoading(false);
+  };
+
   return (
     <Dialog
       open={props.open}
-      onClose={() => props.handleDisagree}
+      onClose={props.handleDisagree}
+      onBackdropClick={props.handleDisagree}
       aria-labelledby="alert-dialog-title"
       aria-describedby="alert-dialog-description"
     >
@@ -146,9 +156,13 @@ export const AgreeDialog = (props: IAgreeDialogProps) => {
       </DialogContent>
       <DialogActions>
         <Button onClick={props.handleDisagree}>Disagree</Button>
-        <Button onClick={props.handleAgree} autoFocus>
+        <LoadingButton
+          loading={loading}
+          onClick={() => executeAction(props.handleAgree)}
+          autoFocus
+        >
           Agree
-        </Button>
+        </LoadingButton>
       </DialogActions>
     </Dialog>
   );
