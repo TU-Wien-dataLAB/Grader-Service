@@ -25,7 +25,9 @@ interface IOverlayProps {
 
 export default function LoadingOverlay(props: IOverlayProps) {
   const baseStyle: SxProps<Theme> = {
-    position: 'relative',
+    position: 'absolute',
+    top: 0,
+    bottom: 0,
     width: '100%',
     height: '100%',
     bgcolor: 'background.paper'
@@ -75,8 +77,14 @@ export default function LoadingOverlay(props: IOverlayProps) {
       <Transition in={props.open} timeout={props.timeout}>
         <Box sx={style}>
           <IconButton
+            className={'.mui-fixed'}
             size="small"
-            sx={{ position: 'fixed', right: '2%', top: '2%' }}
+            sx={{
+              position: 'absolute',
+              right: '2%',
+              top: '2%',
+              zIndex: 1000000
+            }}
             onClick={props.onClose} // only use props.onClose here
           >
             <CloseIcon />

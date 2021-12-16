@@ -74,10 +74,12 @@ export const AssignmentComponent = (props: IAssignmentComponentProps) => {
   let terminalSession: Terminal.ITerminalConnection = null;
 
   React.useEffect(() => {
-    getAllSubmissions(props.lecture,props.assignment,true,true).then((response : any) => {
+    getAllSubmissions(props.lecture, props.assignment, true, true).then(
+      (response: any) => {
         setSubmissions(response);
-    });
-}, []);
+      }
+    );
+  }, []);
 
   const handleExpandClick = () => {
     setExpanded(!expanded);
@@ -289,17 +291,18 @@ export const AssignmentComponent = (props: IAssignmentComponentProps) => {
               </Button>
             </Badge>
 
-
             <LoadingOverlay
               onClose={onSubmissionClose}
               open={displaySubmissions}
               container={props.root}
-              transition='zoom'
+              transition="zoom"
             >
-              <GradingComponent lecture={props.lecture} assignment={props.assignment} latest_submissions={latestSubmissions}/>
+              <GradingComponent
+                lecture={props.lecture}
+                assignment={props.assignment}
+                latest_submissions={latestSubmissions}
+              />
             </LoadingOverlay>
-            
-
           </CardActions>
         </Collapse>
       </Card>
