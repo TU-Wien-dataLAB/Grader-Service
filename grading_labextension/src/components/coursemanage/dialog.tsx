@@ -49,7 +49,6 @@ export const EditDialog = (props: IEditDialogProps) => {
   
 
   const formik = useFormik({
-    enableReinitialize
     initialValues: {
       name: props.assignment.name,
       due_date: props.assignment.due_date != null ? new Date(props.assignment.due_date) : null
