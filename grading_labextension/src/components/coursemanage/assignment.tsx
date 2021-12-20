@@ -21,7 +21,6 @@ import MuiAlert, { AlertProps } from '@mui/material/Alert';
 import FormatListBulletedRoundedIcon from '@mui/icons-material/FormatListBulletedRounded';
 import TerminalRoundedIcon from '@mui/icons-material/TerminalRounded';
 import LayersRoundedIcon from '@mui/icons-material/LayersRounded';
-import EditIcon from '@mui/icons-material/Edit';
 import PublishRoundedIcon from '@mui/icons-material/PublishRounded';
 import GetAppRoundedIcon from '@mui/icons-material/GetAppRounded';
 import NewReleasesRoundedIcon from '@mui/icons-material/NewReleasesRounded';
@@ -37,7 +36,7 @@ import { Terminal } from '@jupyterlab/services';
 import { PageConfig } from '@jupyterlab/coreutils';
 import { getAllSubmissions } from '../../services/submissions.service';
 import { GradingComponent } from './grading';
-import { AgreeDialog, IAgreeDialogProps } from './dialog';
+import { AgreeDialog, EditDialog, IAgreeDialogProps } from './dialog';
 import {
   pullAssignment,
   pushAssignment,
@@ -242,19 +241,13 @@ export const AssignmentComponent = (props: IAssignmentComponentProps) => {
             >
               {assignment.name}
             </Typography>
-            <IconButton
-              sx={{ mt: -1 }}
-              onClick={e => {
-                e.stopPropagation();
-              }}
-              aria-label="edit"
-            >
-              <EditIcon />
-            </IconButton>
           </CardContent>
         </CardActionArea>
+       
         <Collapse in={expanded} timeout="auto" unmountOnExit>
           <CardContent>
+          <EditDialog assignment={assignment}/>
+
             <Typography variant="h6">Files</Typography>
             <ToggleButtonGroup
               color="secondary"

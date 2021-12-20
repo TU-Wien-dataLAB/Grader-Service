@@ -32,7 +32,7 @@ export const GradingComponent = (props: IGradingProps) => {
     });
     return rows;
   };
-  /*
+  
     const [rows,setRows] = React.useState(generateRows(props.latest_submissions));
 
 
@@ -43,30 +43,8 @@ export const GradingComponent = (props: IGradingProps) => {
         { field: 'auto_status', headerName: 'Autograde-Status', width: 170 },
         { field: 'manual_status', headerName: 'Manualgrade-Status', width: 170 },
         { field: 'score', headerName: 'Score', width: 130 }
-        ];*/
+        ];
 
-  const rows: GridRowsProp = [
-    { id: 1, col1: 'Hello', col2: 'World' },
-    { id: 2, col1: 'DataGridPro', col2: 'is Awesome' },
-    { id: 3, col1: 'MUI', col2: 'is Amazing' },
-    { id: 4, col1: 'Hello', col2: 'World' },
-    { id: 5, col1: 'DataGridPro', col2: 'is Awesome' },
-    { id: 6, col1: 'MUI', col2: 'is Amazing' },
-    { id: 7, col1: 'Hello', col2: 'World' },
-    { id: 8, col1: 'DataGridPro', col2: 'is Awesome' },
-    { id: 9, col1: 'MUI', col2: 'is Amazing' },
-    { id: 10, col1: 'Hello', col2: 'World' },
-    { id: 11, col1: 'DataGridPro', col2: 'is Awesome' },
-    { id: 12, col1: 'MUI', col2: 'is Amazing' },
-    { id: 13, col1: 'Hello', col2: 'World' },
-    { id: 14, col1: 'DataGridPro', col2: 'is Awesome' },
-    { id: 15, col1: 'MUI', col2: 'is Amazing' }
-  ];
-
-  const columns: GridColDef[] = [
-    { field: 'col1', headerName: 'Column 1', width: 150 },
-    { field: 'col2', headerName: 'Column 2', width: 150 }
-  ];
 
   return (
     <Box sx={{ height: '85%' }}>
