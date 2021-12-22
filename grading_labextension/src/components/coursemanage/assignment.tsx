@@ -246,7 +246,7 @@ export const AssignmentComponent = (props: IAssignmentComponentProps) => {
        
         <Collapse in={expanded} timeout="auto" unmountOnExit>
           <CardContent>
-          <EditDialog assignment={assignment}/>
+          <EditDialog lecture={lecture} assignment={assignment}/>
 
             <Typography variant="h6">Files</Typography>
             <ToggleButtonGroup

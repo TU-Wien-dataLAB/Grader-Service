@@ -26,6 +26,7 @@ import { Assignment } from '../../model/assignment';
 import { LoadingButton } from '@mui/lab';
 import EditIcon from '@mui/icons-material/Edit';
 import { updateAssignment } from '../../services/assignments.service';
+import { Lecture } from '../../model/lecture';
 
 
 const validationSchema = yup.object({
@@ -41,6 +42,7 @@ const validationSchema = yup.object({
 });
 
 export interface IEditDialogProps {
+  lecture: Lecture;
   assignment: Assignment;
 }
 
@@ -58,7 +60,7 @@ export const EditDialog = (props: IEditDialogProps) => {
       const updatedAssignment : Assignment = Object.assign(props.assignment,values);
       console.log(updatedAssignment);
       //TODO: either need lect id from assignment or need lecture hear
-      //updateAssignment(updatedAssignment.lect_id,updatedAssignment);
+      updateAssignment(props.lecture.id,updatedAssignment);
       setOpen(false);
     }
   });
@@ -118,15 +120,15 @@ export const EditDialog = (props: IEditDialogProps) => {
               />}
               label="Set Deadline"/>
 
-            { formik.values.due_date != null
-              &&
               <DateTimePicker
                 ampm={false}
+                disabled={formik.values.due_date == null}
                 renderInput={(props: TextFieldProps) => {
                   //@ts-ignore
                   return (
                     <TextField
                       {...props}
+                      
                       helperText={
                         formik.touched.due_date && formik.errors.due_date
                       }
@@ -143,7 +145,6 @@ export const EditDialog = (props: IEditDialogProps) => {
                   formik.setFieldValue('due_date', date);
                 }}
               />
-              }
 
             </LocalizationProvider>
 
