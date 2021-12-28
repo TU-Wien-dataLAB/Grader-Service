@@ -5,6 +5,7 @@ import { Assignment } from '../../model/assignment';
 import { Lecture } from '../../model/lecture';
 import { utcToLocalFormat } from '../../services/datetime.service';
 import { Box, Typography } from '@mui/material';
+import min from 'date-fns/esm/fp/min/index.js';
 
 export interface IGradingProps {
   lecture: Lecture;
@@ -47,11 +48,11 @@ export const GradingComponent = (props: IGradingProps) => {
 
 
   return (
-    <Box sx={{ height: '85%' }}>
+    <Box>
       <Typography sx={{ m: 3, top: 4 }} variant={'h5'}>
         Grading
       </Typography>
-      <DataGrid sx={{ m: 4 }} columns={columns} rows={rows} />
+      <DataGrid sx={{height:'200px'}} columns={columns} rows={rows} />
     </Box>
   );
 };
