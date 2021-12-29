@@ -1,5 +1,6 @@
 import * as React from 'react';
 import {
+    Badge,
     BottomNavigation,
     BottomNavigationAction,
     Box,
@@ -51,7 +52,9 @@ export const AssignmentModalComponent = (props: IAssignmentModalProps) => {
                     }}
                 >
                     <BottomNavigationAction label="Overview" icon={<MoreVertIcon />} />
-                    <BottomNavigationAction label="Submissions" icon={<MoreVertIcon />} />
+                    <BottomNavigationAction label="Submissions" icon={<Badge color="secondary"
+                badgeContent={latestSubmissions?.length}
+                showZero={latestSubmissions !== null}><MoreVertIcon /></Badge>} />
                 </BottomNavigation>
             </Paper>
         </Box>

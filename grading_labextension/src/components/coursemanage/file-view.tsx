@@ -1,16 +1,20 @@
 import * as React from 'react';
 import {
+    AlertProps,
     Badge,
     Box,
     Button,
     Card,
     Grid,
+    Snackbar,
     SpeedDial,
     SpeedDialAction,
     ToggleButton,
     ToggleButtonGroup,
     Typography
 } from '@mui/material';
+
+import MuiAlert from '@mui/material/Alert';
 
 import FormatListBulletedRoundedIcon from '@mui/icons-material/FormatListBulletedRounded';
 import TerminalRoundedIcon from '@mui/icons-material/TerminalRounded';
@@ -43,15 +47,13 @@ export interface IAssignmentFileViewProps {
     latest_submissions: any;
 }
 
-export const AssignmentFileView = (props : IAssignmentFileViewProps) => {
+export const AssignmentFileView = (props: IAssignmentFileViewProps) => {
 
     const [assignment, setAssignment] = React.useState(props.assignment);
-    const [expanded, setExpanded] = React.useState(false);
     const [alert, setAlert] = React.useState(false);
     const [severity, setSeverity] = React.useState('success');
     const [alertMessage, setAlertMessage] = React.useState('');
     const [selectedDir, setSelectedDir] = React.useState('source');
-    const [displaySubmissions, setDisplaySubmissions] = React.useState(false);
     const [latestSubmissions, setSubmissions] = React.useState(null);
     const [showDialog, setShowDialog] = React.useState(false);
     const [dialogContent, setDialogContent] = React.useState({
@@ -60,9 +62,6 @@ export const AssignmentFileView = (props : IAssignmentFileViewProps) => {
         handleAgree: null,
         handleDisagree: null
     });
-    const [navigation, setNavigation] = React.useState('files');
-
-    const onSubmissionClose = () => setDisplaySubmissions(false);
 
     const serverRoot = PageConfig.getOption('serverRoot');
 
@@ -77,9 +76,6 @@ export const AssignmentFileView = (props : IAssignmentFileViewProps) => {
         );
     }, []);
 
-    const handleExpandClick = () => {
-        setExpanded(!expanded);
-    };
 
     const closeDialog = () => setShowDialog(false);
 
@@ -231,103 +227,94 @@ export const AssignmentFileView = (props : IAssignmentFileViewProps) => {
 
 
             <Grid item xs={12}>
-            <Typography sx={{ m: 3, top: 4 }} variant='h5'>
-                {props.assignment.name}
-                <EditDialog lecture={lecture} assignment={assignment} />
+                <Typography sx={{ m: 3, top: 4 }} variant='h5'>
+                    {props.assignment.name}
+                    <EditDialog lecture={lecture} assignment={assignment} />
 
-                </Typography>      
-                </Grid>
+                </Typography>
+            </Grid>
 
 
-                <Grid item xs={10}>
-                <Card elevation={3}>         
-                <Typography variant="h6">Files</Typography>
-                <ToggleButtonGroup
-                    color="secondary"
-                    value={selectedDir}
-                    exclusive
-                    onChange={(e, dir) => setSelectedDir(dir)}
-                    size="small"
-                >
-                    <ToggleButton color="primary" value="source">
-                        Source
-                    </ToggleButton>
-                    <ToggleButton value="release">Release</ToggleButton>
-                </ToggleButtonGroup>
-                <FilesList
-                    path={`${selectedDir}/${props.lecture.code}/${props.assignment.name}`}
-                />
-            </Card>
+            <Grid item xs={10}>
+                <Card elevation={3}>
+                    <Typography variant="h6">Files</Typography>
+                    <ToggleButtonGroup
+                        color="secondary"
+                        value={selectedDir}
+                        exclusive
+                        onChange={(e, dir) => setSelectedDir(dir)}
+                        size="small"
+                    >
+                        <ToggleButton color="primary" value="source">
+                            Source
+                        </ToggleButton>
+                        <ToggleButton value="release">Release</ToggleButton>
+                    </ToggleButtonGroup>
+                    <FilesList
+                        path={`${selectedDir}/${props.lecture.code}/${props.assignment.name}`}
+                    />
+                </Card>
             </Grid>
 
 
             <Grid item xs={2}>
-            <SpeedDial
-                direction="right"
-                ariaLabel="SpeedDial openIcon example"
-                icon={<MoreVertIcon />}
-                FabProps={{ size: 'medium' }}
-                sx={{ mt: -2, mr: 'auto' }}
-            >
-                {actions.map(action => (
-                    <SpeedDialAction
-                        onClick={action.onClick}
-                        key={action.name}
-                        icon={action.icon}
-                        tooltipTitle={action.name}
-                    />
-                ))}
-            </SpeedDial>
+                <SpeedDial
+                    direction="right"
+                    ariaLabel="SpeedDial openIcon example"
+                    icon={<MoreVertIcon />}
+                    FabProps={{ size: 'medium' }}
+                    sx={{ mt: -2, mr: 'auto' }}
+                >
+                    {actions.map(action => (
+                        <SpeedDialAction
+                            onClick={action.onClick}
+                            key={action.name}
+                            icon={action.icon}
+                            tooltipTitle={action.name}
+                        />
+                    ))}
+                </SpeedDial>
             </Grid>
             <Grid item xs={12}>
-            <Button
-                sx={{ mt: -1 }}
-                onClick={() => handlePushAssignment()}
-                variant="outlined"
-                size="small"
-            >
-                <PublishRoundedIcon fontSize="small" sx={{ mr: 1 }} />
-                Push
-            </Button>
-            <Button
-                sx={{ mt: -1 }}
-                onClick={() => handlePullAssignment()}
-                variant="outlined"
-                size="small"
-            >
-                <GetAppRoundedIcon fontSize="small" sx={{ mr: 1 }} />
-                Pull
-            </Button>
-            <Button
-                sx={{ mt: -1 }}
-                onClick={() => handleReleaseAssignment()}
-                variant="outlined"
-                size="small"
-            >
-                <NewReleasesRoundedIcon fontSize="small" sx={{ mr: 1 }} />
-                Release
-            </Button>
-
-            <Badge
-                sx={{ mt: -1, mr: 2, ml: 1 }}
-                color="secondary"
-                badgeContent={latestSubmissions?.length}
-                showZero={latestSubmissions !== null}
-            >
                 <Button
-                    sx={{ ml: 'auto' }}
-                    onClick={(e) => {
-                        setDisplaySubmissions(true)
-                    }
-                    }
+                    sx={{ mt: -1 }}
+                    onClick={() => handlePushAssignment()}
                     variant="outlined"
                     size="small"
                 >
-                    <CloudDoneRoundedIcon fontSize="small" sx={{ mr: 1 }} />
-                    Submissions
+                    <PublishRoundedIcon fontSize="small" sx={{ mr: 1 }} />
+                    Push
                 </Button>
-            </Badge>
+                <Button
+                    sx={{ mt: -1 }}
+                    onClick={() => handlePullAssignment()}
+                    variant="outlined"
+                    size="small"
+                >
+                    <GetAppRoundedIcon fontSize="small" sx={{ mr: 1 }} />
+                    Pull
+                </Button>
+                <Button
+                    sx={{ mt: -1 }}
+                    onClick={() => handleReleaseAssignment()}
+                    variant="outlined"
+                    size="small"
+                >
+                    <NewReleasesRoundedIcon fontSize="small" sx={{ mr: 1 }} />
+                    Release
+                </Button>
             </Grid>
+            <AgreeDialog open={showDialog} {...dialogContent} />
+            <Snackbar open={alert} autoHideDuration={3000} onClose={handleAlertClose}>
+                <MuiAlert
+                    onClose={handleAlertClose}
+                    severity={severity as AlertProps['severity']}
+                    sx={{ width: '100%' }}
+                >
+                    {alertMessage}
+                </MuiAlert>
+            </Snackbar>
+
         </Grid>
 
     );
