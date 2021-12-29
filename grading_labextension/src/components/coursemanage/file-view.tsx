@@ -1,15 +1,15 @@
 import * as React from 'react';
 import {
-    Badge,
-    Box,
-    Button,
-    Card,
-    Grid,
-    SpeedDial,
-    SpeedDialAction,
-    ToggleButton,
-    ToggleButtonGroup,
-    Typography
+  Badge,
+  Box,
+  Button,
+  Card,
+  Grid,
+  SpeedDial,
+  SpeedDialAction,
+  ToggleButton,
+  ToggleButtonGroup,
+  Typography
 } from '@mui/material';
 
 import FormatListBulletedRoundedIcon from '@mui/icons-material/FormatListBulletedRounded';
@@ -27,308 +27,280 @@ import { MainAreaWidget } from '@jupyterlab/apputils';
 import { ITerminal } from '@jupyterlab/terminal';
 import { Terminal } from '@jupyterlab/services';
 import { PageConfig } from '@jupyterlab/coreutils';
-import { getAllSubmissions } from '../../services/submissions.service';
-import { GradingComponent } from './grading';
 import { AgreeDialog, EditDialog, IAgreeDialogProps } from './dialog';
 import {
-    pullAssignment,
-    pushAssignment,
-    updateAssignment
+  pullAssignment,
+  pushAssignment,
+  updateAssignment
 } from '../../services/assignments.service';
-
+import { Submission } from '../../model/submission';
 
 export interface IAssignmentFileViewProps {
-    assignment: Assignment;
-    lecture: Lecture;
-    latest_submissions: any;
+  assignment: Assignment;
+  lecture: Lecture;
+  latest_submissions: Submission[];
 }
 
-export const AssignmentFileView = (props : IAssignmentFileViewProps) => {
+export const AssignmentFileView = (props: IAssignmentFileViewProps) => {
+  const [assignment, setAssignment] = React.useState(props.assignment);
+  const [alert, setAlert] = React.useState(false);
+  const [severity, setSeverity] = React.useState('success');
+  const [alertMessage, setAlertMessage] = React.useState('');
+  const [selectedDir, setSelectedDir] = React.useState('source');
+  const [displaySubmissions, setDisplaySubmissions] = React.useState(false);
+  const [showDialog, setShowDialog] = React.useState(false);
+  const [dialogContent, setDialogContent] = React.useState({
+    title: '',
+    message: '',
+    handleAgree: null,
+    handleDisagree: null
+  });
 
-    const [assignment, setAssignment] = React.useState(props.assignment);
-    const [expanded, setExpanded] = React.useState(false);
-    const [alert, setAlert] = React.useState(false);
-    const [severity, setSeverity] = React.useState('success');
-    const [alertMessage, setAlertMessage] = React.useState('');
-    const [selectedDir, setSelectedDir] = React.useState('source');
-    const [displaySubmissions, setDisplaySubmissions] = React.useState(false);
-    const [latestSubmissions, setSubmissions] = React.useState(null);
-    const [showDialog, setShowDialog] = React.useState(false);
-    const [dialogContent, setDialogContent] = React.useState({
-        title: '',
-        message: '',
-        handleAgree: null,
-        handleDisagree: null
-    });
-    const [navigation, setNavigation] = React.useState('files');
+  const serverRoot = PageConfig.getOption('serverRoot');
 
-    const onSubmissionClose = () => setDisplaySubmissions(false);
+  const lecture = props.lecture;
+  let terminalSession: Terminal.ITerminalConnection = null;
 
-    const serverRoot = PageConfig.getOption('serverRoot');
+  const closeDialog = () => setShowDialog(false);
 
-    const lecture = props.lecture;
-    let terminalSession: Terminal.ITerminalConnection = null;
+  const openTerminal = async () => {
+    const path = `${serverRoot}/${selectedDir}/${lecture.code}/${assignment.name}`;
+    console.log('Opening terminal at: ' + path.replace(' ', '\\ '));
+    let args = {};
+    if (
+      terminalSession !== null &&
+      terminalSession.connectionStatus === 'connected'
+    ) {
+      args = { name: terminalSession.name };
+    }
+    const main = (await GlobalObjects.commands.execute(
+      'terminal:open',
+      args
+    )) as MainAreaWidget<ITerminal.ITerminal>;
 
-    React.useEffect(() => {
-        getAllSubmissions(props.lecture, props.assignment, true, true).then(
-            (response: any) => {
-                setSubmissions(response);
-            }
-        );
-    }, []);
+    if (main) {
+      const terminal = main.content;
+      terminalSession = terminal.session;
+    }
 
-    const handleExpandClick = () => {
-        setExpanded(!expanded);
-    };
+    try {
+      terminalSession.send({
+        type: 'stdin',
+        content: ['cd ' + path.replace(' ', '\\ ') + '\n']
+      });
+    } catch (e) {
+      showAlert('error', 'Error Opening Terminal');
+      main.dispose();
+    }
+  };
 
-    const closeDialog = () => setShowDialog(false);
+  const openBrowser = async () => {
+    const path = `${selectedDir}/${lecture.code}/${assignment.name}`;
+    GlobalObjects.commands
+      .execute('filebrowser:go-to-path', {
+        path
+      })
+      .catch(error => {
+        showAlert('error', 'Error showing in File Browser');
+      });
+  };
 
-    const openTerminal = async () => {
-        const path = `${serverRoot}/${selectedDir}/${lecture.code}/${assignment.name}`;
-        console.log('Opening terminal at: ' + path.replace(' ', '\\ '));
-        let args = {};
-        if (
-            terminalSession !== null &&
-            terminalSession.connectionStatus === 'connected'
-        ) {
-            args = { name: terminalSession.name };
-        }
-        const main = (await GlobalObjects.commands.execute(
-            'terminal:open',
-            args
-        )) as MainAreaWidget<ITerminal.ITerminal>;
-
-        if (main) {
-            const terminal = main.content;
-            terminalSession = terminal.session;
-        }
-
+  const handlePushAssignment = async () => {
+    setDialogContent({
+      title: 'Push Assignment',
+      message: `Do you want to push ${assignment.name}? This updates the state of the assignment on the server with your local state.`,
+      handleAgree: async () => {
         try {
-            terminalSession.send({
-                type: 'stdin',
-                content: ['cd ' + path.replace(' ', '\\ ') + '\n']
-            });
-        } catch (e) {
-            showAlert('error', 'Error Opening Terminal');
-            main.dispose();
+          await pushAssignment(lecture.id, assignment.id, 'source');
+          await pushAssignment(lecture.id, assignment.id, 'release');
+        } catch (err) {
+          showAlert('error', 'Error Pushing Assignment');
         }
-    };
+        //TODO: should be atomar with the pushAssignment function
+        const a = assignment;
+        a.status = 'pushed';
+        updateAssignment(lecture.id, a).then(
+          assignment => setAssignment(assignment),
+          error => showAlert('error', 'Error Updating Assignment')
+        );
+        closeDialog();
+      },
+      handleDisagree: () => closeDialog()
+    });
+    setShowDialog(true);
+  };
 
-    const openBrowser = async () => {
-        const path = `${selectedDir}/${lecture.code}/${assignment.name}`;
-        GlobalObjects.commands
-            .execute('filebrowser:go-to-path', {
-                path
-            })
-            .catch(error => {
-                showAlert('error', 'Error showing in File Browser');
-            });
-    };
-
-    const handlePushAssignment = async () => {
-        setDialogContent({
-            title: 'Push Assignment',
-            message: `Do you want to push ${assignment.name}? This updates the state of the assignment on the server with your local state.`,
-            handleAgree: async () => {
-                try {
-                    await pushAssignment(lecture.id, assignment.id, 'source');
-                    await pushAssignment(lecture.id, assignment.id, 'release');
-                } catch (err) {
-                    showAlert('error', 'Error Pushing Assignment');
-                }
-                //TODO: should be atomar with the pushAssignment function
-                const a = assignment;
-                a.status = 'pushed';
-                updateAssignment(lecture.id, a).then(
-                    assignment => setAssignment(assignment),
-                    error => showAlert('error', 'Error Updating Assignment')
-                );
-                closeDialog();
-            },
-            handleDisagree: () => closeDialog()
-        });
-        setShowDialog(true);
-    };
-
-    const handlePullAssignment = async () => {
-        setDialogContent({
-            title: 'Pull Assignment',
-            message: `Do you want to pull ${assignment.name}? This updates your assignment with the state of the server and overwrites all changes.`,
-            handleAgree: async () => {
-                try {
-                    await pullAssignment(lecture.id, assignment.id, 'source');
-                } catch (err) {
-                    showAlert('error', 'Error Pulling Assignment');
-                }
-                // TODO: update file list
-                closeDialog();
-            },
-            handleDisagree: () => closeDialog()
-        });
-        setShowDialog(true);
-    };
-
-    const handleReleaseAssignment = async () => {
-        setDialogContent({
-            title: 'Release Assignment',
-            message: `Do you want to release ${assignment.name} for all students?`,
-            handleAgree: () => {
-                setDialogContent({
-                    title: 'Confirmation',
-                    message: `Are you sure you want to release ${assignment.name}?`,
-                    handleAgree: async () => {
-                        try {
-                            console.log('releasing assignment');
-                            let a = assignment;
-                            a.status = 'released';
-                            a = await updateAssignment(lecture.id, a);
-                            setAssignment(a);
-                        } catch (err) {
-                            showAlert('error', 'Error Releasing Assignment');
-                        }
-                        closeDialog();
-                    },
-                    handleDisagree: () => closeDialog()
-                });
-            },
-            handleDisagree: () => closeDialog()
-        });
-        setShowDialog(true);
-    };
-
-    const showAlert = (severity: string, msg: string) => {
-        setSeverity(severity);
-        setAlertMessage(msg);
-        setAlert(true);
-    };
-
-    const handleAlertClose = (
-        event?: React.SyntheticEvent | Event,
-        reason?: string
-    ) => {
-        if (reason === 'clickaway') {
-            return;
+  const handlePullAssignment = async () => {
+    setDialogContent({
+      title: 'Pull Assignment',
+      message: `Do you want to pull ${assignment.name}? This updates your assignment with the state of the server and overwrites all changes.`,
+      handleAgree: async () => {
+        try {
+          await pullAssignment(lecture.id, assignment.id, 'source');
+        } catch (err) {
+          showAlert('error', 'Error Pulling Assignment');
         }
-        setAlert(false);
-    };
+        // TODO: update file list
+        closeDialog();
+      },
+      handleDisagree: () => closeDialog()
+    });
+    setShowDialog(true);
+  };
 
-    const actions = [
-        {
-            icon: <FormatListBulletedRoundedIcon />,
-            name: 'Show Files',
-            onClick: () => openBrowser()
-        },
-        {
-            icon: <TerminalRoundedIcon />,
-            name: 'Open Terminal',
-            onClick: () => openTerminal()
-        }
-    ];
+  const handleReleaseAssignment = async () => {
+    setDialogContent({
+      title: 'Release Assignment',
+      message: `Do you want to release ${assignment.name} for all students?`,
+      handleAgree: () => {
+        setDialogContent({
+          title: 'Confirmation',
+          message: `Are you sure you want to release ${assignment.name}?`,
+          handleAgree: async () => {
+            try {
+              console.log('releasing assignment');
+              let a = assignment;
+              a.status = 'released';
+              a = await updateAssignment(lecture.id, a);
+              setAssignment(a);
+            } catch (err) {
+              showAlert('error', 'Error Releasing Assignment');
+            }
+            closeDialog();
+          },
+          handleDisagree: () => closeDialog()
+        });
+      },
+      handleDisagree: () => closeDialog()
+    });
+    setShowDialog(true);
+  };
 
+  const showAlert = (severity: string, msg: string) => {
+    setSeverity(severity);
+    setAlertMessage(msg);
+    setAlert(true);
+  };
 
-    return (
-        <Grid container spacing={2}>
+  const handleAlertClose = (
+    event?: React.SyntheticEvent | Event,
+    reason?: string
+  ) => {
+    if (reason === 'clickaway') {
+      return;
+    }
+    setAlert(false);
+  };
 
+  const actions = [
+    {
+      icon: <FormatListBulletedRoundedIcon />,
+      name: 'Show Files',
+      onClick: () => openBrowser()
+    },
+    {
+      icon: <TerminalRoundedIcon />,
+      name: 'Open Terminal',
+      onClick: () => openTerminal()
+    }
+  ];
 
-            <Grid item xs={12}>
-            <Typography sx={{ m: 3, top: 4 }} variant='h5'>
-                {props.assignment.name}
-                <EditDialog lecture={lecture} assignment={assignment} />
+  return (
+    <Grid container spacing={2}>
+      <Grid item xs={12}>
+        <Typography sx={{ m: 3, top: 4 }} variant="h5">
+          {props.assignment.name}
+          <EditDialog lecture={lecture} assignment={assignment} />
+        </Typography>
+      </Grid>
 
-                </Typography>      
-                </Grid>
+      <Grid item xs={10}>
+        <Card elevation={3}>
+          <Typography variant="h6">Files</Typography>
+          <ToggleButtonGroup
+            color="secondary"
+            value={selectedDir}
+            exclusive
+            onChange={(e, dir) => setSelectedDir(dir)}
+            size="small"
+          >
+            <ToggleButton color="primary" value="source">
+              Source
+            </ToggleButton>
+            <ToggleButton value="release">Release</ToggleButton>
+          </ToggleButtonGroup>
+          <FilesList
+            path={`${selectedDir}/${props.lecture.code}/${props.assignment.name}`}
+          />
+        </Card>
+      </Grid>
 
+      <Grid item xs={2}>
+        <SpeedDial
+          direction="right"
+          ariaLabel="SpeedDial openIcon example"
+          icon={<MoreVertIcon />}
+          FabProps={{ size: 'medium' }}
+          sx={{ mt: -2, mr: 'auto' }}
+        >
+          {actions.map(action => (
+            <SpeedDialAction
+              onClick={action.onClick}
+              key={action.name}
+              icon={action.icon}
+              tooltipTitle={action.name}
+            />
+          ))}
+        </SpeedDial>
+      </Grid>
+      <Grid item xs={12}>
+        <Button
+          sx={{ mt: -1 }}
+          onClick={() => handlePushAssignment()}
+          variant="outlined"
+          size="small"
+        >
+          <PublishRoundedIcon fontSize="small" sx={{ mr: 1 }} />
+          Push
+        </Button>
+        <Button
+          sx={{ mt: -1 }}
+          onClick={() => handlePullAssignment()}
+          variant="outlined"
+          size="small"
+        >
+          <GetAppRoundedIcon fontSize="small" sx={{ mr: 1 }} />
+          Pull
+        </Button>
+        <Button
+          sx={{ mt: -1 }}
+          onClick={() => handleReleaseAssignment()}
+          variant="outlined"
+          size="small"
+        >
+          <NewReleasesRoundedIcon fontSize="small" sx={{ mr: 1 }} />
+          Release
+        </Button>
 
-                <Grid item xs={10}>
-                <Card elevation={3}>         
-                <Typography variant="h6">Files</Typography>
-                <ToggleButtonGroup
-                    color="secondary"
-                    value={selectedDir}
-                    exclusive
-                    onChange={(e, dir) => setSelectedDir(dir)}
-                    size="small"
-                >
-                    <ToggleButton color="primary" value="source">
-                        Source
-                    </ToggleButton>
-                    <ToggleButton value="release">Release</ToggleButton>
-                </ToggleButtonGroup>
-                <FilesList
-                    path={`${selectedDir}/${props.lecture.code}/${props.assignment.name}`}
-                />
-            </Card>
-            </Grid>
-
-
-            <Grid item xs={2}>
-            <SpeedDial
-                direction="right"
-                ariaLabel="SpeedDial openIcon example"
-                icon={<MoreVertIcon />}
-                FabProps={{ size: 'medium' }}
-                sx={{ mt: -2, mr: 'auto' }}
-            >
-                {actions.map(action => (
-                    <SpeedDialAction
-                        onClick={action.onClick}
-                        key={action.name}
-                        icon={action.icon}
-                        tooltipTitle={action.name}
-                    />
-                ))}
-            </SpeedDial>
-            </Grid>
-            <Grid item xs={12}>
-            <Button
-                sx={{ mt: -1 }}
-                onClick={() => handlePushAssignment()}
-                variant="outlined"
-                size="small"
-            >
-                <PublishRoundedIcon fontSize="small" sx={{ mr: 1 }} />
-                Push
-            </Button>
-            <Button
-                sx={{ mt: -1 }}
-                onClick={() => handlePullAssignment()}
-                variant="outlined"
-                size="small"
-            >
-                <GetAppRoundedIcon fontSize="small" sx={{ mr: 1 }} />
-                Pull
-            </Button>
-            <Button
-                sx={{ mt: -1 }}
-                onClick={() => handleReleaseAssignment()}
-                variant="outlined"
-                size="small"
-            >
-                <NewReleasesRoundedIcon fontSize="small" sx={{ mr: 1 }} />
-                Release
-            </Button>
-
-            <Badge
-                sx={{ mt: -1, mr: 2, ml: 1 }}
-                color="secondary"
-                badgeContent={latestSubmissions?.length}
-                showZero={latestSubmissions !== null}
-            >
-                <Button
-                    sx={{ ml: 'auto' }}
-                    onClick={(e) => {
-                        setDisplaySubmissions(true)
-                    }
-                    }
-                    variant="outlined"
-                    size="small"
-                >
-                    <CloudDoneRoundedIcon fontSize="small" sx={{ mr: 1 }} />
-                    Submissions
-                </Button>
-            </Badge>
-            </Grid>
-        </Grid>
-
-    );
-}
+        <Badge
+          sx={{ mt: -1, mr: 2, ml: 1 }}
+          color="secondary"
+          badgeContent={props.latest_submissions?.length}
+          showZero={props.latest_submissions !== null}
+        >
+          <Button
+            sx={{ ml: 'auto' }}
+            onClick={e => {
+              setDisplaySubmissions(true);
+            }}
+            variant="outlined"
+            size="small"
+          >
+            <CloudDoneRoundedIcon fontSize="small" sx={{ mr: 1 }} />
+            Submissions
+          </Button>
+        </Badge>
+      </Grid>
+    </Grid>
+  );
+};

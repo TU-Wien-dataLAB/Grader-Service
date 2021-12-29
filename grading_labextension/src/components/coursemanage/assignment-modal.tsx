@@ -1,9 +1,9 @@
 import * as React from 'react';
 import {
-    BottomNavigation,
-    BottomNavigationAction,
-    Box,
-    Paper,
+  BottomNavigation,
+  BottomNavigationAction,
+  Box,
+  Paper
 } from '@mui/material';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import { Assignment } from '../../model/assignment';
@@ -11,49 +11,59 @@ import { Lecture } from '../../model/lecture';
 import { getAllSubmissions } from '../../services/submissions.service';
 import { GradingComponent } from './grading';
 import { AssignmentFileView } from './file-view';
-
+import { Submission } from '../../model/submission';
 
 export interface IAssignmentModalProps {
-    lecture: Lecture;
-    assignment: Assignment;
+  lecture: Lecture;
+  assignment: Assignment;
+  latestSubmissions: Submission[];
 }
 
 export const AssignmentModalComponent = (props: IAssignmentModalProps) => {
+  const [latestSubmissions, setSubmissions] = React.useState(
+    props.latestSubmissions
+  );
+  const [navigation, setNavigation] = React.useState(0);
 
-    const [latestSubmissions, setSubmissions] = React.useState(null);
-    const [navigation, setNavigation] = React.useState(0);
+  return (
+    <Box>
+      {navigation == 0 && (
+        <AssignmentFileView
+          lecture={props.lecture}
+          assignment={props.assignment}
+          latest_submissions={latestSubmissions}
+        />
+      )}
 
-    React.useEffect(() => {
-        getAllSubmissions(props.lecture, props.assignment, true, true).then(
-            (response: any) => {
+      {navigation == 1 && (
+        <GradingComponent
+          lecture={props.lecture}
+          assignment={props.assignment}
+          latest_submissions={latestSubmissions}
+        />
+      )}
+
+      <Paper
+        sx={{ position: 'absolute', bottom: 0, left: 0, right: 0 }}
+        elevation={3}
+      >
+        <BottomNavigation
+          showLabels
+          value={navigation}
+          onChange={(event, newValue) => {
+            console.log(newValue);
+            setNavigation(newValue);
+            getAllSubmissions(props.lecture, props.assignment, true, true).then(
+              (response: any) => {
                 setSubmissions(response);
-            }
-        );
-    }, [navigation]);
-
-    return (
-        <Box>
-            {navigation == 0 && <AssignmentFileView lecture={props.lecture}
-              assignment={props.assignment}
-              latest_submissions={latestSubmissions}/>}
-
-            {navigation == 1 && <GradingComponent lecture={props.lecture}
-              assignment={props.assignment}
-              latest_submissions={latestSubmissions}/>}
-
-            <Paper sx={{ position: "absolute", bottom: 0, left: 0, right: 0 }} elevation={3}>
-                <BottomNavigation
-                    showLabels
-                    value={navigation}
-                    onChange={(event, newValue) => {
-                        console.log(newValue);
-                        setNavigation(newValue);
-                    }}
-                >
-                    <BottomNavigationAction label="Overview" icon={<MoreVertIcon />} />
-                    <BottomNavigationAction label="Submissions" icon={<MoreVertIcon />} />
-                </BottomNavigation>
-            </Paper>
-        </Box>
-    );
-}
+              }
+            );
+          }}
+        >
+          <BottomNavigationAction label="Overview" icon={<MoreVertIcon />} />
+          <BottomNavigationAction label="Submissions" icon={<MoreVertIcon />} />
+        </BottomNavigation>
+      </Paper>
+    </Box>
+  );
+};
