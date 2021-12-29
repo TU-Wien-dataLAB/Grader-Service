@@ -32,7 +32,7 @@ import { ITerminal } from '@jupyterlab/terminal';
 import { Terminal } from '@jupyterlab/services';
 import { PageConfig } from '@jupyterlab/coreutils';
 import { getAllSubmissions } from '../../services/submissions.service';
-import { GradingComponent } from './grading';
+import { GradingComponent, ModalTitle } from './grading';
 import { AgreeDialog, EditDialog, IAgreeDialogProps } from './dialog';
 import {
     pullAssignment,
@@ -227,11 +227,7 @@ export const AssignmentFileView = (props: IAssignmentFileViewProps) => {
 
 
             <Grid item xs={12}>
-                <Typography sx={{ m: 3, top: 4 }} variant='h5'>
-                    {props.assignment.name}
-                    <EditDialog lecture={lecture} assignment={assignment} />
-
-                </Typography>
+                <ModalTitle title={assignment.name}/>
             </Grid>
 
 

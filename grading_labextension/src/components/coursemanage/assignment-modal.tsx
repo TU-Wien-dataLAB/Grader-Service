@@ -34,6 +34,7 @@ export const AssignmentModalComponent = (props: IAssignmentModalProps) => {
 
     return (
         <Box>
+            <Box>
             {navigation == 0 && <AssignmentFileView lecture={props.lecture}
               assignment={props.assignment}
               latest_submissions={latestSubmissions}/>}
@@ -41,6 +42,7 @@ export const AssignmentModalComponent = (props: IAssignmentModalProps) => {
             {navigation == 1 && <GradingComponent lecture={props.lecture}
               assignment={props.assignment}
               latest_submissions={latestSubmissions}/>}
+            </Box>
 
             <Paper sx={{ position: "absolute", bottom: 0, left: 0, right: 0 }} elevation={3}>
                 <BottomNavigation
