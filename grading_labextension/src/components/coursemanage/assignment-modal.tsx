@@ -1,5 +1,6 @@
 import * as React from 'react';
 import {
+    Badge,
     BottomNavigation,
     BottomNavigationAction,
     Box,
@@ -16,20 +17,13 @@ import { Submission } from '../../model/submission';
 export interface IAssignmentModalProps {
     lecture: Lecture;
     assignment: Assignment;
+    latestSubmissions: Submission[];
 }
 
 export const AssignmentModalComponent = (props: IAssignmentModalProps) => {
 
-    const [latestSubmissions, setSubmissions] = React.useState(null);
+    const [latestSubmissions, setSubmissions] = React.useState(props.latestSubmissions);
     const [navigation, setNavigation] = React.useState(0);
-
-    React.useEffect(() => {
-        getAllSubmissions(props.lecture, props.assignment, true, true).then(
-            (response: any) => {
-                setSubmissions(response);
-            }
-        );
-    }, [navigation]);
 
     return (
         <Box>
@@ -57,8 +51,8 @@ export const AssignmentModalComponent = (props: IAssignmentModalProps) => {
                 >
                     <BottomNavigationAction label="Overview" icon={<MoreVertIcon />} />
                     <BottomNavigationAction label="Submissions" icon={<Badge color="secondary"
-                badgeContent={latestSubmissions?.length}
-                showZero={latestSubmissions !== null}><MoreVertIcon /></Badge>} />
+                badgeContent={props.latestSubmissions?.length}
+                showZero={props.latestSubmissions !== null}><MoreVertIcon /></Badge>} />
                 </BottomNavigation>
             </Paper>
         </Box>
