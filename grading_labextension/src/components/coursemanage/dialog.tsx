@@ -35,6 +35,7 @@ import {
 } from '../../services/assignments.service';
 import { Lecture } from '../../model/lecture';
 import TypeEnum = Assignment.TypeEnum;
+import { updateLecture } from '../../services/lectures.service';
 
 const validationSchema = yup.object({
   name: yup
@@ -202,7 +203,134 @@ export const EditDialog = (props: IEditDialogProps) => {
   );
 };
 
-export interface ICreateDialogProps {
+const validationSchemaLecture = yup.object({
+  name: yup
+    .string()
+    .min(4, 'Name should be 4-50 characters long')
+    .max(50, 'Name should be 4-50 characters long')
+    .required('Name is required'),
+  semester: yup
+    .string()
+    .min(4, 'Semester should be 4-12 characters long')
+    .max(12, 'Semester should be 4-12 characters long')
+    .required('Lecture code is required'),
+  complete: yup.boolean()
+});
+
+export interface IEditLectureProps {
+  lecture: Lecture;
+  handleSubmit: () => void;
+}
+
+export const EditLectureDialog = (props: IEditLectureProps) => {
+  const formik = useFormik({
+    initialValues: {
+      name: props.lecture.name,
+      semester: props.lecture.semester,
+      complete: props.lecture.complete
+    },
+    validationSchema: validationSchema,
+    onSubmit: values => {
+      const updatedLecture: Lecture = {
+        name: values.name,
+        semester: values.semester,
+        complete: values.complete
+      };
+      console.log(updatedLecture);
+      updateLecture(updatedLecture).then(props.handleSubmit);
+      setOpen(false);
+    }
+  });
+
+  const [openDialog, setOpen] = React.useState(false);
+
+  return (
+    <div>
+      <IconButton
+        sx={{ mt: -1 }}
+        onClick={e => {
+          e.stopPropagation();
+          setOpen(true);
+        }}
+        onMouseDown={event => event.stopPropagation()}
+        aria-label="edit"
+      >
+        <EditIcon />
+      </IconButton>
+      <Dialog open={openDialog}>
+        <DialogTitle>Edit Lecture</DialogTitle>
+        <form onSubmit={formik.handleSubmit}>
+          <DialogContent>
+            <Stack spacing={2}>
+              <TextField
+                variant="outlined"
+                fullWidth
+                id="name"
+                name="name"
+                label="Lecture Name"
+                value={formik.values.name}
+                onChange={formik.handleChange}
+                error={formik.touched.name && Boolean(formik.errors.name)}
+                helperText={formik.touched.name && formik.errors.name}
+              />
+              <TextField
+                variant="outlined"
+                fullWidth
+                id="semester"
+                name="semester"
+                label="Semester"
+                value={formik.values.semester}
+                onChange={formik.handleChange}
+                error={
+                  formik.touched.semester && Boolean(formik.errors.semester)
+                }
+                helperText={formik.touched.semester && formik.errors.semester}
+              />
+              <FormControlLabel
+                control={
+                  <Checkbox
+                    value={props.lecture.complete}
+                    onChange={e => {
+                      formik.setFieldValue('complete', e.target.checked);
+                    }}
+                  />
+                }
+                label="Complete"
+              />
+              <Button
+                fullWidth
+                color="error"
+                variant="contained"
+                onClick={() => {
+                  setOpen(false);
+                }}
+              >
+                Delete Lecture
+              </Button>
+            </Stack>
+          </DialogContent>
+          <DialogActions>
+            <Button
+              color="primary"
+              variant="outlined"
+              onClick={() => {
+                setOpen(false);
+              }}
+            >
+              Cancel
+            </Button>
+
+            <Button color="primary" variant="contained" type="submit">
+              Submit
+            </Button>
+          </DialogActions>
+        </form>
+      </Dialog>
+    </div>
+  );
+};
+
+interface ICreateDialogProps {
   lecture: Lecture;
   handleSubmit: () => void;
 }
@@ -233,17 +361,18 @@ export const CreateDialog = (props: ICreateDialogProps) => {
 
   return (
     <div>
-      <IconButton
+      <Button
         sx={{ mt: -1 }}
         onClick={e => {
           e.stopPropagation();
           setOpen(true);
         }}
         onMouseDown={event => event.stopPropagation()}
-        aria-label="edit"
+        aria-label="create"
+        size={'small'}
       >
-        <AddRoundedIcon />
-      </IconButton>
+        <AddRoundedIcon /> New Assignment
+      </Button>
       <Dialog open={openDialog}>
         <DialogTitle>Edit Assignment</DialogTitle>
         <form onSubmit={formik.handleSubmit}>

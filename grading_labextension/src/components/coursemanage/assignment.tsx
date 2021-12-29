@@ -7,6 +7,7 @@ import {
   CardActions,
   CardContent,
   Chip,
+  Stack,
   Typography
 } from '@mui/material';
 
@@ -47,22 +48,25 @@ export const AssignmentComponent = (props: IAssignmentComponentProps) => {
           {props.assignment.name}
         </Typography>
 
-        <DeadlineComponent
-          due_date={props.assignment.due_date}
-          compact={true}
-        />
-        <Chip
-          sx={{ mt: 1 }}
-          size="small"
-          icon={<AssignmentTurnedInRoundedIcon />}
-          label={props.assignment.status}
-        />
-        <Chip
-          sx={{ mt: 1 }}
-          size="small"
-          icon={<CloudDoneRoundedIcon />}
-          label={'Submissions: ' + latestSubmissions.length}
-        />
+        <Stack sx={{ display: 'flex', flexDirection: 'column' }}>
+          <DeadlineComponent
+            sx={{ margin: 'auto', ml: 0, mt: 0.75 }}
+            due_date={props.assignment.due_date}
+            compact={true}
+          />
+          <Chip
+            sx={{ margin: 'auto', ml: 0, mt: 0.75 }}
+            size="small"
+            icon={<AssignmentTurnedInRoundedIcon />}
+            label={props.assignment.status}
+          />
+          <Chip
+            sx={{ margin: 'auto', ml: 0, mt: 0.75 }}
+            size="small"
+            icon={<CloudDoneRoundedIcon />}
+            label={'Submissions: ' + latestSubmissions.length}
+          />
+        </Stack>
 
         <LoadingOverlay
           onClose={onSubmissionClose}

@@ -2,10 +2,13 @@ import * as React from 'react';
 import moment from 'moment';
 import { Chip } from '@mui/material';
 import AccessAlarmRoundedIcon from '@mui/icons-material/AccessAlarmRounded';
+import { SxProps } from '@mui/system';
+import { Theme } from '@mui/material/styles';
 
 export interface IDeadlineProps {
   due_date: string | null;
   compact: boolean;
+  sx?: SxProps<Theme>;
 }
 
 interface ITimeSpec {
@@ -112,14 +115,14 @@ export const DeadlineComponent = (props: IDeadlineProps) => {
 
   return date === undefined ? (
     <Chip
-      sx={{ mt: 1 }}
+      sx={props.sx}
       size="small"
       icon={<AccessAlarmRoundedIcon />}
       label={'No Deadline 😁'}
     />
   ) : (
     <Chip
-      sx={{ mt: 1 }}
+      sx={props.sx}
       size="small"
       icon={<AccessAlarmRoundedIcon />}
       label={displayDate}
