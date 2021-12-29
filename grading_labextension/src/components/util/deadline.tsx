@@ -89,7 +89,6 @@ function getDisplayDate(date: Date, compact: boolean): string {
 }
 
 export const DeadlineComponent = (props: IDeadlineProps) => {
-  console.log(props.due_date);
   const [date, setDate] = React.useState(
     props.due_date !== null
       ? moment.utc(props.due_date).local().toDate()
@@ -98,19 +97,28 @@ export const DeadlineComponent = (props: IDeadlineProps) => {
   const [displayDate, setDisplayDate] = React.useState(
     getDisplayDate(date, props.compact)
   );
-  let interval: number = null;
+  const [interval, setNewInterval] = React.useState(null);
 
-  React.useEffect(() => updateTimeoutInterval(), [props]);
+  React.useEffect(() => {
+    const d =
+      props.due_date !== null
+        ? moment.utc(props.due_date).local().toDate()
+        : undefined;
+    setDate(d);
+    setDisplayDate(getDisplayDate(d, props.compact));
+    updateTimeoutInterval(d);
+  }, [props]);
 
-  const updateTimeoutInterval = () => {
+  const updateTimeoutInterval = (date: Date) => {
     if (interval) {
       clearInterval(interval);
     }
     const time: ITimeSpec = calculateTimeLeft(date);
     const timeout = time.weeks === 0 && time.days === 0 ? 1000 : 10000;
-    interval = setInterval(() => {
+    const newInterval = setInterval(() => {
       setDisplayDate(getDisplayDate(date, props.compact));
     }, timeout);
+    setNewInterval(newInterval);
   };
 
   return date === undefined ? (

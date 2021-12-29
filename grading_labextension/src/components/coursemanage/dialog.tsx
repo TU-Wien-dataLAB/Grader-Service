@@ -94,7 +94,7 @@ export const EditDialog = (props: IEditDialogProps) => {
       >
         <EditIcon />
       </IconButton>
-      <Dialog open={openDialog}>
+      <Dialog open={openDialog} onBackdropClick={() => setOpen(false)}>
         <DialogTitle>Edit Assignment</DialogTitle>
         <form onSubmit={formik.handleSubmit}>
           <DialogContent>
@@ -229,15 +229,13 @@ export const EditLectureDialog = (props: IEditLectureProps) => {
       semester: props.lecture.semester,
       complete: props.lecture.complete
     },
-    validationSchema: validationSchema,
+    validationSchema: validationSchemaLecture,
     onSubmit: values => {
-      const updatedLecture: Lecture = {
-        name: values.name,
-        semester: values.semester,
-        complete: values.complete
-      };
+      const updatedLecture: Lecture = Object.assign(props.lecture, values);
       console.log(updatedLecture);
-      updateLecture(updatedLecture).then(props.handleSubmit);
+      updateLecture(updatedLecture)
+        .then(props.handleSubmit)
+        .catch(error => console.log(error));
       setOpen(false);
     }
   });
@@ -257,7 +255,7 @@ export const EditLectureDialog = (props: IEditLectureProps) => {
       >
         <EditIcon />
       </IconButton>
-      <Dialog open={openDialog}>
+      <Dialog open={openDialog} onBackdropClick={() => setOpen(false)}>
         <DialogTitle>Edit Lecture</DialogTitle>
         <form onSubmit={formik.handleSubmit}>
           <DialogContent>
@@ -373,7 +371,7 @@ export const CreateDialog = (props: ICreateDialogProps) => {
       >
         <AddRoundedIcon /> New Assignment
       </Button>
-      <Dialog open={openDialog}>
+      <Dialog open={openDialog} onBackdropClick={() => setOpen(false)}>
         <DialogTitle>Edit Assignment</DialogTitle>
         <form onSubmit={formik.handleSubmit}>
           <DialogContent>

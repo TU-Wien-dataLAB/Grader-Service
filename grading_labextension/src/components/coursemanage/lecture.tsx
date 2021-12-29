@@ -21,6 +21,7 @@ import { Lecture } from '../../model/lecture';
 import { getAllAssignments } from '../../services/assignments.service';
 import { AssignmentComponent } from './assignment';
 import { CreateDialog, EditLectureDialog } from './dialog';
+import { getLecture } from '../../services/lectures.service';
 
 interface ILectureComponentProps {
   lecture: Lecture;
@@ -28,11 +29,12 @@ interface ILectureComponentProps {
 }
 
 export const LectureComponent = (props: ILectureComponentProps) => {
+  const [lecture, setLecture] = React.useState(props.lecture);
   const [assignments, setAssignments] = React.useState(null);
   const [expanded, setExpanded] = React.useState(false);
 
   React.useEffect(() => {
-    getAllAssignments(props.lecture.id).then(response => {
+    getAllAssignments(lecture.id).then(response => {
       setAssignments(response);
     });
   }, []);
@@ -58,12 +60,12 @@ export const LectureComponent = (props: ILectureComponentProps) => {
       >
         <CardContent sx={{ mb: -1, display: 'flex' }}>
           <Typography variant={'h5'} sx={{ mr: 2 }}>
-            {props.lecture.name}
+            {lecture.name}
           </Typography>
           <EditLectureDialog
-            lecture={props.lecture}
-            handleSubmit={() => {
-              console.log('update lecture');
+            lecture={lecture}
+            handleSubmit={async () => {
+              setLecture(await getLecture(lecture.id));
             }}
           />
         </CardContent>
@@ -73,7 +75,7 @@ export const LectureComponent = (props: ILectureComponentProps) => {
             <Box sx={{ display: 'flex', flexWrap: 'wrap' }}>
               {assignments.map((el: Assignment) => (
                 <AssignmentComponent
-                  lecture={props.lecture}
+                  lecture={lecture}
                   assignment={el}
                   root={props.root}
                 />
@@ -83,9 +85,9 @@ export const LectureComponent = (props: ILectureComponentProps) => {
         </Collapse>
         <CardActions>
           <CreateDialog
-            lecture={props.lecture}
+            lecture={lecture}
             handleSubmit={() => {
-              getAllAssignments(props.lecture.id).then(response => {
+              getAllAssignments(lecture.id).then(response => {
                 setAssignments(response);
               });
             }}
