@@ -98,6 +98,9 @@ export const DeadlineComponent = (props: IDeadlineProps) => {
     getDisplayDate(date, props.compact)
   );
   const [interval, setNewInterval] = React.useState(null);
+  const [color, setColor] = React.useState(
+    'default' as 'default' | 'warning' | 'error'
+  );
 
   React.useEffect(() => {
     const d =
@@ -107,6 +110,15 @@ export const DeadlineComponent = (props: IDeadlineProps) => {
     setDate(d);
     setDisplayDate(getDisplayDate(d, props.compact));
     updateTimeoutInterval(d);
+    let c: 'default' | 'warning' | 'error' = 'default';
+    const time: ITimeSpec = calculateTimeLeft(d);
+    if (time.weeks === 0 && time.days === 0) {
+      c = 'warning';
+      if (time.hours === 0) {
+        c = 'error';
+      }
+    }
+    setColor(c);
   }, [props]);
 
   const updateTimeoutInterval = (date: Date) => {
@@ -134,6 +146,7 @@ export const DeadlineComponent = (props: IDeadlineProps) => {
       size="small"
       icon={<AccessAlarmRoundedIcon />}
       label={displayDate}
+      color={color}
     />
   );
 };
