@@ -1,17 +1,25 @@
 import * as React from 'react';
 import {
   Box,
+  Button,
   Card,
   CardActionArea,
+  CardActions,
   CardContent,
+  Chip,
   Typography
 } from '@mui/material';
+
+import AccessAlarmRoundedIcon from '@mui/icons-material/AccessAlarmRounded';
+import AssignmentTurnedInRoundedIcon from '@mui/icons-material/AssignmentTurnedInRounded';
+import CloudDoneRoundedIcon from '@mui/icons-material/CloudDoneRounded';
 
 import { Assignment } from '../../model/assignment';
 import LoadingOverlay from '../util/overlay';
 import { Lecture } from '../../model/lecture';
 import { getAllSubmissions } from '../../services/submissions.service';
 import { AssignmentModalComponent } from './assignment-modal';
+import { DeadlineComponent } from '../util/deadline';
 
 interface IAssignmentComponentProps {
   lecture: Lecture;
@@ -21,39 +29,59 @@ interface IAssignmentComponentProps {
 
 export const AssignmentComponent = (props: IAssignmentComponentProps) => {
   const [displaySubmissions, setDisplaySubmissions] = React.useState(false);
-
   const onSubmissionClose = () => setDisplaySubmissions(false);
 
+  const [latestSubmissions, setSubmissions] = React.useState([]);
+  React.useEffect(() => {
+    getAllSubmissions(props.lecture, props.assignment, true, true).then(
+      (response: any) => {
+        setSubmissions(response);
+      }
+    );
+  }, [props]);
+
   return (
-    <Box sx={{ minWidth: 275 }}>
-      <Card variant="outlined">
-        <CardActionArea onClick={(e) => setDisplaySubmissions(true)
-        }>
-          <CardContent>
-            <Typography
-              sx={{ mb: 1, display: 'inline' }}
-              variant="h5"
-              component="div"
-            >
-              {props.assignment.name}
-            </Typography>
+    <Card elevation={5} sx={{ maxWidth: 225, minWidth: 225, m: 1.5 }}>
+      <CardContent>
+        <Typography variant="h5" component="div">
+          {props.assignment.name}
+        </Typography>
 
-          </CardContent>
-        </CardActionArea>
-      </Card>
+        <DeadlineComponent
+          due_date={props.assignment.due_date}
+          compact={true}
+        />
+        <Chip
+          sx={{ mt: 1 }}
+          size="small"
+          icon={<AssignmentTurnedInRoundedIcon />}
+          label={props.assignment.status}
+        />
+        <Chip
+          sx={{ mt: 1 }}
+          size="small"
+          icon={<CloudDoneRoundedIcon />}
+          label={'Submissions: ' + latestSubmissions.length}
+        />
 
-      <LoadingOverlay
-        onClose={onSubmissionClose}
-        open={displaySubmissions}
-        container={props.root}
-        transition="zoom"
-      >
-
-        <AssignmentModalComponent
-          lecture={props.lecture}
-          assignment={props.assignment} 
+        <LoadingOverlay
+          onClose={onSubmissionClose}
+          open={displaySubmissions}
+          container={props.root}
+          transition="zoom"
+        >
+          <AssignmentModalComponent
+            lecture={props.lecture}
+            assignment={props.assignment}
+            latestSubmissions={latestSubmissions}
           />
-      </LoadingOverlay>
-    </Box>
+        </LoadingOverlay>
+      </CardContent>
+      <CardActions>
+        <Button size="small" onClick={e => setDisplaySubmissions(true)}>
+          View Assignment
+        </Button>
+      </CardActions>
+    </Card>
   );
 };

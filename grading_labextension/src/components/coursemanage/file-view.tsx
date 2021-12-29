@@ -68,16 +68,7 @@ export const AssignmentFileView = (props: IAssignmentFileViewProps) => {
     const lecture = props.lecture;
     let terminalSession: Terminal.ITerminalConnection = null;
 
-    React.useEffect(() => {
-        getAllSubmissions(props.lecture, props.assignment, true, true).then(
-            (response: any) => {
-                setSubmissions(response);
-            }
-        );
-    }, []);
-
-
-    const closeDialog = () => setShowDialog(false);
+  const closeDialog = () => setShowDialog(false);
 
     const openTerminal = async () => {
         const path = `${serverRoot}/${selectedDir}/${lecture.code}/${assignment.name}`;
