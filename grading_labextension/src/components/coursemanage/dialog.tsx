@@ -20,14 +20,21 @@ import {
   DialogContentText,
   IconButton,
   Checkbox,
-  FormControlLabel
+  FormControlLabel,
+  InputLabel,
+  Select,
+  MenuItem
 } from '@mui/material';
 import { Assignment } from '../../model/assignment';
 import { LoadingButton } from '@mui/lab';
 import EditIcon from '@mui/icons-material/Edit';
-import { updateAssignment } from '../../services/assignments.service';
+import AddRoundedIcon from '@mui/icons-material/AddRounded';
+import {
+  createAssignment,
+  updateAssignment
+} from '../../services/assignments.service';
 import { Lecture } from '../../model/lecture';
-
+import TypeEnum = Assignment.TypeEnum;
 
 const validationSchema = yup.object({
   name: yup
@@ -38,7 +45,8 @@ const validationSchema = yup.object({
   due_date: yup
     .date()
     .min(new Date(), 'Deadline must be set in the future')
-    .nullable()
+    .nullable(),
+  type: yup.mixed().oneOf(['user', 'group'])
 });
 
 export interface IEditDialogProps {
@@ -48,120 +56,133 @@ export interface IEditDialogProps {
 
 //TODO: props interface
 export const EditDialog = (props: IEditDialogProps) => {
-  
-
   const formik = useFormik({
     initialValues: {
       name: props.assignment.name,
-      due_date: props.assignment.due_date != null ? new Date(props.assignment.due_date) : null
+      due_date:
+        props.assignment.due_date !== null
+          ? new Date(props.assignment.due_date)
+          : null,
+      type: props.assignment.type
     },
     validationSchema: validationSchema,
     onSubmit: values => {
-      const updatedAssignment : Assignment = Object.assign(props.assignment,values);
+      const updatedAssignment: Assignment = Object.assign(
+        props.assignment,
+        values
+      );
       console.log(updatedAssignment);
       //TODO: either need lect id from assignment or need lecture hear
-      updateAssignment(props.lecture.id,updatedAssignment);
+      updateAssignment(props.lecture.id, updatedAssignment);
       setOpen(false);
     }
   });
 
   const [openDialog, setOpen] = React.useState(false);
 
-
   return (
     <div>
       <IconButton
-              sx={{ mt: -1 }}
-              onClick={e => {
-                e.stopPropagation();
-                setOpen(true);
-              }}
-              onMouseDown={event => event.stopPropagation()}
-              aria-label="edit"
-            >
-              <EditIcon />
-            </IconButton>
+        sx={{ mt: -1 }}
+        onClick={e => {
+          e.stopPropagation();
+          setOpen(true);
+        }}
+        onMouseDown={event => event.stopPropagation()}
+        aria-label="edit"
+      >
+        <EditIcon />
+      </IconButton>
       <Dialog open={openDialog}>
         <DialogTitle>Edit Assignment</DialogTitle>
         <form onSubmit={formik.handleSubmit}>
           <DialogContent>
             <Stack spacing={2}>
-            <TextField
-              variant="outlined"
-              fullWidth
-              id="name"
-              name="name"
-              label="Assignment Name"
-              value={formik.values.name}
-              onChange={formik.handleChange}
-              error={formik.touched.name && Boolean(formik.errors.name)}
-              helperText={formik.touched.name && formik.errors.name}
-            />
-
-            
-            <LocalizationProvider dateAdapter={AdapterDateFns}>
-
-            <FormControlLabel 
-              control={
-              <Checkbox 
-                value={props.assignment.due_date != null ? true : false} 
-                onChange={
-                  async (e) => {
-                    console.log("Before: "+formik.values.due_date);
-                    if(e.target.checked) {
-                      await formik.setFieldValue('due_date', new Date())
-                    } else {
-                      await formik.setFieldValue('due_date', null) 
-                    }
-                    console.log("After: "+formik.values.due_date)
-
-                  }
-                } 
-              />}
-              label="Set Deadline"/>
-
-              <DateTimePicker
-                ampm={false}
-                disabled={formik.values.due_date == null}
-                renderInput={(props: TextFieldProps) => {
-                  //@ts-ignore
-                  return (
-                    <TextField
-                      {...props}
-                      
-                      helperText={
-                        formik.touched.due_date && formik.errors.due_date
-                      }
-                      error={
-                        formik.touched.due_date &&
-                        Boolean(formik.errors.due_date)
-                      }
-                    />
-                  );
-                }}
-                label="DateTimePicker"
-                value={formik.values.due_date}
-                onChange={date => {
-                  formik.setFieldValue('due_date', date);
-                }}
+              <TextField
+                variant="outlined"
+                fullWidth
+                id="name"
+                name="name"
+                label="Assignment Name"
+                value={formik.values.name}
+                onChange={formik.handleChange}
+                error={formik.touched.name && Boolean(formik.errors.name)}
+                helperText={formik.touched.name && formik.errors.name}
               />
 
-            </LocalizationProvider>
+              <LocalizationProvider dateAdapter={AdapterDateFns}>
+                <FormControlLabel
+                  control={
+                    <Checkbox
+                      value={props.assignment.due_date !== null ? true : false}
+                      onChange={async e => {
+                        console.log('Before: ' + formik.values.due_date);
+                        if (e.target.checked) {
+                          await formik.setFieldValue('due_date', new Date());
+                        } else {
+                          await formik.setFieldValue('due_date', null);
+                        }
+                        console.log('After: ' + formik.values.due_date);
+                      }}
+                    />
+                  }
+                  label="Set Deadline"
+                />
 
-            <Button
-              fullWidth
-              color="error"
-              variant="contained"
-              onClick={() => {
-                setOpen(false);
-              }}
-            >
-              Delete Assignment
-            </Button>
+                <DateTimePicker
+                  ampm={false}
+                  disabled={formik.values.due_date === null}
+                  renderInput={(props: TextFieldProps) => {
+                    //@ts-ignore
+                    return (
+                      <TextField
+                        {...props}
+                        helperText={
+                          formik.touched.due_date && formik.errors.due_date
+                        }
+                        error={
+                          formik.touched.due_date &&
+                          Boolean(formik.errors.due_date)
+                        }
+                      />
+                    );
+                  }}
+                  label="DateTimePicker"
+                  value={formik.values.due_date}
+                  onChange={date => {
+                    formik.setFieldValue('due_date', date);
+                  }}
+                />
+              </LocalizationProvider>
+
+              <InputLabel id="demo-simple-select-label">Type</InputLabel>
+              <Select
+                labelId="assignment-type-select-label"
+                id="assignment-type-select"
+                value={formik.values.type}
+                label="Type"
+                onChange={e => {
+                  formik.setFieldValue('type', e.target.value);
+                }}
+              >
+                <MenuItem value={'user'}>User</MenuItem>
+                <MenuItem value={'group'}>Group</MenuItem>
+              </Select>
+
+              <Button
+                fullWidth
+                color="error"
+                variant="contained"
+                onClick={() => {
+                  setOpen(false);
+                }}
+              >
+                Delete Assignment
+              </Button>
             </Stack>
           </DialogContent>
           <DialogActions>
-          <Button
+            <Button
               color="primary"
               variant="outlined"
               onClick={() => {
@@ -170,11 +191,150 @@ export const EditDialog = (props: IEditDialogProps) => {
             >
               Cancel
             </Button>
-            
+
             <Button color="primary" variant="contained" type="submit">
               Submit
             </Button>
-           
+          </DialogActions>
+        </form>
+      </Dialog>
+    </div>
+  );
+};
+
+export interface ICreateDialogProps {
+  lecture: Lecture;
+  handleSubmit: () => void;
+}
+
+export const CreateDialog = (props: ICreateDialogProps) => {
+  const formik = useFormik({
+    initialValues: {
+      name: 'Assignment',
+      due_date: null,
+      type: 'user'
+    },
+    validationSchema: validationSchema,
+    onSubmit: values => {
+      const updatedAssignment: Assignment = {
+        name: values.name,
+        due_date: values.due_date,
+        type: values.type as TypeEnum
+      };
+      console.log(updatedAssignment);
+      //TODO: either need lect id from assignment or need lecture hear
+      createAssignment(props.lecture.id, updatedAssignment);
+      setOpen(false);
+      props.handleSubmit();
+    }
+  });
+
+  const [openDialog, setOpen] = React.useState(false);
+
+  return (
+    <div>
+      <IconButton
+        sx={{ mt: -1 }}
+        onClick={e => {
+          e.stopPropagation();
+          setOpen(true);
+        }}
+        onMouseDown={event => event.stopPropagation()}
+        aria-label="edit"
+      >
+        <AddRoundedIcon />
+      </IconButton>
+      <Dialog open={openDialog}>
+        <DialogTitle>Edit Assignment</DialogTitle>
+        <form onSubmit={formik.handleSubmit}>
+          <DialogContent>
+            <Stack spacing={2}>
+              <TextField
+                variant="outlined"
+                fullWidth
+                id="name"
+                name="name"
+                label="Assignment Name"
+                value={formik.values.name}
+                onChange={formik.handleChange}
+                error={formik.touched.name && Boolean(formik.errors.name)}
+                helperText={formik.touched.name && formik.errors.name}
+              />
+
+              <LocalizationProvider dateAdapter={AdapterDateFns}>
+                <FormControlLabel
+                  control={
+                    <Checkbox
+                      value={false}
+                      onChange={async e => {
+                        console.log('Before: ' + formik.values.due_date);
+                        if (e.target.checked) {
+                          await formik.setFieldValue('due_date', new Date());
+                        } else {
+                          await formik.setFieldValue('due_date', null);
+                        }
+                        console.log('After: ' + formik.values.due_date);
+                      }}
+                    />
+                  }
+                  label="Set Deadline"
+                />
+
+                <DateTimePicker
+                  ampm={false}
+                  disabled={formik.values.due_date === null}
+                  renderInput={(props: TextFieldProps) => {
+                    //@ts-ignore
+                    return (
+                      <TextField
+                        {...props}
+                        helperText={
+                          formik.touched.due_date && formik.errors.due_date
+                        }
+                        error={
+                          formik.touched.due_date &&
+                          Boolean(formik.errors.due_date)
+                        }
+                      />
+                    );
+                  }}
+                  label="DateTimePicker"
+                  value={formik.values.due_date}
+                  onChange={date => {
+                    formik.setFieldValue('due_date', date);
+                  }}
+                />
+              </LocalizationProvider>
+
+              <InputLabel id="demo-simple-select-label">Type</InputLabel>
+              <Select
+                labelId="assignment-type-select-label"
+                id="assignment-type-select"
+                value={formik.values.type}
+                label="Type"
+                onChange={e => {
+                  formik.setFieldValue('type', e.target.value);
+                }}
+              >
+                <MenuItem value={'user'}>User</MenuItem>
+                <MenuItem value={'group'}>Group</MenuItem>
+              </Select>
+            </Stack>
+          </DialogContent>
+          <DialogActions>
+            <Button
+              color="primary"
+              variant="outlined"
+              onClick={() => {
+                setOpen(false);
+              }}
+            >
+              Cancel
+            </Button>
+
+            <Button color="primary" variant="contained" type="submit">
+              Create
+            </Button>
           </DialogActions>
         </form>
       </Dialog>

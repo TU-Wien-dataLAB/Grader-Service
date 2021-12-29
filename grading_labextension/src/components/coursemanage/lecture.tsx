@@ -1,4 +1,5 @@
 import {
+  Box,
   Button,
   Card,
   CardActionArea,
@@ -18,6 +19,7 @@ import { Assignment } from '../../model/assignment';
 import { Lecture } from '../../model/lecture';
 import { getAllAssignments } from '../../services/assignments.service';
 import { AssignmentComponent } from './assignment';
+import { CreateDialog } from './dialog';
 
 interface ILectureComponentProps {
   lecture: Lecture;
@@ -55,16 +57,25 @@ export const LectureComponent = (props: ILectureComponentProps) => {
 
         <Collapse in={expanded} timeout="auto" unmountOnExit>
           <CardContent>
-            {assignments.map((el: Assignment) => (
-              <AssignmentComponent
-                lecture={props.lecture}
-                assignment={el}
-                root={props.root}
-              />
-            ))}
+            <Box sx={{ display: 'flex', flexWrap: 'wrap' }}>
+              {assignments.map((el: Assignment) => (
+                <AssignmentComponent
+                  lecture={props.lecture}
+                  assignment={el}
+                  root={props.root}
+                />
+              ))}
+            </Box>
           </CardContent>
           <CardActions>
-            <Button>Create Assignment</Button>
+            <CreateDialog
+              lecture={props.lecture}
+              handleSubmit={() => {
+                getAllAssignments(props.lecture.id).then(response => {
+                  setAssignments(response);
+                });
+              }}
+            />
           </CardActions>
         </Collapse>
       </Card>
