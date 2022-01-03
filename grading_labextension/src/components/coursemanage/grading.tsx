@@ -4,9 +4,12 @@ import * as React from 'react';
 import { Assignment } from '../../model/assignment';
 import { Lecture } from '../../model/lecture';
 import { utcToLocalFormat } from '../../services/datetime.service';
-import { Box, Button, Container, FormControl, Grid, InputLabel, MenuItem, Stack, Typography } from '@mui/material';
+import { AlertProps, Box, Button, Container, FormControl, Grid, InputLabel, MenuItem, Snackbar, Stack, Typography } from '@mui/material';
 import Select, { SelectChangeEvent } from '@mui/material/Select';
 import { getAllSubmissions } from '../../services/submissions.service';
+import { AgreeDialog } from './dialog';
+import MuiAlert from '@mui/material/Alert';
+
 
 export interface IGradingProps {
   lecture: Lecture;
@@ -16,9 +19,59 @@ export interface IGradingProps {
 
 export const GradingComponent = (props: IGradingProps) => {
   const [option, setOption] = React.useState('latest');
+  //TODO: We have redundant code with AgreeDialog, maybe there is a way to put all states in a different component for example
+  const [alert, setAlert] = React.useState(false);
+  const [severity, setSeverity] = React.useState('success');
+  const [alertMessage, setAlertMessage] = React.useState('');
+  const [showDialog, setShowDialog] = React.useState(false);
+  const [dialogContent, setDialogContent] = React.useState({
+      title: '',
+      message: '',
+      handleAgree: null,
+      handleDisagree: null
+  });
 
+  
+  const showAlert = (severity: string, msg: string) => {
+    setSeverity(severity);
+    setAlertMessage(msg);
+    setAlert(true);
+};
+
+const handleAutogradeSubmissions = async () => {
+  setDialogContent({
+      title: 'Autograde Selected Submissions',
+      message: ``,
+      handleAgree: async () => {
+          try {
+              // TODO: Add text, Autograde and Error Printing
+
+          } catch (err) {
+              showAlert('error', 'Error Autograding Submission');
+          }
+          closeDialog();
+      },
+      handleDisagree: () => closeDialog()
+  });
+  setShowDialog(true);
+};
+
+const closeDialog = () => setShowDialog(false);
+
+const handleAlertClose = (
+    event?: React.SyntheticEvent | Event,
+    reason?: string
+) => {
+    if (reason === 'clickaway') {
+        return;
+    }
+    setAlert(false);
+};
 
   const generateRows = (submissions: any) => {
+    console.log("Submissions");
+    console.log(submissions);
+    console.log("option: "+option);
     const rows: any[] = [];
 
     if (option === 'latest') {
@@ -51,6 +104,7 @@ export const GradingComponent = (props: IGradingProps) => {
       });
     });
     }
+    console.log(rows);
     return rows;
   };
 
@@ -59,12 +113,13 @@ export const GradingComponent = (props: IGradingProps) => {
 
   const handleChange = (event: SelectChangeEvent) => {
     setOption(event.target.value as string);
-    const latest = 'latest' === event.target.value;
-    getAllSubmissions(props.lecture, props.assignment, latest, true).then(response => {
-      setRows(generateRows(response))
-      console.log(response)
-    })
   };
+
+  React.useEffect(() => {
+    getAllSubmissions(props.lecture, props.assignment, false, true).then(response => {
+      setRows(generateRows(response))
+    })
+  }, [option]);
 
 
 
@@ -79,27 +134,30 @@ export const GradingComponent = (props: IGradingProps) => {
 
 
   return (
-    <Box>
+    <div>
       <ModalTitle title="Grading" />
-      <Box>
-        <DataGrid
-          sx={{ minHeight: '600px' }}
-          columns={columns}
-          rows={rows}
-          checkboxSelection
-          disableSelectionOnClick
-          onSelectionModelChange={e => {
-            const selectedIDs = new Set(e);
-            const selectedRowData = rows.filter(row =>
-              selectedIDs.has(row.id)
-            );
-            setselectedRows(selectedRowData);
+      <div style={{ display: 'flex', height: '500px' }}>
+        <div style={{ flexGrow: 1 }}>
+          <DataGrid
+                  sx={{mb:3,ml:3,mr:3}}
+                  columns={columns}
+                  rows={rows}
+                  checkboxSelection
+                  disableSelectionOnClick
+                  onSelectionModelChange={e => {
+                    const selectedIDs = new Set(e);
+                    const selectedRowData = rows.filter(row =>
+                      selectedIDs.has(row.id)
+                    );
+                    setselectedRows(selectedRowData);
 
-          }}
-        />
-      </Box>
-      <FormControl>
-        <InputLabel id="submission-select-label">View Submissions</InputLabel>
+                  }}
+              />
+          </div>
+        </div>
+      <span>
+      <FormControl sx={{m:3}}>
+        <InputLabel id="submission-select-label">View</InputLabel>
         <Select
           labelId="submission-select-label"
           id="submission-select"
@@ -111,7 +169,23 @@ export const GradingComponent = (props: IGradingProps) => {
           <MenuItem value={"latest"}>Latest Submissions of Users</MenuItem>
         </Select>
       </FormControl>
-    </Box>
+      <Button sx={{m:3}} variant='outlined' onClick={handleAutogradeSubmissions}>Autograde selected</Button>
+      <Button sx={{m:3}} variant='outlined'>Generate Feedback of selected</Button>
+      </span>
+
+      {/* Dialog */}
+      <AgreeDialog open={showDialog} {...dialogContent} />
+            <Snackbar open={alert} autoHideDuration={3000} onClose={handleAlertClose}>
+                <MuiAlert
+                    onClose={handleAlertClose}
+                    severity={severity as AlertProps['severity']}
+                    sx={{ width: '100%' }}
+                >
+                    {alertMessage}
+                </MuiAlert>
+            </Snackbar>
+          
+    </div>
   );
 };
 
