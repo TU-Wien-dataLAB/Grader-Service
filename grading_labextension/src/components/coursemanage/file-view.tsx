@@ -33,196 +33,194 @@ import { ITerminal } from '@jupyterlab/terminal';
 import { Terminal } from '@jupyterlab/services';
 import { PageConfig } from '@jupyterlab/coreutils';
 import { getAllSubmissions } from '../../services/submissions.service';
-import { GradingComponent } from './grading';
+import { GradingComponent, ModalTitle } from './grading';
 import { AgreeDialog, EditDialog, IAgreeDialogProps } from './dialog';
 import {
-  pullAssignment,
-  pushAssignment,
-  updateAssignment
+    pullAssignment,
+    pushAssignment,
+    updateAssignment
 } from '../../services/assignments.service';
 
+
 export interface IAssignmentFileViewProps {
-  assignment: Assignment;
-  lecture: Lecture;
-  latest_submissions: any;
+    assignment: Assignment;
+    lecture: Lecture;
+    latest_submissions: any;
 }
 
 export const AssignmentFileView = (props: IAssignmentFileViewProps) => {
-  const [assignment, setAssignment] = React.useState(props.assignment);
-  const [alert, setAlert] = React.useState(false);
-  const [severity, setSeverity] = React.useState('success');
-  const [alertMessage, setAlertMessage] = React.useState('');
-  const [selectedDir, setSelectedDir] = React.useState('source');
-  const [latestSubmissions, setSubmissions] = React.useState(null);
-  const [showDialog, setShowDialog] = React.useState(false);
-  const [dialogContent, setDialogContent] = React.useState({
-    title: '',
-    message: '',
-    handleAgree: null,
-    handleDisagree: null
-  });
 
-  const serverRoot = PageConfig.getOption('serverRoot');
+    const [assignment, setAssignment] = React.useState(props.assignment);
+    const [alert, setAlert] = React.useState(false);
+    const [severity, setSeverity] = React.useState('success');
+    const [alertMessage, setAlertMessage] = React.useState('');
+    const [selectedDir, setSelectedDir] = React.useState('source');
+    const [latestSubmissions, setSubmissions] = React.useState(null);
+    const [showDialog, setShowDialog] = React.useState(false);
+    const [dialogContent, setDialogContent] = React.useState({
+        title: '',
+        message: '',
+        handleAgree: null,
+        handleDisagree: null
+    });
 
-  const lecture = props.lecture;
-  let terminalSession: Terminal.ITerminalConnection = null;
+    const serverRoot = PageConfig.getOption('serverRoot');
+
+    const lecture = props.lecture;
+    let terminalSession: Terminal.ITerminalConnection = null;
 
   const closeDialog = () => setShowDialog(false);
 
-  const openTerminal = async () => {
-    const path = `${serverRoot}/${selectedDir}/${lecture.code}/${assignment.name}`;
-    console.log('Opening terminal at: ' + path.replace(' ', '\\ '));
-    let args = {};
-    if (
-      terminalSession !== null &&
-      terminalSession.connectionStatus === 'connected'
-    ) {
-      args = { name: terminalSession.name };
-    }
-    const main = (await GlobalObjects.commands.execute(
-      'terminal:open',
-      args
-    )) as MainAreaWidget<ITerminal.ITerminal>;
-
-    if (main) {
-      const terminal = main.content;
-      terminalSession = terminal.session;
-    }
-
-    try {
-      terminalSession.send({
-        type: 'stdin',
-        content: ['cd ' + path.replace(' ', '\\ ') + '\n']
-      });
-    } catch (e) {
-      showAlert('error', 'Error Opening Terminal');
-      main.dispose();
-    }
-  };
-
-  const openBrowser = async () => {
-    const path = `${selectedDir}/${lecture.code}/${assignment.name}`;
-    GlobalObjects.commands
-      .execute('filebrowser:go-to-path', {
-        path
-      })
-      .catch(error => {
-        showAlert('error', 'Error showing in File Browser');
-      });
-  };
-
-  const handlePushAssignment = async () => {
-    setDialogContent({
-      title: 'Push Assignment',
-      message: `Do you want to push ${assignment.name}? This updates the state of the assignment on the server with your local state.`,
-      handleAgree: async () => {
-        try {
-          await pushAssignment(lecture.id, assignment.id, 'source');
-          await pushAssignment(lecture.id, assignment.id, 'release');
-          showAlert('success', 'Successfully Pushed Assignment');
-        } catch (err) {
-          showAlert('error', 'Error Pushing Assignment');
+    const openTerminal = async () => {
+        const path = `${serverRoot}/${selectedDir}/${lecture.code}/${assignment.name}`;
+        console.log('Opening terminal at: ' + path.replace(' ', '\\ '));
+        let args = {};
+        if (
+            terminalSession !== null &&
+            terminalSession.connectionStatus === 'connected'
+        ) {
+            args = { name: terminalSession.name };
         }
-        //TODO: should be atomar with the pushAssignment function
-        const a = assignment;
-        a.status = 'pushed';
-        updateAssignment(lecture.id, a).then(
-          assignment => setAssignment(assignment),
-          error => showAlert('error', 'Error Updating Assignment')
-        );
-        closeDialog();
-      },
-      handleDisagree: () => closeDialog()
-    });
-    setShowDialog(true);
-  };
+        const main = (await GlobalObjects.commands.execute(
+            'terminal:open',
+            args
+        )) as MainAreaWidget<ITerminal.ITerminal>;
 
-  const handlePullAssignment = async () => {
-    setDialogContent({
-      title: 'Pull Assignment',
-      message: `Do you want to pull ${assignment.name}? This updates your assignment with the state of the server and overwrites all changes.`,
-      handleAgree: async () => {
-        try {
-          await pullAssignment(lecture.id, assignment.id, 'source');
-          showAlert('success', 'Successfully Pulled Assignment');
-        } catch (err) {
-          showAlert('error', 'Error Pulling Assignment');
+        if (main) {
+            const terminal = main.content;
+            terminalSession = terminal.session;
         }
-        // TODO: update file list
-        closeDialog();
-      },
-      handleDisagree: () => closeDialog()
-    });
-    setShowDialog(true);
-  };
 
-  const handleReleaseAssignment = async () => {
-    setDialogContent({
-      title: 'Release Assignment',
-      message: `Do you want to release ${assignment.name} for all students?`,
-      handleAgree: () => {
+        try {
+            terminalSession.send({
+                type: 'stdin',
+                content: ['cd ' + path.replace(' ', '\\ ') + '\n']
+            });
+        } catch (e) {
+            showAlert('error', 'Error Opening Terminal');
+            main.dispose();
+        }
+    };
+
+    const openBrowser = async () => {
+        const path = `${selectedDir}/${lecture.code}/${assignment.name}`;
+        GlobalObjects.commands
+            .execute('filebrowser:go-to-path', {
+                path
+            })
+            .catch(error => {
+                showAlert('error', 'Error showing in File Browser');
+            });
+    };
+
+    const handlePushAssignment = async () => {
         setDialogContent({
-          title: 'Confirmation',
-          message: `Are you sure you want to release ${assignment.name}?`,
-          handleAgree: async () => {
-            try {
-              console.log('releasing assignment');
-              let a = assignment;
-              a.status = 'released';
-              a = await updateAssignment(lecture.id, a);
-              setAssignment(a);
-              showAlert('success', 'Successfully Released Assignment');
-            } catch (err) {
-              showAlert('error', 'Error Releasing Assignment');
-            }
-            closeDialog();
-          },
-          handleDisagree: () => closeDialog()
+            title: 'Push Assignment',
+            message: `Do you want to push ${assignment.name}? This updates the state of the assignment on the server with your local state.`,
+            handleAgree: async () => {
+                try {
+                    await pushAssignment(lecture.id, assignment.id, 'source');
+                    await pushAssignment(lecture.id, assignment.id, 'release');
+                } catch (err) {
+                    showAlert('error', 'Error Pushing Assignment');
+                }
+                //TODO: should be atomar with the pushAssignment function
+                const a = assignment;
+                a.status = 'pushed';
+                updateAssignment(lecture.id, a).then(
+                    assignment => setAssignment(assignment),
+                    error => showAlert('error', 'Error Updating Assignment')
+                );
+                closeDialog();
+            },
+            handleDisagree: () => closeDialog()
         });
-      },
-      handleDisagree: () => closeDialog()
-    });
-    setShowDialog(true);
-  };
+        setShowDialog(true);
+    };
 
-  const showAlert = (severity: string, msg: string) => {
-    console.log(severity);
-    setSeverity(severity);
-    setAlertMessage(msg);
-    setAlert(true);
-  };
+    const handlePullAssignment = async () => {
+        setDialogContent({
+            title: 'Pull Assignment',
+            message: `Do you want to pull ${assignment.name}? This updates your assignment with the state of the server and overwrites all changes.`,
+            handleAgree: async () => {
+                try {
+                    await pullAssignment(lecture.id, assignment.id, 'source');
+                } catch (err) {
+                    showAlert('error', 'Error Pulling Assignment');
+                }
+                // TODO: update file list
+                closeDialog();
+            },
+            handleDisagree: () => closeDialog()
+        });
+        setShowDialog(true);
+    };
 
-  const handleAlertClose = (
-    event?: React.SyntheticEvent | Event,
-    reason?: string
-  ) => {
-    if (reason === 'clickaway') {
-      return;
-    }
-    setAlert(false);
-  };
+    const handleReleaseAssignment = async () => {
+        setDialogContent({
+            title: 'Release Assignment',
+            message: `Do you want to release ${assignment.name} for all students?`,
+            handleAgree: () => {
+                setDialogContent({
+                    title: 'Confirmation',
+                    message: `Are you sure you want to release ${assignment.name}?`,
+                    handleAgree: async () => {
+                        try {
+                            console.log('releasing assignment');
+                            let a = assignment;
+                            a.status = 'released';
+                            a = await updateAssignment(lecture.id, a);
+                            setAssignment(a);
+                        } catch (err) {
+                            showAlert('error', 'Error Releasing Assignment');
+                        }
+                        closeDialog();
+                    },
+                    handleDisagree: () => closeDialog()
+                });
+            },
+            handleDisagree: () => closeDialog()
+        });
+        setShowDialog(true);
+    };
 
-  const actions = [
-    {
-      icon: <FormatListBulletedRoundedIcon />,
-      name: 'Show Files',
-      onClick: () => openBrowser()
-    },
-    {
-      icon: <TerminalRoundedIcon />,
-      name: 'Open Terminal',
-      onClick: () => openTerminal()
-    }
-  ];
+    const showAlert = (severity: string, msg: string) => {
+        setSeverity(severity);
+        setAlertMessage(msg);
+        setAlert(true);
+    };
 
-  return (
-    <Grid container spacing={2}>
-      <Grid item xs={12}>
-        <Typography sx={{ m: 3, top: 4 }} variant="h5">
-          {props.assignment.name}
-          <EditDialog lecture={lecture} assignment={assignment} />
-        </Typography>
-      </Grid>
+    const handleAlertClose = (
+        event?: React.SyntheticEvent | Event,
+        reason?: string
+    ) => {
+        if (reason === 'clickaway') {
+            return;
+        }
+        setAlert(false);
+    };
+
+    const actions = [
+        {
+            icon: <FormatListBulletedRoundedIcon />,
+            name: 'Show Files',
+            onClick: () => openBrowser()
+        },
+        {
+            icon: <TerminalRoundedIcon />,
+            name: 'Open Terminal',
+            onClick: () => openTerminal()
+        }
+    ];
+
+
+    return (
+        <Grid container spacing={2}>
+
+
+            <Grid item xs={12}>
+                <ModalTitle title={assignment.name}/>
+            </Grid>
 
       <Grid item xs={10}>
         <Card elevation={3}>
