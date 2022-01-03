@@ -2,10 +2,13 @@ import * as React from 'react';
 import moment from 'moment';
 import { Chip } from '@mui/material';
 import AccessAlarmRoundedIcon from '@mui/icons-material/AccessAlarmRounded';
+import { SxProps } from '@mui/system';
+import { Theme } from '@mui/material/styles';
 
 export interface IDeadlineProps {
   due_date: string | null;
   compact: boolean;
+  sx?: SxProps<Theme>;
 }
 
 interface ITimeSpec {
@@ -86,7 +89,6 @@ function getDisplayDate(date: Date, compact: boolean): string {
 }
 
 export const DeadlineComponent = (props: IDeadlineProps) => {
-  console.log(props.due_date);
   const [date, setDate] = React.useState(
     props.due_date !== null
       ? moment.utc(props.due_date).local().toDate()
@@ -95,34 +97,56 @@ export const DeadlineComponent = (props: IDeadlineProps) => {
   const [displayDate, setDisplayDate] = React.useState(
     getDisplayDate(date, props.compact)
   );
-  let interval: number = null;
+  const [interval, setNewInterval] = React.useState(null);
+  const [color, setColor] = React.useState(
+    'default' as 'default' | 'warning' | 'error'
+  );
 
-  React.useEffect(() => updateTimeoutInterval(), [props]);
+  React.useEffect(() => {
+    const d =
+      props.due_date !== null
+        ? moment.utc(props.due_date).local().toDate()
+        : undefined;
+    setDate(d);
+    setDisplayDate(getDisplayDate(d, props.compact));
+    updateTimeoutInterval(d);
+    let c: 'default' | 'warning' | 'error' = 'default';
+    const time: ITimeSpec = calculateTimeLeft(d);
+    if (time.weeks === 0 && time.days === 0) {
+      c = 'warning';
+      if (time.hours === 0) {
+        c = 'error';
+      }
+    }
+    setColor(c);
+  }, [props]);
 
-  const updateTimeoutInterval = () => {
+  const updateTimeoutInterval = (date: Date) => {
     if (interval) {
       clearInterval(interval);
     }
     const time: ITimeSpec = calculateTimeLeft(date);
     const timeout = time.weeks === 0 && time.days === 0 ? 1000 : 10000;
-    interval = setInterval(() => {
+    const newInterval = setInterval(() => {
       setDisplayDate(getDisplayDate(date, props.compact));
     }, timeout);
+    setNewInterval(newInterval);
   };
 
   return date === undefined ? (
     <Chip
-      sx={{ mt: 1 }}
+      sx={props.sx}
       size="small"
       icon={<AccessAlarmRoundedIcon />}
       label={'No Deadline 😁'}
     />
   ) : (
     <Chip
-      sx={{ mt: 1 }}
+      sx={props.sx}
       size="small"
       icon={<AccessAlarmRoundedIcon />}
       label={displayDate}
+      color={color}
     />
   );
 };

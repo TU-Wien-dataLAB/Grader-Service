@@ -1,4 +1,5 @@
 import {
+  Box,
   Button,
   Card,
   CardActionArea,
@@ -11,13 +12,16 @@ import {
   IconButton,
   LinearProgress,
   styled,
-  ThemeProvider
+  ThemeProvider,
+  Typography
 } from '@mui/material';
 import * as React from 'react';
 import { Assignment } from '../../model/assignment';
 import { Lecture } from '../../model/lecture';
 import { getAllAssignments } from '../../services/assignments.service';
 import { AssignmentComponent } from './assignment';
+import { CreateDialog, EditLectureDialog } from './dialog';
+import { getLecture } from '../../services/lectures.service';
 
 interface ILectureComponentProps {
   lecture: Lecture;
@@ -25,11 +29,12 @@ interface ILectureComponentProps {
 }
 
 export const LectureComponent = (props: ILectureComponentProps) => {
+  const [lecture, setLecture] = React.useState(props.lecture);
   const [assignments, setAssignments] = React.useState(null);
   const [expanded, setExpanded] = React.useState(false);
 
   React.useEffect(() => {
-    getAllAssignments(props.lecture.id).then(response => {
+    getAllAssignments(lecture.id).then(response => {
       setAssignments(response);
     });
   }, []);
@@ -48,25 +53,49 @@ export const LectureComponent = (props: ILectureComponentProps) => {
   }
   return (
     <div>
-      <Card elevation={4} className="lecture-card">
-        <CardActionArea onClick={handleExpandClick}>
-          <CardHeader title={props.lecture.name}></CardHeader>
-        </CardActionArea>
+      <Card
+        sx={{ backgroundColor: expanded ? '#fafafa' : 'background.paper' }}
+        elevation={expanded ? 0 : 2}
+        className="lecture-card"
+      >
+        <CardContent sx={{ mb: -1, display: 'flex' }}>
+          <Typography variant={'h5'} sx={{ mr: 2 }}>
+            {lecture.name}
+          </Typography>
+          <EditLectureDialog
+            lecture={lecture}
+            handleSubmit={async () => {
+              setLecture(await getLecture(lecture.id));
+            }}
+          />
+        </CardContent>
 
         <Collapse in={expanded} timeout="auto" unmountOnExit>
           <CardContent>
-            {assignments.map((el: Assignment) => (
-              <AssignmentComponent
-                lecture={props.lecture}
-                assignment={el}
-                root={props.root}
-              />
-            ))}
+            <Box sx={{ display: 'flex', flexWrap: 'wrap' }}>
+              {assignments.map((el: Assignment) => (
+                <AssignmentComponent
+                  lecture={lecture}
+                  assignment={el}
+                  root={props.root}
+                />
+              ))}
+            </Box>
           </CardContent>
-          <CardActions>
-            <Button>Create Assignment</Button>
-          </CardActions>
         </Collapse>
+        <CardActions>
+          <CreateDialog
+            lecture={lecture}
+            handleSubmit={() => {
+              getAllAssignments(lecture.id).then(response => {
+                setAssignments(response);
+              });
+            }}
+          />
+          <Button size="small" sx={{ ml: 'auto' }} onClick={handleExpandClick}>
+            {(expanded ? 'Hide' : 'Show') + ' Assignments'}
+          </Button>
+        </CardActions>
       </Card>
     </div>
   );
