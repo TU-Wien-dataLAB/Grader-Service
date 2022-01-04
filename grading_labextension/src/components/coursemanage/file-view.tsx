@@ -5,6 +5,8 @@ import {
     Box,
     Button,
     Card,
+    CardContent,
+    CardHeader,
     Grid,
     Snackbar,
     SpeedDial,
@@ -13,6 +15,7 @@ import {
     ToggleButtonGroup,
     Typography
 } from '@mui/material';
+import IconButton, { IconButtonProps } from '@mui/material/IconButton';
 
 import MuiAlert from '@mui/material/Alert';
 
@@ -214,7 +217,7 @@ export const AssignmentFileView = (props: IAssignmentFileViewProps) => {
 
 
     return (
-        <Grid container spacing={2}>
+        <Grid container spacing={2} alignItems="stretch">
 
 
             <Grid item xs={12}>
@@ -222,9 +225,32 @@ export const AssignmentFileView = (props: IAssignmentFileViewProps) => {
             </Grid>
 
 
-            <Grid item xs={10}>
-                <Card elevation={3}>
-                    <Typography variant="h6">Files</Typography>
+            <Grid item xs={6}>
+                <Card elevation={3} sx={{mb:3,ml:3,mr:3}} >
+                <CardHeader
+                    action={
+                        <SpeedDial
+                        direction="left"
+                        ariaLabel="SpeedDial openIcon example"
+                        icon={<MoreVertIcon />}
+                        FabProps={{ size: 'small' }}
+                        sx={{mr:1}}
+                    >
+                        {actions.map(action => (
+                            <SpeedDialAction
+                                onClick={action.onClick}
+                                key={action.name}
+                                icon={action.icon}
+                                tooltipTitle={action.name}
+                            />
+                        ))}
+                    </SpeedDial>
+                    }
+                    title="Files"
+                    subheader=""
+                />
+
+                    <CardContent>
                     <ToggleButtonGroup
                         color="secondary"
                         value={selectedDir}
@@ -240,28 +266,16 @@ export const AssignmentFileView = (props: IAssignmentFileViewProps) => {
                     <FilesList
                         path={`${selectedDir}/${props.lecture.code}/${props.assignment.name}`}
                     />
+                    </CardContent>
+
+                </Card>
+            </Grid>
+            <Grid item xs={6}>
+                <Card elevation={3}>
+                    <Typography variant='h5'>Stats or something</Typography>
                 </Card>
             </Grid>
 
-
-            <Grid item xs={2}>
-                <SpeedDial
-                    direction="right"
-                    ariaLabel="SpeedDial openIcon example"
-                    icon={<MoreVertIcon />}
-                    FabProps={{ size: 'medium' }}
-                    sx={{ mt: -2, mr: 'auto' }}
-                >
-                    {actions.map(action => (
-                        <SpeedDialAction
-                            onClick={action.onClick}
-                            key={action.name}
-                            icon={action.icon}
-                            tooltipTitle={action.name}
-                        />
-                    ))}
-                </SpeedDial>
-            </Grid>
             <Grid item xs={12}>
                 <Button
                     sx={{ mt: -1 }}
