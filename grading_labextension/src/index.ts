@@ -7,7 +7,12 @@ import {
   JupyterFrontEndPlugin
 } from '@jupyterlab/application';
 
-import { ICommandPalette, MainAreaWidget, WidgetTracker, IWidgetTracker } from '@jupyterlab/apputils';
+import {
+  ICommandPalette,
+  MainAreaWidget,
+  WidgetTracker,
+  IWidgetTracker
+} from '@jupyterlab/apputils';
 
 import { ILauncher } from '@jupyterlab/launcher';
 import { INotebookTools, Notebook, NotebookPanel } from '@jupyterlab/notebook';
@@ -32,7 +37,7 @@ import { IDocumentManager } from '@jupyterlab/docmanager';
 import { IFileBrowserFactory } from '@jupyterlab/filebrowser';
 import { UserPermissions } from './services/permission.service';
 import { CellPlayButton } from './components/notebook/create-assignment/widget';
-
+import { AssignmentList } from './widgets/assignment-list';
 
 namespace AssignmentsCommandIDs {
   export const create = 'assignments:create';
@@ -55,20 +60,14 @@ namespace GradingCommandIDs {
 namespace ManualGradeCommandIDs {
   export const create = 'manualgrade:create';
 
-  export const open = 'manualgrade:open'
+  export const open = 'manualgrade:open';
 }
 
 namespace FeedbackCommandIDs {
   export const create = 'feedback:create';
 
-  export const open = 'feedback:open'
+  export const open = 'feedback:open';
 }
-
-/*namespace CreateAssignmentIDs {
-  export const create = 'create-assignment:create';
-  
-  export const open = 'create-assignment:open';
-}*/
 
 export class GlobalObjects {
   static commands: CommandRegistry;
@@ -116,20 +115,30 @@ const extension: JupyterFrontEndPlugin<void> = {
     GlobalObjects.browserFactory = browserFactory;
     GlobalObjects.tracker = tracker;
 
+    const assignmentTracker = new WidgetTracker<MainAreaWidget<AssignmentList>>(
+      {
+        namespace: 'grader-assignments'
+      }
+    );
 
+    restorer.restore(assignmentTracker, {
+      command: AssignmentsCommandIDs.open,
+      name: () => 'grader-assignments'
+    });
 
-    const courseManageTracker = new WidgetTracker<MainAreaWidget<CourseManageView>>({
-      namespace: 'grader-coursemanage',
+    const courseManageTracker = new WidgetTracker<
+      MainAreaWidget<CourseManageView>
+    >({
+      namespace: 'grader-coursemanage'
     });
 
     restorer.restore(courseManageTracker, {
       command: CourseManageCommandIDs.open,
-      name: () => 'grader-coursemanage',
+      name: () => 'grader-coursemanage'
     });
 
-
     //Creation of in-cell widget for create assignment
-    let connectTrackerSignals = (tracker: INotebookTracker) => {
+    const connectTrackerSignals = (tracker: INotebookTracker) => {
       tracker.currentChanged.connect(async () => {
         const notebookPanel = tracker.currentWidget;
         const notebook: Notebook = tracker.currentWidget.content;
@@ -149,8 +158,12 @@ const extension: JupyterFrontEndPlugin<void> = {
       tracker.activeCellChanged.connect(() => {
         const notebookPanel: NotebookPanel = tracker.currentWidget;
         const notebook: Notebook = tracker.currentWidget.content;
-        const notebookPaths: string[] = notebookPanel.context.contentsModel.path.split("/")
-        if (notebookPaths[0] == "manualgrade") return;
+        const notebookPaths: string[] = notebookPanel.context.contentsModel.path.split(
+          '/'
+        );
+        if (notebookPaths[0] === 'manualgrade') {
+          return;
+        }
         const switcher: any = (notebookPanel.toolbar.layout as PanelLayout)
           .widgets[10]; // TODO: instead of indexing use search for instance of CreationmodeSwitch; maybe other plugins change index
         // Remove the existing play button from
@@ -190,7 +203,6 @@ const extension: JupyterFrontEndPlugin<void> = {
 
     /* ##### Course Manage View Widget ##### */
     let command: string = CourseManageCommandIDs.create;
-
     app.commands.addCommand(command, {
       execute: () => {
         // Create a blank content widget inside of a MainAreaWidget
@@ -205,6 +217,24 @@ const extension: JupyterFrontEndPlugin<void> = {
         courseManageTracker.add(gradingWidget);
 
         return gradingWidget;
+      }
+    });
+
+    command = AssignmentsCommandIDs.create;
+    app.commands.addCommand(command, {
+      execute: () => {
+        // Create a blank content widget inside of a MainAreaWidget
+        const assignmentList = new AssignmentList();
+        const assignmentWidget = new MainAreaWidget<AssignmentList>({
+          content: assignmentList
+        });
+        assignmentWidget.id = 'assignments-jupyterlab';
+        assignmentWidget.title.label = 'Assignments';
+        assignmentWidget.title.closable = true;
+
+        assignmentTracker.add(assignmentWidget);
+
+        return assignmentWidget;
       }
     });
 
@@ -249,6 +279,33 @@ const extension: JupyterFrontEndPlugin<void> = {
           rank: 0
         });
       }
+
+      // only add assignment list if user permissions can be loaded
+      command = AssignmentsCommandIDs.open;
+      app.commands.addCommand(command, {
+        label: 'Assignments',
+        execute: async () => {
+          const assignmentWidget: MainAreaWidget<AssignmentList> = await app.commands.execute(
+            AssignmentsCommandIDs.create
+          );
+
+          if (!assignmentWidget.isAttached) {
+            // Attach the widget to the main work area if it's not there
+            app.shell.add(assignmentWidget, 'main');
+          }
+          // Activate the widget
+          app.shell.activateById(assignmentWidget.id);
+        },
+        icon: editIcon
+      });
+
+      // Add the command to the launcher
+      console.log('Add assignment launcher');
+      launcher.add({
+        command: command,
+        category: 'Assignments',
+        rank: 0
+      });
     });
   }
 };

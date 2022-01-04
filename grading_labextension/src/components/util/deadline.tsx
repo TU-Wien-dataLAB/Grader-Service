@@ -118,6 +118,9 @@ export const DeadlineComponent = (props: IDeadlineProps) => {
         c = 'error';
       }
     }
+    if (+d - +new Date() < 0) {
+      c = 'error';
+    }
     setColor(c);
   }, [props]);
 
