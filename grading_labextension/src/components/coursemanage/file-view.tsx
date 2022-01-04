@@ -5,15 +5,17 @@ import {
     Box,
     Button,
     Card,
-    CardContent,
-    CardHeader,
     Grid,
     Snackbar,
     SpeedDial,
     SpeedDialAction,
     ToggleButton,
     ToggleButtonGroup,
-    Typography
+    Typography,
+    Portal,
+    CardHeader,
+    CardContent,
+    CardActions
 } from '@mui/material';
 import IconButton, { IconButtonProps } from '@mui/material/IconButton';
 
@@ -35,14 +37,14 @@ import { ITerminal } from '@jupyterlab/terminal';
 import { Terminal } from '@jupyterlab/services';
 import { PageConfig } from '@jupyterlab/coreutils';
 import { getAllSubmissions } from '../../services/submissions.service';
-import { GradingComponent, ModalTitle } from './grading';
+import { GradingComponent } from './grading';
 import { AgreeDialog, EditDialog, IAgreeDialogProps } from './dialog';
 import {
     pullAssignment,
     pushAssignment,
     updateAssignment
 } from '../../services/assignments.service';
-
+import { ModalTitle } from '../util/modal-title';
 
 export interface IAssignmentFileViewProps {
     assignment: Assignment;
@@ -51,7 +53,6 @@ export interface IAssignmentFileViewProps {
 }
 
 export const AssignmentFileView = (props: IAssignmentFileViewProps) => {
-
     const [assignment, setAssignment] = React.useState(props.assignment);
     const [alert, setAlert] = React.useState(false);
     const [severity, setSeverity] = React.useState('success');
@@ -71,7 +72,7 @@ export const AssignmentFileView = (props: IAssignmentFileViewProps) => {
     const lecture = props.lecture;
     let terminalSession: Terminal.ITerminalConnection = null;
 
-  const closeDialog = () => setShowDialog(false);
+    const closeDialog = () => setShowDialog(false);
 
     const openTerminal = async () => {
         const path = `${serverRoot}/${selectedDir}/${lecture.code}/${assignment.name}`;
@@ -130,7 +131,10 @@ export const AssignmentFileView = (props: IAssignmentFileViewProps) => {
                 const a = assignment;
                 a.status = 'pushed';
                 updateAssignment(lecture.id, a).then(
-                    assignment => setAssignment(assignment),
+                    assignment => {
+                        setAssignment(assignment);
+                        showAlert('success', 'Successfully Pushed Assignment');
+                    },
                     error => showAlert('error', 'Error Updating Assignment')
                 );
                 closeDialog();
@@ -147,6 +151,7 @@ export const AssignmentFileView = (props: IAssignmentFileViewProps) => {
             handleAgree: async () => {
                 try {
                     await pullAssignment(lecture.id, assignment.id, 'source');
+                    showAlert('success', 'Successfully Pulled Assignment');
                 } catch (err) {
                     showAlert('error', 'Error Pulling Assignment');
                 }
@@ -173,6 +178,7 @@ export const AssignmentFileView = (props: IAssignmentFileViewProps) => {
                             a.status = 'released';
                             a = await updateAssignment(lecture.id, a);
                             setAssignment(a);
+                            showAlert('success', 'Successfully Released Assignment');
                         } catch (err) {
                             showAlert('error', 'Error Releasing Assignment');
                         }
@@ -191,7 +197,6 @@ export const AssignmentFileView = (props: IAssignmentFileViewProps) => {
         setAlertMessage(msg);
         setAlert(true);
     };
-
     const handleAlertClose = (
         event?: React.SyntheticEvent | Event,
         reason?: string
@@ -215,108 +220,112 @@ export const AssignmentFileView = (props: IAssignmentFileViewProps) => {
         }
     ];
 
-
     return (
-        <Grid container spacing={2} alignItems="stretch">
+        <Box>
+            <ModalTitle title={assignment.name} />
+            <Box sx={{ ml: 3, mr: 3 }}>
+                <Grid container spacing={3} alignItems="stretch">
+
+                    <Grid item xs={6}>
+                        <Card elevation={3}>
+
+                            <CardHeader title="Files"
+                                action={
+                                    <SpeedDial
+                                        direction="left"
+                                        ariaLabel="SpeedDial openIcon example"
+                                        icon={<MoreVertIcon />}
+                                        FabProps={{ size: 'medium' }}
+                                    >
+                                        {actions.map(action => (
+                                            <SpeedDialAction
+                                                onClick={action.onClick}
+                                                key={action.name}
+                                                icon={action.icon}
+                                                tooltipTitle={action.name}
+                                            />
+                                        ))}
+                                    </SpeedDial>} />
 
 
-            <Grid item xs={12}>
-                <ModalTitle title={assignment.name}/>
-            </Grid>
+                            <CardContent>
+                                <ToggleButtonGroup
+                                    color="secondary"
+                                    value={selectedDir}
+                                    exclusive
+                                    onChange={(e, dir) => setSelectedDir(dir)}
+                                    size="small"
+                                >
+                                    <ToggleButton color="primary" value="source">
+                                        Source
+                                    </ToggleButton>
+                                    <ToggleButton value="release">Release</ToggleButton>
+                                </ToggleButtonGroup>
+                                <FilesList
+                                    path={`${selectedDir}/${props.lecture.code}/${props.assignment.name}`}
+                                />
+                            </CardContent>
+                            <CardActions>
+                                <Button
+                                    sx={{ mt: -1 }}
+                                    onClick={() => handlePushAssignment()}
+                                    variant="outlined"
+                                    size="small"
+                                >
+                                    <PublishRoundedIcon fontSize="small" sx={{ mr: 1 }} />
+                                    Push
+                                </Button>
+                                <Button
+                                    sx={{ mt: -1 }}
+                                    onClick={() => handlePullAssignment()}
+                                    variant="outlined"
+                                    size="small"
+                                >
+                                    <GetAppRoundedIcon fontSize="small" sx={{ mr: 1 }} />
+                                    Pull
+                                </Button>
+                                <Button
+                                    sx={{ mt: -1 }}
+                                    onClick={() => handleReleaseAssignment()}
+                                    variant="outlined"
+                                    size="small"
+                                >
+                                    <NewReleasesRoundedIcon fontSize="small" sx={{ mr: 1 }} />
+                                    Release
+                                </Button>
+                            </CardActions>
+                        </Card>
+                    </Grid>
+                    <Grid item xs={6}>
+                        <Card elevation={3}>
+                            <CardHeader title="Stats or other stuff" />
+                            <CardContent>
+                                <Box sx={{ height: 300, backgroundColor: 'primary.dark' }}>
 
-
-            <Grid item xs={6}>
-                <Card elevation={3} sx={{mb:3,ml:3,mr:3}} >
-                <CardHeader
-                    action={
-                        <SpeedDial
-                        direction="left"
-                        ariaLabel="SpeedDial openIcon example"
-                        icon={<MoreVertIcon />}
-                        FabProps={{ size: 'small' }}
-                        sx={{mr:1}}
-                    >
-                        {actions.map(action => (
-                            <SpeedDialAction
-                                onClick={action.onClick}
-                                key={action.name}
-                                icon={action.icon}
-                                tooltipTitle={action.name}
-                            />
-                        ))}
-                    </SpeedDial>
-                    }
-                    title="Files"
-                    subheader=""
-                />
-
-                    <CardContent>
-                    <ToggleButtonGroup
-                        color="secondary"
-                        value={selectedDir}
-                        exclusive
-                        onChange={(e, dir) => setSelectedDir(dir)}
-                        size="small"
-                    >
-                        <ToggleButton color="primary" value="source">
-                            Source
-                        </ToggleButton>
-                        <ToggleButton value="release">Release</ToggleButton>
-                    </ToggleButtonGroup>
-                    <FilesList
-                        path={`${selectedDir}/${props.lecture.code}/${props.assignment.name}`}
-                    />
-                    </CardContent>
-
-                </Card>
-            </Grid>
-            <Grid item xs={6}>
-                <Card elevation={3}>
-                    <Typography variant='h5'>Stats or something</Typography>
-                </Card>
-            </Grid>
-
-            <Grid item xs={12}>
-                <Button
-                    sx={{ mt: -1 }}
-                    onClick={() => handlePushAssignment()}
-                    variant="outlined"
-                    size="small"
-                >
-                    <PublishRoundedIcon fontSize="small" sx={{ mr: 1 }} />
-                    Push
-                </Button>
-                <Button
-                    sx={{ mt: -1 }}
-                    onClick={() => handlePullAssignment()}
-                    variant="outlined"
-                    size="small"
-                >
-                    <GetAppRoundedIcon fontSize="small" sx={{ mr: 1 }} />
-                    Pull
-                </Button>
-                <Button
-                    sx={{ mt: -1 }}
-                    onClick={() => handleReleaseAssignment()}
-                    variant="outlined"
-                    size="small"
-                >
-                    <NewReleasesRoundedIcon fontSize="small" sx={{ mr: 1 }} />
-                    Release
-                </Button>
-            </Grid>
-            <AgreeDialog open={showDialog} {...dialogContent} />
-            <Snackbar open={alert} autoHideDuration={3000} onClose={handleAlertClose}>
-                <MuiAlert
-                    onClose={handleAlertClose}
-                    severity={severity as AlertProps['severity']}
-                    sx={{ width: '100%' }}
-                >
-                    {alertMessage}
-                </MuiAlert>
-            </Snackbar>
-
-        </Grid>
+                                </Box>
+                            </CardContent>
+                        </Card>
+                    </Grid>
+                    <AgreeDialog open={showDialog} {...dialogContent} />
+                    <Portal container={document.body}>
+                        <Snackbar
+                            open={alert}
+                            autoHideDuration={3000}
+                            onClose={handleAlertClose}
+                            sx={{ mb: 2, ml: 2 }}
+                        >
+                            <MuiAlert
+                                onClose={handleAlertClose}
+                                severity={severity as AlertProps['severity']}
+                                sx={{ width: '100%' }}
+                            >
+                                {alertMessage}
+                            </MuiAlert>
+                        </Snackbar>
+                    </Portal>
+                </Grid>
+            </Box>
+        </Box>
 
     );
-}
+};

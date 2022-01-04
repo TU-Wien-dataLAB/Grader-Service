@@ -6,16 +6,19 @@ import {
   ListItemButton,
   ListItemIcon,
   ListItemText,
-  Paper
+  Paper, Typography
 } from '@mui/material';
 import InsertDriveFileRoundedIcon from '@mui/icons-material/InsertDriveFileRounded';
 import { FilterFileBrowserModel } from '@jupyterlab/filebrowser/lib/model';
 import { GlobalObjects } from '../../index';
 import { Contents } from '@jupyterlab/services';
 import IModel = Contents.IModel;
+import {SxProps} from "@mui/system";
+import {Theme} from "@mui/material/styles";
 
 interface IFileListProps {
   path: string;
+  sx?: SxProps<Theme>;
 }
 
 export const FilesList = (props: IFileListProps) => {
@@ -23,7 +26,7 @@ export const FilesList = (props: IFileListProps) => {
 
   React.useEffect(() => {
     getFiles().then(files => setFiles(files));
-  }, []);
+  }, [props]);
 
   const openFile = async (path: string) => {
     console.log('Opening file: ' + path);
@@ -74,9 +77,12 @@ export const FilesList = (props: IFileListProps) => {
   };
 
   return (
-    <Paper elevation={0}>
+    <Paper elevation={0} sx={props.sx}>
       <Card sx={{ mt: 1 }} variant="outlined">
-        <List dense={true}>{generateItems(files)}</List>
+        {files.length === 0
+          ? <Typography variant={'body1'} sx={{ml: 1}}>No Files Found</Typography>
+          : <List dense={true}>{generateItems(files)}</List>
+        }
       </Card>
     </Paper>
   );
