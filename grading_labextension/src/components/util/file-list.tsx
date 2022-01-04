@@ -81,7 +81,7 @@ export const FilesList = (props: IFileListProps) => {
       <Card sx={{ mt: 1 }} variant="outlined">
         {files.length === 0
           ? <Typography variant={'body1'} sx={{ml: 1}}>No Files Found</Typography>
-          : <List dense={true}>{generateItems(files)}</List>
+          : <List dense={false}>{generateItems(files)}</List>
         }
       </Card>
     </Paper>

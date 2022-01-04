@@ -1,6 +1,7 @@
 import * as React from 'react';
 import {
-  Card, IconButton,
+  Box,
+  Card, Divider, IconButton,
   List,
   ListItem,
   ListItemButton,
@@ -35,19 +36,21 @@ export const SubmissionList = (props: ISubmissionListProps) => {
   // generateItems will be fed using the IIterator from the FilterFileBrowserModel
   const generateItems = (submissions: Submission[]) => {
     return submissions.reverse().map(value => (
-      <ListItem disablePadding
-                secondaryAction={
-                  value.feedback_available
-                    ? <IconButton edge="end" aria-label="delete" onClick={() => openFeedback(value)}>
-                      <ChatRoundedIcon/>
-                    </IconButton>
-                    : null
-                }>
-        <ListItemIcon>
-          <CloudDoneRoundedIcon sx={{ml: 1}}/>
-        </ListItemIcon>
-        <ListItemText primary={utcToLocalFormat(value.submitted_at)}/>
-      </ListItem>
+      <Box>
+        <ListItem disablePadding
+                  secondaryAction={
+                    value.feedback_available
+                      ? <IconButton edge="end" aria-label="delete" onClick={() => openFeedback(value)}>
+                        <ChatRoundedIcon/>
+                      </IconButton>
+                      : null
+                  }>
+          <ListItemIcon>
+            <CloudDoneRoundedIcon sx={{ml: 1}}/>
+          </ListItemIcon>
+          <ListItemText primary={utcToLocalFormat(value.submitted_at)}/>
+        </ListItem>
+      </Box>
     ));
   };
 
@@ -56,7 +59,7 @@ export const SubmissionList = (props: ISubmissionListProps) => {
       <Card sx={{mt: 1}} variant="outlined">
         {props.submissions.length === 0
           ? <Typography variant={'body1'} sx={{ml: 1}}>No Submissions Yet</Typography>
-          : <List dense={true}>{generateItems(props.submissions)}</List>
+          : <List dense={false}>{generateItems(props.submissions)}</List>
         }
       </Card>
     </Paper>

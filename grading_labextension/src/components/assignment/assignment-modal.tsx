@@ -54,6 +54,7 @@ export const AssignmentModalComponent = (props: IAssignmentModalProps) => {
   const submitAssignmentHandler = async () => {
     try {
       await submitAssignment(props.lecture, props.assignment);
+      showAlert('success', 'Successfully Submitted Assignment');
     } catch (e) {
       showAlert('error', 'Error Submitting Assignment');
     }
