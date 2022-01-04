@@ -53,10 +53,10 @@ class LocalAutogradeExecutor(LoggingConfigurable):
 
         :param grader_service_dir: The base directory of the whole grader service specified in the configuration.
         :type grader_service_dir: str
-        :param submission: The subission object which should be graded by the executor.
+        :param submission: The submission object which should be graded by the executor.
         :type submission: Submission
         """        
-        super().__init__(**kwargs)
+        super(LocalAutogradeExecutor, self).__init__(**kwargs)
         self.grader_service_dir = grader_service_dir
         self.submission = submission
         self.session: Session = Session.object_session(self.submission)

@@ -45,7 +45,7 @@ class GradingAutoHandler(GraderBaseHandler):
             self.error_message = "Not Found!"
             raise HTTPError(404)
         executor = LocalAutogradeExecutor(
-            self.application.grader_service_dir, submission
+            self.application.grader_service_dir, submission, config=self.application.config
         )
         IOLoop.current().spawn_callback(executor.start)
         submission = self.session.query(Submission).get(sub_id)
@@ -84,7 +84,7 @@ class GenerateFeedbackHandler(GraderBaseHandler):
             self.error_message = "Not Found!"
             raise HTTPError(404)
         executor = GenerateFeedbackExecutor(
-            self.application.grader_service_dir, submission
+            self.application.grader_service_dir, submission, config=self.application.config
         )
         IOLoop.current().spawn_callback(executor.start)
         submission = self.session.query(Submission).get(sub_id)

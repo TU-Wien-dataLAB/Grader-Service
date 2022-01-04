@@ -170,8 +170,6 @@ class GraderService(config.Application):
             xheaders=True,
         )
 
-        LocalAutogradeExecutor.config = self.config
-
         self.http_server.listen(self.service_port, address=self.service_host)
 
         for s in (signal.SIGTERM, signal.SIGINT):
