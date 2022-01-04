@@ -66,7 +66,7 @@ export const AssignmentModalComponent = (props: IAssignmentModalProps) => {
   }
 
   return (
-    <Box>
+    <div style={{overflow: "scroll", height: "100%"}}>
       <ModalTitle title={props.assignment.name}/>
       <Typography variant={'h6'} sx={{ml: 2}}>Files</Typography>
       <FilesList path={path} sx={{m: 2, mt: 1}}/>
@@ -109,6 +109,6 @@ export const AssignmentModalComponent = (props: IAssignmentModalProps) => {
           </MuiAlert>
         </Snackbar>
       </Portal>
-    </Box>
+    </div>
   );
 };
