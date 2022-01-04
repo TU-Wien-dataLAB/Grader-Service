@@ -1,14 +1,14 @@
-import { GridColDef, GridRowsProp } from '@mui/x-data-grid';
-import { DataGrid } from '@mui/x-data-grid';
+import {DataGrid} from '@mui/x-data-grid';
 import * as React from 'react';
-import { Assignment } from '../../model/assignment';
-import { Lecture } from '../../model/lecture';
-import { utcToLocalFormat } from '../../services/datetime.service';
-import { AlertProps, Box, Button, Container, FormControl, Grid, InputLabel, MenuItem, Snackbar, Stack, Typography } from '@mui/material';
-import Select, { SelectChangeEvent } from '@mui/material/Select';
-import { getAllSubmissions } from '../../services/submissions.service';
-import { AgreeDialog } from './dialog';
+import {Assignment} from '../../model/assignment';
+import {Lecture} from '../../model/lecture';
+import {utcToLocalFormat} from '../../services/datetime.service';
+import {AlertProps, Button, FormControl, InputLabel, MenuItem, Snackbar} from '@mui/material';
+import Select, {SelectChangeEvent} from '@mui/material/Select';
+import {getAllSubmissions} from '../../services/submissions.service';
+import {AgreeDialog} from './dialog';
 import MuiAlert from '@mui/material/Alert';
+import {ModalTitle} from "../util/modal-title";
 
 
 export interface IGradingProps {
@@ -191,12 +191,3 @@ const handleAlertClose = (
 
 
 
-export const ModalTitle = (props: any) => {
-  return (
-    <Box sx={{ m: 3, top: 4 }}>
-      <Typography variant='h5'>
-        {props.title}
-      </Typography>
-    </Box>
-  )
-}

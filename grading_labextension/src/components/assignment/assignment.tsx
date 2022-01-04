@@ -11,7 +11,7 @@ import {
   Typography
 } from '@mui/material';
 
-import AssignmentTurnedInRoundedIcon from '@mui/icons-material/AssignmentTurnedInRounded';
+import ChatRoundedIcon from '@mui/icons-material/ChatRounded';
 import CloudDoneRoundedIcon from '@mui/icons-material/CloudDoneRounded';
 import ReportRoundedIcon from '@mui/icons-material/ReportRounded';
 
@@ -21,6 +21,9 @@ import { Lecture } from '../../model/lecture';
 import { getAllSubmissions } from '../../services/submissions.service';
 import { getAssignment } from '../../services/assignments.service';
 import { DeadlineComponent } from '../util/deadline';
+import { AssignmentModalComponent } from './assignment-modal';
+import { Submission } from '../../model/submission';
+import { User } from '../../model/user';
 
 interface IAssignmentComponentProps {
   lecture: Lecture;
@@ -31,11 +34,11 @@ interface IAssignmentComponentProps {
 export const AssignmentComponent = (props: IAssignmentComponentProps) => {
   const [assignment, setAssignment] = React.useState(props.assignment);
   const [displayAssignment, setDisplayAssignment] = React.useState(false);
-  const [submissions, setSubmissions] = React.useState([]);
+  const [submissions, setSubmissions] = React.useState([] as Submission[]);
   React.useEffect(() => {
     getAllSubmissions(props.lecture, assignment, false, false).then(
-      (response: any) => {
-        setSubmissions(response);
+      response => {
+        setSubmissions(response[0].submissions);
       }
     );
   }, [props]);
@@ -43,6 +46,8 @@ export const AssignmentComponent = (props: IAssignmentComponentProps) => {
   const onAssignmentClose = async () => {
     setDisplayAssignment(false);
     setAssignment(await getAssignment(props.lecture.id, assignment));
+    const submissions = await getAllSubmissions(props.lecture, assignment, false, false);
+    setSubmissions(submissions[0].submissions);
   };
 
   return (
@@ -69,6 +74,19 @@ export const AssignmentComponent = (props: IAssignmentComponentProps) => {
                 icon={<CloudDoneRoundedIcon />}
                 label={'Submissions: ' + submissions.length}
               />
+              <Chip
+                sx={{ margin: 'auto', ml: 0, mt: 0.75 }}
+                size="small"
+                icon={<ChatRoundedIcon />}
+                label={
+                  'Feedback available: ' +
+                  submissions.reduce(
+                    (accum: boolean, curr: Submission) =>
+                      accum || curr.feedback_available,
+                    false
+                  )
+                }
+              />
               {assignment.status === 'released' ? null : (
                 <Chip
                   sx={{ margin: 'auto', ml: 0, mt: 0.75 }}
@@ -88,7 +106,11 @@ export const AssignmentComponent = (props: IAssignmentComponentProps) => {
         container={props.root}
         transition="zoom"
       >
-        <div>Assignment Detail View</div>
+        <AssignmentModalComponent
+          lecture={props.lecture}
+          assignment={assignment}
+          submissions={submissions}
+        />
       </LoadingOverlay>
     </Box>
   );

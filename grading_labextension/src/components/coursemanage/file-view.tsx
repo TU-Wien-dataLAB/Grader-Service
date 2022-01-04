@@ -33,13 +33,14 @@ import { ITerminal } from '@jupyterlab/terminal';
 import { Terminal } from '@jupyterlab/services';
 import { PageConfig } from '@jupyterlab/coreutils';
 import { getAllSubmissions } from '../../services/submissions.service';
-import { GradingComponent, ModalTitle } from './grading';
+import { GradingComponent } from './grading';
 import { AgreeDialog, EditDialog, IAgreeDialogProps } from './dialog';
 import {
   pullAssignment,
   pushAssignment,
   updateAssignment
 } from '../../services/assignments.service';
+import { ModalTitle } from '../util/modal-title';
 
 export interface IAssignmentFileViewProps {
   assignment: Assignment;
