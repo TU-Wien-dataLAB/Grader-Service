@@ -167,6 +167,7 @@ export const AssignmentFileView = (props: IAssignmentFileViewProps) => {
     return (
         <Box>
             <ModalTitle title={assignment.name} />
+            <EditDialog lecture={props.lecture} assignment={assignment} />
             <Box sx={{ ml: 3, mr: 3 }}>
                 <Grid container spacing={3} alignItems="stretch">
 

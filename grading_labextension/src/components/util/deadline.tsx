@@ -1,13 +1,15 @@
 import * as React from 'react';
 import moment from 'moment';
-import { Chip } from '@mui/material';
+import {CardContent, Chip, Typography} from '@mui/material';
 import AccessAlarmRoundedIcon from '@mui/icons-material/AccessAlarmRounded';
-import { SxProps } from '@mui/system';
-import { Theme } from '@mui/material/styles';
+import {SxProps} from '@mui/system';
+import {Theme} from '@mui/material/styles';
+import {red, orange, grey} from "@mui/material/colors";
 
 export interface IDeadlineProps {
   due_date: string | null;
   compact: boolean;
+  component: "chip" | "card"
   sx?: SxProps<Theme>;
 }
 
@@ -22,6 +24,7 @@ interface ITimeSpec {
 interface IUnitMap {
   [name: string]: string;
 }
+
 const compactTimeUnits: IUnitMap = {
   w: 'W',
   d: 'd',
@@ -62,6 +65,9 @@ const calculateTimeLeft = (date: Date) => {
 };
 
 function getDisplayDate(date: Date, compact: boolean): string {
+  if (date === undefined) {
+    return 'No Deadline 😁'
+  }
   const time: ITimeSpec = calculateTimeLeft(date);
   if (time.weeks === 0) {
     if (time.days === 0) {
@@ -85,6 +91,16 @@ function getDisplayDate(date: Date, compact: boolean): string {
     )} ${getTimeUnit('h', time.hours, compact)}`;
   } else {
     return 'Deadline over!';
+  }
+}
+
+function getCardColor(c: 'default' | 'warning' | 'error') {
+  if (c === 'default') {
+    return grey[300];
+  } else if (c === 'warning') {
+    return orange[500];
+  } else {
+    return red[500];
   }
 }
 
@@ -112,14 +128,16 @@ export const DeadlineComponent = (props: IDeadlineProps) => {
     updateTimeoutInterval(d);
     let c: 'default' | 'warning' | 'error' = 'default';
     const time: ITimeSpec = calculateTimeLeft(d);
-    if (time.weeks === 0 && time.days === 0) {
-      c = 'warning';
-      if (time.hours === 0) {
+    if (d !== undefined) {
+      if (time.weeks === 0 && time.days === 0) {
+        c = 'warning';
+        if (time.hours === 0) {
+          c = 'error';
+        }
+      }
+      if (+d - +new Date() < 0) {
         c = 'error';
       }
-    }
-    if (+d - +new Date() < 0) {
-      c = 'error';
     }
     setColor(c);
   }, [props]);
@@ -136,20 +154,20 @@ export const DeadlineComponent = (props: IDeadlineProps) => {
     setNewInterval(newInterval);
   };
 
-  return date === undefined ? (
+  return props.component === "chip" ? (
     <Chip
       sx={props.sx}
       size="small"
-      icon={<AccessAlarmRoundedIcon />}
-      label={'No Deadline 😁'}
-    />
-  ) : (
-    <Chip
-      sx={props.sx}
-      size="small"
-      icon={<AccessAlarmRoundedIcon />}
+      icon={<AccessAlarmRoundedIcon/>}
       label={displayDate}
       color={color}
     />
+  ) : (
+    <CardContent sx={{backgroundColor: getCardColor(color), p: 1}}>
+      <Typography variant="overline" align="left" sx={{fontSize: 9}}>Deadline</Typography>
+      <Typography align="center" sx={{fontSize: 12, m: 0, mt: -1}}>
+        {displayDate}
+      </Typography>
+    </CardContent>
   );
 };
