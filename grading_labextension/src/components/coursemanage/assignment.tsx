@@ -6,22 +6,25 @@ import {
   CardActionArea,
   CardActions,
   CardContent,
-  Chip,
+  Chip, Divider,
   Stack,
   Typography
 } from '@mui/material';
 
-import AccessAlarmRoundedIcon from '@mui/icons-material/AccessAlarmRounded';
 import AssignmentTurnedInRoundedIcon from '@mui/icons-material/AssignmentTurnedInRounded';
 import CloudDoneRoundedIcon from '@mui/icons-material/CloudDoneRounded';
 
-import { Assignment } from '../../model/assignment';
+import {Assignment} from '../../model/assignment';
 import LoadingOverlay from '../util/overlay';
-import { Lecture } from '../../model/lecture';
-import { getAllSubmissions } from '../../services/submissions.service';
-import { getAssignment } from '../../services/assignments.service';
-import { AssignmentModalComponent } from './assignment-modal';
-import { DeadlineComponent } from '../util/deadline';
+import {Lecture} from '../../model/lecture';
+import {getAllSubmissions} from '../../services/submissions.service';
+import {getAssignment} from '../../services/assignments.service';
+import {AssignmentModalComponent} from './assignment-modal';
+import {DeadlineComponent} from '../util/deadline';
+import {blue} from "@mui/material/colors";
+import {getFiles} from "../../services/file.service";
+import CheckCircleOutlineOutlinedIcon from "@mui/icons-material/CheckCircleOutlineOutlined";
+import CancelOutlinedIcon from "@mui/icons-material/CancelOutlined";
 
 interface IAssignmentComponentProps {
   lecture: Lecture;
@@ -32,24 +35,40 @@ interface IAssignmentComponentProps {
 export const AssignmentComponent = (props: IAssignmentComponentProps) => {
   const [assignment, setAssignment] = React.useState(props.assignment);
   const [displaySubmissions, setDisplaySubmissions] = React.useState(false);
+  const [files, setFiles] = React.useState([]);
   const onSubmissionClose = async () => {
     setDisplaySubmissions(false);
     setAssignment(await getAssignment(props.lecture.id, assignment));
   };
 
   const [latestSubmissions, setSubmissions] = React.useState([]);
+  const [numAutoGraded, setNumAutoGraded] = React.useState(0);
+  const [numManualGraded, setNumManualGraded] = React.useState(0);
   React.useEffect(() => {
-    getAllSubmissions(props.lecture, assignment, true, true).then(
-      (response: any) => {
-        setSubmissions(response);
-      }
-    );
-  }, [props]);
+      getAllSubmissions(props.lecture, assignment, true, true).then(
+        response => {
+          setSubmissions(response);
+          let auto = 0;
+          let manual = 0;
+          for (const userSubmission of response) {
+            for (const submission of userSubmission.submissions) {
+              if (submission.auto_status === "automatically_graded") auto++;
+              if (submission.manual_status === "manually_graded") manual++;
+            }
+          }
+          setNumAutoGraded(auto);
+          setNumManualGraded(manual);
+        })
+      getFiles(`${props.lecture.code}/${assignment.name}`).then(files => {
+        setFiles(files)
+      })
+    }, [props]
+  );
 
   return (
     <Box>
       <Card
-        sx={{ maxWidth: 225, minWidth: 225, m: 1.5 }}
+        sx={{maxWidth: 225, minWidth: 225, m: 1.5}}
         onClick={e => setDisplaySubmissions(true)}
       >
         <CardActionArea>
@@ -57,28 +76,61 @@ export const AssignmentComponent = (props: IAssignmentComponentProps) => {
             <Typography variant="h5" component="div">
               {assignment.name}
             </Typography>
+            <Typography sx={{fontSize: 14}} color="text.secondary" gutterBottom>
+              {files.length + ' File' + (files.length === 1 ? '' : 's')}
+              <Typography sx={{fontSize: 12, display: "inline-block", color: blue[500], float: "right"}}>
+                {assignment.status}
+              </Typography>
+            </Typography>
+            <Divider sx={{mt: 1, mb: 1}}/>
 
-            <Stack sx={{ display: 'flex', flexDirection: 'column' }}>
-              <DeadlineComponent
-                sx={{ margin: 'auto', ml: 0, mt: 0.75 }}
-                due_date={assignment.due_date}
-                compact={true}
-                component={"chip"}
-              />
-              <Chip
-                sx={{ margin: 'auto', ml: 0, mt: 0.75 }}
-                size="small"
-                icon={<AssignmentTurnedInRoundedIcon />}
-                label={assignment.status}
-              />
-              <Chip
-                sx={{ margin: 'auto', ml: 0, mt: 0.75 }}
-                size="small"
-                icon={<CloudDoneRoundedIcon />}
-                label={'Submissions: ' + latestSubmissions.length}
-              />
-            </Stack>
+            <Typography sx={{fontSize: 15, mt: 0.5, ml: 0.5}}>
+              {latestSubmissions.length}
+              <Typography
+                color="text.secondary"
+                sx={{
+                  display: "inline-block",
+                  ml: 0.75,
+                  fontSize: 13
+                }}
+              >
+                {'Submission' + (latestSubmissions.length === 1 ? '' : 's')}
+              </Typography>
+            </Typography>
+            <Typography sx={{fontSize: 15, mt: 0.5, ml: 0.5}}>
+              {numAutoGraded}
+              <Typography sx={{fontSize: 10, ml: 0, display: "inline-block"}}>
+                {'/' + latestSubmissions.length}
+              </Typography>
+              <Typography
+                color="text.secondary"
+                sx={{
+                  display: "inline-block",
+                  ml: 0.75,
+                  fontSize: 13
+                }}
+              >
+                {'Autograded Submission' + (numAutoGraded === 1 ? '' : 's')}
+              </Typography>
+            </Typography>
+            <Typography sx={{fontSize: 15, mt: 0.5, ml: 0.5}}>
+              {numManualGraded}
+              <Typography sx={{fontSize: 10, ml: 0, display: "inline-block"}}>
+                {'/' + latestSubmissions.length}
+              </Typography>
+              <Typography
+                color="text.secondary"
+                sx={{
+                  display: "inline-block",
+                  ml: 0.75,
+                  fontSize: 13
+                }}
+              >
+                {'Manualgraded Submission' + (numManualGraded === 1 ? '' : 's')}
+              </Typography>
+            </Typography>
           </CardContent>
+          <DeadlineComponent due_date={assignment.due_date} compact={false} component={"card"}/>
         </CardActionArea>
       </Card>
       <LoadingOverlay
