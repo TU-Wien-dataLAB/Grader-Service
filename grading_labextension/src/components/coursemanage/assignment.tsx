@@ -63,6 +63,7 @@ export const AssignmentComponent = (props: IAssignmentComponentProps) => {
                 sx={{ margin: 'auto', ml: 0, mt: 0.75 }}
                 due_date={assignment.due_date}
                 compact={true}
+                component={"chip"}
               />
               <Chip
                 sx={{ margin: 'auto', ml: 0, mt: 0.75 }}

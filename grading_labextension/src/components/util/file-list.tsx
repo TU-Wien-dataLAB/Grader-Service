@@ -15,6 +15,7 @@ import { Contents } from '@jupyterlab/services';
 import IModel = Contents.IModel;
 import {SxProps} from "@mui/system";
 import {Theme} from "@mui/material/styles";
+import {getFiles} from "../../services/file.service";
 
 interface IFileListProps {
   path: string;
@@ -25,7 +26,7 @@ export const FilesList = (props: IFileListProps) => {
   const [files, setFiles] = React.useState([]);
 
   React.useEffect(() => {
-    getFiles().then(files => setFiles(files));
+    getFiles(props.path).then(files => setFiles(files));
   }, [props]);
 
   const openFile = async (path: string) => {
@@ -42,24 +43,6 @@ export const FilesList = (props: IFileListProps) => {
         // showAlert('error', 'Error Opening File');
         console.log(error);
       });
-  };
-
-  const model = new FilterFileBrowserModel({
-    auto: true,
-    manager: GlobalObjects.docManager
-  });
-
-  const getFiles = async () => {
-    await model.cd(props.path);
-    const items = model.items();
-    const files = [];
-    let f: IModel = items.next();
-    while (f !== undefined) {
-      files.push(f);
-      f = items.next();
-    }
-    console.log('getting files from path ' + props.path);
-    return files;
   };
 
   // generateItems will be fed using the IIterator from the FilterFileBrowserModel
