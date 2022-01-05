@@ -45,6 +45,7 @@ import {
     updateAssignment
 } from '../../services/assignments.service';
 import { ModalTitle } from '../util/modal-title';
+import { Settings } from './settings-menu';
 
 export interface IAssignmentFileViewProps {
     assignment: Assignment;
@@ -67,54 +68,9 @@ export const AssignmentFileView = (props: IAssignmentFileViewProps) => {
         handleDisagree: null
     });
 
-    const serverRoot = PageConfig.getOption('serverRoot');
-
     const lecture = props.lecture;
-    let terminalSession: Terminal.ITerminalConnection = null;
 
     const closeDialog = () => setShowDialog(false);
-
-    const openTerminal = async () => {
-        const path = `${serverRoot}/${selectedDir}/${lecture.code}/${assignment.name}`;
-        console.log('Opening terminal at: ' + path.replace(' ', '\\ '));
-        let args = {};
-        if (
-            terminalSession !== null &&
-            terminalSession.connectionStatus === 'connected'
-        ) {
-            args = { name: terminalSession.name };
-        }
-        const main = (await GlobalObjects.commands.execute(
-            'terminal:open',
-            args
-        )) as MainAreaWidget<ITerminal.ITerminal>;
-
-        if (main) {
-            const terminal = main.content;
-            terminalSession = terminal.session;
-        }
-
-        try {
-            terminalSession.send({
-                type: 'stdin',
-                content: ['cd ' + path.replace(' ', '\\ ') + '\n']
-            });
-        } catch (e) {
-            showAlert('error', 'Error Opening Terminal');
-            main.dispose();
-        }
-    };
-
-    const openBrowser = async () => {
-        const path = `${selectedDir}/${lecture.code}/${assignment.name}`;
-        GlobalObjects.commands
-            .execute('filebrowser:go-to-path', {
-                path
-            })
-            .catch(error => {
-                showAlert('error', 'Error showing in File Browser');
-            });
-    };
 
     const handlePushAssignment = async () => {
         setDialogContent({
@@ -207,18 +163,6 @@ export const AssignmentFileView = (props: IAssignmentFileViewProps) => {
         setAlert(false);
     };
 
-    const actions = [
-        {
-            icon: <FormatListBulletedRoundedIcon />,
-            name: 'Show Files',
-            onClick: () => openBrowser()
-        },
-        {
-            icon: <TerminalRoundedIcon />,
-            name: 'Open Terminal',
-            onClick: () => openTerminal()
-        }
-    ];
 
     return (
         <Box>
@@ -232,22 +176,8 @@ export const AssignmentFileView = (props: IAssignmentFileViewProps) => {
 
                             <CardHeader title="Files"
                                 action={
-                                    <SpeedDial
-                                        direction="left"
-                                        ariaLabel="SpeedDial openIcon example"
-                                        icon={<MoreVertIcon />}
-                                        FabProps={{ size: 'medium' }}
-                                    >
-                                        {actions.map(action => (
-                                            <SpeedDialAction
-                                                onClick={action.onClick}
-                                                key={action.name}
-                                                icon={action.icon}
-                                                tooltipTitle={action.name}
-                                            />
-                                        ))}
-                                    </SpeedDial>} />
-
+                                    <Settings lecture={lecture} assignment={assignment} selectedDir={selectedDir}/>
+                                    } />
 
                             <CardContent>
                                 <ToggleButtonGroup
