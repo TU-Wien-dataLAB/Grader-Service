@@ -17,6 +17,7 @@ import { Submission } from '../../model/submission';
 export interface IAssignmentModalProps {
     lecture: Lecture;
     assignment: Assignment;
+    allSubmissions: any[];
     latestSubmissions: Submission[];
 }
 
@@ -30,6 +31,7 @@ export const AssignmentModalComponent = (props: IAssignmentModalProps) => {
             <Box>
             {navigation == 0 && <AssignmentFileView lecture={props.lecture}
               assignment={props.assignment}
+              allSubmissions={props.allSubmissions}
               latest_submissions={latestSubmissions}/>}
 
             {navigation == 1 && <GradingComponent lecture={props.lecture}

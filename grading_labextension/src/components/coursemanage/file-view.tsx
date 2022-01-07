@@ -46,10 +46,12 @@ import {
 } from '../../services/assignments.service';
 import { ModalTitle } from '../util/modal-title';
 import { Settings } from './settings-menu';
+import { Charts } from './charts';
 
 export interface IAssignmentFileViewProps {
     assignment: Assignment;
     lecture: Lecture;
+    allSubmissions: any[];
     latest_submissions: any;
 }
 
@@ -59,7 +61,7 @@ export const AssignmentFileView = (props: IAssignmentFileViewProps) => {
     const [severity, setSeverity] = React.useState('success');
     const [alertMessage, setAlertMessage] = React.useState('');
     const [selectedDir, setSelectedDir] = React.useState('source');
-    const [latestSubmissions, setSubmissions] = React.useState(null);
+    const [latestSubmissions, setSubmissions] = React.useState(props.latest_submissions);
     const [showDialog, setShowDialog] = React.useState(false);
     const [dialogContent, setDialogContent] = React.useState({
         title: '',
@@ -227,16 +229,11 @@ export const AssignmentFileView = (props: IAssignmentFileViewProps) => {
                             </CardActions>
                         </Card>
                     </Grid>
-                    <Grid item xs={6}>
-                        <Card elevation={3}>
-                            <CardHeader title="Stats or other stuff" />
-                            <CardContent>
-                                <Box sx={{ height: 300, backgroundColor: 'primary.dark' }}>
 
-                                </Box>
-                            </CardContent>
-                        </Card>
+                    <Grid item xs={6}>
+                       <Charts lecture={lecture} assignment={assignment} allSubmissions={props.allSubmissions}/>
                     </Grid>
+
                     <AgreeDialog open={showDialog} {...dialogContent} />
                     <Portal container={document.body}>
                         <Snackbar

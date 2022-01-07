@@ -41,24 +41,32 @@ export const AssignmentComponent = (props: IAssignmentComponentProps) => {
     setAssignment(await getAssignment(props.lecture.id, assignment));
   };
 
-  const [latestSubmissions, setSubmissions] = React.useState([]);
+  const [allSubmissions, setAllSubmissions] = React.useState([]);
+  const [latestSubmissions, setLatestSubmissions] = React.useState([]);
   const [numAutoGraded, setNumAutoGraded] = React.useState(0);
   const [numManualGraded, setNumManualGraded] = React.useState(0);
   React.useEffect(() => {
+
+    getAllSubmissions(props.lecture, assignment, false, true).then(
+      response => {
+        setAllSubmissions(response);
+        let auto = 0;
+        let manual = 0;
+        for (const userSubmission of response) {
+          for (const submission of userSubmission.submissions) {
+            if (submission.auto_status === "automatically_graded") auto++;
+            if (submission.manual_status === "manually_graded") manual++;
+          }
+        }
+        setNumAutoGraded(auto);
+        setNumManualGraded(manual);
+      })
+
       getAllSubmissions(props.lecture, assignment, true, true).then(
         response => {
-          setSubmissions(response);
-          let auto = 0;
-          let manual = 0;
-          for (const userSubmission of response) {
-            for (const submission of userSubmission.submissions) {
-              if (submission.auto_status === "automatically_graded") auto++;
-              if (submission.manual_status === "manually_graded") manual++;
-            }
-          }
-          setNumAutoGraded(auto);
-          setNumManualGraded(manual);
+          setLatestSubmissions(response);
         })
+
       getFiles(`${props.lecture.code}/${assignment.name}`).then(files => {
         setFiles(files)
       })
@@ -142,6 +150,7 @@ export const AssignmentComponent = (props: IAssignmentComponentProps) => {
         <AssignmentModalComponent
           lecture={props.lecture}
           assignment={assignment}
+          allSubmissions={allSubmissions}
           latestSubmissions={latestSubmissions}
         />
       </LoadingOverlay>
