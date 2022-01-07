@@ -5,6 +5,7 @@
 @import url('components/cellwidget.css');
 @import url('components/manual-grade.css');
 @import url('components/lecturecard.css');
+@import url('components/file-view.css');
 :root {
     --text-color: #2e373d;
     --accent-color: rgb(243, 114, 0);

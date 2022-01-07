@@ -7,32 +7,13 @@ import { Lecture } from '../../model/lecture';
 import { Assignment } from '../../model/assignment';
 import { getAllSubmissions } from '../../services/submissions.service';
 
-export interface ChartProps {
+export interface ChartsProps {
     lecture : Lecture;
     assignment : Assignment;
     allSubmissions: any[];
 }
 
-export const Charts = (props : ChartProps) => {
-
-    const generateSubmittedData = (submissions : any) => {
-        const data = [1,0,0];
-        //TODO: set data of users that have not submitted yet 
-
-
-        let i: number, j: number = 0;
-        submissions.forEach((e: { submissions: any[]; }) => {
-            if(e.submissions.length == 1) {
-                i++;
-            } else {
-                j++;
-            }
-        });
-        data[1] = i;
-        data[2] = j;
-        
-        return data;
-        }
+export const GradingChart = (props : ChartsProps) => {
 
     const generateGradingData = (submissions: {user:string,submissions:Submission[]}[]) => {
         const data = [1,1,1,1];
@@ -63,31 +44,8 @@ export const Charts = (props : ChartProps) => {
         return data;
     }
     
-    const [submittedData, setSubmittedData] = React.useState(generateSubmittedData(props.allSubmissions));
     const [gradingData, setGradingData] = React.useState(generateGradingData(props.allSubmissions));
 
-
-
-    const submittedDataProps = {
-        labels: ['Has not submitted yet', 'Submitted at least once', 'Submitted more than once'],
-        datasets: [
-          {
-            label: 'User Submission Status',
-            data: submittedData,
-            backgroundColor: [
-              'rgba(255, 99, 132, 0.2)',
-              'rgba(54, 162, 235, 0.2)',
-              'rgba(75, 192, 192, 0.2)',
-            ],
-            borderColor: [
-              'rgba(255, 99, 132, 1)',
-              'rgba(54, 162, 235, 1)',
-              'rgba(75, 192, 192, 1)',
-            ],
-            borderWidth: 1,
-          },
-        ],
-      };
 
       const gradingDataProps = {
         labels: ['Only autograded submissions', 'Autograded and manualgraded submissions', 'grading failed','not graded'],
@@ -114,16 +72,73 @@ export const Charts = (props : ChartProps) => {
 
      
     return ( 
-    <Card elevation={3}>
-        <CardHeader title="Charts" />
+    <Card elevation={3} className='flexbox-item'>
+        <CardHeader title="Grading Status" />
         <CardContent>
-            <Box sx={{height:'300px', width:'300px'}}>
-            <Pie data={submittedDataProps}/>
-            </Box>
             <Box sx={{height:'300px', width:'300px'}}>
             <Pie data={gradingDataProps}/>
             </Box>
             
         </CardContent>
-    </Card>);
+    </Card>
+    );
+}
+
+export const SubmittedChart = (props : ChartsProps) => {
+
+    const generateSubmittedData = (submissions : any) => {
+        const data = [1,0,0];
+        //TODO: set data of users that have not submitted yet 
+
+
+        let i: number, j: number = 0;
+        submissions.forEach((e: { submissions: any[]; }) => {
+            if(e.submissions.length == 1) {
+                i++;
+            } else {
+                j++;
+            }
+        });
+        data[1] = i;
+        data[2] = j;
+        
+        return data;
+        }
+    
+    const [submittedData, setSubmittedData] = React.useState(generateSubmittedData(props.allSubmissions));
+
+
+
+    const submittedDataProps = {
+        labels: ['Has not submitted yet', 'Submitted at least once', 'Submitted more than once'],
+        datasets: [
+          {
+            label: 'User Submission Status',
+            data: submittedData,
+            backgroundColor: [
+              'rgba(255, 99, 132, 0.2)',
+              'rgba(54, 162, 235, 0.2)',
+              'rgba(75, 192, 192, 0.2)',
+            ],
+            borderColor: [
+              'rgba(255, 99, 132, 1)',
+              'rgba(54, 162, 235, 1)',
+              'rgba(75, 192, 192, 1)',
+            ],
+            borderWidth: 1,
+          },
+        ],
+      };
+     
+    return ( 
+    <Card elevation={3} className='flexbox-item'>
+        <CardHeader title="User Submission Status" />
+        <CardContent>
+            <Box sx={{height:'300px', width:'300px'}}>
+            <Pie data={submittedDataProps}/>
+            </Box>
+            
+        </CardContent>
+    </Card>
+    );
 }

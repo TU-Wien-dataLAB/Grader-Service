@@ -46,7 +46,7 @@ import {
 } from '../../services/assignments.service';
 import { ModalTitle } from '../util/modal-title';
 import { Settings } from './settings-menu';
-import { Charts } from './charts';
+import { GradingChart, SubmittedChart } from './charts';
 
 export interface IAssignmentFileViewProps {
     assignment: Assignment;
@@ -170,11 +170,9 @@ export const AssignmentFileView = (props: IAssignmentFileViewProps) => {
         <Box>
             <ModalTitle title={assignment.name} />
             <EditDialog lecture={props.lecture} assignment={assignment} />
-            <Box sx={{ ml: 3, mr: 3 }}>
-                <Grid container spacing={3} alignItems="stretch">
+            <Box className='flexbox-panel' sx={{ ml: 3, mr: 3,mb:3,mt:6}}>
 
-                    <Grid item xs={6}>
-                        <Card elevation={3}>
+                        <Card className='flexbox-item' elevation={3}>
 
                             <CardHeader title="Files"
                                 action={
@@ -228,11 +226,9 @@ export const AssignmentFileView = (props: IAssignmentFileViewProps) => {
                                 </Button>
                             </CardActions>
                         </Card>
-                    </Grid>
 
-                    <Grid item xs={6}>
-                       <Charts lecture={lecture} assignment={assignment} allSubmissions={props.allSubmissions}/>
-                    </Grid>
+                       <SubmittedChart lecture={lecture} assignment={assignment} allSubmissions={props.allSubmissions}/>
+                       <GradingChart lecture={lecture} assignment={assignment} allSubmissions={props.allSubmissions}/>
 
                     <AgreeDialog open={showDialog} {...dialogContent} />
                     <Portal container={document.body}>
@@ -251,7 +247,6 @@ export const AssignmentFileView = (props: IAssignmentFileViewProps) => {
                             </MuiAlert>
                         </Snackbar>
                     </Portal>
-                </Grid>
             </Box>
         </Box>
 

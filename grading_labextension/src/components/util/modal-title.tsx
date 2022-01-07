@@ -7,7 +7,7 @@ export interface IModalTitle {
 
 export const ModalTitle = (props: IModalTitle) => {
   return (
-    <Box sx={{ m: 3, top: 4 }}>
+    <Box sx={{position:'absolute', m: 3, top: 4 }}>
       <Typography variant="h4">{props.title}</Typography>
     </Box>
   );
