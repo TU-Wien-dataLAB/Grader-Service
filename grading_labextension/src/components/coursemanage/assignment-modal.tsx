@@ -11,7 +11,7 @@ import { Assignment } from '../../model/assignment';
 import { Lecture } from '../../model/lecture';
 import { getAllSubmissions } from '../../services/submissions.service';
 import { GradingComponent } from './grading';
-import { AssignmentFileView } from './file-view';
+import { AssignmentFileView } from './overview/overview';
 import { Submission } from '../../model/submission';
 
 export interface IAssignmentModalProps {

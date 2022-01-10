@@ -2,10 +2,10 @@ import { Card, CardHeader, CardContent, Box } from '@mui/material';
 import * as React from 'react';
 import 'chart.js/auto';
 import { Pie } from 'react-chartjs-2';
-import { Submission } from '../../model/submission';
-import { Lecture } from '../../model/lecture';
-import { Assignment } from '../../model/assignment';
-import { getAllSubmissions } from '../../services/submissions.service';
+import { Submission } from '../../../model/submission';
+import { Lecture } from '../../../model/lecture';
+import { Assignment } from '../../../model/assignment';
+import { getAllSubmissions } from '../../../services/submissions.service';
 
 export interface ChartsProps {
     lecture : Lecture;

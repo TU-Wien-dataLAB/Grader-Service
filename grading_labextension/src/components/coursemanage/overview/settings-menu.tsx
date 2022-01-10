@@ -2,12 +2,12 @@ import { Box, IconButton, Menu, MenuItem } from '@mui/material';
 import * as React from 'react';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import { PageConfig } from '@jupyterlab/coreutils';
-import { GlobalObjects } from '../..';
+import { GlobalObjects } from '../../..';
 import { MainAreaWidget } from '@jupyterlab/apputils';
 import { ITerminal } from '@jupyterlab/terminal';
 import { Terminal } from '@jupyterlab/services';
-import { Assignment } from '../../model/assignment';
-import { Lecture } from '../../model/lecture';
+import { Assignment } from '../../../model/assignment';
+import { Lecture } from '../../../model/lecture';
 
 export interface SettingsProps {
     lecture : Lecture;
