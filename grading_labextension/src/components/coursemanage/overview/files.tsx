@@ -17,7 +17,9 @@ import {
     CardHeader,
     CardContent,
     CardActions,
-    Snackbar
+    Snackbar,
+    Tabs,
+    Tab
 } from '@mui/material';
 import { FilesList } from '../../util/file-list';
 import { Settings } from './settings-menu';
@@ -145,18 +147,11 @@ export const Files = (props: FilesProps) => {
                         } />
 
                     <CardContent>
-                        <ToggleButtonGroup
-                            color="secondary"
-                            value={selectedDir}
-                            exclusive
-                            onChange={(e, dir) => setSelectedDir(dir)}
-                            size="small"
-                        >
-                            <ToggleButton color="primary" value="source">
-                                Source
-                            </ToggleButton>
-                            <ToggleButton value="release">Release</ToggleButton>
-                        </ToggleButtonGroup>
+                            <Tabs variant='fullWidth' value={selectedDir} onChange={(e, dir) => setSelectedDir(dir)}>
+                                <Tab label="Source" value="source" />
+                                <Tab label="Release" value="release" />
+                            </Tabs>
+
                         <FilesList
                             path={`${selectedDir}/${props.lecture.code}/${props.assignment.name}`}
                         />
