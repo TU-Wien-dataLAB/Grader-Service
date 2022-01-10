@@ -1,6 +1,6 @@
 import logging
 import subprocess
-from typing import List
+from typing import List, Dict
 from traitlets.config.configurable import Configurable
 from traitlets.config.loader import Config
 from traitlets.traitlets import Int, TraitError, Unicode, validate
@@ -13,22 +13,27 @@ import shutil
 import sys
 from urllib.parse import quote
 
+
 class GitError(Exception):
     def __init__(self, error: str):
         self.error = error
-    
+
     def __str__(self):
         return self.error
-    
+
     def __repr__(self) -> str:
         return self.__str__()
+
 
 class GitService(Configurable):
     git_access_token = Unicode(os.environ.get("JUPYTERHUB_API_TOKEN"), allow_none=False).tag(config=True)
     git_http_scheme = Unicode(os.environ.get("GRADER_HTTP_SCHEME", 'http'), allow_none=False).tag(config=True)
-    git_remote_url = Unicode(f'{os.environ.get("GRADER_HOST_URL", "127.0.0.1")}:{os.environ.get("GRADER_HOST_PORT", "4010")}{os.environ.get("GRADER_GIT_BASE_URL", "/services/grader/git")}', allow_none=False).tag(config=True)
+    git_remote_url = Unicode(
+        f'{os.environ.get("GRADER_HOST_URL", "127.0.0.1")}:{os.environ.get("GRADER_HOST_PORT", "4010")}{os.environ.get("GRADER_GIT_BASE_URL", "/services/grader/git")}',
+        allow_none=False).tag(config=True)
 
-    def __init__(self, server_root_dir: str, lecture_code: str, assignment_name: str, repo_type: str, force_user_repo=False, *args, **kwargs):
+    def __init__(self, server_root_dir: str, lecture_code: str, assignment_name: str, repo_type: str,
+                 force_user_repo=False, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.log = logging.getLogger(str(self.__class__))
         self._git_version = None
@@ -45,8 +50,7 @@ class GitService(Configurable):
 
         self.log.info("git_access_token: " + self.git_access_token)
         self.log.info("git_http_scheme: " + self.git_http_scheme)
-        self.log.info("git_remote_url: " + self.git_remote_url)        
-
+        self.log.info("git_remote_url: " + self.git_remote_url)
 
     def push(self, origin: str, force=False):
         """Pushes commits on the remote
@@ -57,7 +61,7 @@ class GitService(Configurable):
         """
         self.log.info(f"Pushing remote {origin} for {self.path}")
         self._run_command(f"git push {origin} main" + (" --force" if force else ""), cwd=self.path)
-    
+
     def set_remote(self, origin: str, sub_id=None):
         """Set a remote in the local repository
 
@@ -69,24 +73,32 @@ class GitService(Configurable):
         url = posixpath.join(self.git_remote_url, self.lecture_code, quote(self.assignment_name), self.repo_type)
         try:
             if sub_id is None:
-                self._run_command(f"git remote add {origin} {self.git_http_scheme}://oauth:{self.git_access_token}@{url}", cwd=self.path)
+                self._run_command(
+                    f"git remote add {origin} {self.git_http_scheme}://oauth:{self.git_access_token}@{url}",
+                    cwd=self.path)
             else:
                 self.log.info(f"Setting remote with sub_id {sub_id}")
-                self._run_command(f"git remote add {origin} {self.git_http_scheme}://oauth:{self.git_access_token}@{posixpath.join(url, sub_id)}", cwd=self.path)
+                self._run_command(
+                    f"git remote add {origin} {self.git_http_scheme}://oauth:{self.git_access_token}@{posixpath.join(url, sub_id)}",
+                    cwd=self.path)
 
         except GitError as e:
             self.log.error("GitError:\n" + e.error)
             self.log.info(f"Remote set: Updating remote {origin} for {self.path}")
             if sub_id is None:
-                self._run_command(f"git remote set-url {origin} {self.git_http_scheme}://oauth:{self.git_access_token}@{url}", cwd=self.path)
+                self._run_command(
+                    f"git remote set-url {origin} {self.git_http_scheme}://oauth:{self.git_access_token}@{url}",
+                    cwd=self.path)
             else:
                 self.log.info(f"Setting remote with sub_id {sub_id}")
-                self._run_command(f"git remote set-url {origin} {self.git_http_scheme}://oauth:{self.git_access_token}@{posixpath.join(url, sub_id)}", cwd=self.path)
+                self._run_command(
+                    f"git remote set-url {origin} {self.git_http_scheme}://oauth:{self.git_access_token}@{posixpath.join(url, sub_id)}",
+                    cwd=self.path)
 
     def delete_remote(self, origin: str):
         raise NotImplementedError()
 
-    def switch_branch(self,branch: str):
+    def switch_branch(self, branch: str):
         """Switches into another branch
 
         Args:
@@ -107,9 +119,11 @@ class GitService(Configurable):
         """
         if force:
             self.log.info(f"Pulling remote {origin}")
-            out = self._run_command(f'sh -c "git clean -fd && git fetch {origin} && git reset --hard {origin}/{branch}"', cwd=self.path, capture_output=True)
+            out = self._run_command(
+                f'sh -c "git clean -fd && git fetch {origin} && git reset --hard {origin}/{branch}"', cwd=self.path,
+                capture_output=True)
             self.log.info(out)
-            #self._run_command(f'sh -c "git fetch --all && git reset --mixed {origin}/main"',cwd=self.path)
+            # self._run_command(f'sh -c "git fetch --all && git reset --mixed {origin}/main"',cwd=self.path)
         else:
             self._run_command(f"git pull {origin} {branch}", cwd=self.path)
 
@@ -121,12 +135,12 @@ class GitService(Configurable):
         """
         if not self.is_git() or force:
             self.log.info(f"Calling init for {self.path}")
-            if self.git_version < (2,28):
+            if self.git_version < (2, 28):
                 self._run_command(f"git init", cwd=self.path)
                 self._run_command("git checkout -b main", cwd=self.path)
             else:
                 self._run_command(f"git init -b main", cwd=self.path)
-    
+
     def is_git(self):
         """Checks if the directory is a local repository
 
@@ -134,7 +148,6 @@ class GitService(Configurable):
             bool: states if the directory is a repository
         """
         return os.path.exists(os.path.join(self.path, ".git"))
-    
 
     def commit(self, m=str(datetime.now())):
         """Commits the staged changes
@@ -151,8 +164,8 @@ class GitService(Configurable):
 
     def set_author(self, author=getpass.getuser()):
         self._run_command(f'git config user.name "{author}"', cwd=self.path)
-    
-    def clone(self,origin: str, force=False):
+
+    def clone(self, origin: str, force=False):
         """Clones the repository
 
         Args:
@@ -161,8 +174,7 @@ class GitService(Configurable):
         """
         self.init(force=force)
         self.set_remote(origin=origin)
-        self.pull(origin=origin,force=force)
-    
+        self.pull(origin=origin, force=force)
 
     def delete_repo_contents(self, include_git=False):
         """Deletes the contents of the git service
@@ -178,7 +190,6 @@ class GitService(Configurable):
                 if d != ".git" or include_git:
                     shutil.rmtree(os.path.join(root, d))
                     self.log.info(f"Deleted {os.path.join(root, d)} from {self.git_root_dir}")
-    
 
     # ATTENTION: dirs_exist_ok was only added in Python 3.8
     def copy_repo_contents(self, src: str):
@@ -200,7 +211,35 @@ class GitService(Configurable):
                 else:
                     shutil.copy2(s, d)
 
+    def get_log(self, history_count=10) -> List[Dict[str, str]]:
+        """
+        Execute git log command & return the result.
+        """
+        cmd = f'git log --pretty=format:%H%n%an%n%at%n%D%n%s -{history_count}'
+        my_output = self._run_command(cmd, cwd=self.path, capture_output=True)
 
+        result = []
+        line_array = my_output.splitlines()
+        previous_commit_offset = 5
+        self.log.info(f"Found {len(line_array) // previous_commit_offset} commits in history")
+
+        for i in range(0, len(line_array), previous_commit_offset):
+            commit = {
+                "commit": line_array[i],
+                "author": line_array[i + 1],
+                "date": datetime.utcfromtimestamp(int(line_array[i + 2])).isoformat("T", "milliseconds") + "Z",
+                # "date": line_array[i + 2],
+                "ref": line_array[i + 3],
+                "commit_msg": line_array[i + 4],
+                "pre_commit": "",
+            }
+
+            if i + previous_commit_offset < len(line_array):
+                commit["pre_commit"] = line_array[i + previous_commit_offset]
+
+            result.append(commit)
+
+        return result
 
     @property
     def git_version(self):
@@ -217,7 +256,7 @@ class GitService(Configurable):
             version = version.split(" ")[2]
             self._git_version = tuple([int(v) for v in version.split(".")])
         return self._git_version
-    
+
     def _run_command(self, command, cwd=None, capture_output=False):
         """Starts a sub process and runs an cmd command
 

@@ -4,9 +4,9 @@ import sys
 from urllib.parse import unquote, quote
 
 from grader_convert.converters.generate_assignment import GenerateAssignment
-from grading_labextension.handlers.base_handler import ExtensionBaseHandler
-from grading_labextension.registry import register_handler
-from grading_labextension.services.git import GitError, GitService
+from .base_handler import ExtensionBaseHandler
+from ..registry import register_handler
+from ..services.git import GitError, GitService
 from tornado.httpclient import HTTPError, HTTPResponse
 
 
@@ -61,7 +61,43 @@ class GenerateHandler(ExtensionBaseHandler):
         except OSError as e:
             self.log.error(f"Could delete {gradebook_path}! Error: {e.strerror}")
         self.log.info("GenerateAssignment conversion done")
-        self.write({"cool": "cool"})
+        self.write("OK")
+
+
+@register_handler(
+    path=r"\/lectures\/(?P<lecture_id>\d*)\/assignments\/(?P<assignment_id>\d*)\/log\/(?P<repo>\w*)\/?"
+)
+class GitLogHandler(ExtensionBaseHandler):
+    async def get(self, lecture_id: int, assignment_id: int, repo: str):
+        if repo not in {"assignment", "source", "release"}:
+            self.write_error(404)
+        n_history = int(self.get_argument("n", "10"))
+        try:
+            lecture = await self.request_service.request(
+                "GET",
+                f"{self.base_url}/lectures/{lecture_id}",
+                header=self.grader_authentication_header,
+            )
+            assignment = await self.request_service.request(
+                "GET",
+                f"{self.base_url}/lectures/{lecture_id}/assignments/{assignment_id}",
+                header=self.grader_authentication_header,
+            )
+        except HTTPError as e:
+            self.set_status(e.code)
+            self.write_error(e.code)
+            return
+
+        git_service = GitService(
+            server_root_dir=self.root_dir,
+            lecture_code=lecture["code"],
+            assignment_name=assignment["name"],
+            repo_type=repo,
+            config=self.config,
+            force_user_repo=True if repo == "release" else False,
+        )
+        logs = git_service.get_log(n_history)
+        self.write(json.dumps(logs))
 
 
 @register_handler(

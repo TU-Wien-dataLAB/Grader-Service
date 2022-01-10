@@ -28,6 +28,7 @@ import { Settings } from './settings-menu';
 export interface FilesProps {
     lecture: Lecture;
     assignment: Assignment;
+    onGitAction: () => void;
 }
 
 export const Files = (props: FilesProps) => {
@@ -65,6 +66,7 @@ export const Files = (props: FilesProps) => {
                     assignment => {
                         setAssignment(assignment);
                         showAlert('success', 'Successfully Pushed Assignment');
+                        props.onGitAction();
                     },
                     error => showAlert('error', 'Error Updating Assignment')
                 );
@@ -83,6 +85,7 @@ export const Files = (props: FilesProps) => {
                 try {
                     await pullAssignment(lecture.id, assignment.id, 'source');
                     showAlert('success', 'Successfully Pulled Assignment');
+                    props.onGitAction();
                 } catch (err) {
                     showAlert('error', 'Error Pulling Assignment');
                 }

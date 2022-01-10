@@ -2,6 +2,9 @@ import {FilterFileBrowserModel} from "@jupyterlab/filebrowser/lib/model";
 import {GlobalObjects} from "../index";
 import {Contents} from '@jupyterlab/services';
 import IModel = Contents.IModel;
+import {Assignment} from "../model/assignment";
+import {HTTPMethod, request} from "./request.service";
+import {Lecture} from "../model/lecture";
 
 export const getFiles = async (path: string): Promise<IModel[]> => {
   const model = new FilterFileBrowserModel({
@@ -19,3 +22,21 @@ export const getFiles = async (path: string): Promise<IModel[]> => {
   console.log('getting files from path ' + path);
   return files;
 };
+
+export interface IGitLogObject {
+  commit: string,
+  author: string,
+  date: string,
+  ref: string,
+  commit_msg: string,
+  pre_commit: string
+}
+
+export function getGitLog(lecture: Lecture, assignment: Assignment, repo: "assignment" | "source" | "release", nCommits: number): Promise<IGitLogObject[]> {
+  let url = `/lectures/${lecture.id}/assignments/${assignment.id}/log/${repo}/`;
+  let searchParams = new URLSearchParams({
+    "n": String(nCommits)
+  })
+  url += '?' + searchParams;
+  return request<IGitLogObject[]>(HTTPMethod.GET, url);
+}
