@@ -25,9 +25,12 @@ export const AssignmentFileView = (props: IAssignmentFileViewProps) => {
 
   return (
     <Box>
-      <ModalTitle title={assignment.name}/>
-      <EditDialog lecture={props.lecture} assignment={assignment}/>
-      <Box className='flexbox-panel' sx={{ml: 3, mr: 3, mb: 3, mt: 6}}>
+      <ModalTitle title={assignment.name}>
+        <Box sx={{ml: 2}} display="inline-block">
+          <EditDialog lecture={props.lecture} assignment={assignment}/>
+        </Box>
+      </ModalTitle>
+      <Box className='flexbox-panel' sx={{ml: 3, mr: 3, mb: 3, mt: 9}}>
 
         <OverviewCard assignment={assignment} allSubmissions={props.allSubmissions}/>
 
