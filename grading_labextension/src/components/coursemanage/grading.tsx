@@ -3,7 +3,7 @@ import * as React from 'react';
 import {Assignment} from '../../model/assignment';
 import {Lecture} from '../../model/lecture';
 import {utcToLocalFormat} from '../../services/datetime.service';
-import {AlertProps, Button, FormControl, InputLabel, MenuItem, Portal, Snackbar} from '@mui/material';
+import {AlertProps, Box, Button, FormControl, InputLabel, MenuItem, Portal, Snackbar, Typography} from '@mui/material';
 import Select, {SelectChangeEvent} from '@mui/material/Select';
 import {getAllSubmissions} from '../../services/submissions.service';
 import {AgreeDialog} from './dialog';
@@ -12,12 +12,16 @@ import {ModalTitle} from "../util/modal-title";
 import {User} from "../../model/user";
 import {Submission} from "../../model/submission";
 import {autogradeSubmission} from "../../services/grading.service";
+import LoadingOverlay from "../util/overlay";
+import {getAssignment} from "../../services/assignments.service";
+import {ManualGrading} from "./manual-grading";
 
 
 export interface IGradingProps {
   lecture: Lecture;
   assignment: Assignment;
-  latest_submissions: any;
+  latest_submissions: { user: User, submissions: Submission[] }[];
+  root: HTMLElement;
 }
 
 interface IRowValues {
@@ -43,6 +47,10 @@ export const GradingComponent = (props: IGradingProps) => {
     handleDisagree: null
   });
 
+  const [displayManualGrading, setDisplayManualGrading] = React.useState(false);
+  const onManualGradingClose = async () => {
+    setDisplayManualGrading(false);
+  };
 
   const showAlert = (severity: string, msg: string) => {
     setSeverity(severity);
@@ -128,6 +136,7 @@ export const GradingComponent = (props: IGradingProps) => {
     return rows;
   };
 
+  const [submissions, setSubmissions] = React.useState(props.latest_submissions);
   const [rows, setRows] = React.useState(generateRows(props.latest_submissions));
   const [selectedRows, setSelectedRows] = React.useState([] as IRowValues[]);
 
@@ -137,7 +146,8 @@ export const GradingComponent = (props: IGradingProps) => {
 
   React.useEffect(() => {
     getAllSubmissions(props.lecture, props.assignment, false, true).then(response => {
-      setRows(generateRows(response))
+      setRows(generateRows(response));
+      setSubmissions(response);
     })
   }, [option]);
 
@@ -151,11 +161,23 @@ export const GradingComponent = (props: IGradingProps) => {
     {field: 'score', headerName: 'Score', width: 130}
   ];
 
+  const getSubmissionFromRow = (row: IRowValues): Submission => {
+    if (row === undefined) return null;
+    const id = row.id;
+    for (const userSubmission of submissions) {
+      for (const submission of userSubmission.submissions) {
+        if (submission.id === id) {
+          return submission;
+        }
+      }
+    }
+    return null;
+  }
 
   return (
     <div>
       <ModalTitle title="Grading"/>
-      <div style={{display: 'flex', height: '500px', marginTop:'90px'}}>
+      <div style={{display: 'flex', height: '500px', marginTop: '90px'}}>
         <div style={{flexGrow: 1}}>
           <DataGrid
             sx={{mb: 3, ml: 3, mr: 3}}
@@ -195,8 +217,25 @@ export const GradingComponent = (props: IGradingProps) => {
         onClick={handleAutogradeSubmissions}>
         {`Autograde ${selectedRows.length} selected`}
       </Button>
+      <Button
+        disabled={selectedRows.length !== 1}
+        sx={{m: 3}}
+        onClick={() => setDisplayManualGrading(true)}
+        variant='outlined'>
+        {`Manualgrade ${selectedRows.length} selected`}
+      </Button>
       <Button sx={{m: 3}} variant='outlined'>Generate Feedback of selected</Button>
       </span>
+
+      <LoadingOverlay
+        onClose={onManualGradingClose}
+        open={displayManualGrading}
+        container={props.root}
+        transition="zoom"
+      >
+        <ManualGrading lecture={props.lecture} assignment={props.assignment}
+                       submission={getSubmissionFromRow(selectedRows[0])}/>
+      </LoadingOverlay>
 
       {/* Dialog */}
       <AgreeDialog open={showDialog} {...dialogContent} />

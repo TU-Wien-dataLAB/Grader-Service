@@ -13,12 +13,14 @@ import { getAllSubmissions } from '../../services/submissions.service';
 import { GradingComponent } from './grading';
 import { AssignmentFileView } from './overview/overview';
 import { Submission } from '../../model/submission';
+import {User} from "../../model/user";
 
 export interface IAssignmentModalProps {
     lecture: Lecture;
     assignment: Assignment;
     allSubmissions: any[];
-    latestSubmissions: Submission[];
+    latestSubmissions: { user: User, submissions: Submission[] }[];
+    root: HTMLElement;
 }
 
 export const AssignmentModalComponent = (props: IAssignmentModalProps) => {
@@ -36,7 +38,7 @@ export const AssignmentModalComponent = (props: IAssignmentModalProps) => {
 
             {navigation == 1 && <GradingComponent lecture={props.lecture}
               assignment={props.assignment}
-              latest_submissions={latestSubmissions}/>}
+              latest_submissions={latestSubmissions} root={props.root}/>}
             </Box>
 
             <Paper sx={{ position: "absolute", bottom: 0, left: 0, right: 0 }} elevation={3}>

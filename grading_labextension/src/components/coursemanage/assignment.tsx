@@ -152,6 +152,7 @@ export const AssignmentComponent = (props: IAssignmentComponentProps) => {
           assignment={assignment}
           allSubmissions={allSubmissions}
           latestSubmissions={latestSubmissions}
+          root={props.root}
         />
       </LoadingOverlay>
     </Box>
