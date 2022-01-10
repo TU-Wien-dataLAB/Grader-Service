@@ -69,6 +69,7 @@ export const AssignmentModalComponent = (props: IAssignmentModalProps) => {
   return (
     <div style={{overflow: "scroll", height: "100%"}}>
       <ModalTitle title={props.assignment.name}/>
+      <Box sx={{mt:10}}>
       <Typography variant={'h6'} sx={{ml: 2}}>Files</Typography>
       <FilesList path={path} sx={{m: 2, mt: 1}}/>
       <Stack direction={"row"} spacing={1} sx={{m: 1, ml: 2}}>
@@ -93,7 +94,7 @@ export const AssignmentModalComponent = (props: IAssignmentModalProps) => {
       <Typography variant={'h6'} sx={{ml: 2, mt: 3}}>Submissions</Typography>
       <SubmissionList submissions={submissions} sx={{m: 2, mt: 1}}/>
 
-
+      </Box>
       <Portal container={document.body}>
         <Snackbar
           open={alert}

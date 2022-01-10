@@ -19,7 +19,8 @@ import {
     CardActions,
     Snackbar,
     Tabs,
-    Tab
+    Tab,
+    Box
 } from '@mui/material';
 import { FilesList } from '../../util/file-list';
 import { Settings } from './settings-menu';
@@ -151,10 +152,11 @@ export const Files = (props: FilesProps) => {
                                 <Tab label="Source" value="source" />
                                 <Tab label="Release" value="release" />
                             </Tabs>
-
+                        <Box height={214} overflow={'scroll'}>
                         <FilesList
                             path={`${selectedDir}/${props.lecture.code}/${props.assignment.name}`}
                         />
+                        </Box>
                     </CardContent>
                     <CardActions>
                         <Button
