@@ -34,7 +34,6 @@ components:
           example: "Baz Bar"
       example:
         name: "Baz Bar"
-        groups: ["LVA1", "LVA2"]
     Lecture:
       type: "object"
       properties:

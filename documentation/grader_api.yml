@@ -20,13 +20,16 @@ tags:
 
 paths:
   /lectures:
-    $ref: './openapi/paths.yml#/lectures'
+    $ref: './openapi/paths_shared.yml#/lectures'
 
   /lectures/{lect_id}:
-    $ref: './openapi/paths.yml#/lecturesById'
+    $ref: './openapi/paths_shared.yml#/lecturesById'
+
+  /lectures/{lect_id}/users:
+    $ref: './openapi/paths_shared.yml#/lectureUsers'
 
   /lectures/{lect_id}/assignments:
-    $ref: './openapi/paths.yml#/assignments'
+    $ref: './openapi/paths_shared.yml#/assignments'
 
   # get id has no query params for grader 
   /lectures/{lect_id}/assignments/{a_id}:
@@ -39,19 +42,19 @@ paths:
     $ref: './openapi/paths_grader.yml#/submissions'
   
   /lectures/{lect_id}/assignments/{a_id}/submissions/{s_id}:
-    $ref: './openapi/paths.yml#/submissionsById'
+    $ref: './openapi/paths_shared.yml#/submissionsById'
 
   /lectures/{lect_id}/assignments/{a_id}/submissions/{s_id}/properties:
     $ref: './openapi/paths_grader.yml#/propertiesSubmission'
 
   /lectures/{lect_id}/assignments/{a_id}/grading/{s_id}/auto:
-    $ref: './openapi/paths.yml#/auto'
+    $ref: './openapi/paths_shared.yml#/auto'
 
   /lectures/{lect_id}/assignments/{a_id}/grading/{s_id}/feedback:
-    $ref: './openapi/paths.yml#/feedback'
+    $ref: './openapi/paths_shared.yml#/feedback'
   
   /permissions:
-    $ref: './openapi/paths.yml#/permissions'
+    $ref: './openapi/paths_shared.yml#/permissions'
 
 
 
