@@ -197,26 +197,4 @@ class AssignmentObjectHandler(ExtensionBaseHandler):
         self.write("OK")
 
 
-@register_handler(
-    path=r"\/lectures\/(?P<lecture_id>\d*)\/assignments\/(?P<assignment_id>\d*)\/coursedata\/?"
-)
-class AssignmentCourseDataHandler(ExtensionBaseHandler):
-    async def get(self, lecture_id: int, assignment_id: int):
-        try:
-            response = await self.request_service.request(
-                method="GET",
-                endpoint=f"{self.base_url}/lectures/{lecture_id}/assignments/",
-                header=self.grader_authentication_header,
-            )
 
-            lecture = await self.request_service.request(
-                "GET",
-                f"{self.base_url}/lectures/{lecture_id}",
-                header=self.grader_authentication_header,
-            )
-        except HTTPError as e:
-            self.set_status(e.code)
-            self.write_error(e.code)
-            return
-        
-        self.write(json.dumps(response))

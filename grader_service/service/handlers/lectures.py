@@ -132,3 +132,22 @@ class LectureObjectHandler(GraderBaseHandler):
         except ObjectDeletedError:
             raise HTTPError(404)
         self.write("OK")
+
+@register_handler(
+    path=r"\/lectures\/(?P<lecture_id>\d*)\/students\/?",
+    version_specifier=VersionSpecifier.ALL,
+)
+class LectureStudentsHandler(GraderBaseHandler):
+    @authorize([Scope.tutor, Scope.instructor])
+    async def get(self, lecture_id: int):
+
+        roles = self.session.query(Role).filter(Role.lectid == lecture_id).all()
+        students = [r for r in roles if r.role == Scope.student]
+        students_count = len(students)
+        tutors = [r for r in roles if r.role == Scope.tutor]
+        tutors_count = len(tutors)
+        instructors = [r for r in roles if r.role == Scope.instructor]
+        instructors_count = len(instructors)
+
+        counts = {"instructors": instructors_count, "tutors": tutors_count, "students": students_count }
+        self.write_json(counts)

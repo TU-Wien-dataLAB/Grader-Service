@@ -255,39 +255,3 @@ class AssignmentPropertiesHandler(GraderBaseHandler):
         properties_string: str = self.request.body.decode("utf-8")
         assignment.properties = properties_string
         self.session.commit()
-
-
-@register_handler(
-    path=r"\/lectures\/(?P<lecture_id>\d*)\/assignments\/(?P<assignment_id>\d*)\/coursedata\/?",
-    version_specifier=VersionSpecifier.ALL,
-)
-class AssignmentCourseDataHandler(GraderBaseHandler):
-    @authorize([Scope.tutor, Scope.instructor])
-    async def get(self, lecture_id: int, assignment_id: int):
-        lecture_id, assignment_id = parse_ids(lecture_id, assignment_id)
-        assignment = self.session.query(Assignment).get(assignment_id)
-        if (
-            assignment is None
-            or assignment.deleted == DeleteState.deleted
-            or assignment.lectid != lecture_id
-        ):
-            self.error_message = "Not Found!"
-            raise HTTPError(404)
-        
-        students_of_assignment = self.session.query(Role).filter(Role.role == Scope.student,Role.lectid == lecture_id).all()
-        students_of_assignment = [s.username for s in students_of_assignment]
-
-        user_map = {}
-        submissions = assignment.submissions
-        for sub in submissions:
-                if sub.username in user_map:
-                    user_map[sub.username]["submissions"].append(sub)
-                else:
-                    u = User()
-                    u.name = sub.username
-                    user_map[sub.username] = {"user": u, "submissions": [sub]} 
-        
-        user_map = list(user_map.values())
-
-        dataobject = {"assignment": assignment, "students": students_of_assignment, "student_submissions":user_map}
-        self.write_json(dataobject)
