@@ -25,13 +25,11 @@ export namespace Assignment {
         User: 'user' as TypeEnum,
         Group: 'group' as TypeEnum
     };
-    export type StatusEnum = 'created' | 'pushed' | 'released' | 'fetching' | 'fetched' | 'complete';
+    export type StatusEnum = 'created' | 'pushed' | 'released' | 'complete';
     export const StatusEnum = {
         Created: 'created' as StatusEnum,
         Pushed: 'pushed' as StatusEnum,
         Released: 'released' as StatusEnum,
-        Fetching: 'fetching' as StatusEnum,
-        Fetched: 'fetched' as StatusEnum,
         Complete: 'complete' as StatusEnum
     };
 }

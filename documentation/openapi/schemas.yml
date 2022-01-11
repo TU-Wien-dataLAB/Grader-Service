@@ -83,8 +83,6 @@ components:
             - created # another state of an assignment (instructor only)
             - pushed
             - released
-            - fetching
-            - fetched
             - complete # final state -> final grade is calculated
         points:
           type: number
