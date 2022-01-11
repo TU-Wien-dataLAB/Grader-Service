@@ -17,99 +17,67 @@ export interface IAssignmentModalProps {
   lecture: Lecture;
   assignment: Assignment;
   submissions: Submission[];
+  showAlert: (severity: string, msg: string) => void;
 }
 
 export const AssignmentModalComponent = (props: IAssignmentModalProps) => {
   const [submissions, setSubmissions] = React.useState(props.submissions);
   const [path, setPath] = React.useState(`${props.lecture.code}/${props.assignment.name}`);
-  const [alert, setAlert] = React.useState(false);
-  const [severity, setSeverity] = React.useState('success');
-  const [alertMessage, setAlertMessage] = React.useState('');
-
-  const showAlert = (severity: string, msg: string) => {
-    setSeverity(severity);
-    setAlertMessage(msg);
-    setAlert(true);
-  };
-
-  const handleAlertClose = (
-    event?: React.SyntheticEvent | Event,
-    reason?: string
-  ) => {
-    if (reason === 'clickaway') {
-      return;
-    }
-    setAlert(false);
-  };
 
   const fetchAssignmentHandler = async (repo: "user" | "release") => {
     try {
       await pullAssignment(props.lecture.id, props.assignment.id, repo);
-      showAlert('success', 'Successfully Pulled Repo');
+      props.showAlert('success', 'Successfully Pulled Repo');
     } catch (e) {
-      showAlert('error', 'Error Fetching Assignment');
+      props.showAlert('error', 'Error Fetching Assignment');
     }
   }
 
   const submitAssignmentHandler = async () => {
     try {
       await submitAssignment(props.lecture, props.assignment);
-      showAlert('success', 'Successfully Submitted Assignment');
+      props.showAlert('success', 'Successfully Submitted Assignment');
     } catch (e) {
-      showAlert('error', 'Error Submitting Assignment');
+      props.showAlert('error', 'Error Submitting Assignment');
     }
     try {
       const submissions = await getAllSubmissions(props.lecture, props.assignment, false, false);
       setSubmissions(submissions[0].submissions)
     } catch (e) {
-      showAlert('error', 'Error Updating Submissions');
+      props.showAlert('error', 'Error Updating Submissions');
     }
   }
 
   return (
     <div style={{overflow: "scroll", height: "100%"}}>
       <ModalTitle title={props.assignment.name}/>
-      <Box sx={{mt:10}}>
-      <Typography variant={'h6'} sx={{ml: 2}}>Files</Typography>
-      <FilesList path={path} sx={{m: 2, mt: 1}}/>
-      <Stack direction={"row"} spacing={1} sx={{m: 1, ml: 2}}>
-        <Button
-          variant="outlined"
-          size="small"
-          onClick={() => submitAssignmentHandler()}
-        >
-          <PublishRoundedIcon fontSize="small" sx={{mr: 1}}/>
-          Submit
-        </Button>
-        <SplitButton
-          variant="outlined"
-          size="small"
-          icon={<GetAppRoundedIcon fontSize="small" sx={{mr: 1}}/>}
-          options={[
-            {name: "Pull User", onClick: () => fetchAssignmentHandler("user")},
-            {name: "Pull Release", onClick: () => fetchAssignmentHandler("release")}
-          ]}
-        />
-      </Stack>
-      <Typography variant={'h6'} sx={{ml: 2, mt: 3}}>Submissions</Typography>
-      <SubmissionList submissions={submissions} sx={{m: 2, mt: 1}}/>
+      <Box sx={{mt: 10}}>
+        <Typography variant={'h6'} sx={{ml: 2}}>Files</Typography>
+        <FilesList path={path} sx={{m: 2, mt: 1}}/>
+        <Stack direction={"row"} spacing={1} sx={{m: 1, ml: 2}}>
+          <Button
+            variant="outlined"
+            size="small"
+            onClick={() => submitAssignmentHandler()}
+          >
+            <PublishRoundedIcon fontSize="small" sx={{mr: 1}}/>
+            Submit
+          </Button>
+          <SplitButton
+            variant="outlined"
+            size="small"
+            icon={<GetAppRoundedIcon fontSize="small" sx={{mr: 1}}/>}
+            options={[
+              {name: "Pull User", onClick: () => fetchAssignmentHandler("user")},
+              {name: "Pull Release", onClick: () => fetchAssignmentHandler("release")}
+            ]}
+          />
+        </Stack>
+        <Typography variant={'h6'} sx={{ml: 2, mt: 3}}>Submissions</Typography>
+        <SubmissionList submissions={submissions} sx={{m: 2, mt: 1}}/>
 
       </Box>
       <Portal container={document.body}>
-        <Snackbar
-          open={alert}
-          autoHideDuration={3000}
-          onClose={handleAlertClose}
-          sx={{mb: 2, ml: 2}}
-        >
-          <MuiAlert
-            onClose={handleAlertClose}
-            severity={severity as AlertProps['severity']}
-            sx={{width: '100%'}}
-          >
-            {alertMessage}
-          </MuiAlert>
-        </Snackbar>
       </Portal>
     </div>
   );

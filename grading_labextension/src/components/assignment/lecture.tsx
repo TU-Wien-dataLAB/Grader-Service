@@ -17,6 +17,7 @@ import { AssignmentComponent } from './assignment';
 interface ILectureComponentProps {
   lecture: Lecture;
   root: HTMLElement;
+  showAlert: (severity: string, msg: string) => void;
   open?: boolean;
 }
 
@@ -64,6 +65,7 @@ export const LectureComponent = (props: ILectureComponentProps) => {
                   lecture={lecture}
                   assignment={el}
                   root={props.root}
+                  showAlert={props.showAlert}
                 />
               ))}
             </Box>
