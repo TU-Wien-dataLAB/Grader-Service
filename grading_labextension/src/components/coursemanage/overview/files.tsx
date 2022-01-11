@@ -93,37 +93,6 @@ export const Files = (props: FilesProps) => {
     setShowDialog(true);
   };
 
-  const handleReleaseAssignment = async () => {
-    setDialogContent({
-      title: 'Release Assignment',
-      message: `Do you want to release ${assignment.name} for all students?`,
-      handleAgree: () => {
-        setDialogContent({
-          title: 'Confirmation',
-          message: `Are you sure you want to release ${assignment.name}?`,
-          handleAgree: async () => {
-            try {
-              console.log('releasing assignment');
-              let a = assignment;
-              a.status = 'released';
-              a = await updateAssignment(lecture.id, a);
-              setAssignment(a);
-              props.onAssignmentChange(a);
-              props.showAlert('success', 'Successfully Released Assignment');
-            } catch (err) {
-              props.showAlert('error', 'Error Releasing Assignment');
-            }
-            closeDialog();
-          },
-          handleDisagree: () => closeDialog()
-        });
-      },
-      handleDisagree: () => closeDialog()
-    });
-    setShowDialog(true);
-  };
-
-
   return (
     <Card className='flexbox-item' elevation={3}>
 
@@ -132,7 +101,7 @@ export const Files = (props: FilesProps) => {
                     <Settings lecture={lecture} assignment={assignment} selectedDir={selectedDir}/>
                   }/>
 
-      <CardContent>
+      <CardContent sx={{height: '270px', width: '300px', overflowY: "auto"}}>
         <Tabs variant='fullWidth' value={selectedDir} onChange={(e, dir) => setSelectedDir(dir)}>
           <Tab label="Source" value="source"/>
           <Tab label="Release" value="release"/>
@@ -161,15 +130,6 @@ export const Files = (props: FilesProps) => {
         >
           <GetAppRoundedIcon fontSize="small" sx={{mr: 1}}/>
           Pull
-        </Button>
-        <Button
-          sx={{mt: -1}}
-          onClick={() => handleReleaseAssignment()}
-          variant="outlined"
-          size="small"
-        >
-          <NewReleasesRoundedIcon fontSize="small" sx={{mr: 1}}/>
-          Release
         </Button>
       </CardActions>
       <AgreeDialog open={showDialog} {...dialogContent} />
