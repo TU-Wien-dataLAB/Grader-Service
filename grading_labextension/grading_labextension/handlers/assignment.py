@@ -34,6 +34,7 @@ class AssignmentBaseHandler(ExtensionBaseHandler):
             self.write_error(e.code)
             return
 
+        # Create directories for every assignment
         try:
             dirs = set(filter(lambda e: e[0] != ".", os.listdir(os.path.expanduser(f'{self.root_dir}/{lecture["code"]}'))))
             for assignment in response:
@@ -194,3 +195,28 @@ class AssignmentObjectHandler(ExtensionBaseHandler):
         self.log.warn(f'Deleting directory {self.root_dir}/{lecture["code"]}/{assignment["name"]}')
         shutil.rmtree(os.path.expanduser(f'{self.root_dir}/{lecture["code"]}/{assignment["name"]}'), ignore_errors=True)
         self.write("OK")
+
+
+@register_handler(
+    path=r"\/lectures\/(?P<lecture_id>\d*)\/assignments\/(?P<assignment_id>\d*)\/coursedata\/?"
+)
+class AssignmentCourseDataHandler(ExtensionBaseHandler):
+    async def get(self, lecture_id: int, assignment_id: int):
+        try:
+            response = await self.request_service.request(
+                method="GET",
+                endpoint=f"{self.base_url}/lectures/{lecture_id}/assignments/",
+                header=self.grader_authentication_header,
+            )
+
+            lecture = await self.request_service.request(
+                "GET",
+                f"{self.base_url}/lectures/{lecture_id}",
+                header=self.grader_authentication_header,
+            )
+        except HTTPError as e:
+            self.set_status(e.code)
+            self.write_error(e.code)
+            return
+        
+        self.write(json.dumps(response))
