@@ -142,12 +142,9 @@ class LectureStudentsHandler(GraderBaseHandler):
     async def get(self, lecture_id: int):
 
         roles = self.session.query(Role).filter(Role.lectid == lecture_id).all()
-        students = [r for r in roles if r.role == Scope.student]
-        students_count = len(students)
-        tutors = [r for r in roles if r.role == Scope.tutor]
-        tutors_count = len(tutors)
-        instructors = [r for r in roles if r.role == Scope.instructor]
-        instructors_count = len(instructors)
+        students = [r.username for r in roles if r.role == Scope.student]
+        tutors = [r.username for r in roles if r.role == Scope.tutor]
+        instructors = [r.username for r in roles if r.role == Scope.instructor]
 
-        counts = {"instructors": instructors_count, "tutors": tutors_count, "students": students_count }
+        counts = {"instructors": instructors, "tutors": tutors, "students": students }
         self.write_json(counts)
