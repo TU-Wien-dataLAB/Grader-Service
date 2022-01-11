@@ -11,7 +11,7 @@ from ..orm.takepart import Role, Scope
 from ..registry import VersionSpecifier, register_handler
 from sqlalchemy.sql.expression import func
 from tornado.web import HTTPError
-from convert.grader_convert.gradebook.models import GradeBookModel
+from grader_convert.gradebook.models import GradeBookModel
 
 from .base_handler import GraderBaseHandler, authorize
 

@@ -47,7 +47,3 @@ export function pullAssignment(lectureId: number, assignmentId: number, repoType
   return request<void>(HTTPMethod.GET, `/lectures/${lectureId}/assignments/${assignmentId}/pull/${repoType}`)
 }
 
-//TODO: create Datapackage model to replace any
-export function getAssignmentCourseData(lecture: Lecture, assignment: Assignment) : Promise<any> {
-  return request<any>(HTTPMethod.GET, `/lectures/${lecture.id}/assignments/${assignment.id}/coursedata`);
-}

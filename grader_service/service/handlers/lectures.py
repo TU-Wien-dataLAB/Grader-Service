@@ -134,7 +134,7 @@ class LectureObjectHandler(GraderBaseHandler):
         self.write("OK")
 
 @register_handler(
-    path=r"\/lectures\/(?P<lecture_id>\d*)\/students\/?",
+    path=r"\/lectures\/(?P<lecture_id>\d*)\/users\/?",
     version_specifier=VersionSpecifier.ALL,
 )
 class LectureStudentsHandler(GraderBaseHandler):

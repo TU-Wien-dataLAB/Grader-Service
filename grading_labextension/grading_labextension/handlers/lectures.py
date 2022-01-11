@@ -109,14 +109,14 @@ class LectureObjectHandler(ExtensionBaseHandler):
         self.write("OK")
 
 @register_handler(
-    path=r"\/lectures\/(?P<lecture_id>\d*)\/students\/?"
+    path=r"\/lectures\/(?P<lecture_id>\d*)\/users\/?"
 )
 class LectureStudentsHandler(ExtensionBaseHandler):
     async def get(self, lecture_id: int):
         try:
             response = await self.request_service.request(
                 method="GET",
-                endpoint=f"{self.base_url}/lectures/{lecture_id}/students/",
+                endpoint=f"{self.base_url}/lectures/{lecture_id}/users/",
                 header=self.grader_authentication_header,
             )
         except HTTPError as e:

@@ -23,5 +23,5 @@ export function deleteLecture(lectureId: number): void {
 
 //TODO: create Datapackage model to replace any
 export function getStudents(lecture: Lecture) : Promise<any> {
-  return request<any>(HTTPMethod.GET, `/lectures/${lecture.id}/students`);
+  return request<any>(HTTPMethod.GET, `/lectures/${lecture.id}/users`);
 }
