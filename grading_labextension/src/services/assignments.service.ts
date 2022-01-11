@@ -1,4 +1,5 @@
 import { Assignment } from '../model/assignment';
+import { Lecture } from '../model/lecture';
 import { request, HTTPMethod } from './request.service'
 
 export function createAssignment(lectureId: number, assignment: Assignment): Promise<Assignment> {
@@ -44,4 +45,9 @@ export function pushAssignment(lectureId: number, assignmentId: number, repoType
 
 export function pullAssignment(lectureId: number, assignmentId: number, repoType: string): Promise<void> {
   return request<void>(HTTPMethod.GET, `/lectures/${lectureId}/assignments/${assignmentId}/pull/${repoType}`)
+}
+
+//TODO: create Datapackage model to replace any
+export function getAssignmentCourseData(lecture: Lecture, assignment: Assignment) : Promise<any> {
+  return request<any>(HTTPMethod.GET, `/lectures/${lecture.id}/assignments/${assignment.id}/coursedata`);
 }
