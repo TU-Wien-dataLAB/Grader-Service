@@ -3,11 +3,11 @@ import * as React from 'react';
 import {Assignment} from '../../model/assignment';
 import {Lecture} from '../../model/lecture';
 import {utcToLocalFormat} from '../../services/datetime.service';
-import { Box, Button, FormControl, InputLabel, MenuItem } from '@mui/material';
+import {Box, Button, FormControl, InputLabel, MenuItem} from '@mui/material';
 import Select, {SelectChangeEvent} from '@mui/material/Select';
 import {getAllSubmissions} from '../../services/submissions.service';
 import {AgreeDialog} from './dialog';
-import MuiAlert from '@mui/material/Alert';
+import NavigateNextIcon from '@mui/icons-material/NavigateNext';
 import {ModalTitle} from "../util/modal-title";
 import {User} from "../../model/user";
 import {Submission} from "../../model/submission";
@@ -156,6 +156,12 @@ export const GradingComponent = (props: IGradingProps) => {
     return null;
   }
 
+  const allManualGraded = (selection: IRowValues[]) => {
+    return selection.reduce((acc, cur) => {
+      return cur.manual_status === "manually_graded" && acc
+    }, true);
+  }
+
   return (
     <div>
       <ModalTitle title="Grading"/>
@@ -173,7 +179,6 @@ export const GradingComponent = (props: IGradingProps) => {
                 selectedIDs.has(row.id)
               );
               setSelectedRows(selectedRowData);
-
             }}
           />
         </div>
@@ -199,14 +204,29 @@ export const GradingComponent = (props: IGradingProps) => {
         onClick={handleAutogradeSubmissions}>
         {`Autograde ${selectedRows.length} selected`}
       </Button>
+        <NavigateNextIcon
+          color={(selectedRows.length === 1 && selectedRows[0]?.auto_status !== "automatically_graded")
+            ? "error" : (selectedRows.length !== 1 || selectedRows[0]?.auto_status !== "automatically_graded")
+              ? "disabled" : "primary"}
+          sx={{mb: -1}}/>
       <Button
-        disabled={selectedRows.length !== 1}
+        disabled={(selectedRows.length !== 1 || selectedRows[0]?.auto_status !== "automatically_graded")}
         sx={{m: 3}}
         onClick={() => setDisplayManualGrading(true)}
         variant='outlined'>
-        {`Manualgrade ${selectedRows.length} selected`}
+        {`Manualgrade selected`}
       </Button>
-      <Button sx={{m: 3}} variant='outlined'>Generate Feedback of selected</Button>
+        <NavigateNextIcon
+          color={selectedRows.length === 0 ?
+          "disabled" : allManualGraded(selectedRows)
+            ? "primary" : "error"}
+          sx={{mb: -1}}/>
+      <Button
+        disabled={selectedRows.length === 0 || !allManualGraded(selectedRows)}
+        sx={{m: 3}}
+        variant='outlined'>
+        {`Generate Feedback for ${selectedRows.length} selected`}
+      </Button>
       </span>
 
       <LoadingOverlay
