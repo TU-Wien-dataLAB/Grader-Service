@@ -23,6 +23,7 @@ import {Lecture} from "../../../model/lecture";
 export interface IAssignmentStatusProps {
   lecture: Lecture;
   assignment: Assignment;
+  onAssignmentChange: (assignment: Assignment) => void;
   showAlert: (severity: string, msg: string) => void;
 }
 
@@ -115,6 +116,7 @@ export const AssignmentStatus = (props: IAssignmentStatusProps) => {
               a.status = 'released';
               a = await updateAssignment(props.lecture.id, a);
               setAssignment(a);
+              props.onAssignmentChange(a);
               props.showAlert('success', 'Successfully Released Assignment');
             } catch (err) {
               props.showAlert('error', 'Error Releasing Assignment');
@@ -139,6 +141,7 @@ export const AssignmentStatus = (props: IAssignmentStatusProps) => {
           a.status = 'complete';
           a = await updateAssignment(props.lecture.id, a);
           setAssignment(a);
+          props.onAssignmentChange(a);
           props.showAlert('success', 'Successfully Updated Assignment');
         } catch (err) {
           props.showAlert('error', 'Error Updating Assignment');

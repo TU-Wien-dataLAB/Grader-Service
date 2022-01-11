@@ -24,6 +24,9 @@ export const AssignmentFileView = (props: IAssignmentFileViewProps) => {
   const [assignment, setAssignment] = React.useState(props.assignment);
   const lecture = props.lecture;
 
+  const onAssignmentChange = (assignment: Assignment) => {
+    setAssignment(assignment)
+  }
 
   return (
     <Box>
@@ -36,10 +39,11 @@ export const AssignmentFileView = (props: IAssignmentFileViewProps) => {
 
         <OverviewCard assignment={assignment} allSubmissions={props.allSubmissions}/>
 
-        <AssignmentStatus lecture={props.lecture} assignment={assignment} showAlert={props.showAlert}/>
+        <AssignmentStatus lecture={props.lecture} assignment={assignment}
+                          onAssignmentChange={onAssignmentChange} showAlert={props.showAlert}/>
 
         <Files lecture={lecture} assignment={assignment}
-               onGitAction={async () => setAssignment(await getAssignment(props.lecture.id, assignment))}
+               onAssignmentChange={onAssignmentChange}
                showAlert={props.showAlert}
         />
 

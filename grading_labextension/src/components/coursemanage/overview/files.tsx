@@ -1,7 +1,7 @@
 import * as React from 'react';
 import {Assignment} from '../../../model/assignment';
 import {Lecture} from '../../../model/lecture';
-import {pullAssignment, pushAssignment, updateAssignment} from '../../../services/assignments.service';
+import {getAssignment, pullAssignment, pushAssignment, updateAssignment} from '../../../services/assignments.service';
 import PublishRoundedIcon from '@mui/icons-material/PublishRounded';
 import GetAppRoundedIcon from '@mui/icons-material/GetAppRounded';
 import NewReleasesRoundedIcon from '@mui/icons-material/NewReleasesRounded';
@@ -27,7 +27,7 @@ import {Settings} from './settings-menu';
 export interface FilesProps {
   lecture: Lecture;
   assignment: Assignment;
-  onGitAction: () => void;
+  onAssignmentChange: (assignment: Assignment) => void;
   showAlert: (severity: string, msg: string) => void;
 }
 
@@ -63,7 +63,7 @@ export const Files = (props: FilesProps) => {
           assignment => {
             setAssignment(assignment);
             props.showAlert('success', 'Successfully Pushed Assignment');
-            props.onGitAction();
+            props.onAssignmentChange(assignment);
           },
           error => props.showAlert('error', 'Error Updating Assignment')
         );
@@ -82,7 +82,6 @@ export const Files = (props: FilesProps) => {
         try {
           await pullAssignment(lecture.id, assignment.id, 'source');
           props.showAlert('success', 'Successfully Pulled Assignment');
-          props.onGitAction();
         } catch (err) {
           props.showAlert('error', 'Error Pulling Assignment');
         }
@@ -109,6 +108,7 @@ export const Files = (props: FilesProps) => {
               a.status = 'released';
               a = await updateAssignment(lecture.id, a);
               setAssignment(a);
+              props.onAssignmentChange(a);
               props.showAlert('success', 'Successfully Released Assignment');
             } catch (err) {
               props.showAlert('error', 'Error Releasing Assignment');
