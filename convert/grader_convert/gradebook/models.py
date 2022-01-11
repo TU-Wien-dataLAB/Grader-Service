@@ -145,7 +145,7 @@ class GradedMixin:
 @dataclass
 class GradeCell(BaseCell, GradedMixin):
     @classmethod
-    def from_dict(cls: Type["BaseCell"], d: dict) -> Type["BaseCell"]:
+    def from_dict(cls: Type["BaseCell"], d: dict) -> "GradeCell":
         return GradeCell(
             max_score=d["max_score"],
             cell_type=d["cell_type"],
@@ -160,7 +160,7 @@ class GradeCell(BaseCell, GradedMixin):
 @dataclass
 class SolutionCell(BaseCell):
     @classmethod
-    def from_dict(cls: Type["BaseCell"], d: dict) -> Type["BaseCell"]:
+    def from_dict(cls: Type["BaseCell"], d: dict) -> "SolutionCell":
         return SolutionCell(
             id=d["id"],
             notebook_id=d["notebook_id"],
@@ -173,7 +173,7 @@ class SolutionCell(BaseCell):
 @dataclass
 class TaskCell(BaseCell, GradedMixin):
     @classmethod
-    def from_dict(cls: Type["BaseCell"], d: dict) -> Type["BaseCell"]:
+    def from_dict(cls: Type["BaseCell"], d: dict) -> "TaskCell":
         return TaskCell(
             max_score=d["max_score"],
             cell_type="code",  # cell_type from GradedMixin should always be 'code'
@@ -250,13 +250,7 @@ class Notebook(BaseModel, IDMixin, NameMixin):
 
     @property
     def score(self) -> float:
-        return sum(
-            [
-                self.grades_dict[g.grade_id].score
-                for g in self.graded_cells
-                if g is not None and g.grade_id is not None
-            ]
-        )
+        return sum([gr.score for gr in self.grades_dict.values()])
 
     @property
     def code_score(self) -> float:
@@ -293,15 +287,15 @@ class Notebook(BaseModel, IDMixin, NameMixin):
         return any([g.failed_tests for g in self.grades])
 
     @property
-    def grades(self) -> List[Grade]:
+    def grades(self) -> List[Type[Grade]]:
         return list(self.grades_dict.values())
 
     @property
-    def comments(self) -> List[Comment]:
+    def comments(self) -> List[Type[Comment]]:
         return list(self.comments_dict.values())
 
     @classmethod
-    def from_dict(cls: Type["Notebook"], d: dict) -> Type["Notebook"]:
+    def from_dict(cls: Type["Notebook"], d: dict) -> "Notebook":
         gc = {id: GradeCell.from_dict(v) for id, v in d["grade_cells_dict"].items()}
         sc = {i: SolutionCell.from_dict(v) for i, v in d["solution_cells_dict"].items()}
         tc = {id: TaskCell.from_dict(v) for id, v in d["task_cells_dict"].items()}
@@ -348,6 +342,13 @@ class Notebook(BaseModel, IDMixin, NameMixin):
 @dataclass
 class GradeBookModel(BaseModel):
     notebooks: Dict[str, Notebook]
+
+    @property
+    def score(self) -> float:
+        score = 0
+        for nb in self.notebooks.values():
+            score += nb.score
+        return score
 
     @property
     def notebook_id_set(self) -> Set[Notebook]:
