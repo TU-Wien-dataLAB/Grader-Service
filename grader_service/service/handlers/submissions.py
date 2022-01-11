@@ -1,3 +1,5 @@
+import json
+
 from .handler_utils import parse_ids
 from ..orm.user import User
 import tornado
@@ -9,6 +11,7 @@ from ..orm.takepart import Role, Scope
 from ..registry import VersionSpecifier, register_handler
 from sqlalchemy.sql.expression import func
 from tornado.web import HTTPError
+from convert.grader_convert.gradebook.models import GradeBookModel
 
 from .base_handler import GraderBaseHandler, authorize
 
@@ -262,6 +265,8 @@ class SubmissionPropertiesHandler(GraderBaseHandler):
             self.error_message = "Not Found!"
             raise HTTPError(404)
         properties_string: str = self.request.body.decode("utf-8")
+        score = GradeBookModel.from_dict(json.loads(properties_string)).score
+        submission.score = score
         submission.properties = properties_string
         self.session.commit()
         self.write_json(submission)
