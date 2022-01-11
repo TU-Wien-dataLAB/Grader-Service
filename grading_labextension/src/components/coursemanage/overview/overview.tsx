@@ -10,6 +10,7 @@ import {Box} from '@mui/material';
 import {Files} from './files';
 import {GitLog} from "./git-log";
 import {getAssignment} from "../../../services/assignments.service";
+import {AssignmentStatus} from "./assignment-status";
 
 export interface IAssignmentFileViewProps {
   assignment: Assignment;
@@ -34,6 +35,8 @@ export const AssignmentFileView = (props: IAssignmentFileViewProps) => {
       <Box className='flexbox-panel' sx={{ml: 3, mr: 3, mb: 3, mt: 9}}>
 
         <OverviewCard assignment={assignment} allSubmissions={props.allSubmissions}/>
+
+        <AssignmentStatus lecture={props.lecture} assignment={assignment} showAlert={props.showAlert}/>
 
         <Files lecture={lecture} assignment={assignment}
                onGitAction={async () => setAssignment(await getAssignment(props.lecture.id, assignment))}
