@@ -1,4 +1,4 @@
-import tornado
+import tornado, json
 from ..api.models.assignment import Assignment as AssignmentModel
 from ..orm.assignment import Assignment
 from ..orm.base import DeleteState
@@ -8,6 +8,8 @@ from sqlalchemy.orm.exc import ObjectDeletedError
 from sqlalchemy.exc import IntegrityError
 from tornado.web import HTTPError
 from .handler_utils import parse_ids
+from ..orm.user import User
+
 
 from ..handlers.base_handler import GraderBaseHandler, authorize
 
@@ -273,6 +275,19 @@ class AssignmentCourseDataHandler(GraderBaseHandler):
             raise HTTPError(404)
         
         students_of_assignment = self.session.query(Role).filter(Role.role == Scope.student,Role.lectid == lecture_id).all()
+        students_of_assignment = [s.username for s in students_of_assignment]
 
-        dataobject = {"assignment": assignment, "students": students_of_assignment}
+        user_map = {}
+        submissions = assignment.submissions
+        for sub in submissions:
+                if sub.username in user_map:
+                    user_map[sub.username]["submissions"].append(sub)
+                else:
+                    u = User()
+                    u.name = sub.username
+                    user_map[sub.username] = {"user": u, "submissions": [sub]} 
+        
+        user_map = list(user_map.values())
+
+        dataobject = {"assignment": assignment, "students": students_of_assignment, "student_submissions":user_map}
         self.write_json(dataobject)
