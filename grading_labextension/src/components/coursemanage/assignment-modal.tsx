@@ -30,7 +30,7 @@ export const AssignmentModalComponent = (props: IAssignmentModalProps) => {
 
     return (
         <Box>
-            <Box sx={{ position: "absolute", bottom:58,top:0,left:0,right:0, overflow:'scroll'}}>
+            <Box sx={{ position: "absolute", bottom:58,top:0,left:0,right:0, overflowY: "auto"}}>
             {navigation == 0 && <AssignmentFileView lecture={props.lecture}
               assignment={props.assignment}
               allSubmissions={props.allSubmissions}
