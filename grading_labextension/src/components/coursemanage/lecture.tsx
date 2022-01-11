@@ -26,6 +26,7 @@ import { getLecture } from '../../services/lectures.service';
 interface ILectureComponentProps {
   lecture: Lecture;
   root: HTMLElement;
+  showAlert: (severity: string, msg: string) => void;
 }
 
 export const LectureComponent = (props: ILectureComponentProps) => {
@@ -78,6 +79,7 @@ export const LectureComponent = (props: ILectureComponentProps) => {
                   lecture={lecture}
                   assignment={el}
                   root={props.root}
+                  showAlert={props.showAlert}
                 />
               ))}
             </Box>

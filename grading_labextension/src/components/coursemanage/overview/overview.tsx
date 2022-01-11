@@ -16,6 +16,7 @@ export interface IAssignmentFileViewProps {
   lecture: Lecture;
   allSubmissions: any[];
   latest_submissions: any;
+  showAlert: (severity: string, msg: string) => void;
 }
 
 export const AssignmentFileView = (props: IAssignmentFileViewProps) => {
@@ -35,7 +36,9 @@ export const AssignmentFileView = (props: IAssignmentFileViewProps) => {
         <OverviewCard assignment={assignment} allSubmissions={props.allSubmissions}/>
 
         <Files lecture={lecture} assignment={assignment}
-               onGitAction={async () => setAssignment(await getAssignment(props.lecture.id, assignment))}/>
+               onGitAction={async () => setAssignment(await getAssignment(props.lecture.id, assignment))}
+               showAlert={props.showAlert}
+        />
 
         <GitLog lecture={lecture} assignment={assignment}/>
 

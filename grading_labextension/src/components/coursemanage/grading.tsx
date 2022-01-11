@@ -3,7 +3,7 @@ import * as React from 'react';
 import {Assignment} from '../../model/assignment';
 import {Lecture} from '../../model/lecture';
 import {utcToLocalFormat} from '../../services/datetime.service';
-import {AlertProps, Box, Button, FormControl, InputLabel, MenuItem, Portal, Snackbar, Typography} from '@mui/material';
+import { Box, Button, FormControl, InputLabel, MenuItem } from '@mui/material';
 import Select, {SelectChangeEvent} from '@mui/material/Select';
 import {getAllSubmissions} from '../../services/submissions.service';
 import {AgreeDialog} from './dialog';
@@ -22,6 +22,7 @@ export interface IGradingProps {
   assignment: Assignment;
   latest_submissions: { user: User, submissions: Submission[] }[];
   root: HTMLElement;
+  showAlert: (severity: string, msg: string) => void;
 }
 
 interface IRowValues {
@@ -35,10 +36,6 @@ interface IRowValues {
 
 export const GradingComponent = (props: IGradingProps) => {
   const [option, setOption] = React.useState('latest');
-  //TODO: We have redundant code with AgreeDialog, maybe there is a way to put all states in a different component for example
-  const [alert, setAlert] = React.useState(false);
-  const [severity, setSeverity] = React.useState('success');
-  const [alertMessage, setAlertMessage] = React.useState('');
   const [showDialog, setShowDialog] = React.useState(false);
   const [dialogContent, setDialogContent] = React.useState({
     title: '',
@@ -50,12 +47,6 @@ export const GradingComponent = (props: IGradingProps) => {
   const [displayManualGrading, setDisplayManualGrading] = React.useState(false);
   const onManualGradingClose = async () => {
     setDisplayManualGrading(false);
-  };
-
-  const showAlert = (severity: string, msg: string) => {
-    setSeverity(severity);
-    setAlertMessage(msg);
-    setAlert(true);
   };
 
   const handleAutogradeSubmissions = async () => {
@@ -71,11 +62,11 @@ export const GradingComponent = (props: IGradingProps) => {
           }));
           getAllSubmissions(props.lecture, props.assignment, false, true).then(response => {
             setRows(generateRows(response));
-            showAlert('success', `Grading ${numSubs} Submissions`);
+            props.showAlert('success', `Grading ${numSubs} Submissions`);
           })
         } catch (err) {
           console.error(err);
-          showAlert('error', 'Error Autograding Submissions');
+          props.showAlert('error', 'Error Autograding Submissions');
         }
         closeDialog();
       },
@@ -86,15 +77,6 @@ export const GradingComponent = (props: IGradingProps) => {
 
   const closeDialog = () => setShowDialog(false);
 
-  const handleAlertClose = (
-    event?: React.SyntheticEvent | Event,
-    reason?: string
-  ) => {
-    if (reason === 'clickaway') {
-      return;
-    }
-    setAlert(false);
-  };
 
   const generateRows = (submissions: { user: User, submissions: Submission[] }[]) => {
     console.log("Submissions");
@@ -239,23 +221,6 @@ export const GradingComponent = (props: IGradingProps) => {
 
       {/* Dialog */}
       <AgreeDialog open={showDialog} {...dialogContent} />
-      <Portal container={document.body}>
-        <Snackbar
-          open={alert}
-          autoHideDuration={3000}
-          onClose={handleAlertClose}
-          sx={{mb: 2, ml: 2}}
-        >
-          <MuiAlert
-            onClose={handleAlertClose}
-            severity={severity as AlertProps['severity']}
-            sx={{width: '100%'}}
-          >
-            {alertMessage}
-          </MuiAlert>
-        </Snackbar>
-      </Portal>
-
     </div>
   );
 };

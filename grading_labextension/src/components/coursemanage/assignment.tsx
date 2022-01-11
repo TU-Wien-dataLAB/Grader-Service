@@ -30,6 +30,7 @@ interface IAssignmentComponentProps {
   lecture: Lecture;
   assignment: Assignment;
   root: HTMLElement;
+  showAlert: (severity: string, msg: string) => void;
 }
 
 export const AssignmentComponent = (props: IAssignmentComponentProps) => {
@@ -153,6 +154,7 @@ export const AssignmentComponent = (props: IAssignmentComponentProps) => {
           allSubmissions={allSubmissions}
           latestSubmissions={latestSubmissions}
           root={props.root}
+          showAlert={props.showAlert}
         />
       </LoadingOverlay>
     </Box>
