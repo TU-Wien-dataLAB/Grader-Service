@@ -7,6 +7,7 @@ import {HTTPMethod, request} from "./request.service";
 import {Lecture} from "../model/lecture";
 
 export const getFiles = async (path: string): Promise<IModel[]> => {
+  if (path === null) return [];
   const model = new FilterFileBrowserModel({
     auto: true,
     manager: GlobalObjects.docManager

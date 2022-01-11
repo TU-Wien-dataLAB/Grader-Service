@@ -218,8 +218,8 @@ export const GradingComponent = (props: IGradingProps) => {
       </Button>
         <NavigateNextIcon
           color={selectedRows.length === 0 ?
-          "disabled" : allManualGraded(selectedRows)
-            ? "primary" : "error"}
+            "disabled" : allManualGraded(selectedRows)
+              ? "primary" : "error"}
           sx={{mb: -1}}/>
       <Button
         disabled={selectedRows.length === 0 || !allManualGraded(selectedRows)}
@@ -236,7 +236,7 @@ export const GradingComponent = (props: IGradingProps) => {
         transition="zoom"
       >
         <ManualGrading lecture={props.lecture} assignment={props.assignment}
-                       submission={getSubmissionFromRow(selectedRows[0])}/>
+                       submission={getSubmissionFromRow(selectedRows[0])} username={selectedRows[0]?.name}/>
       </LoadingOverlay>
 
       {/* Dialog */}
