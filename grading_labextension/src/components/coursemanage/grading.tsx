@@ -11,7 +11,7 @@ import NavigateNextIcon from '@mui/icons-material/NavigateNext';
 import {ModalTitle} from "../util/modal-title";
 import {User} from "../../model/user";
 import {Submission} from "../../model/submission";
-import {autogradeSubmission} from "../../services/grading.service";
+import {autogradeSubmission, generateFeedback} from "../../services/grading.service";
 import LoadingOverlay from "../util/overlay";
 import {getAssignment} from "../../services/assignments.service";
 import {ManualGrading} from "./manual-grading";
@@ -52,7 +52,7 @@ export const GradingComponent = (props: IGradingProps) => {
   const handleAutogradeSubmissions = async () => {
     setDialogContent({
       title: 'Autograde Selected Submissions',
-      message: ``,
+      message: `Do you wish to autograde the seleceted submissions?`,
       handleAgree: async () => {
         try {
           const numSubs = selectedRows.length
@@ -67,6 +67,32 @@ export const GradingComponent = (props: IGradingProps) => {
         } catch (err) {
           console.error(err);
           props.showAlert('error', 'Error Autograding Submissions');
+        }
+        closeDialog();
+      },
+      handleDisagree: () => closeDialog()
+    });
+    setShowDialog(true);
+  };
+
+  const handleGenerateFeedback = async () => {
+    setDialogContent({
+      title: 'Generate Feedback',
+      message: `Do you wish to generate Feedback of the selected submissions?`,
+      handleAgree: async () => {
+        try {
+          const numSubs = selectedRows.length
+          await Promise.all(selectedRows.map(async (row) => {
+            await generateFeedback(props.lecture.id, props.assignment.id, row.id)
+            console.log("Autograded submission");
+          }));
+          getAllSubmissions(props.lecture, props.assignment, false, true).then(response => {
+            setRows(generateRows(response));
+            props.showAlert('success', `Generating Feedback for ${numSubs} Submissions`);
+          })
+        } catch (err) {
+          console.error(err);
+          props.showAlert('error', 'Error Generating Feedback');
         }
         closeDialog();
       },
@@ -224,6 +250,7 @@ export const GradingComponent = (props: IGradingProps) => {
       <Button
         disabled={selectedRows.length === 0 || !allManualGraded(selectedRows)}
         sx={{m: 3}}
+        onClick={handleGenerateFeedback}
         variant='outlined'>
         {`Generate Feedback for ${selectedRows.length} selected`}
       </Button>
