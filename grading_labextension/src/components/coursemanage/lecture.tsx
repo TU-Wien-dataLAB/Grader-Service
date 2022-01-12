@@ -21,7 +21,7 @@ import { Lecture } from '../../model/lecture';
 import { getAllAssignments } from '../../services/assignments.service';
 import { AssignmentComponent } from './assignment';
 import { CreateDialog, EditLectureDialog } from './dialog';
-import { getLecture } from '../../services/lectures.service';
+import { getLecture, getUsers } from '../../services/lectures.service';
 
 interface ILectureComponentProps {
   lecture: Lecture;
@@ -33,10 +33,15 @@ export const LectureComponent = (props: ILectureComponentProps) => {
   const [lecture, setLecture] = React.useState(props.lecture);
   const [assignments, setAssignments] = React.useState(null);
   const [expanded, setExpanded] = React.useState(false);
+  const [users, setUsers] = React.useState(null);
 
   React.useEffect(() => {
     getAllAssignments(lecture.id).then(response => {
       setAssignments(response);
+    });
+
+    getUsers(lecture).then(response => { 
+      setUsers(response) 
     });
   }, []);
 
@@ -79,6 +84,7 @@ export const LectureComponent = (props: ILectureComponentProps) => {
                   lecture={lecture}
                   assignment={el}
                   root={props.root}
+                  users={users}
                   showAlert={props.showAlert}
                 />
               ))}

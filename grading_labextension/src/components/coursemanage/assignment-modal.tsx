@@ -11,7 +11,7 @@ import {Assignment} from '../../model/assignment';
 import {Lecture} from '../../model/lecture';
 import {getAllSubmissions} from '../../services/submissions.service';
 import {GradingComponent} from './grading';
-import {AssignmentFileView} from './overview/overview';
+import {OverviewComponent} from './overview/overview';
 import {Submission} from '../../model/submission';
 import {User} from "../../model/user";
 
@@ -21,6 +21,7 @@ export interface IAssignmentModalProps {
   allSubmissions: any[];
   latestSubmissions: { user: User, submissions: Submission[] }[];
   root: HTMLElement;
+  users: any;
   showAlert: (severity: string, msg: string) => void;
 }
 
@@ -32,11 +33,12 @@ export const AssignmentModalComponent = (props: IAssignmentModalProps) => {
   return (
     <Box>
       <Box sx={{position: "absolute", bottom: 58, top: 0, left: 0, right: 0, overflowY: "auto"}}>
-        {navigation == 0 && <AssignmentFileView lecture={props.lecture}
+        {navigation == 0 && <OverviewComponent lecture={props.lecture}
                                                 assignment={props.assignment}
                                                 allSubmissions={props.allSubmissions}
                                                 latest_submissions={latestSubmissions}
                                                 showAlert={props.showAlert}
+                                                users={props.users}
         />}
 
         {navigation == 1 && <GradingComponent lecture={props.lecture}

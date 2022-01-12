@@ -12,15 +12,16 @@ import {GitLog} from "./git-log";
 import {getAssignment} from "../../../services/assignments.service";
 import {AssignmentStatus} from "./assignment-status";
 
-export interface IAssignmentFileViewProps {
+export interface IOverviewProps {
   assignment: Assignment;
   lecture: Lecture;
   allSubmissions: any[];
   latest_submissions: any;
+  users: any;
   showAlert: (severity: string, msg: string) => void;
 }
 
-export const AssignmentFileView = (props: IAssignmentFileViewProps) => {
+export const OverviewComponent = (props: IOverviewProps) => {
   const [assignment, setAssignment] = React.useState(props.assignment);
   const lecture = props.lecture;
 
@@ -49,9 +50,9 @@ export const AssignmentFileView = (props: IAssignmentFileViewProps) => {
 
         <GitLog lecture={lecture} assignment={assignment}/>
 
-        <SubmittedChart lecture={lecture} assignment={assignment} allSubmissions={props.allSubmissions}/>
+        <SubmittedChart lecture={lecture} assignment={assignment} allSubmissions={props.allSubmissions} users={props.users}/>
 
-        <GradingChart lecture={lecture} assignment={assignment} allSubmissions={props.allSubmissions}/>
+        <GradingChart lecture={lecture} assignment={assignment} allSubmissions={props.allSubmissions} users={props.users}/>
 
       </Box>
     </Box>
