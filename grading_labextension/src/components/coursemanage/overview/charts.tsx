@@ -88,24 +88,9 @@ export const GradingChart = (props : ChartsProps) => {
 export const SubmittedChart = (props : ChartsProps) => {
 
     const generateSubmittedData = (submissions : any) => {
-        const data = [0,0,0];
-        //TODO: data can be screwed because tutors and instructors can submit too
-
-
-        let i: number = 0; 
-        let j: number = 0;
-        submissions.forEach((e: { submissions: any[]; }) => {
-            if(e.submissions.length == 1) {
-                i++;
-            } else {
-                j++;
-            }
-        });
-        data[0] = props.users.students.length -i -j
-        console.log("students: "+props.users.students);
-        data[1] = i;
-        data[2] = j;
-        console.log(data);
+        const data = [0,0];
+        data[0] = props.users.students.length+props.users.instructors.length+props.users.tutors.length;
+        data[1] = submissions.length;
         return data;
         }
     
@@ -114,7 +99,7 @@ export const SubmittedChart = (props : ChartsProps) => {
 
 
     const submittedDataProps = {
-        labels: ['Has not submitted yet', 'Submitted at least once', 'Submitted more than once'],
+        labels: ['Has not submitted yet', 'Submitted at least once'],
         datasets: [
           {
             label: 'User Submission Status',
@@ -122,12 +107,10 @@ export const SubmittedChart = (props : ChartsProps) => {
             backgroundColor: [
               'rgba(255, 99, 132, 0.2)',
               'rgba(54, 162, 235, 0.2)',
-              'rgba(75, 192, 192, 0.2)',
             ],
             borderColor: [
               'rgba(255, 99, 132, 1)',
               'rgba(54, 162, 235, 1)',
-              'rgba(75, 192, 192, 1)',
             ],
             borderWidth: 1,
           },

@@ -61,7 +61,7 @@ export const FilesList = (props: IFileListProps) => {
 
   return (
     <Paper elevation={0} sx={props.sx}>
-      <Card sx={{ mt: 1 }} variant="outlined">
+      <Card sx={{ mt: 1, height: '80%' }} variant="outlined">
         {files.length === 0
           ? <Typography variant={'body1'} sx={{ml: 1}}>No Files Found</Typography>
           : <List dense={false}>{generateItems(files)}</List>

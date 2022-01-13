@@ -106,7 +106,7 @@ export const Files = (props: FilesProps) => {
           <Tab label="Source" value="source"/>
           <Tab label="Release" value="release"/>
         </Tabs>
-        <Box height={214} overflow={'scroll'}>
+        <Box height={214} sx={{overflowY: 'auto'}}>
           <FilesList
             path={`${selectedDir}/${props.lecture.code}/${props.assignment.name}`}
           />
