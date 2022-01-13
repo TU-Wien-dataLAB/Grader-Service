@@ -38,7 +38,7 @@ export const OverviewComponent = (props: IOverviewProps) => {
       </ModalTitle>
       <Box className='flexbox-panel' sx={{ml: 3, mr: 3, mb: 3, mt: 9}}>
 
-        <OverviewCard assignment={assignment} allSubmissions={props.allSubmissions}/>
+        <OverviewCard assignment={assignment} allSubmissions={props.allSubmissions} users={props.users}/>
 
         <AssignmentStatus lecture={props.lecture} assignment={assignment}
                           onAssignmentChange={onAssignmentChange} showAlert={props.showAlert}/>
