@@ -23,15 +23,11 @@ import CloudDoneRoundedIcon from "@mui/icons-material/CloudDoneRounded";
 
 interface ISubmissionListProps {
   submissions: Submission[];
+  openFeedback: (s: Submission) => void;
   sx?: SxProps<Theme>;
 }
 
 export const SubmissionList = (props: ISubmissionListProps) => {
-
-  const openFeedback = async (submission: Submission) => {
-    console.log('Opening Feedback for Submission: ' + submission.id);
-
-  };
 
   // generateItems will be fed using the IIterator from the FilterFileBrowserModel
   const generateItems = (submissions: Submission[]) => {
@@ -40,7 +36,7 @@ export const SubmissionList = (props: ISubmissionListProps) => {
         <ListItem disablePadding
                   secondaryAction={
                     value.feedback_available
-                      ? <IconButton edge="end" aria-label="delete" onClick={() => openFeedback(value)}>
+                      ? <IconButton edge="end" aria-label="delete" onClick={() => props.openFeedback(value)}>
                         <ChatRoundedIcon/>
                       </IconButton>
                       : null

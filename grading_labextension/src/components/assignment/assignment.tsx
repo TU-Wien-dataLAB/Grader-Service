@@ -126,6 +126,7 @@ export const AssignmentComponent = (props: IAssignmentComponentProps) => {
           lecture={props.lecture}
           assignment={assignment}
           submissions={submissions}
+          root={props.root}
           showAlert={props.showAlert}
         />
       </LoadingOverlay>

@@ -12,17 +12,22 @@ import MuiAlert from "@mui/material/Alert";
 import {SubmissionList} from "./submission-list";
 import {pullAssignment} from "../../services/assignments.service";
 import {getAllSubmissions, getSubmissions, submitAssignment} from "../../services/submissions.service";
+import LoadingOverlay from "../util/overlay";
+import {Feedback} from "./feedback";
 
 export interface IAssignmentModalProps {
   lecture: Lecture;
   assignment: Assignment;
   submissions: Submission[];
+  root: HTMLElement;
   showAlert: (severity: string, msg: string) => void;
 }
 
 export const AssignmentModalComponent = (props: IAssignmentModalProps) => {
   const [submissions, setSubmissions] = React.useState(props.submissions);
   const [path, setPath] = React.useState(`${props.lecture.code}/${props.assignment.name}`);
+  const [showFeedback, setShowFeedback] = React.useState(false);
+  const [feedbackSubmission, setFeedbackSubmission] = React.useState(null);
 
   const fetchAssignmentHandler = async (repo: "user" | "release") => {
     try {
@@ -46,6 +51,11 @@ export const AssignmentModalComponent = (props: IAssignmentModalProps) => {
     } catch (e) {
       props.showAlert('error', 'Error Updating Submissions');
     }
+  }
+
+  const openFeedback = (submission: Submission) => {
+    setFeedbackSubmission(submission);
+    setShowFeedback(true);
   }
 
   return (
@@ -74,11 +84,12 @@ export const AssignmentModalComponent = (props: IAssignmentModalProps) => {
           />
         </Stack>
         <Typography variant={'h6'} sx={{ml: 2, mt: 3}}>Submissions</Typography>
-        <SubmissionList submissions={submissions} sx={{m: 2, mt: 1}}/>
+        <SubmissionList submissions={submissions} openFeedback={openFeedback} sx={{m: 2, mt: 1}}/>
 
       </Box>
-      <Portal container={document.body}>
-      </Portal>
+      <LoadingOverlay onClose={() => setShowFeedback(false)} open={showFeedback} container={props.root}>
+        <Feedback lecture={props.lecture} assignment={props.assignment} submission={feedbackSubmission}/>
+      </LoadingOverlay>
     </div>
   );
 };
