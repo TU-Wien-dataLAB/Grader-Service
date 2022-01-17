@@ -14,7 +14,7 @@ import { request, HTTPMethod } from "./request.service";
     return request<void>(HTTPMethod.GET,`/lectures/${lecture.id}/assignments/${assignment.id}/grading/${submission.id}/pull/feedback`)
   }
 
-  export function getSubmissions(lecture: Lecture, assignment : Assignment, latest: boolean = false): Promise<any> {
+  export function getSubmissions(lecture: Lecture, assignment : Assignment, latest: boolean = false): Promise<Submission[]> {
     let url = `/lectures/${lecture.id}/assignments/${assignment.id}/submissions`;
     if (latest) {
       let searchParams = new URLSearchParams({
@@ -25,7 +25,7 @@ import { request, HTTPMethod } from "./request.service";
     return request<any>(HTTPMethod.GET, url);
   }
 
-  export function getAllSubmissions(lecture: Lecture, assignment : Assignment, latest: boolean = false, instructor: boolean = true): Promise<{user: User, submissions: Submission[]}[]> {
+  export function getAllSubmissions(lecture: Lecture, assignment : Assignment, latest: boolean = false, instructor: boolean = true): Promise<Submission[]> {
     let url = `/lectures/${lecture.id}/assignments/${assignment.id}/submissions`;
 
     if (latest || instructor) {
@@ -35,7 +35,7 @@ import { request, HTTPMethod } from "./request.service";
       })
       url += '?' + searchParams;
     }
-    return request<{user: User, submissions: Submission[]}[]>(HTTPMethod.GET, url)
+    return request<Submission[]>(HTTPMethod.GET, url)
 
   }
 

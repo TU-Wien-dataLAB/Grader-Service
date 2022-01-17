@@ -54,12 +54,10 @@ export const AssignmentComponent = (props: IAssignmentComponentProps) => {
         setAllSubmissions(response);
         let auto = 0;
         let manual = 0;
-        for (const userSubmission of response) {
-          for (const submission of userSubmission.submissions) {
+          for (const submission of response) {
             if (submission.auto_status === "automatically_graded") auto++;
             if (submission.manual_status === "manually_graded") manual++;
           }
-        }
         setNumAutoGraded(auto);
         setNumManualGraded(manual);
       })
