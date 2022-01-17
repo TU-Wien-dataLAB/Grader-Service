@@ -1,6 +1,8 @@
 import { Card, CardContent, CardHeader, Chip, Typography } from '@mui/material';
 import * as React from 'react';
 import { Assignment } from '../../../model/assignment';
+import { utcToLocalFormat } from '../../../services/datetime.service';
+import { DeadlineComponent } from '../../util/deadline';
 
 export interface OverviewCardProps {
     assignment: Assignment;
@@ -15,19 +17,22 @@ export const OverviewCard = (props: OverviewCardProps) => {
         <Card elevation={3} className="flexbox-item">
             <CardHeader title="Overview"/>
             <CardContent sx={{alignItems:{xs: 'center'}}}>
-                <Typography variant='body1'>Students: 
+                <Typography variant='body1'>Deadline 
+                    <Chip color={'primary'} variant='outlined' label={utcToLocalFormat(props.assignment.due_date)}/>
+                </Typography>
+                <Typography variant='body1'>Students 
                     <Chip color={'primary'} variant='outlined' label={props.users.students.length}/>
                 </Typography>
 
-                <Typography variant='body1'>Tutors: 
+                <Typography variant='body1'>Tutors
                     <Chip color={'primary'} variant='outlined' label={props.users.tutors.length}/>
                 </Typography>
 
-                <Typography variant='body1'>Instructors: 
+                <Typography variant='body1'>Instructors 
                     <Chip color={'primary'} variant='outlined' label={props.users.instructors.length}/>
                 </Typography>
 
-                <Typography variant='body1'>Users that submitted the assignment: 
+                <Typography variant='body1'>Users that submitted the assignment
                     <Chip color={'primary'} variant='outlined' label={props.allSubmissions.length}/>
                 </Typography>
 
