@@ -40,8 +40,8 @@ class LocalAutogradeExecutor(LoggingConfigurable):
     """Runs an autograde job on the local machine with the default Python environment. 
     Sets up the necessary directories and the gradebook JSON file used by :mod:`grader_convert`.
     """    
-    base_input_path = Unicode(None, allow_none=False).tag(config=True)
-    base_output_path = Unicode(None, allow_none=False).tag(config=True)
+    base_input_path = Unicode(os.getenv("GRADER_AUTOGRADE_IN_PATH"), allow_none=False).tag(config=True)
+    base_output_path = Unicode(os.getenv("GRADER_AUTOGRADE_OUT_PATH"), allow_none=False).tag(config=True)
 
     convert_executable = Unicode("grader-convert", allow_none=False).tag(config=True)
     git_executable = Unicode("git", allow_none=False).tag(config=True)

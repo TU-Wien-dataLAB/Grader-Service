@@ -10,15 +10,15 @@ from traitlets.traitlets import Int, Unicode
 class DataBaseManager(SingletonConfigurable):
 
     # database URLs: dialect+driver://username:password@host:port/database
-    db_dialect = Unicode("sqlite").tag(config=True)
-    db_driver = Unicode(None, allow_none=True).tag(config=True)
-    db_username = Unicode(None, allow_none=True).tag(config=True)
+    db_dialect = Unicode(os.getenv("GRADER_DB_DIALECT", "sqlite"), allow_none=False).tag(config=True)
+    db_driver = Unicode(os.getenv("GRADER_DB_DRIVER"), allow_none=True).tag(config=True)
+    db_username = Unicode(os.getenv("GRADER_DB_USERNAME"), allow_none=True).tag(config=True)
     db_password = Unicode(os.environ.get("GRADER_DB_PASSWORD"), allow_none=True).tag(
         config=True
     )
-    db_host = Unicode("").tag(config=True)
-    db_port = Int(None, allow_none=True).tag(config=True)
-    db_path = Unicode("").tag(config=True)
+    db_host = Unicode(os.getenv("GRADER_DB_HOST"), allow_none=False).tag(config=True)
+    db_port = Int(os.getenv("GRADER_DB_PORT"), allow_none=True).tag(config=True)
+    db_path = Unicode(os.getenv("GRADER_DB_URL_PATH", "")).tag(config=True)
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)

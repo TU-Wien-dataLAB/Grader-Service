@@ -36,6 +36,12 @@ def sql_alchemy_db(db_test_config):
 def app(tmpdir, sql_alchemy_db):
     service_dir = str(tmpdir.mkdir("grader_service"))
     handlers = HandlerPathRegistry.handler_list()
+    GraderServer.hub_service_name = ""
+    GraderServer.hub_api_token = ""
+    GraderServer.hub_api_url = ""
+    GraderServer.hub_base_url = ""
+    GraderServer.hub_service_prefix = ""
+    GraderServer.hub_service_url = ""
     application = GraderServer(
         grader_service_dir=service_dir,
         handlers=handlers,

@@ -2,7 +2,7 @@ import json
 import os
 import shutil
 from subprocess import CalledProcessError
-from .local import LocalAutogradeExecutor, rm_error
+from .local_grader import LocalAutogradeExecutor, rm_error
 from grader_convert.gradebook.models import GradeBookModel
 from ..orm.assignment import Assignment
 from ..orm.group import Group

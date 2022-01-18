@@ -10,13 +10,13 @@ class GraderServer(config.LoggingConfigurable, web.Application):
     hub_service_name = Unicode(os.environ.get("JUPYTERHUB_SERVICE_NAME", "")).tag(
         config=True
     )
-    hub_api_token = Unicode(os.environ.get("JUPYTERHUB_API_TOKEN", "")).tag(config=True)
-    hub_api_url = Unicode(os.environ.get("JUPYTERHUB_API_URL", "")).tag(config=True)
-    hub_base_url = Unicode(os.environ.get("JUPYTERHUB_BASE_URL", "")).tag(config=True)
-    hub_service_prefix = Unicode(os.environ.get("JUPYTERHUB_SERVICE_PREFIX", "")).tag(
+    hub_api_token = Unicode(os.environ.get("JUPYTERHUB_API_TOKEN"), allow_none=False).tag(config=True)
+    hub_api_url = Unicode(os.environ.get("JUPYTERHUB_API_URL"), allow_none=False).tag(config=True)
+    hub_base_url = Unicode(os.environ.get("JUPYTERHUB_BASE_URL"), allow_none=False).tag(config=True)
+    hub_service_prefix = Unicode(os.environ.get("JUPYTERHUB_SERVICE_PREFIX"), allow_none=False).tag(
         config=True
     )
-    hub_service_url = Unicode(os.environ.get("JUPYTERHUB_SERVICE_URL", "")).tag(
+    hub_service_url = Unicode(os.environ.get("JUPYTERHUB_SERVICE_URL"), allow_none=False).tag(
         config=True
     )
 

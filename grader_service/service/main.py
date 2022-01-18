@@ -14,7 +14,7 @@ from traitlets.traitlets import Enum, Int, TraitError, Unicode, observe, validat
 
 # run __init__.py to register handlers
 import service.handlers
-from service.autograding.local import LocalAutogradeExecutor
+from service.autograding.local_grader import LocalAutogradeExecutor
 from service.persistence.database import DataBaseManager
 from service.registry import HandlerPathRegistry
 from service.server import GraderServer
@@ -37,12 +37,12 @@ class GraderService(config.Application):
       grader-service -f /etc/grader/grader_service_config.py
   """
 
-    service_host = Unicode("0.0.0.0", help="The host address of the service").tag(
+    service_host = Unicode(os.getenv("GRADER_SERVICE_HOST", "0.0.0.0"), help="The host address of the service").tag(
         config=True
     )
-    service_port = Int(4010, help="The port the service runs on").tag(config=True)
+    service_port = Int(os.getenv("GRADER_SERVICE_PORT", 4010), help="The port the service runs on").tag(config=True)
 
-    grader_service_dir = Unicode(None, allow_none=False).tag(config=True)
+    grader_service_dir = Unicode(os.getenv("GRADER_SERVICE_DIRECTORY"), allow_none=False).tag(config=True)
 
     config_file = Unicode(
         "grader_service_config.py", help="The config file to load"

@@ -9,11 +9,12 @@ from tornado.httpclient import HTTPClientError
 from datetime import timezone
 from .db_util import insert_submission
 from unittest.mock import AsyncMock, MagicMock, Mock, patch
-from service.autograding.local import LocalAutogradeExecutor
-from service.autograding.feedback import GenerateFeedbackExecutor
+from service.autograding.local_grader import LocalAutogradeExecutor
+from service.autograding.local_feedback import GenerateFeedbackExecutor
 
 # Imports are important otherwise they will not be found
 from .tornado_test_utils import *
+from ...autograding.grader_executor import GraderExecutor
 
 
 async def test_auto_grading(
@@ -131,14 +132,15 @@ async def test_feedback(
     insert_submission(engine, a_id, default_user["name"])
 
     with patch.object(GenerateFeedbackExecutor, "start", return_value=None) as start_mock:
-        response = await http_server_client.fetch(
-            url, method="GET", headers={"Authorization": f"Token {default_token}"}
-        )
-        assert response.code == 200
-        submission = Submission.from_dict(json.loads(response.body.decode()))
-        assert submission.id == 1
+        with patch.object(GraderExecutor, "submit", return_value=None) as submit_mock:
+            response = await http_server_client.fetch(
+                url, method="GET", headers={"Authorization": f"Token {default_token}"}
+            )
+            assert response.code == 200
+            submission = Submission.from_dict(json.loads(response.body.decode()))
+            assert submission.id == 1
 
-    start_mock.assert_called()
+    submit_mock.assert_called()
 
 
 async def test_feedback_wrong_assignment(

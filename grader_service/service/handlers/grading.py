@@ -1,8 +1,8 @@
 from typing import Any
 
-from ..autograding.feedback import GenerateFeedbackExecutor
+from ..autograding.local_feedback import GenerateFeedbackExecutor
 from ..autograding.grader_executor import GraderExecutor
-from ..autograding.local import LocalAutogradeExecutor
+from ..autograding.local_grader import LocalAutogradeExecutor
 from .handler_utils import parse_ids
 from ..orm.submission import Submission
 from ..orm.takepart import Scope

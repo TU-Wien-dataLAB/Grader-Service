@@ -42,16 +42,10 @@ async def test_get_submissions(
     assert response.code == 200
     submissions = json.loads(response.body.decode())
     assert isinstance(submissions, list)
-    assert len(submissions) == 1
-    user_submissions = submissions[0]
-    user = User.from_dict(user_submissions["user"])
-    assert user.name == default_user["name"]
-
-    submissions_list = user_submissions["submissions"]
-    assert isinstance(submissions_list, list)
-    assert len(submissions_list) == 2
-    assert all([isinstance(s, dict) for s in submissions_list])
-    [Submission.from_dict(s) for s in submissions_list]
+    assert len(submissions) == 2
+    assert submissions[0]["username"] == "ubuntu"
+    assert submissions[1]["username"] == "ubuntu"
+    Submission.from_dict(submissions[0])
 
 
 async def test_get_submissions_latest(
@@ -83,13 +77,10 @@ async def test_get_submissions_latest(
     submissions = json.loads(response.body.decode())
     assert isinstance(submissions, list)
     assert len(submissions) == 1
-    user_submissions = submissions[0]
-    user = User.from_dict(user_submissions["user"])
-    assert user.name == default_user["name"]
+    assert submissions[0]["username"] == "ubuntu"
 
-    submissions_list = user_submissions["submissions"]
+    submissions_list = submissions
     assert isinstance(submissions_list, list)
-    assert len(submissions_list) == 1
     assert isinstance(submissions_list[0], dict)
     Submission.from_dict(submissions_list[0])
 
@@ -124,33 +115,30 @@ async def test_get_submissions_instructor_version(
     assert response.code == 200
     submissions = json.loads(response.body.decode())
     assert isinstance(submissions, list)
-    assert len(submissions) == 2
-    # Submissions of first user
-    user_submission = submissions[0]
+    assert len(submissions) == 4
+    user_submission = submissions[0:2]
 
     possible_users = {default_user["name"], "user1"}
-    user = User.from_dict(user_submission["user"])
-    assert user.name in possible_users
-    possible_users.remove(user.name)
+    user_name = submissions[0]["username"]
+    assert user_name in possible_users
+    possible_users.remove(user_name)
 
-    submissions_list = user_submission["submissions"]
-    assert isinstance(submissions_list, list)
-    assert len(submissions_list) == 2
-    assert all([isinstance(s, dict) for s in submissions_list])
-    [Submission.from_dict(s) for s in submissions_list]
+    assert isinstance(user_submission, list)
+    assert len(user_submission) == 2
+    assert all([isinstance(s, dict) for s in user_submission])
+    [Submission.from_dict(s) for s in user_submission]
 
-    user_submission = submissions[1]
+    user_submission = submissions[2:4]
 
-    user = User.from_dict(user_submission["user"])
-    assert user.name in possible_users
-    possible_users.remove(user.name)
+    user_name = user_submission[0]["username"]
+    assert user_name in possible_users
+    possible_users.remove(user_name)
     assert len(possible_users) == 0
 
-    submissions_list = user_submission["submissions"]
-    assert isinstance(submissions_list, list)
-    assert len(submissions_list) == 2
-    assert all([isinstance(s, dict) for s in submissions_list])
-    [Submission.from_dict(s) for s in submissions_list]
+    assert isinstance(user_submission, list)
+    assert len(user_submission) == 2
+    assert all([isinstance(s, dict) for s in user_submission])
+    [Submission.from_dict(s) for s in user_submission]
 
 
 async def test_get_submissions_instructor_version_unauthorized(
@@ -214,31 +202,29 @@ async def test_get_submissions_latest_instructor_version(
     assert isinstance(submissions, list)
     assert len(submissions) == 2
     # Submissions of first user
-    user_submission = submissions[0]
+    user_submission = submissions[0:1]
 
     possible_users = {default_user["name"], "user1"}
-    user = User.from_dict(user_submission["user"])
-    assert user.name in possible_users
-    possible_users.remove(user.name)
+    user_name = user_submission[0]["username"]
+    assert user_name in possible_users
+    possible_users.remove(user_name)
 
-    submissions_list = user_submission["submissions"]
-    assert isinstance(submissions_list, list)
-    assert len(submissions_list) == 1
-    assert all([isinstance(s, dict) for s in submissions_list])
-    [Submission.from_dict(s) for s in submissions_list]
+    assert isinstance(user_submission, list)
+    assert len(user_submission) == 1
+    assert all([isinstance(s, dict) for s in user_submission])
+    [Submission.from_dict(s) for s in user_submission]
 
-    user_submission = submissions[1]
+    user_submission = submissions[1:2]
 
-    user = User.from_dict(user_submission["user"])
-    assert user.name in possible_users
-    possible_users.remove(user.name)
+    user_name = user_submission[0]["username"]
+    assert user_name in possible_users
+    possible_users.remove(user_name)
     assert len(possible_users) == 0
 
-    submissions_list = user_submission["submissions"]
-    assert isinstance(submissions_list, list)
-    assert len(submissions_list) == 1
-    assert all([isinstance(s, dict) for s in submissions_list])
-    [Submission.from_dict(s) for s in submissions_list]
+    assert isinstance(user_submission, list)
+    assert len(user_submission) == 1
+    assert all([isinstance(s, dict) for s in user_submission])
+    [Submission.from_dict(s) for s in user_submission]
 
 
 async def test_get_submissions_lecture_assignment_missmatch(
@@ -591,7 +577,7 @@ async def test_submission_properties(
     insert_assignments(engine, l_id)
     insert_submission(engine, a_id, default_user["name"])
 
-    prop = {"test": "property", "value": 2, "bool": True, "null": None}
+    prop = {"notebooks": {}}
     put_response = await http_server_client.fetch(
         url,
         method="PUT",

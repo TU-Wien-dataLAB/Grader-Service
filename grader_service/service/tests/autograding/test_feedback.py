@@ -5,7 +5,7 @@ from service.server import GraderServer
 import json
 from service.orm.submission import Submission
 from unittest.mock import AsyncMock, MagicMock, Mock, patch
-from service.autograding.feedback import GenerateFeedbackExecutor
+from service.autograding.local_feedback import GenerateFeedbackExecutor
 from sqlalchemy.engine.base import Engine
 from sqlalchemy.orm.session import Session
 

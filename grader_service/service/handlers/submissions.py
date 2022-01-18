@@ -256,7 +256,11 @@ class SubmissionPropertiesHandler(GraderBaseHandler):
             self.error_message = "Not Found!"
             raise HTTPError(404)
         properties_string: str = self.request.body.decode("utf-8")
-        score = GradeBookModel.from_dict(json.loads(properties_string)).score
+        try:
+            score = GradeBookModel.from_dict(json.loads(properties_string)).score
+        except:
+            self.error_message = "Cannot parse properties file!"
+            raise HTTPError(400)
         submission.score = score
         submission.properties = properties_string
         self.session.commit()
