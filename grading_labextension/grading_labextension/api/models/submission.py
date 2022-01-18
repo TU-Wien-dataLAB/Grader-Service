@@ -15,7 +15,7 @@ class Submission(Model):
     Do not edit the class manually.
     """
 
-    def __init__(self, id=None, submitted_at=None, auto_status=None, manual_status=None, score=None, commit_hash=None, feedback_available=None):  # noqa: E501
+    def __init__(self, id=None, submitted_at=None, auto_status=None, manual_status=None, username=None, score=None, commit_hash=None, feedback_available=None):  # noqa: E501
         """Submission - a model defined in OpenAPI
 
         :param id: The id of this Submission.  # noqa: E501
@@ -26,6 +26,8 @@ class Submission(Model):
         :type auto_status: str
         :param manual_status: The manual_status of this Submission.  # noqa: E501
         :type manual_status: str
+        :param username: The username of this Submission.  # noqa: E501
+        :type username: str
         :param score: The score of this Submission.  # noqa: E501
         :type score: float
         :param commit_hash: The commit_hash of this Submission.  # noqa: E501
@@ -38,6 +40,7 @@ class Submission(Model):
             'submitted_at': datetime,
             'auto_status': str,
             'manual_status': str,
+            'username': str,
             'score': float,
             'commit_hash': str,
             'feedback_available': bool
@@ -48,6 +51,7 @@ class Submission(Model):
             'submitted_at': 'submitted_at',
             'auto_status': 'auto_status',
             'manual_status': 'manual_status',
+            'username': 'username',
             'score': 'score',
             'commit_hash': 'commit_hash',
             'feedback_available': 'feedback_available'
@@ -57,6 +61,7 @@ class Submission(Model):
         self._submitted_at = submitted_at
         self._auto_status = auto_status
         self._manual_status = manual_status
+        self._username = username
         self._score = score
         self._commit_hash = commit_hash
         self._feedback_available = feedback_available
@@ -167,6 +172,27 @@ class Submission(Model):
             )
 
         self._manual_status = manual_status
+
+    @property
+    def username(self):
+        """Gets the username of this Submission.
+
+
+        :return: The username of this Submission.
+        :rtype: str
+        """
+        return self._username
+
+    @username.setter
+    def username(self, username):
+        """Sets the username of this Submission.
+
+
+        :param username: The username of this Submission.
+        :type username: str
+        """
+
+        self._username = username
 
     @property
     def score(self):
