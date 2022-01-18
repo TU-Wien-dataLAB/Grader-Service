@@ -47,7 +47,7 @@ export const AssignmentModalComponent = (props: IAssignmentModalProps) => {
     }
     try {
       const submissions = await getAllSubmissions(props.lecture, props.assignment, false, false);
-      setSubmissions(submissions[0].submissions)
+      setSubmissions(submissions)
     } catch (e) {
       props.showAlert('error', 'Error Updating Submissions');
     }

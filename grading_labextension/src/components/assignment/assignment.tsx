@@ -43,7 +43,7 @@ export const AssignmentComponent = (props: IAssignmentComponentProps) => {
   React.useEffect(() => {
     getAllSubmissions(props.lecture, assignment, false, false).then(
       response => {
-        setSubmissions(response[0].submissions);
+        setSubmissions(response);
         setHasFeedback(submissions.reduce(
           (accum: boolean, curr: Submission) =>
             accum || curr.feedback_available,
@@ -60,7 +60,7 @@ export const AssignmentComponent = (props: IAssignmentComponentProps) => {
     setDisplayAssignment(false);
     setAssignment(await getAssignment(props.lecture.id, assignment));
     const submissions = await getAllSubmissions(props.lecture, assignment, false, false);
-    setSubmissions(submissions[0].submissions);
+    setSubmissions(submissions);
   };
 
   return (

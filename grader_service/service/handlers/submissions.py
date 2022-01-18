@@ -96,17 +96,6 @@ class SubmissionHandler(GraderBaseHandler):
                 submissions = [tuple_to_submission(t) for t in submissions]
             else:
                 submissions = assignment.submissions
-            user_map = {}
-            sub: Submission
-            for sub in submissions:
-                if sub.username in user_map:
-                    user_map[sub.username]["submissions"].append(sub)
-                else:
-                    # sub.user is none because submission was created in tuple_to_submission (without database conn.)
-                    u = User()
-                    u.name = sub.username
-                    user_map[sub.username] = {"user": u, "submissions": [sub]}
-            response = list(user_map.values())
         else:
             if latest:
                 submissions = (
@@ -130,16 +119,18 @@ class SubmissionHandler(GraderBaseHandler):
                 )
                 submissions = [tuple_to_submission(t) for t in submissions]
             else:
-                submissions = role.user.submissions
-            response = [
-                {
-                    "user": role.user,
-                    "submissions": [
-                        s for s in submissions if s.assignid == int(assignment_id)
-                    ],
-                }
-            ]
-        self.write_json(response)
+                submissions = (
+                    self.session.query(
+                        Submission
+                    )
+                    .filter(
+                        Submission.assignid == assignment_id,
+                        Submission.username == role.username,
+                    )
+                    .all()
+                )
+            
+        self.write_json(submissions)
 
 
 @register_handler(

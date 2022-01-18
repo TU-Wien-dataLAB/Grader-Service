@@ -19,7 +19,7 @@ export interface IAssignmentModalProps {
   lecture: Lecture;
   assignment: Assignment;
   allSubmissions: any[];
-  latestSubmissions: { user: User, submissions: Submission[] }[];
+  latestSubmissions: Submission[];
   root: HTMLElement;
   users: any;
   showAlert: (severity: string, msg: string) => void;
