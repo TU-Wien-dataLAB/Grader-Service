@@ -93,7 +93,7 @@ export const AssignmentComponent = (props: IAssignmentComponentProps) => {
             <Divider sx={{mt: 1, mb: 1}}/>
 
             <Typography sx={{fontSize: 15, mt: 0.5, ml: 0.5}}>
-              {latestSubmissions.length}
+              {allSubmissions.length}
               <Typography
                 color="text.secondary"
                 sx={{
@@ -102,13 +102,13 @@ export const AssignmentComponent = (props: IAssignmentComponentProps) => {
                   fontSize: 13
                 }}
               >
-                {'Submission' + (latestSubmissions.length === 1 ? '' : 's')}
+                {'Submission' + (allSubmissions.length === 1 ? '' : 's')}
               </Typography>
             </Typography>
             <Typography sx={{fontSize: 15, mt: 0.5, ml: 0.5}}>
               {numAutoGraded}
               <Typography sx={{fontSize: 10, ml: 0, display: "inline-block"}}>
-                {'/' + latestSubmissions.length}
+                {'/' + allSubmissions.length}
               </Typography>
               <Typography
                 color="text.secondary"
@@ -124,7 +124,7 @@ export const AssignmentComponent = (props: IAssignmentComponentProps) => {
             <Typography sx={{fontSize: 15, mt: 0.5, ml: 0.5}}>
               {numManualGraded}
               <Typography sx={{fontSize: 10, ml: 0, display: "inline-block"}}>
-                {'/' + latestSubmissions.length}
+                {'/' + allSubmissions.length}
               </Typography>
               <Typography
                 color="text.secondary"

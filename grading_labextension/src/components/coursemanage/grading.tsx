@@ -1,9 +1,9 @@
-import { DataGrid } from '@mui/x-data-grid';
+import { DataGrid, GridRenderCellParams } from '@mui/x-data-grid';
 import * as React from 'react';
 import { Assignment } from '../../model/assignment';
 import { Lecture } from '../../model/lecture';
 import { utcToLocalFormat } from '../../services/datetime.service';
-import { Box, Button, FormControl, InputLabel, MenuItem } from '@mui/material';
+import { Box, Button, Chip, FormControl, InputLabel, MenuItem } from '@mui/material';
 import Select, { SelectChangeEvent } from '@mui/material/Select';
 import { getAllSubmissions } from '../../services/submissions.service';
 import { AgreeDialog } from './dialog';
@@ -15,6 +15,7 @@ import { autogradeSubmission, generateFeedback } from "../../services/grading.se
 import LoadingOverlay from "../util/overlay";
 import { getAssignment } from "../../services/assignments.service";
 import { ManualGrading } from "./manual-grading";
+import { PanoramaSharp } from '@mui/icons-material';
 
 
 export interface IGradingProps {
@@ -31,6 +32,7 @@ interface IRowValues {
   date: string,
   auto_status: string,
   manual_status: string,
+  feedback_available: boolean,
   score: number
 }
 
@@ -117,6 +119,7 @@ export const GradingComponent = (props: IGradingProps) => {
         date: utcToLocalFormat(sub.submitted_at),
         auto_status: sub.auto_status,
         manual_status: sub.manual_status,
+        feedback_available: sub.feedback_available,
         score: sub.score
       });
     });
@@ -140,13 +143,39 @@ export const GradingComponent = (props: IGradingProps) => {
     })
   }, [option]);
 
+  const getColor = (value : string) => {
+    if(value === 'not_graded') {
+      return 'warning';
+    } else if(value === 'automatically_graded' || value === 'manually_graded') {
+      return 'success';
+    } else if(value === 'grading_failed') {
+      return 'error';
+    }
+    return 'primary'
+  }
+
 
   const columns = [
     { field: 'id', headerName: 'Id', width: 110 },
     { field: 'name', headerName: 'User', width: 130 },
     { field: 'date', headerName: 'Date', width: 170 },
-    { field: 'auto_status', headerName: 'Autograde-Status', width: 170 },
-    { field: 'manual_status', headerName: 'Manualgrade-Status', width: 170 },
+    { field: 'auto_status', headerName: 'Autograde-Status', width: 170,
+      renderCell: (params: GridRenderCellParams<string>) => (
+
+        <Chip variant='outlined' label={params.value} color={getColor(params.value)}/>
+      ), 
+    },
+    { field: 'manual_status', headerName: 'Manualgrade-Status', width: 170,
+      renderCell: (params: GridRenderCellParams<string>) => (
+
+        <Chip variant='outlined' label={params.value} color={getColor(params.value)}/>
+      ),
+    },
+    { field: 'feedback_available', headerName: 'Feedback generated', width: 170,
+      renderCell: (params: GridRenderCellParams<boolean>) => (
+        <Chip variant='outlined' label={params.value ? 'Generated' : 'Not Generated'} color={params.value ? 'success' : 'error'}/>
+      ),
+    },
     { field: 'score', headerName: 'Score', width: 130 }
   ];
 
