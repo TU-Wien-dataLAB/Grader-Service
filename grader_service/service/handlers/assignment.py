@@ -1,4 +1,4 @@
-import tornado, json
+import tornado
 from ..api.models.assignment import Assignment as AssignmentModel
 from ..orm.assignment import Assignment
 from ..orm.base import DeleteState
@@ -8,7 +8,6 @@ from sqlalchemy.orm.exc import ObjectDeletedError
 from sqlalchemy.exc import IntegrityError
 from tornado.web import HTTPError
 from .handler_utils import parse_ids
-from ..orm.user import User
 
 
 from ..handlers.base_handler import GraderBaseHandler, authorize

@@ -1,6 +1,7 @@
 from typing import Any
 
 from ..autograding.feedback import GenerateFeedbackExecutor
+from ..autograding.grader_executor import GraderExecutor
 from ..autograding.local import LocalAutogradeExecutor
 from .handler_utils import parse_ids
 from ..orm.submission import Submission
@@ -47,7 +48,10 @@ class GradingAutoHandler(GraderBaseHandler):
         executor = LocalAutogradeExecutor(
             self.application.grader_service_dir, submission, config=self.application.config
         )
-        IOLoop.current().spawn_callback(executor.start)
+        GraderExecutor.instance().submit(
+            executor.start,
+            lambda: self.log.info(f"Autograding of submission {submission.id} successful!")
+        )
         submission = self.session.query(Submission).get(sub_id)
         self.write_json(submission)
 
@@ -86,6 +90,9 @@ class GenerateFeedbackHandler(GraderBaseHandler):
         executor = GenerateFeedbackExecutor(
             self.application.grader_service_dir, submission, config=self.application.config
         )
-        IOLoop.current().spawn_callback(executor.start)
+        GraderExecutor.instance().submit(
+            executor.start,
+            lambda: self.log.info(f"Successfully generated feedback for submission {submission.id}!")
+        )
         submission = self.session.query(Submission).get(sub_id)
         self.write_json(submission)

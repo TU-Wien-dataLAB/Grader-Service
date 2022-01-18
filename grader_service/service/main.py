@@ -18,6 +18,7 @@ from service.autograding.local import LocalAutogradeExecutor
 from service.persistence.database import DataBaseManager
 from service.registry import HandlerPathRegistry
 from service.server import GraderServer
+from service.autograding.grader_executor import GraderExecutor
 
 
 class GraderService(config.Application):
@@ -151,8 +152,10 @@ class GraderService(config.Application):
         self.log.info("Starting Grader Service...")
         self.io_loop = tornado.ioloop.IOLoop.current()
 
-        # pass config to DataBaseManager
+        # pass config to DataBaseManager and GraderExecutor
         DataBaseManager.config = self.config
+        GraderExecutor.config = self.config
+
         handlers = HandlerPathRegistry.handler_list()
         # start the webserver
         self.http_server: HTTPServer = HTTPServer(
