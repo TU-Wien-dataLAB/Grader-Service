@@ -76,7 +76,7 @@ class Execute(NbGraderPreprocessor, ExecutePreprocessor):
             error_output = NotebookNode(output_type="error")
             error_output.ename = "CellTimeoutError"
             error_output.evalue = "CellTimeoutError"
-            error_output.traceback = "CellTimeoutError:\n" + e.args[0]
+            error_output.traceback = [e.args[0]]
             cell.outputs.append(error_output)
 
         return cell, resources
