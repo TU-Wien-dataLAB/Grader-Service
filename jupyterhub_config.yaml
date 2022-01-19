@@ -1,0 +1,5 @@
+hub:
+  services:
+    grader:
+      url: "http://grader-service:4010"
+      oauth_client_id: "grader"
