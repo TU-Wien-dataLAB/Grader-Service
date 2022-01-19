@@ -6,6 +6,6 @@ hub:
 singleuser:
   image:
     name: s210.dl.hpc.tuwien.ac.at/grader/grader-notebook-minimal
-    tag: latest
+    tag: arm
   extraEnv:
     GRADER_HOST_URL: "grader-service"

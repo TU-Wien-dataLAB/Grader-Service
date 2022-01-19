@@ -17,7 +17,8 @@ RUN apt-get update \
     rm -rf /var/lib/apt/lists/*
 
 # install dependencies
-RUN python3 -m pip install -r ./grader_service/requirements.txt && \
+RUN python3 -m pip install -r ./convert/requirements.txt && \
+    python3 -m pip install -r ./grader_service/requirements.txt && \
     python3 -m pip install -e ./convert/ && \
     python3 -m pip install -e ./grader_service/
 
