@@ -75,11 +75,10 @@ class Execute(NbGraderPreprocessor, ExecutePreprocessor):
         return cell, resources
 
     async def _async_handle_timeout(self, timeout: int, cell: t.Optional[NotebookNode] = None) -> None:
-        e = CellTimeoutError.error_from_timeout_and_cell("Cell execution timed out", timeout, cell)
         await super()._async_handle_timeout(timeout, cell)
 
         error_output = NotebookNode(output_type="error")
         error_output.ename = "CellTimeoutError"
         error_output.evalue = "CellTimeoutError"
-        error_output.traceback = [e.args[0]]
+        error_output.traceback = ["This cell timed out while it was being executed, after 5 seconds."]
         cell.outputs.append(error_output)
