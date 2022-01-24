@@ -1,6 +1,9 @@
+import typing as t
 from textwrap import dedent
 from typing import Any, Optional, Tuple
 
+from jupyter_client.utils import ensure_async, run_sync
+from nbclient import NotebookClient
 from nbclient.exceptions import CellTimeoutError
 from nbconvert.exporters.exporter import ResourcesDict
 from nbconvert.preprocessors import CellExecutionError, ExecutePreprocessor
@@ -15,7 +18,6 @@ class UnresponsiveKernelError(Exception):
 
 
 class Execute(NbGraderPreprocessor, ExecutePreprocessor):
-
     interrupt_on_timeout = Bool(True)
     allow_errors = Bool(True)
     raise_on_iopub_timeout = Bool(True)
@@ -42,7 +44,7 @@ class Execute(NbGraderPreprocessor, ExecutePreprocessor):
     ).tag(config=True)
 
     def preprocess(
-        self, nb: NotebookNode, resources: ResourcesDict, retries: Optional[Any] = None
+            self, nb: NotebookNode, resources: ResourcesDict, retries: Optional[Any] = None
     ) -> Tuple[NotebookNode, ResourcesDict]:
         # This gets added in by the parent execute preprocessor, so if it's already in our
         # extra arguments we need to delete it or traitlets will be unhappy.
@@ -66,17 +68,18 @@ class Execute(NbGraderPreprocessor, ExecutePreprocessor):
         """
         Need to override preprocess_cell to check reply for errors
         """
-        # Copied from nbconvert ExecutePreprocessor
         if cell.cell_type != "code" or not cell.source.strip():
             return cell, resources
 
-        try:
-            cell = self.execute_cell(cell, cell_index, store_history=True)
-        except CellTimeoutError as e:
-            error_output = NotebookNode(output_type="error")
-            error_output.ename = "CellTimeoutError"
-            error_output.evalue = "CellTimeoutError"
-            error_output.traceback = [e.args[0]]
-            cell.outputs.append(error_output)
-
+        cell = self.execute_cell(cell, cell_index, store_history=True)
         return cell, resources
+
+    async def _async_handle_timeout(self, timeout: int, cell: t.Optional[NotebookNode] = None) -> None:
+        e = CellTimeoutError.error_from_timeout_and_cell("Cell execution timed out", timeout, cell)
+        await super()._async_handle_timeout(timeout, cell)
+
+        error_output = NotebookNode(output_type="error")
+        error_output.ename = "CellTimeoutError"
+        error_output.evalue = "CellTimeoutError"
+        error_output.traceback = [e.args[0]]
+        cell.outputs.append(error_output)
