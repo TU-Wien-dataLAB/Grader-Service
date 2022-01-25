@@ -1,0 +1,21 @@
+sudo chmod 666 /var/run/docker.sock
+
+minikube start
+
+
+#tunneling in a diffrent terminal for the loadbalancer
+minikube tunnel
+
+#build base notebook
+docker build -t s210.dl.hpc.tuwien.ac.at/grader/grader-notebook-base:latest -f docker-stacks/base-notebook/Dockerfile .
+
+#push base notebook
+docker push s210.dl.hpc.tuwien.ac.at/grader/grader-notebook-base:latest
+
+#other notebooks can be built and pushed with the same commands
+
+#update the jupyterhub config
+helm upgrade --install jupyterhub jupyterhub/jupyterhub --values jupyterhub_config.yaml 
+
+#restart pod manually
+kubectl delete pod hub-*******
