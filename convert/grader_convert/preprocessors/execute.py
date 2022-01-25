@@ -80,5 +80,6 @@ class Execute(NbGraderPreprocessor, ExecutePreprocessor):
         error_output = NotebookNode(output_type="error")
         error_output.ename = "CellTimeoutError"
         error_output.evalue = "CellTimeoutError"
-        error_output.traceback = ["This cell timed out while it was being executed, after 5 seconds."]
+        error_output.traceback = [
+            f"CellTimeoutInterrupt: Cell execution timed out after maximum execution time of {self.timeout} seconds."]
         cell.outputs.append(error_output)
