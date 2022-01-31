@@ -19,3 +19,7 @@ helm upgrade --install jupyterhub jupyterhub/jupyterhub --values jupyterhub_conf
 
 #restart pod manually
 kubectl delete pod hub-*******
+
+#go into grader service
+kubectl exec -it grader-service-******* -- /bin/bash
+
