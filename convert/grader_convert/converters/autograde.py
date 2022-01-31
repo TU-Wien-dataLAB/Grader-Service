@@ -143,4 +143,5 @@ class AutogradeApp(ConverterApp):
             input_dir=self.input_directory,
             output_dir=self.output_directory,
             file_pattern=self.file_pattern,
+            config=self.config
         ).start()
