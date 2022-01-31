@@ -28,7 +28,7 @@ class HandlerPathRegistry(object, metaclass=Singleton):
 
     @staticmethod
     def handler_list(
-        base_url: str = "/services/grader",
+            base_url: str = "/services/grader"
     ) -> List[Tuple[str, RequestHandler]]:
         return list(
             zip(
@@ -65,7 +65,7 @@ class VersionSpecifier(enum.Enum):
 
 
 def register_handler(
-    path: str, version_specifier: VersionSpecifier = VersionSpecifier.NONE
+        path: str, version_specifier: VersionSpecifier = VersionSpecifier.NONE
 ):
     if version_specifier == VersionSpecifier.ALL:
         # only supports single digit versions

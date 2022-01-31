@@ -14,8 +14,6 @@ from kubernetes import config, client
 from ...orm import Lecture, Submission
 from ...orm import Assignment
 
-config.load_incluster_config()
-
 
 class GraderPod(LoggingConfigurable):
     poll_interval = Integer(default_value=1000, allow_none=False,
@@ -31,11 +29,11 @@ class GraderPod(LoggingConfigurable):
         self._polling_task = self.loop.create_task(self._poll_status())
 
     @property
-    def started(self) -> Future[bool]:
+    def started(self) -> Future:
         return self._started_future
 
     @property
-    def completed(self) -> Future[bool]:
+    def completed(self) -> Future:
         return self._completed_future
 
     def stop_polling(self) -> None:
@@ -59,7 +57,7 @@ class GraderPod(LoggingConfigurable):
             if status.phase == "Failed":
                 self.stop_polling()
             # continue for Unknown and Pending
-            await asyncio.sleep(self.poll_interval/1000)
+            await asyncio.sleep(self.poll_interval / 1000)
 
 
 def _get_image_name(lecture: Lecture, assignment: Assignment = None) -> str:
@@ -69,12 +67,19 @@ def _get_image_name(lecture: Lecture, assignment: Assignment = None) -> str:
 class KubeAutogradeExecutor(LocalAutogradeExecutor):
     image_config_path = Unicode(default_value=None, allow_none=True).tag(config=True)
     default_image_name = Callable(default_value=_get_image_name, allow_none=False).tag(config=True)
+    kube_context = Unicode(default_value=None, allow_none=True,
+                           help="Kubernetes context to load config from. " +
+                                "If the context is None (default), the incluster config will be used.").tag(config=True)
 
     def __init__(self, grader_service_dir: str, submission: Submission, **kwargs):
         super().__init__(grader_service_dir, submission, **kwargs)
         self.assignment = self.submission.assignment
         self.lecture = self.assignment.lecture
         self.client = CoreV1Api()
+        if self.kube_context is None:
+            config.load_incluster_config()
+        else:
+            config.load_kube_config(context=self.kube_context)
 
     def get_image(self) -> str:
         cfg = {}

@@ -6,8 +6,12 @@ import logging
 from typing import Any, Awaitable, Callable, List, Optional
 from urllib.parse import ParseResult, urlparse
 
+from traitlets import Type
+from traitlets.config import SingletonConfigurable
+
 from ..api.models.base_model_ import Model
 from ..api.models.error_message import ErrorMessage
+from ..autograding.local_grader import LocalAutogradeExecutor
 from ..orm.base import DeleteState, Serializable
 from ..orm.lecture import Lecture, LectureState
 from ..orm.takepart import Role, Scope
@@ -318,3 +322,12 @@ class VersionHandler(GraderBaseHandler):
 class VersionHandlerV1(GraderBaseHandler):
     async def get(self):
         self.write("1.0")
+
+
+# This class exists to not avoid all request handlers to inherit from traitlets.config.Configurable
+# and making all requests super slow. If a request handler needs configurable values, they can be accessed
+# from this object.
+class RequestHandlerConfig(SingletonConfigurable):
+    autograde_executor_class = Type(default_value=LocalAutogradeExecutor,
+                                    klass=object,  # TODO: why does using LocalAutogradeExecutor give subclass error?
+                                    allow_none=False).tag(config=True)
