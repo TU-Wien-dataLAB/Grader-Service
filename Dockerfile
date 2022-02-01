@@ -12,6 +12,7 @@ RUN apt-get update \
     && apt-get install -yq --no-install-recommends \
     python3 \
     python3-pip \
+    git \
     tini && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
@@ -47,4 +48,4 @@ ENV GRADER_AUTOGRADE_IN_PATH="/grader_service_dir/convert_in"
 ENV GRADER_AUTOGRADE_OUT_PATH="/grader_service_dir/convert_out"
 
 ENTRYPOINT ["tini", "-g", "--"]
-CMD [ "grader-service" ]
+CMD [ "grader-service", "-f", "/grader_service_dir/grader_service_config.py" ]
