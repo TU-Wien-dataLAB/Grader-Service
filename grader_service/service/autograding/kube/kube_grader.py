@@ -1,10 +1,10 @@
 import asyncio
 import json
-from asyncio import Future
+from asyncio import Future, Task
 from contextlib import contextmanager
 
-from kubernetes.client import V1Pod, CoreV1Api, V1ObjectMeta, V1PodStatus
-from traitlets import Callable, Unicode, Integer
+from kubernetes.client import V1Pod, CoreV1Api, V1ObjectMeta, V1PodStatus, ApiException
+from traitlets import Callable, Unicode, Integer, Dict, List
 from traitlets.config import LoggingConfigurable
 
 from .util import make_pod
@@ -24,39 +24,31 @@ class GraderPod(LoggingConfigurable):
         self.pod = pod
         self._client = api
         self.loop = asyncio.get_event_loop()
-        self._started_future: Future[bool] = Future(loop=self.loop)
-        self._completed_future: Future[bool] = Future(loop=self.loop)
         self._polling_task = self.loop.create_task(self._poll_status())
 
-    @property
-    def started(self) -> Future:
-        return self._started_future
-
-    @property
-    def completed(self) -> Future:
-        return self._completed_future
-
     def stop_polling(self) -> None:
-        if not self._started_future.done():
-            self._started_future.set_result(False)
-        if not self._completed_future.done():
-            self._completed_future.set_result(False)
         self._polling_task.cancel()
 
+    @property
+    def polling(self) -> Task:
+        return self._polling_task
+
+    @property
+    def name(self) -> str:
+        return self.pod.metadata.name
+
+    @property
+    def namespace(self) -> str:
+        return self.pod.metadata.namespace
+
     # https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle/#pod-phase
-    async def _poll_status(self):
+    async def _poll_status(self) -> str:
         meta: V1ObjectMeta = self.pod.metadata
         while True:
-            status: V1PodStatus = self._client.read_namespaced_pod_status(name=meta.name, namespace=meta.namespace)
-            if status.phase == "Running" and not self._started_future.done():
-                self._started_future.set_result(True)
-            if status.phase == "Succeeded" and not self._started_future.done():
-                if not self._started_future.done():
-                    self._started_future.set_result(True)
-                self._completed_future.set_result(True)
-            if status.phase == "Failed":
-                self.stop_polling()
-            # continue for Unknown and Pending
+            status: V1PodStatus = self._client.read_namespaced_pod_status(name=meta.name, namespace=meta.namespace).status
+            if status.phase == "Succeeded" or status.phase == "Failed":
+                return status.phase
+            # continue for Running, Unknown and Pending
             await asyncio.sleep(self.poll_interval / 1000)
 
 
@@ -70,16 +62,19 @@ class KubeAutogradeExecutor(LocalAutogradeExecutor):
     kube_context = Unicode(default_value=None, allow_none=True,
                            help="Kubernetes context to load config from. " +
                                 "If the context is None (default), the incluster config will be used.").tag(config=True)
+    volumes = List(default_value=[], allow_none=False).tag(config=True)
+    volume_mounts = List(default_value=[], allow_none=False).tag(config=True)
 
     def __init__(self, grader_service_dir: str, submission: Submission, **kwargs):
         super().__init__(grader_service_dir, submission, **kwargs)
         self.assignment = self.submission.assignment
         self.lecture = self.assignment.lecture
-        self.client = CoreV1Api()
+
         if self.kube_context is None:
             config.load_incluster_config()
         else:
             config.load_kube_config(context=self.kube_context)
+        self.client = CoreV1Api()
 
     def get_image(self) -> str:
         cfg = {}
@@ -98,25 +93,29 @@ class KubeAutogradeExecutor(LocalAutogradeExecutor):
     def start_pod(self) -> GraderPod:
         pod = make_pod(
             name=self.submission.commit_hash,
-            cmd=["/usr/bin/true"],
+            cmd=[self.convert_executable, "-i", self.input_path, "-o", self.output_path, "-p", "*.ipynb"],
             image=self.get_image(),
             image_pull_policy=None,
             working_dir="/",
-            volumes=None,
-            volume_mounts=None,
+            volumes=self.volumes,
+            volume_mounts=self.volume_mounts,
             labels=None,
             annotations=None,
             tolerations=None,
         )
-        self.client.create_namespaced_pod(namespace="default", body=pod)
+        pod = self.client.create_namespaced_pod(namespace="default", body=pod)
         return GraderPod(pod, self.client, config=self.config)
 
     async def _run(self):
-        grader_pod = self.start_pod()
-        success = await grader_pod.started
-        if success:
-            self.log.info("Pod has successfully started on the cluster!")
-        success = await grader_pod.completed
-        if success:
-            self.log.info("Pod has successfully completed execution!")
-        # TODO: cleanup
+        try:
+            grader_pod = self.start_pod()
+            status = await grader_pod.polling
+            if status == "Succeeded":
+                self.log.info("Pod has successfully completed execution!")
+            else:
+                self.log.info("Pod has failed execution!")
+            # cleanup
+            self.client.delete_namespaced_pod(name=grader_pod.name, namespace=grader_pod.namespace)
+        except ApiException as e:
+            error_message = json.loads(e.body)
+            self.log.error(f'{error_message["reason"]}: {error_message["message"]}')

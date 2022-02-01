@@ -5,6 +5,7 @@ import shutil
 import stat
 from dataclasses import dataclass
 from datetime import datetime
+from pathlib import Path
 from re import S
 from subprocess import PIPE, CalledProcessError
 
@@ -288,6 +289,8 @@ class LocalAutogradeExecutor(LoggingConfigurable):
         path: str = proposal["value"]
         if not os.path.isabs(path):
             raise TraitError("The path specified has to be absolute")
+        if not os.path.exists(path):
+            Path(path).mkdir(parents=True, exist_ok=True)
         if not os.path.isdir(path):
             raise TraitError("The path has to be an existing directory")
         return path

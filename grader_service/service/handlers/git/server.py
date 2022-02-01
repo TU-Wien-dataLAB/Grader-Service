@@ -19,8 +19,6 @@ from tornado.web import HTTPError, stream_request_body
 
 from service.server import GraderServer
 
-logger = logging.getLogger(__name__)
-
 
 class GitBaseHandler(GraderBaseHandler):
     def initialize(self):
@@ -193,6 +191,7 @@ class GitBaseHandler(GraderBaseHandler):
             os.mkdir(path)
             # this path has to be a git dir -> call git init
             try:
+                self.log.info("Running: git init --bare")
                 subprocess.run(["git", "init", "--bare", path], check=True)
             except subprocess.CalledProcessError:
                 return None
@@ -208,7 +207,7 @@ class GitBaseHandler(GraderBaseHandler):
         gitdir = self.gitlookup(rpc)
         if gitdir is None:
             raise HTTPError(404, "unable to find repository")
-        logger.info("Accessing git at: %s", gitdir)
+        self.log.info("Accessing git at: %s", gitdir)
 
         return gitdir
 
@@ -225,6 +224,7 @@ class RPCHandler(GitBaseHandler):
         self.rpc = self.path_args[0]
         self.gitdir = self.get_gitdir(rpc=self.rpc)
         self.cmd = f'git {self.rpc} --stateless-rpc "{self.gitdir}"'
+        self.log.info(f"Running command: {self.cmd}")
         self.process = Subprocess(
             shlex.split(self.cmd),
             stdin=Subprocess.STREAM,
@@ -317,6 +317,7 @@ class InfoRefsHandler(GitBaseHandler):
             return
         self.rpc = self.get_argument("service")[4:]
         self.cmd = f'git {self.rpc} --stateless-rpc --advertise-refs "{self.get_gitdir(self.rpc)}"'
+        self.log.info(f"Running command: {self.cmd}")
         self.process = Subprocess(
             shlex.split(self.cmd),
             stdin=Subprocess.STREAM,

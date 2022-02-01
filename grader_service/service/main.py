@@ -153,6 +153,9 @@ class GraderService(config.Application):
         self.log.info("Starting Grader Service...")
         self.io_loop = tornado.ioloop.IOLoop.current()
 
+        if not os.path.exists(os.path.join(self.grader_service_dir, "git")):
+            os.mkdir(os.path.join(self.grader_service_dir, "git"))
+
         # pass config to DataBaseManager and GraderExecutor
         DataBaseManager.config = self.config
         GraderExecutor.config = self.config
