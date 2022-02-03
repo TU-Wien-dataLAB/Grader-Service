@@ -8,9 +8,11 @@ minikube tunnel
 
 #build base notebook
 docker build -t s210.dl.hpc.tuwien.ac.at/grader/grader-notebook-base:latest -f docker-stacks/base-notebook/Dockerfile .
+docker build -t s210.dl.hpc.tuwien.ac.at/grader/grader-notebook-minimal:latest -f docker-stacks/minimal-notebook/Dockerfile .
 
 #push base notebook
 docker push s210.dl.hpc.tuwien.ac.at/grader/grader-notebook-base:latest
+docker push s210.dl.hpc.tuwien.ac.at/grader/grader-notebook-minimal:latest
 
 #other notebooks can be built and pushed with the same commands
 
