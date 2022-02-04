@@ -90,21 +90,46 @@ class GraderExecutor(SingletonConfigurable):
 if __name__ == "__main__":
     async def main():
         from random import randint
+        from traitlets.config import LoggingConfigurable
+        from traitlets import log as traitlets_log
+        import sys
+        import logging
 
         def demo_task(code):
-            async def wait_task():
-                wait_time = randint(1, 3)
-                print('running {} will take {} second(s)'.format(code, wait_time))
-                await asyncio.sleep(wait_time)  # I/O, context will switch to main function
-                print('ran {}'.format(code))
+            class DemoExec(LoggingConfigurable):
+                def __init__(self, **kwargs):
+                    stream_handler = logging.StreamHandler
+                    traitlet_logger = traitlets_log.get_logger()
+                    traitlet_logger.removeHandler(traitlet_logger.handlers[0])
+                    traitlet_logger.setLevel("INFO")
+                    traitlets_handler = stream_handler(stream=sys.stdout)
+                    traitlets_handler.setFormatter(
+                        logging.Formatter(
+                            "[%(asctime)s] %(levelname)-8s %(name)-13s %(module)-15s %(message)s"
+                        )
+                    )
+                    traitlet_logger.addHandler(traitlets_handler)
 
-            return wait_task
+                    super().__init__(**kwargs)
+
+                    # self.log = logging.getLogger()  # THIS WORKS?!?!
+
+                    log: logging.Logger = self.log
+                    print(f"name: {log.name}, handlers: {log.handlers}, disabled: {log.disabled}")
+
+                async def wait_task(self):
+                    wait_time = randint(1, 3)
+                    self.log.error('running {} will take {} second(s)'.format(code, wait_time))
+                    await asyncio.sleep(wait_time)  # I/O, context will switch to main function
+                    self.log.error('ran {}'.format(code))
+
+            return DemoExec()
 
         GraderExecutor.n_concurrent_tasks = 3
         GraderExecutor.resubmit_cancelled_tasks = True
         executor = GraderExecutor.instance()
         for i in range(9):
-            task = demo_task(i)
+            task = demo_task(i).wait_task
 
             async def p():
                 await asyncio.sleep(0.5)

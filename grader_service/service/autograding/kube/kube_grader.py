@@ -45,7 +45,8 @@ class GraderPod(LoggingConfigurable):
     async def _poll_status(self) -> str:
         meta: V1ObjectMeta = self.pod.metadata
         while True:
-            status: V1PodStatus = self._client.read_namespaced_pod_status(name=meta.name, namespace=meta.namespace).status
+            status: V1PodStatus = self._client.read_namespaced_pod_status(name=meta.name,
+                                                                          namespace=meta.namespace).status
             if status.phase == "Succeeded" or status.phase == "Failed":
                 return status.phase
             # continue for Running, Unknown and Pending
@@ -71,8 +72,11 @@ class KubeAutogradeExecutor(LocalAutogradeExecutor):
         self.lecture = self.assignment.lecture
 
         if self.kube_context is None:
+            self.log.info(f"Loading in-cluster config for kube executor of submission {self.submission.id}")
             config.load_incluster_config()
         else:
+            self.log.info(
+                f"Loading cluster config '{self.kube_context}' for kube executor of submission {self.submission.id}")
             config.load_kube_config(context=self.kube_context)
         self.client = CoreV1Api()
 
@@ -107,14 +111,18 @@ class KubeAutogradeExecutor(LocalAutogradeExecutor):
         return GraderPod(pod, self.client, config=self.config)
 
     async def _run(self):
+        # TODO: make logs show up when running in cluster: https://jira.it.tuwien.ac.at/browse/PJAAS-41
         try:
             grader_pod = self.start_pod()
+            self.log.info(f"Started pod {grader_pod.name} in namespace {grader_pod.namespace}")
             status = await grader_pod.polling
             if status == "Succeeded":
                 self.log.info("Pod has successfully completed execution!")
             else:
                 self.log.info("Pod has failed execution!")
             # cleanup
+            self.log.info(
+                f"Deleting pod {grader_pod.name} in namespace {grader_pod.namespace} after execution status {status}")
             self.client.delete_namespaced_pod(name=grader_pod.name, namespace=grader_pod.namespace)
         except ApiException as e:
             error_message = json.loads(e.body)
