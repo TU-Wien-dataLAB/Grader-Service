@@ -184,8 +184,14 @@ class GitBaseHandler(GraderBaseHandler):
             return None
 
         os.makedirs(os.path.dirname(path), exist_ok=True)
+
+        try:
+            out = subprocess.run(["git", "rev-parse", "--is-bare-repository"], cwd=path, capture_output=True)
+            is_git = out.returncode == 0 and "true" in out.stdout.decode("utf-8")
+        except FileNotFoundError:
+            is_git = False
         # return git repo
-        if os.path.exists(path):
+        if os.path.exists(path) and is_git:
             return path
         else:
             os.mkdir(path)
