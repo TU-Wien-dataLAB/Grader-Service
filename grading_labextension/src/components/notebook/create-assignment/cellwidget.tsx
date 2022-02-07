@@ -5,6 +5,9 @@ import { IObservableJSON, IObservableMap } from '@jupyterlab/observables';
 import { ReadonlyPartialJSONValue } from '@lumino/coreutils';
 import { ISignal, Signal } from '@lumino/signaling';
 import { Panel } from '@lumino/widgets';
+import { Alert } from '@mui/material';
+import * as React from 'react';
+import { render } from 'react-dom';
 import { CellModel, CellType, ToolData } from '../model';
 
 const CSS_CELL_HEADER = 'cellHeader';
@@ -34,9 +37,11 @@ export class CellWidget extends Panel {
   private taskInput: HTMLSelectElement;
   private gradeIdInput: HTMLInputElement;
   private pointsInput: HTMLInputElement;
+  private duplicateError: boolean;
 
-  constructor(cell: Cell) {
+  constructor(cell: Cell, duplicate: boolean = false) {
     super();
+    this.duplicateError = duplicate;
     this._cell = cell;
     this.addMetadataListener(cell);
     this.initLayout();
@@ -232,13 +237,19 @@ export class CellWidget extends Panel {
 
   private newIdElement(): HTMLDivElement {
     const element = document.createElement('div');
+
+
     element.className = CSS_CELL_ID;
     const label = document.createElement('label');
     label.textContent = 'ID: ';
     const input = document.createElement('input');
     input.type = 'text';
+    const duplicate = document.createElement('label');
+    duplicate.hidden = !this.duplicateError;
+    duplicate.innerText = "Duplicate ID";
     label.appendChild(input);
     element.appendChild(label);
+    element.appendChild(duplicate);
     return element;
   }
 

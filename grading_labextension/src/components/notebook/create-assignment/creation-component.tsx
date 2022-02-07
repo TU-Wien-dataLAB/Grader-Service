@@ -3,6 +3,11 @@ import { Cell, ICellModel } from '@jupyterlab/cells';
 import { CellModel, CellType, NbgraderData, ToolData } from '../model';
 import { Alert, Box, Divider, Grid, InputLabel, MenuItem, Select, SxProps, TextField } from '@mui/material';
 import { CellTypeSwitcher } from '@jupyterlab/notebook';
+import { createTheme, ThemeProvider } from '@mui/material/styles';
+
+
+
+
 
 
 export interface CreationComponentProps {
@@ -14,10 +19,10 @@ const randomString = (length: number) => {
     let chars = 'abcdef0123456789';
     let i;
     for (i = 0; i < length; i++) {
-      result += chars[Math.floor(Math.random() * chars.length)];
+        result += chars[Math.floor(Math.random() * chars.length)];
     }
     return result;
-  }
+}
 
 export const CreationComponent = (props: CreationComponentProps) => {
     const nbgraderData = CellModel.getNbgraderData(props.cell.model.metadata);
@@ -29,8 +34,8 @@ export const CreationComponent = (props: CreationComponentProps) => {
 
     const updateMetadata = () => {
         toolData.type = type as CellType;
-        if(id === "" || id === undefined) {
-            toolData.id = "cell- "+randomString(16);
+        if (id === undefined) {
+            setId("cell-"+randomString(16));
         } else {
             toolData.id = id;
         }
@@ -39,7 +44,7 @@ export const CreationComponent = (props: CreationComponentProps) => {
         CellModel.setNbgraderData(data, props.cell.model.metadata);
     }
 
-  
+
 
     React.useEffect(() => {
         updateMetadata();
@@ -61,29 +66,7 @@ export const CreationComponent = (props: CreationComponentProps) => {
                             </Alert>
                         </Grid> */}
 
-                        {(points === undefined && gradableCell) &&
-                            <Grid item>
-                                <Alert variant='outlined' sx={alertStyle} severity='error'>
-                                    Points not set
-                                </Alert>
-                            </Grid>
-                        }
 
-                        {type === "" &&
-                            <Grid item>
-                                <Alert variant='outlined' sx={alertStyle} severity='warning'>
-                                    Type not set
-                                </Alert>
-                            </Grid>
-                        }
-
-                        {points == 0 &&
-                            <Grid item>
-                                <Alert variant='outlined' sx={alertStyle} severity='error'>
-                                    Gradable cell with zero points
-                                </Alert>
-                            </Grid>
-                        }
                     </Grid>
                 </Box>
 
@@ -106,7 +89,9 @@ export const CreationComponent = (props: CreationComponentProps) => {
                                 size='small'
                                 label="ID"
                                 value={id}
-                                onChange={(e) => setId(e.target.value)}>
+                                onChange={(e) => setId(e.target.value)}
+                                error={id === "" }
+                                helperText={id === "" ? 'ID not set' : ' '}>
                             </TextField>
                         </Grid>
                     }
@@ -123,8 +108,27 @@ export const CreationComponent = (props: CreationComponentProps) => {
                                     inputProps: {
                                         max: 10000, min: 0
                                     }
-                                }} />
+                                }}
+                                error={points === undefined }
+                                helperText={points === undefined ? 'Points not set' : ' '}
+                                />
 
+                        </Grid>
+                    }
+
+                    {type === "" &&
+                        <Grid item>
+                            <Alert variant='outlined' sx={alertStyle} severity='warning'>
+                                Type not set
+                            </Alert>
+                        </Grid>
+                    }
+
+                    {points == 0 &&
+                        <Grid item>
+                            <Alert variant='outlined' sx={alertStyle} severity='warning'>
+                                Gradable cell with zero points
+                            </Alert>
                         </Grid>
                     }
 

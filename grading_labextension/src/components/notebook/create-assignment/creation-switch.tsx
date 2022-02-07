@@ -6,8 +6,10 @@ import React from 'react';
 import { Assignment } from '../../../model/assignment';
 import { Lecture } from '../../../model/lecture';
 import { GradeBook } from '../../../services/gradebook';
+import { NbgraderData } from '../model';
 import { ImodeSwitchProps } from "../slider";
 import { CellWidget } from './cellwidget';
+import { CreationWidget } from './creation-widget';
 import { CellPlayButton } from './widget';
 
 export class CreationModeSwitch extends React.Component<ImodeSwitchProps> {
@@ -16,10 +18,7 @@ export class CreationModeSwitch extends React.Component<ImodeSwitchProps> {
       };
       private notebook: Notebook;
       private notebookpanel: NotebookPanel;
-      private notebookPaths
-      private lecture: Lecture;
-      private assignment: Assignment;
-      private gradeBook: GradeBook;
+
       private onChange: any;
     
       public constructor(props: ImodeSwitchProps) {
@@ -27,7 +26,6 @@ export class CreationModeSwitch extends React.Component<ImodeSwitchProps> {
         this.state.mode = props.mode || false;
         this.notebook = props.notebook;
         this.notebookpanel = props.notebookpanel;
-        this.notebookPaths = this.notebookpanel.context.contentsModel.path.split("/");
         this.onChange = this.props.onChange;
       }
 
@@ -35,14 +33,17 @@ export class CreationModeSwitch extends React.Component<ImodeSwitchProps> {
       
     protected handleChange = async () => {
         this.setState({ mode: !this.state.mode }, () => {
+            const ids = new Set();
             this.onChange(this.state.mode);
             this.notebook.widgets.map((c: Cell) => {
+                
                 const currentLayout = c.layout as PanelLayout;
                 if (this.state.mode) {
-                    currentLayout.insertWidget(0, new CellWidget(c));
+                    currentLayout.insertWidget(0, new CreationWidget(c));
+                    
                 } else {
                     currentLayout.widgets.map(w => {
-                        if (w instanceof CellWidget) {
+                        if (w instanceof CreationWidget) {
                             currentLayout.removeWidget(w);
                         }
                     });

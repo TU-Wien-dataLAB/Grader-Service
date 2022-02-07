@@ -7,7 +7,7 @@ import { ReadonlyPartialJSONValue } from '@lumino/coreutils';
 
 import { ReactElement, JSXElementConstructor } from 'react';
 import { CellModel, CellType, NbgraderData, ToolData } from '../model';
-import { CreationComponent } from './creation';
+import { CreationComponent } from './creation-component';
 
 
 export class CreationWidget extends ReactWidget {

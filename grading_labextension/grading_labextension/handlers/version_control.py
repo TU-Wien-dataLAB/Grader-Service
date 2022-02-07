@@ -53,7 +53,7 @@ class GenerateHandler(ExtensionBaseHandler):
             e = sys.exc_info()[0]
             self.log.error(e)
             self.set_status(400)
-            self.write_error("Could not generate assignment")
+            self.write_error(e)
         try:
             gradebook_path = os.path.join(generator._output_directory, "gradebook.json")
             os.remove(gradebook_path)
