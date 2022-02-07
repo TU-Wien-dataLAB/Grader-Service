@@ -1,5 +1,6 @@
 import asyncio
 import json
+import logging
 from asyncio import Future, Task
 from contextlib import contextmanager
 
@@ -111,7 +112,6 @@ class KubeAutogradeExecutor(LocalAutogradeExecutor):
         return GraderPod(pod, self.client, config=self.config)
 
     async def _run(self):
-        # TODO: make logs show up when running in cluster: https://jira.it.tuwien.ac.at/browse/PJAAS-41
         try:
             grader_pod = self.start_pod()
             self.log.info(f"Started pod {grader_pod.name} in namespace {grader_pod.namespace}")
@@ -120,10 +120,16 @@ class KubeAutogradeExecutor(LocalAutogradeExecutor):
                 self.log.info("Pod has successfully completed execution!")
             else:
                 self.log.info("Pod has failed execution!")
+                self._delete_pod(grader_pod)
+                raise RuntimeError("Pod has failed execution!")
             # cleanup
-            self.log.info(
-                f"Deleting pod {grader_pod.name} in namespace {grader_pod.namespace} after execution status {status}")
-            self.client.delete_namespaced_pod(name=grader_pod.name, namespace=grader_pod.namespace)
+            self._delete_pod(grader_pod)
         except ApiException as e:
             error_message = json.loads(e.body)
             self.log.error(f'{error_message["reason"]}: {error_message["message"]}')
+            raise RuntimeError("Pod has failed execution!")
+
+    def _delete_pod(self, pod: GraderPod):
+        self.log.info(
+            f"Deleting pod {pod.name} in namespace {pod.namespace} after execution status {pod.polling.result()}")
+        self.client.delete_namespaced_pod(name=pod.name, namespace=pod.namespace)

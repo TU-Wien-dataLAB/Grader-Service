@@ -1,5 +1,8 @@
 import asyncio
 import inspect
+import logging
+import sys
+import traceback
 import typing
 from traitlets import Integer, TraitError, validate, Bool, Callable
 from traitlets.config import SingletonConfigurable
@@ -16,12 +19,19 @@ class GraderExecutor(SingletonConfigurable):
         try:
             while self.running:
                 coro, on_finish = await self.queue.get()
-                await coro()
-                if on_finish is not None:
-                    if inspect.iscoroutinefunction(on_finish):
-                        await on_finish()
-                    else:
-                        on_finish()
+                try:
+                    await coro()
+                    if on_finish is not None:
+                        if inspect.iscoroutinefunction(on_finish):
+                            await on_finish()
+                        else:
+                            on_finish()
+                except asyncio.CancelledError:
+                    raise  # raise the asyncio.CancelledError on the outside when it happens while executing coro
+                except Exception as e:
+                    self.log.error(
+                        f"An exception ({e.__class__.__name__}) was raised when executing task {coro.__name__}!",
+                        exc_info=e)
                 self.queue.task_done()
         except asyncio.CancelledError:
             if self.resubmit_cancelled_tasks and coro is not None:
@@ -98,6 +108,23 @@ if __name__ == "__main__":
         def demo_task(code):
             class DemoExec(LoggingConfigurable):
                 def __init__(self, **kwargs):
+                    self._setup_logger()
+                    super().__init__(**kwargs)
+
+                    # self.log = logging.getLogger()  # THIS WORKS?!?!
+
+                    log: logging.Logger = self.log
+                    print(f"name: {log.name}, handlers: {log.handlers}, disabled: {log.disabled}, parent: {log.parent}")
+
+                async def wait_task(self):
+                    wait_time = randint(1, 3)
+                    raise ValueError()
+                    sys.stdout.flush()
+                    self.log.error('running {} will take {} second(s)'.format(code, wait_time))
+                    await asyncio.sleep(wait_time)  # I/O, context will switch to main function
+                    self.log.error('ran {}'.format(code))
+
+                def _setup_logger(self):
                     stream_handler = logging.StreamHandler
                     traitlet_logger = traitlets_log.get_logger()
                     traitlet_logger.removeHandler(traitlet_logger.handlers[0])
@@ -110,19 +137,6 @@ if __name__ == "__main__":
                     )
                     traitlet_logger.addHandler(traitlets_handler)
 
-                    super().__init__(**kwargs)
-
-                    # self.log = logging.getLogger()  # THIS WORKS?!?!
-
-                    log: logging.Logger = self.log
-                    print(f"name: {log.name}, handlers: {log.handlers}, disabled: {log.disabled}")
-
-                async def wait_task(self):
-                    wait_time = randint(1, 3)
-                    self.log.error('running {} will take {} second(s)'.format(code, wait_time))
-                    await asyncio.sleep(wait_time)  # I/O, context will switch to main function
-                    self.log.error('ran {}'.format(code))
-
             return DemoExec()
 
         GraderExecutor.n_concurrent_tasks = 3
@@ -134,6 +148,7 @@ if __name__ == "__main__":
             async def p():
                 await asyncio.sleep(0.5)
                 print(f"Queue Size: {executor.queue.qsize()}")
+
             executor.submit(task, p)
         await asyncio.sleep(4)
         print("CANCEL")
@@ -142,6 +157,7 @@ if __name__ == "__main__":
         executor.start()
 
         await asyncio.sleep(10)
+
 
     # need running asyncio loop
     asyncio.run(main())

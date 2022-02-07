@@ -40,7 +40,7 @@ class AutogradingStatus:
 class LocalAutogradeExecutor(LoggingConfigurable):
     """Runs an autograde job on the local machine with the default Python environment. 
     Sets up the necessary directories and the gradebook JSON file used by :mod:`grader_convert`.
-    """    
+    """
     base_input_path = Unicode(os.getenv("GRADER_AUTOGRADE_IN_PATH"), allow_none=False).tag(config=True)
     base_output_path = Unicode(os.getenv("GRADER_AUTOGRADE_OUT_PATH"), allow_none=False).tag(config=True)
 
@@ -56,7 +56,7 @@ class LocalAutogradeExecutor(LoggingConfigurable):
         :type grader_service_dir: str
         :param submission: The submission object which should be graded by the executor.
         :type submission: Submission
-        """        
+        """
         super(LocalAutogradeExecutor, self).__init__(**kwargs)
         self.grader_service_dir = grader_service_dir
         self.submission = submission
@@ -68,15 +68,26 @@ class LocalAutogradeExecutor(LoggingConfigurable):
 
     async def start(self):
         """Starts the autograding job. This is the only method that is exposed to the client.
-        """        
-        await self._pull_submission()
-        self.autograding_start = datetime.now()
-        await self._run()
-        self.autograding_finished = datetime.now()
-        self._set_properties()
-        await self._push_results()
-        self._set_db_state()
-        self._cleanup()
+        It re-raises all exceptions that happen while running.
+        """
+        self.log.info(f"Starting autograding job for submission {self.submission.id} in {self.__class__.__name__}")
+        try:
+            await self._pull_submission()
+            self.autograding_start = datetime.now()
+            await self._run()
+            self.autograding_finished = datetime.now()
+            self._set_properties()
+            await self._push_results()
+            self._set_db_state()
+        except Exception:
+            self.log.error(f"Failed autograding job for submission {self.submission.id} in {self.__class__.__name__}")
+            raise
+        finally:
+            self._cleanup()
+        ts = round((self.autograding_finished - self.autograding_start).total_seconds())
+        self.log.info(
+            f"Successfully completed autograding job for submission {self.submission.id} in {self.__class__.__name__};"
+            + f" took {ts // 60}min {ts % 60}s")
 
     @property
     def input_path(self):
@@ -89,7 +100,7 @@ class LocalAutogradeExecutor(LoggingConfigurable):
     def _write_gradebook(self):
         """Writes the gradebook of the submission to the output directory where it will be used by :mod:`grader_convert` to load the data.
         The name of the written file is gradebook.json.
-        """        
+        """
         gradebook_str = self.submission.assignment.properties
         if not os.path.exists(self.output_path):
             os.mkdir(self.output_path)
@@ -102,9 +113,9 @@ class LocalAutogradeExecutor(LoggingConfigurable):
         """Pulls the submission repository based on the assignment type.
 
         :raises ValueError: [description]
-        """        
+        """
         if not os.path.exists(self.input_path):
-            os.mkdir(self.input_path)
+            Path(self.input_path).mkdir(parents=True, exist_ok=True)
 
         assignment: Assignment = self.submission.assignment
         lecture: Lecture = assignment.lecture
@@ -270,8 +281,11 @@ class LocalAutogradeExecutor(LoggingConfigurable):
         self.session.commit()
 
     def _cleanup(self):
-        shutil.rmtree(self.input_path)
-        shutil.rmtree(self.output_path)
+        try:
+            shutil.rmtree(self.input_path)
+            shutil.rmtree(self.output_path)
+        except FileNotFoundError:
+            pass
         self.session.close()
 
     async def _run_subprocess(self, command: str, cwd: str) -> Subprocess:
@@ -290,6 +304,7 @@ class LocalAutogradeExecutor(LoggingConfigurable):
         if not os.path.isabs(path):
             raise TraitError("The path specified has to be absolute")
         if not os.path.exists(path):
+            self.log.info(f"Path {path} not found, creating new directories.")
             Path(path).mkdir(parents=True, exist_ok=True)
         if not os.path.isdir(path):
             raise TraitError("The path has to be an existing directory")
