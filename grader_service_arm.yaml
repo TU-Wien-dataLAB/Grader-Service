@@ -1,40 +1,39 @@
 apiVersion: v1
 kind: ServiceAccount
 metadata:
-  name: grader-service-account
+  name: grader-service
   namespace: default
-automountServiceAccountToken: true
 
 ---
 
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
-  name: grader-cluster-role
+  name: grader-service
   namespace: default
 rules:
   - apiGroups:
         - ""
     resources:
       - pods
-      - events
-      - jobs
-    verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
+      - pods/status
+      - pods/logs
+    verbs: ["get", "create", "update", "delete"]
 
 ---
 
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
 metadata:
-  name: grader-cluster-role-binding
+  name: grader-service
 subjects:
 - namespace: default
   kind: ServiceAccount
-  name: grader-service-account
+  name: grader-service
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: ClusterRole
-  name: grader-cluster-role
+  name: grader-service
 
 ---
 
@@ -94,6 +93,8 @@ spec:
         hub.jupyter.org/network-access-hub: "true"
         hub.jupyter.org/network-access-proxy-http: "true"
     spec:
+      serviceAccount: grader-service
+      serviceAccountName: grader-service
       containers:
       - name: grader-service
         image: s210.dl.hpc.tuwien.ac.at/grader/grader-service:arm
