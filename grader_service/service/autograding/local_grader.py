@@ -79,15 +79,16 @@ class LocalAutogradeExecutor(LoggingConfigurable):
             self._set_properties()
             await self._push_results()
             self._set_db_state()
+            ts = round((self.autograding_finished - self.autograding_start).total_seconds())
+            self.log.info(
+                f"Successfully completed autograding job for submission {self.submission.id} in {self.__class__.__name__};"
+                + f" took {ts // 60}min {ts % 60}s")
         except Exception:
             self.log.error(f"Failed autograding job for submission {self.submission.id} in {self.__class__.__name__}")
-            raise
+            self._set_db_state(success=False)
+            # raise
         finally:
             self._cleanup()
-        ts = round((self.autograding_finished - self.autograding_start).total_seconds())
-        self.log.info(
-            f"Successfully completed autograding job for submission {self.submission.id} in {self.__class__.__name__};"
-            + f" took {ts // 60}min {ts % 60}s")
 
     @property
     def input_path(self):
@@ -178,17 +179,20 @@ class LocalAutogradeExecutor(LoggingConfigurable):
         os.mkdir(self.output_path)
         self._write_gradebook()
 
-        # command = f'{self.convert_executable} autograde -i "{self.input_path}" -o "{self.output_path}" -p "*.ipynb"'
-        # self.log.info(f"Running {command}")
-        # try:
-        #     process = await self._run_subprocess(command, None)
-        # except CalledProcessError:
-        #     raise # TODO: exit gracefully
-        # output = process.stderr.read().decode("utf-8")
-        # self.log.info(output)
-        autograder = Autograde(self.input_path, self.output_path, "*.ipynb")
-        autograder.force = True
-        autograder.start()
+        command = f'{self.convert_executable} autograde -i "{self.input_path}" -o "{self.output_path}" -p "*.ipynb"'
+        self.log.info(f"Running {command}")
+        process = await self._run_subprocess(command, None)
+        output = process.stderr.read().decode("utf-8")
+        self.log.info(output)
+        if process.returncode == 0:
+            self.log.info("Process has successfully completed execution!")
+        else:
+            self.log.info("Pod failed execution:")
+            self.log.info(output)
+            raise RuntimeError("Process has failed execution!")
+        # autograder = Autograde(self.input_path, self.output_path, "*.ipynb")
+        # autograder.force = True
+        # autograder.start()
 
     async def _push_results(self):
         os.unlink(os.path.join(self.output_path, "gradebook.json"))
@@ -276,8 +280,11 @@ class LocalAutogradeExecutor(LoggingConfigurable):
         self.submission.score = score
         self.session.commit()
 
-    def _set_db_state(self):
-        self.submission.auto_status = "automatically_graded"
+    def _set_db_state(self, success=True):
+        if success:
+            self.submission.auto_status = "automatically_graded"
+        else:
+            self.submission.auto_status = "grading_failed"
         self.session.commit()
 
     def _cleanup(self):
@@ -295,7 +302,6 @@ class LocalAutogradeExecutor(LoggingConfigurable):
         except CalledProcessError:
             error = process.stderr.read().decode("utf-8")
             self.log.error(error)
-            raise
         return process
 
     @validate("base_input_path", "base_output_path")

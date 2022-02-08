@@ -62,6 +62,8 @@ data:
     from service.autograding.kube.kube_grader import KubeAutogradeExecutor
     c.RequestHandlerConfig.autograde_executor_class = KubeAutogradeExecutor
     c.KubeAutogradeExecutor.kube_context = None
+    c.KubeAutogradeExecutor.base_input_path = "/grader_service_dir/convert_in"
+    c.KubeAutogradeExecutor.base_output_path = "/grader_service_dir/convert_out"
     c.KubeAutogradeExecutor.default_image_name = lambda l, a: "s210.dl.hpc.tuwien.ac.at/grader/grader-notebook-minimal:arm"
     c.KubeAutogradeExecutor.volume_mounts = [{"name": "data", "mountPath": "/grader_service_dir"}]
     c.KubeAutogradeExecutor.volumes = [{"name": "data", "persistentVolumeClaim": {"claimName": "grader-service"}}]

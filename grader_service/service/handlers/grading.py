@@ -52,7 +52,7 @@ class GradingAutoHandler(GraderBaseHandler):
         )
         GraderExecutor.instance().submit(
             executor.start,
-            lambda: self.log.info(f"Autograding of submission {submission.id} successful!")
+            lambda: self.log.info(f"Autograding task of submission {submission.id} exited!")
         )
         submission = self.session.query(Submission).get(sub_id)
         self.write_json(submission)
