@@ -35,17 +35,10 @@ class GenerateFeedback(BaseConverter):
             input_dir, output_dir, file_pattern, **kwargs
         )
         c = Config()
-        if "template_file" not in self.config.HTMLExporter:
-            c.HTMLExporter.template_file = "feedback.tpl"
-        if "template_path" not in self.config.HTMLExporter:
-            template_path = os.path.abspath(
-                os.path.join(
-                    os.path.dirname(__file__),
-                    "..",
-                    "templates",
-                )
-            )
-            c.HTMLExporter.template_path = [".", template_path]
+        # Note: nbconvert 6.0 completely changed how templates work: they can now be installed separately
+        #  and can be given by name (classic is default)
+        if "template" not in self.config.HTMLExporter:
+            c.HTMLExporter.template = "classic"
         self.update_config(c)
         self.force = True  # always overwrite generated assignments
 
