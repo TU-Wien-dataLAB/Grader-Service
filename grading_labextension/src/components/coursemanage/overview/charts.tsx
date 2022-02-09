@@ -17,7 +17,7 @@ export interface ChartsProps {
 export const GradingChart = (props: ChartsProps) => {
 
   const generateGradingData = (submissions: Submission[]) => {
-    const data = [1, 1, 1, 1];
+    const data = [0, 0, 0, 0];
     let auto = 0;
     let manual = 0;
     let failed = 0;
@@ -76,7 +76,10 @@ export const GradingChart = (props: ChartsProps) => {
       <CardHeader title="Grading Status" />
       <CardContent>
         <Box sx={{ height: '300px', width: '300px' }}>
-          <Pie data={gradingDataProps} />
+          { gradingData === [0,0,0,0] ?
+          <Pie data={gradingDataProps} /> :
+          <Card>No submissions found</Card>
+          }
         </Box>
 
       </CardContent>
