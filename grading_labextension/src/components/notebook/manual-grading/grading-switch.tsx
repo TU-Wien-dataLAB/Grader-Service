@@ -2,8 +2,6 @@ import { Cell } from '@jupyterlab/cells';
 import { PanelLayout } from "@lumino/widgets";
 import { GradeBook } from "../../../services/gradebook";
 import { getProperties, getSubmission, updateProperties, updateSubmission } from "../../../services/submissions.service";
-import { CellWidget } from "../create-assignment/cellwidget";
-import { CellPlayButton } from "../create-assignment/widget";
 import { ImodeSwitchProps } from "../slider";
 import { GradeCellWidget } from "./grade-cell-widget";
 import { GradeCommentCellWidget } from "./grade-comment-cell-widget";
@@ -16,7 +14,8 @@ import { Assignment } from '../../../model/assignment';
 import { IconNames } from '@blueprintjs/icons';
 import { getAllAssignments } from '../../../services/assignments.service';
 import { getAllLectures } from '../../../services/lectures.service';
-import { UserPermissions, Scope } from '../../../services/permission.service';
+import { DataWidget } from './data-widget';
+import { GradeWidget } from './grade-widget';
 
 
 export class GradingModeSwitch extends React.Component<ImodeSwitchProps> {
@@ -82,11 +81,11 @@ export class GradingModeSwitch extends React.Component<ImodeSwitchProps> {
             this.notebook.widgets.map((c: Cell) => {
                 const currentLayout = c.layout as PanelLayout;
                 if (this.state.mode) {
-                    currentLayout.insertWidget(0, new GradeCellWidget(c, this.gradeBook, this.notebookPaths[4].split(".").slice(0, -1).join(".")));
-                    currentLayout.addWidget(new GradeCommentCellWidget(c, this.gradeBook, this.notebookPaths[4].split(".").slice(0, -1).join(".")))
+                    currentLayout.insertWidget(0, new DataWidget(c, this.gradeBook, this.notebookPaths[4].split(".").slice(0, -1).join(".")));
+                    currentLayout.addWidget(new GradeWidget(c, this.gradeBook, this.notebookPaths[4].split(".").slice(0, -1).join(".")))
                 } else {
                     currentLayout.widgets.map(w => {
-                    if (w instanceof GradeCellWidget || w instanceof GradeCommentCellWidget) {
+                    if (w instanceof DataWidget || w instanceof GradeWidget) {
                         currentLayout.removeWidget(w);
                         }
                     });

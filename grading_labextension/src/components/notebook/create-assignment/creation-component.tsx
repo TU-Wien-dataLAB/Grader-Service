@@ -1,9 +1,7 @@
 import * as React from 'react';
-import { Cell, ICellModel } from '@jupyterlab/cells';
-import { CellModel, CellType, NbgraderData, ToolData } from '../model';
-import { Alert, Box, Divider, Grid, InputLabel, MenuItem, Select, SxProps, TextField } from '@mui/material';
-import { CellTypeSwitcher } from '@jupyterlab/notebook';
-import { createTheme, ThemeProvider } from '@mui/material/styles';
+import { Cell } from '@jupyterlab/cells';
+import { CellModel, CellType } from '../model';
+import { Alert, Box, Divider, Grid, MenuItem, TextField } from '@mui/material';
 
 
 

@@ -1,3 +1,9 @@
+/* OLD WIDGET
+ * Not used right now
+ * 
+ */
+
+
 import { Styling } from '@jupyterlab/apputils';
 import { Cell, ICellModel } from '@jupyterlab/cells';
 import { IChangedArgs } from '@jupyterlab/coreutils';
