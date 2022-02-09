@@ -1,5 +1,7 @@
 from typing import Any
 
+from traitlets import Type
+
 from ..autograding.local_feedback import GenerateFeedbackExecutor
 from ..autograding.grader_executor import GraderExecutor
 from ..autograding.local_grader import LocalAutogradeExecutor
@@ -10,7 +12,7 @@ from ..registry import VersionSpecifier, register_handler
 from tornado.web import HTTPError
 from tornado.ioloop import IOLoop
 
-from .base_handler import GraderBaseHandler, authorize
+from .base_handler import GraderBaseHandler, authorize, RequestHandlerConfig
 
 
 @register_handler(
@@ -39,18 +41,18 @@ class GradingAutoHandler(GraderBaseHandler):
         self.validate_parameters()
         submission = self.session.query(Submission).get(sub_id)
         if (
-            submission is None
-            or submission.assignid != assignment_id
-            or submission.assignment.lectid != lecture_id
+                submission is None
+                or submission.assignid != assignment_id
+                or submission.assignment.lectid != lecture_id
         ):
             self.error_message = "Not Found!"
             raise HTTPError(404)
-        executor = LocalAutogradeExecutor(
+        executor = RequestHandlerConfig.instance().autograde_executor_class(
             self.application.grader_service_dir, submission, config=self.application.config
         )
         GraderExecutor.instance().submit(
             executor.start,
-            lambda: self.log.info(f"Autograding of submission {submission.id} successful!")
+            lambda: self.log.info(f"Autograding task of submission {submission.id} exited!")
         )
         submission = self.session.query(Submission).get(sub_id)
         self.write_json(submission)
@@ -81,9 +83,9 @@ class GenerateFeedbackHandler(GraderBaseHandler):
         self.validate_parameters()
         submission = self.session.query(Submission).get(sub_id)
         if (
-            submission is None
-            or submission.assignid != assignment_id
-            or submission.assignment.lectid != lecture_id
+                submission is None
+                or submission.assignid != assignment_id
+                or submission.assignment.lectid != lecture_id
         ):
             self.error_message = "Not Found!"
             raise HTTPError(404)

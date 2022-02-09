@@ -184,6 +184,6 @@ class GenerateFeedbackExecutor(LocalAutogradeExecutor):
         self.submission.score = score
         self.session.commit()
 
-    def _set_db_state(self):
+    def _set_db_state(self, success=True):
         self.submission.feedback_available = True
         self.session.commit()

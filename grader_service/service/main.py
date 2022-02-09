@@ -15,6 +15,7 @@ from traitlets.traitlets import Enum, Int, TraitError, Unicode, observe, validat
 # run __init__.py to register handlers
 import service.handlers
 from service.autograding.local_grader import LocalAutogradeExecutor
+from service.handlers.base_handler import RequestHandlerConfig
 from service.persistence.database import DataBaseManager
 from service.registry import HandlerPathRegistry
 from service.server import GraderServer
@@ -152,9 +153,13 @@ class GraderService(config.Application):
         self.log.info("Starting Grader Service...")
         self.io_loop = tornado.ioloop.IOLoop.current()
 
+        if not os.path.exists(os.path.join(self.grader_service_dir, "git")):
+            os.mkdir(os.path.join(self.grader_service_dir, "git"))
+
         # pass config to DataBaseManager and GraderExecutor
         DataBaseManager.config = self.config
         GraderExecutor.config = self.config
+        RequestHandlerConfig.config = self.config
 
         handlers = HandlerPathRegistry.handler_list()
         # start the webserver
