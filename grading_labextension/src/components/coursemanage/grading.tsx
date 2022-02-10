@@ -199,7 +199,7 @@ export const GradingComponent = (props: IGradingProps) => {
   return (
     <div>
       <ModalTitle title="Grading" />
-      <div style={{ display: 'flex', height: '500px', marginTop: '90px' }}>
+      <div style={{ display: 'flex', height: '550px', marginTop: '90px' }}>
         <div style={{ flexGrow: 1 }}>
           <DataGrid
             sx={{ mb: 3, ml: 3, mr: 3 }}
