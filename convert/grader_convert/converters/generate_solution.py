@@ -4,15 +4,15 @@ from typing import Any
 from traitlets import Bool, List, default
 from traitlets.config.loader import Config
 
-from ..converters.baseapp import ConverterApp
-from ..preprocessors import (
+from grader_convert.converters.baseapp import ConverterApp
+from grader_convert.preprocessors import (
     ClearMarkScheme,
     ClearOutput,
     Execute,
     IncludeHeaderFooter,
     LockCells,
 )
-from .base import BaseConverter
+from grader_convert.converters.base import BaseConverter
 
 
 class GenerateSolution(BaseConverter):

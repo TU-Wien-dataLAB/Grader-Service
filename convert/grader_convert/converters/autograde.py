@@ -5,9 +5,9 @@ from typing import Any
 from traitlets import Bool, Dict, List
 from traitlets.config.loader import Config
 
-from .. import utils
-from ..gradebook.gradebook import Gradebook, MissingEntry
-from ..preprocessors import (
+from grader_convert import utils
+from grader_convert.gradebook.gradebook import Gradebook, MissingEntry
+from grader_convert.preprocessors import (
     CheckCellMetadata,
     ClearOutput,
     DeduplicateIds,
@@ -17,8 +17,8 @@ from ..preprocessors import (
     OverwriteKernelspec,
     SaveAutoGrades,
 )
-from .base import BaseConverter
-from .baseapp import ConverterApp
+from grader_convert.converters.base import BaseConverter
+from grader_convert.converters.baseapp import ConverterApp
 
 
 class Autograde(BaseConverter):

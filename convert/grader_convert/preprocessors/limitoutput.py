@@ -4,7 +4,7 @@ from nbconvert.exporters.exporter import ResourcesDict
 from nbformat.notebooknode import NotebookNode
 from traitlets import Integer
 
-from . import NbGraderPreprocessor
+from grader_convert.preprocessors.base import NbGraderPreprocessor
 
 
 class LimitOutput(NbGraderPreprocessor):

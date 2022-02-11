@@ -10,7 +10,7 @@ from nbconvert.preprocessors import CellExecutionError, ExecutePreprocessor
 from nbformat.notebooknode import NotebookNode
 from traitlets import Bool, Integer, List
 
-from . import NbGraderPreprocessor
+from grader_convert.preprocessors.base import NbGraderPreprocessor
 
 
 class UnresponsiveKernelError(Exception):

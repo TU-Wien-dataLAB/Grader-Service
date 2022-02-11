@@ -3,8 +3,8 @@ from typing import Dict, Tuple
 
 from nbformat.notebooknode import NotebookNode
 
-from ..nbgraderformat import MetadataValidator, ValidationError
-from . import NbGraderPreprocessor
+from grader_convert.nbgraderformat import MetadataValidator, ValidationError
+from grader_convert.preprocessors.base import NbGraderPreprocessor
 
 
 class CheckCellMetadata(NbGraderPreprocessor):

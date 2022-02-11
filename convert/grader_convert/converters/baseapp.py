@@ -1,8 +1,9 @@
 import os
 import sys
 
-from jupyter_core.application import JupyterApp
-from traitlets.traitlets import Unicode, validate
+# from jupyter_core.application import JupyterApp
+from traitlets.config.application import Application
+from traitlets.traitlets import Unicode, validate, TraitError
 
 base_converter_aliases = {
     "log-level": "Application.log_level",
@@ -25,7 +26,7 @@ base_converter_flags = {
 }
 
 
-class ConverterApp(JupyterApp):
+class ConverterApp(Application):
     description = """Base app for converters
     """
 
@@ -39,11 +40,12 @@ class ConverterApp(JupyterApp):
     file_pattern = Unicode("*.ipynb", allow_none=False).tag(config=True)
 
     @validate("input_directory", "output_directory")
-    def _dir_exits(self, proposal: str) -> bool:
+    def _dir_exits(self, proposal) -> str:
         if os.path.isdir(proposal["value"]):
             return proposal["value"]
         else:
-            return None
+            self.log.error(f'The path {proposal.value} of {proposal.trait.name} is not a directory')
+            raise TraitError(f'The path {proposal.value} of {proposal.trait.name} is not a directory')
 
     def fail(self, msg, *args):
         """Log the error msg using self.log.error and exit using sys.exit(1)."""

@@ -1,6 +1,6 @@
 from nbconvert.preprocessors import ClearOutputPreprocessor
 
-from . import NbGraderPreprocessor
+from grader_convert.preprocessors.base import NbGraderPreprocessor
 
 
 class ClearOutput(NbGraderPreprocessor, ClearOutputPreprocessor):

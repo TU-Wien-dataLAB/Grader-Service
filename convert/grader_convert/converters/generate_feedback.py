@@ -6,9 +6,9 @@ from nbconvert.preprocessors import CSSHTMLHeaderPreprocessor
 from traitlets import List, default
 from traitlets.config import Config
 
-from ..converters.baseapp import ConverterApp
-from ..preprocessors import GetGrades
-from .base import BaseConverter
+from grader_convert.converters.baseapp import ConverterApp
+from grader_convert.preprocessors import GetGrades
+from grader_convert.converters.base import BaseConverter
 
 
 class GenerateFeedback(BaseConverter):
