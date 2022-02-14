@@ -2,17 +2,17 @@ from typing import Any
 
 from traitlets import Type
 
-from ..autograding.local_feedback import GenerateFeedbackExecutor
-from ..autograding.grader_executor import GraderExecutor
-from ..autograding.local_grader import LocalAutogradeExecutor
+from grader_service.autograding.local_feedback import GenerateFeedbackExecutor
+from grader_service.autograding.grader_executor import GraderExecutor
+from grader_service.autograding.local_grader import LocalAutogradeExecutor
 from .handler_utils import parse_ids
-from ..orm.submission import Submission
-from ..orm.takepart import Scope
-from ..registry import VersionSpecifier, register_handler
+from grader_service.orm.submission import Submission
+from grader_service.orm.takepart import Scope
+from grader_service.registry import VersionSpecifier, register_handler
 from tornado.web import HTTPError
 from tornado.ioloop import IOLoop
 
-from .base_handler import GraderBaseHandler, authorize, RequestHandlerConfig
+from grader_service.handlers.base_handler import GraderBaseHandler, authorize, RequestHandlerConfig
 
 
 @register_handler(

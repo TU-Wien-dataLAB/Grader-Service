@@ -11,10 +11,10 @@ from subprocess import PIPE, CalledProcessError
 
 from grader_convert.converters.autograde import Autograde
 from grader_convert.gradebook.models import GradeBookModel
-from ..orm.assignment import Assignment
-from ..orm.group import Group
-from ..orm.lecture import Lecture
-from ..orm.submission import Submission
+from grader_service.orm.assignment import Assignment
+from grader_service.orm.group import Group
+from grader_service.orm.lecture import Lecture
+from grader_service.orm.submission import Submission
 from sqlalchemy.orm import Session
 from tornado.process import Subprocess
 from traitlets.config.configurable import LoggingConfigurable
@@ -311,7 +311,7 @@ class LocalAutogradeExecutor(LoggingConfigurable):
             raise TraitError("The path specified has to be absolute")
         if not os.path.exists(path):
             self.log.info(f"Path {path} not found, creating new directories.")
-            Path(path).mkdir(parents=True, exist_ok=True)
+            Path(path).mkdir(parents=True, exist_ok=True, mode=0o777)
         if not os.path.isdir(path):
             raise TraitError("The path has to be an existing directory")
         return path

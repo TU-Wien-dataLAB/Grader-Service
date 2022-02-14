@@ -13,13 +13,13 @@ from traitlets import log as traitlets_log
 from traitlets.traitlets import Enum, Int, TraitError, Unicode, observe, validate
 
 # run __init__.py to register handlers
-import service.handlers
-from service.autograding.local_grader import LocalAutogradeExecutor
-from service.handlers.base_handler import RequestHandlerConfig
-from service.persistence.database import DataBaseManager
-from service.registry import HandlerPathRegistry
-from service.server import GraderServer
-from service.autograding.grader_executor import GraderExecutor
+import grader_service.handlers
+from grader_service.autograding.local_grader import LocalAutogradeExecutor
+from grader_service.handlers.base_handler import RequestHandlerConfig
+from grader_service.persistence.database import DataBaseManager
+from grader_service.registry import HandlerPathRegistry
+from grader_service.server import GraderServer
+from grader_service.autograding.grader_executor import GraderExecutor
 
 
 class GraderService(config.Application):
@@ -229,7 +229,7 @@ class GraderService(config.Application):
             self.initialize(argv)
             await self.start()
         except Exception as e:
-            self.log.exception("")
+            self.log.exception(e)
             self.exit(1)
 
     @classmethod

@@ -1,4 +1,4 @@
-from service.api.models import submission
+from grader_service.api.models import submission
 from sqlalchemy import (
     Boolean,
     Column,

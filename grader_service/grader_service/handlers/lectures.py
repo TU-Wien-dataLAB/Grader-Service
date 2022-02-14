@@ -1,14 +1,14 @@
 import tornado
-from ..api.models.lecture import Lecture as LectureModel
-from ..orm.base import DeleteState
-from ..orm.lecture import Lecture, LectureState
-from ..orm.assignment import Assignment
-from ..orm.takepart import Role, Scope
-from ..registry import VersionSpecifier, register_handler
+from grader_service.api.models.lecture import Lecture as LectureModel
+from grader_service.orm.base import DeleteState
+from grader_service.orm.lecture import Lecture, LectureState
+from grader_service.orm.assignment import Assignment
+from grader_service.orm.takepart import Role, Scope
+from grader_service.registry import VersionSpecifier, register_handler
 from sqlalchemy.orm.exc import MultipleResultsFound, NoResultFound, ObjectDeletedError
 from tornado.web import HTTPError
 
-from .base_handler import GraderBaseHandler, authorize
+from grader_service.handlers.base_handler import GraderBaseHandler, authorize
 
 
 @register_handler(r"\/lectures\/?", VersionSpecifier.ALL)

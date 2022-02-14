@@ -1,6 +1,6 @@
 import enum
 
-from service.api.models import lecture
+from grader_service.api.models import lecture
 from sqlalchemy import Column, Enum, Integer, String
 from sqlalchemy.orm import relationship
 

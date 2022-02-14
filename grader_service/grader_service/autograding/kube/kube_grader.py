@@ -4,10 +4,12 @@ import os
 import shlex
 from asyncio import Future, Task
 from contextlib import contextmanager
+from pathlib import Path
 
 from kubernetes.client import V1Pod, CoreV1Api, V1ObjectMeta, V1PodStatus, ApiException
 from traitlets import Callable, Unicode, Integer, Dict, List
 from traitlets.config import LoggingConfigurable
+from urllib3.exceptions import MaxRetryError
 
 from .util import make_pod
 from ..local_grader import LocalAutogradeExecutor
@@ -60,11 +62,6 @@ def _get_image_name(lecture: Lecture, assignment: Assignment = None) -> str:
 
 
 class KubeAutogradeExecutor(LocalAutogradeExecutor):
-    kube_input_path = Unicode(os.getenv("GRADER_AUTOGRADE_KUBE_IN_PATH"), allow_none=False,
-                              help="Input path for convert task in pod file system").tag(config=True)
-    kube_output_path = Unicode(os.getenv("GRADER_AUTOGRADE_KUBE_OUT_PATH"), allow_none=False,
-                               help="Output path for convert task in pod file system").tag(config=True)
-
     image_config_path = Unicode(default_value=None, allow_none=True).tag(config=True)
     default_image_name = Callable(default_value=_get_image_name, allow_none=False).tag(config=True)
     kube_context = Unicode(default_value=None, allow_none=True,
@@ -72,14 +69,6 @@ class KubeAutogradeExecutor(LocalAutogradeExecutor):
                                 "If the context is None (default), the incluster config will be used.").tag(config=True)
     volumes = List(default_value=[], allow_none=False).tag(config=True)
     volume_mounts = List(default_value=[], allow_none=False).tag(config=True)
-
-    @property
-    def pod_input_path(self):
-        return os.path.join(self.kube_input_path, f"submission_{self.submission.id}")
-
-    @property
-    def pod_output_path(self):
-        return os.path.join(self.kube_output_path, f"submission_{self.submission.id}")
 
     def __init__(self, grader_service_dir: str, submission: Submission, **kwargs):
         super().__init__(grader_service_dir, submission, **kwargs)
@@ -110,15 +99,18 @@ class KubeAutogradeExecutor(LocalAutogradeExecutor):
             return self.default_image_name(self.lecture, self.assignment)
 
     def start_pod(self) -> GraderPod:
+        # The output path will not exist in the pod
+        Path(self.output_path).mkdir(parents=True, exist_ok=True, mode=0o666)
         command = f'{self.convert_executable} autograde ' \
-                  f'-i "{self.pod_input_path}" ' \
-                  f'-o "{self.pod_output_path}" ' \
+                  f'-i "{self.input_path}" ' \
+                  f'-o "{self.output_path}" ' \
                   f'-p "*.ipynb"'
+        command = "sleep 10000"
         pod = make_pod(
             name=self.submission.commit_hash,
             cmd=shlex.split(command),
             image=self.get_image(),
-            image_pull_policy=None,
+            image_pull_policy="Always",
             working_dir="/",
             volumes=self.volumes,
             volume_mounts=self.volume_mounts,
@@ -126,6 +118,7 @@ class KubeAutogradeExecutor(LocalAutogradeExecutor):
             annotations=None,
             tolerations=None,
         )
+        self.log.info(f"Starting pod {pod.metadata.name} with command: {command}")
         pod = self.client.create_namespaced_pod(namespace="default", body=pod)
         return GraderPod(pod, self.client, config=self.config)
 
@@ -154,6 +147,9 @@ class KubeAutogradeExecutor(LocalAutogradeExecutor):
                     pass
             self.log.error(f'{error_message["reason"]}: {error_message["message"]}')
             raise RuntimeError("Pod has failed execution!")
+        except MaxRetryError:
+            self.log.error("Kubernetes client could not connect to cluster! Is it running and specified correctly?")
+            raise RuntimeError("Pod has failed execution!")
 
     def _delete_pod(self, pod: GraderPod):
         self.log.info(
@@ -161,5 +157,5 @@ class KubeAutogradeExecutor(LocalAutogradeExecutor):
         self.client.delete_namespaced_pod(name=pod.name, namespace=pod.namespace)
 
     def _get_pod_logs(self, pod: GraderPod) -> str:
-        api_response = self.client.read_namespaced_pod_log(name=pod.name, namespace='default')
-        return api_response
+        api_response: str = self.client.read_namespaced_pod_log(name=pod.name, namespace=pod.namespace)
+        return api_response.strip()

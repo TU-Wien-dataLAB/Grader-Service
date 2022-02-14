@@ -1,16 +1,16 @@
 import tornado
-from ..api.models.assignment import Assignment as AssignmentModel
-from ..orm.assignment import Assignment
-from ..orm.base import DeleteState
-from ..orm.takepart import Role, Scope
-from ..registry import VersionSpecifier, register_handler
+from grader_service.api.models.assignment import Assignment as AssignmentModel
+from grader_service.orm.assignment import Assignment
+from grader_service.orm.base import DeleteState
+from grader_service.orm.takepart import Role, Scope
+from grader_service.registry import VersionSpecifier, register_handler
 from sqlalchemy.orm.exc import ObjectDeletedError
 from sqlalchemy.exc import IntegrityError
 from tornado.web import HTTPError
 from .handler_utils import parse_ids
 
 
-from ..handlers.base_handler import GraderBaseHandler, authorize
+from grader_service.handlers.base_handler import GraderBaseHandler, authorize
 
 
 @register_handler(

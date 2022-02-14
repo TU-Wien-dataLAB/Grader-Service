@@ -1,4 +1,4 @@
-from service.api.models import assignment
+from grader_service.api.models import assignment
 from sqlalchemy import Column, DateTime, Enum, ForeignKey, Integer, String, Text
 from sqlalchemy.orm import relationship
 

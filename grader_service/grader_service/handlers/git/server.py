@@ -5,19 +5,19 @@ import shlex
 import subprocess
 from urllib.parse import unquote
 
-from service.handlers.base_handler import GraderBaseHandler
-from service.orm.assignment import Assignment
-from service.orm.group import Group
-from service.orm.lecture import Lecture
-from service.orm.submission import Submission
-from service.orm.takepart import Role, Scope
-from service.registry import VersionSpecifier, register_handler
+from grader_service.handlers.base_handler import GraderBaseHandler
+from grader_service.orm.assignment import Assignment
+from grader_service.orm.group import Group
+from grader_service.orm.lecture import Lecture
+from grader_service.orm.submission import Submission
+from grader_service.orm.takepart import Role, Scope
+from grader_service.registry import VersionSpecifier, register_handler
 from sqlalchemy.orm.exc import MultipleResultsFound, NoResultFound
 from tornado.ioloop import IOLoop
 from tornado.process import Subprocess
 from tornado.web import HTTPError, stream_request_body
 
-from service.server import GraderServer
+from grader_service.server import GraderServer
 
 
 class GitBaseHandler(GraderBaseHandler):

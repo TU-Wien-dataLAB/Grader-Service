@@ -1,19 +1,19 @@
 import json
 
-from .handler_utils import parse_ids
-from ..orm.user import User
+from grader_service.handlers.handler_utils import parse_ids
+from grader_service.orm.user import User
 import tornado
-from ..api.models.submission import Submission as SubmissionModel
-from ..orm.assignment import Assignment
-from ..orm.base import DeleteState
-from ..orm.submission import Submission
-from ..orm.takepart import Role, Scope
-from ..registry import VersionSpecifier, register_handler
+from grader_service.api.models.submission import Submission as SubmissionModel
+from grader_service.orm.assignment import Assignment
+from grader_service.orm.base import DeleteState
+from grader_service.orm.submission import Submission
+from grader_service.orm.takepart import Role, Scope
+from grader_service.registry import VersionSpecifier, register_handler
 from sqlalchemy.sql.expression import func
 from tornado.web import HTTPError
 from grader_convert.gradebook.models import GradeBookModel
 
-from .base_handler import GraderBaseHandler, authorize
+from grader_service.handlers.base_handler import GraderBaseHandler, authorize
 
 
 def tuple_to_submission(t):

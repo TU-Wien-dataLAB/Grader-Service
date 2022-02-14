@@ -9,16 +9,16 @@ from urllib.parse import ParseResult, urlparse
 from traitlets import Type
 from traitlets.config import SingletonConfigurable
 
-from ..api.models.base_model_ import Model
-from ..api.models.error_message import ErrorMessage
-from ..autograding.local_grader import LocalAutogradeExecutor
-from ..orm.base import DeleteState, Serializable
-from ..orm.lecture import Lecture, LectureState
-from ..orm.takepart import Role, Scope
-from ..orm.user import User
-from ..registry import VersionSpecifier, register_handler
-from ..request import RequestService
-from ..server import GraderServer
+from grader_service.api.models.base_model_ import Model
+from grader_service.api.models.error_message import ErrorMessage
+from grader_service.autograding.local_grader import LocalAutogradeExecutor
+from grader_service.orm.base import DeleteState, Serializable
+from grader_service.orm.lecture import Lecture, LectureState
+from grader_service.orm.takepart import Role, Scope
+from grader_service.orm.user import User
+from grader_service.registry import VersionSpecifier, register_handler
+from grader_service.request import RequestService
+from grader_service.server import GraderServer
 from sqlalchemy.orm.exc import MultipleResultsFound, NoResultFound
 from tornado import httputil, web
 from tornado.escape import json_decode
