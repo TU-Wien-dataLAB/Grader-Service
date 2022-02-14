@@ -2,10 +2,10 @@ from datetime import datetime
 from re import sub
 import secrets
 import pytest
-from service.server import GraderServer
+from grader_service.server import GraderServer
 import json
-from service.api.models.user import User
-from service.api.models.submission import Submission
+from grader_service.api.models.user import User
+from grader_service.api.models.submission import Submission
 from tornado.httpclient import HTTPClientError
 from datetime import timezone
 from .db_util import insert_submission, insert_take_part

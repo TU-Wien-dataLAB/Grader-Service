@@ -2,7 +2,7 @@ from grader_service.api.models import assignment
 from sqlalchemy import Column, DateTime, Enum, ForeignKey, Integer, String, Text
 from sqlalchemy.orm import relationship
 
-from .base import Base, DeleteState, Serializable
+from grader_service.orm.base import Base, DeleteState, Serializable
 
 
 class Assignment(Base, Serializable):

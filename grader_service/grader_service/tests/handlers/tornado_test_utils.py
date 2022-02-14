@@ -1,8 +1,8 @@
 import os
 from re import S
 import pytest
-from service.registry import HandlerPathRegistry
-from service.server import GraderServer
+from grader_service.registry import HandlerPathRegistry
+from grader_service.server import GraderServer
 from tornado_sqlalchemy import SQLAlchemy
 from alembic.config import Config
 from alembic.command import upgrade

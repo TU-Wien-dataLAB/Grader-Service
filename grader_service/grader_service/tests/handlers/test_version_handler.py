@@ -1,5 +1,5 @@
 import pytest
-from service.server import GraderServer
+from grader_service.server import GraderServer
 
 ## Imports are important otherwise they will not be found
 from .tornado_test_utils import *

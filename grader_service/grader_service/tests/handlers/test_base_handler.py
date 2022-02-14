@@ -1,9 +1,9 @@
 import json
-from service.handlers.base_handler import GraderBaseHandler
-from service.orm.assignment import Assignment
+from grader_service.handlers.base_handler import GraderBaseHandler
+from grader_service.orm.assignment import Assignment
 from datetime import datetime
-from service.api.models.error_message import ErrorMessage
-from service.orm.lecture import Lecture
+from grader_service.api.models.error_message import ErrorMessage
+from grader_service.orm.lecture import Lecture
 from sqlalchemy.orm import sessionmaker
 
 from .db_util import *

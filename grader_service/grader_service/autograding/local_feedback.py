@@ -2,12 +2,12 @@ import json
 import os
 import shutil
 from subprocess import CalledProcessError
-from .local_grader import LocalAutogradeExecutor, rm_error
+from grader_service.autograding.local_grader import LocalAutogradeExecutor, rm_error
 from grader_convert.gradebook.models import GradeBookModel
-from ..orm.assignment import Assignment
-from ..orm.group import Group
-from ..orm.lecture import Lecture
-from ..orm.submission import Submission
+from grader_service.orm.assignment import Assignment
+from grader_service.orm.group import Group
+from grader_service.orm.lecture import Lecture
+from grader_service.orm.submission import Submission
 from grader_convert.converters.generate_feedback import GenerateFeedback
 
 

@@ -11,12 +11,12 @@ from traitlets import Callable, Unicode, Integer, Dict, List
 from traitlets.config import LoggingConfigurable
 from urllib3.exceptions import MaxRetryError
 
-from .util import make_pod
-from ..local_grader import LocalAutogradeExecutor
+from grader_service.autograding.kube.util import make_pod
+from grader_service.autograding.local_grader import LocalAutogradeExecutor
 from kubernetes import config, client
 
-from ...orm import Lecture, Submission
-from ...orm import Assignment
+from grader_service.orm import Lecture, Submission
+from grader_service.orm import Assignment
 
 
 class GraderPod(LoggingConfigurable):

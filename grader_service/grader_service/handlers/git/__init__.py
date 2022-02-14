@@ -1,1 +1,1 @@
-from .server import RPCHandler, InfoRefsHandler
+from grader_service.handlers.git.server import RPCHandler, InfoRefsHandler

@@ -10,13 +10,12 @@ from tornado.httpserver import HTTPServer
 from tornado_sqlalchemy import SQLAlchemy
 from traitlets import config
 from traitlets import log as traitlets_log
-from traitlets.traitlets import Enum, Int, TraitError, Unicode, observe, validate
+from traitlets import Enum, Int, TraitError, Unicode, observe, validate, default
 
 # run __init__.py to register handlers
 import grader_service.handlers
 from grader_service.autograding.local_grader import LocalAutogradeExecutor
 from grader_service.handlers.base_handler import RequestHandlerConfig
-from grader_service.persistence.database import DataBaseManager
 from grader_service.registry import HandlerPathRegistry
 from grader_service.server import GraderServer
 from grader_service.autograding.grader_executor import GraderExecutor
@@ -44,6 +43,8 @@ class GraderService(config.Application):
     service_port = Int(int(os.getenv("GRADER_SERVICE_PORT", "4010")), help="The port the service runs on").tag(config=True)
 
     grader_service_dir = Unicode(os.getenv("GRADER_SERVICE_DIRECTORY"), allow_none=False).tag(config=True)
+
+    db_url = Unicode(os.getenv("GRADER_DB_URL", "sqlite:///grader.db"), allow_none=False).tag(config=True)
 
     config_file = Unicode(
         "grader_service_config.py", help="The config file to load"
@@ -157,7 +158,6 @@ class GraderService(config.Application):
             os.mkdir(os.path.join(self.grader_service_dir, "git"))
 
         # pass config to DataBaseManager and GraderExecutor
-        DataBaseManager.config = self.config
         GraderExecutor.config = self.config
         RequestHandlerConfig.config = self.config
 
@@ -171,13 +171,13 @@ class GraderService(config.Application):
                     nbytes=32
                 ),  # generate new cookie secret at startup
                 config=self.config,
-                db=SQLAlchemy(DataBaseManager.instance().get_database_url()),
+                db=SQLAlchemy(self.db_url),
                 parent=self,
             ),
             # ssl_options=ssl_context,
             xheaders=True,
         )
-
+        self.log.info(f"db_url - {self.db_url}")
         self.http_server.listen(self.service_port, address=self.service_host)
 
         for s in (signal.SIGTERM, signal.SIGINT):

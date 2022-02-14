@@ -3,7 +3,7 @@ import enum
 from sqlalchemy import Column, Enum, ForeignKey, Integer
 from sqlalchemy.orm import relationship
 
-from .base import Base, Serializable
+from grader_service.orm.base import Base, Serializable
 
 
 class Scope(enum.IntEnum):

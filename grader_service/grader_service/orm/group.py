@@ -1,7 +1,7 @@
 from sqlalchemy import Column, ForeignKey, Integer, String
 from sqlalchemy.orm import relationship
 
-from .base import Base, Serializable
+from grader_service.orm.base import Base, Serializable
 
 
 class Group(Base, Serializable):

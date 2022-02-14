@@ -2,19 +2,19 @@ from datetime import datetime
 from re import sub
 import secrets
 import pytest
-from service.server import GraderServer
+from grader_service.server import GraderServer
 import json
-from service.api.models.submission import Submission
+from grader_service.api.models.submission import Submission
 from tornado.httpclient import HTTPClientError
 from datetime import timezone
 from .db_util import insert_submission
 from unittest.mock import AsyncMock, MagicMock, Mock, patch
-from service.autograding.local_grader import LocalAutogradeExecutor
-from service.autograding.local_feedback import GenerateFeedbackExecutor
+from grader_service.autograding.local_grader import LocalAutogradeExecutor
+from grader_service.autograding.local_feedback import GenerateFeedbackExecutor
 
 # Imports are important otherwise they will not be found
 from .tornado_test_utils import *
-from ...autograding.grader_executor import GraderExecutor
+from grader_service.autograding.grader_executor import GraderExecutor
 
 
 async def test_auto_grading(

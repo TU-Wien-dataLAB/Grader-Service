@@ -1,11 +1,11 @@
-from service.orm.assignment import Assignment
-from service.orm.group import Group
-from service.orm.submission import Submission
-from service.orm.takepart import Role, Scope
+from grader_service.orm.assignment import Assignment
+from grader_service.orm.group import Group
+from grader_service.orm.submission import Submission
+from grader_service.orm.takepart import Role, Scope
 import pytest
 from unittest.mock import Mock
-from service.handlers.git.server import GitBaseHandler
-from service.orm.lecture import Lecture
+from grader_service.handlers.git.server import GitBaseHandler
+from grader_service.orm.lecture import Lecture
 from tornado.web import HTTPError
 from .db_util import *
 import os

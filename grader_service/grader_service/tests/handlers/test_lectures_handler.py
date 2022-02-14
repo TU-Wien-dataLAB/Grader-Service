@@ -1,9 +1,9 @@
 import pytest
-from service.server import GraderServer
+from grader_service.server import GraderServer
 import json
 
-from ...api.models.assignment import Assignment
-from ...api.models.lecture import Lecture
+from grader_service.api.models.assignment import Assignment
+from grader_service.api.models.lecture import Lecture
 from .db_util import insert_submission
 from tornado.httpclient import HTTPClientError
 

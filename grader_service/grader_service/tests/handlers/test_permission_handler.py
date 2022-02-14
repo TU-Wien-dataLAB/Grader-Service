@@ -2,7 +2,7 @@ from datetime import datetime
 from re import sub
 import secrets
 import pytest
-from service.server import GraderServer
+from grader_service.server import GraderServer
 import json
 from tornado.httpclient import HTTPClientError
 from .db_util import insert_submission, insert_take_part

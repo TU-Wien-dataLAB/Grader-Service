@@ -12,7 +12,7 @@ from sqlalchemy import (
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql.expression import false
 
-from .base import Base, Serializable
+from grader_service.orm.base import Base, Serializable
 
 
 class Submission(Base, Serializable):

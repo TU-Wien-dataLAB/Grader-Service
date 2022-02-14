@@ -1,7 +1,7 @@
 import pytest
-from service.server import GraderServer
+from grader_service.server import GraderServer
 import json
-from service.api.models.assignment import Assignment
+from grader_service.api.models.assignment import Assignment
 from tornado.httpclient import HTTPClientError
 
 # Imports are important otherwise they will not be found
