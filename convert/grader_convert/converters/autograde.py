@@ -22,30 +22,6 @@ from grader_convert.converters.baseapp import ConverterApp
 
 
 class Autograde(BaseConverter):
-
-    create_student = Bool(
-        True,
-        help=dedent(
-            """
-            Whether to create the student at runtime if it does not
-            already exist.
-            """
-        ),
-    ).tag(config=True)
-
-    exclude_overwriting = Dict(
-        {},
-        help=dedent(
-            """
-            A dictionary with keys corresponding to assignment names and values
-            being a list of filenames (relative to the assignment's source
-            directory) that should NOT be overwritten with the source version.
-            This is to allow students to e.g. edit a python file and submit it
-            alongside the notebooks in their assignment.
-            """
-        ),
-    ).tag(config=True)
-
     _sanitizing = True
 
     sanitize_preprocessors = List(
