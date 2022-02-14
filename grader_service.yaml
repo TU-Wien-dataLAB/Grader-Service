@@ -59,13 +59,13 @@ metadata:
   name: grader-service
 data:
   grader_service_config.py: |
-    from service.autograding.kube.kube_grader import KubeAutogradeExecutor
+    from grader_service.autograding.kube.kube_grader import KubeAutogradeExecutor
     c.RequestHandlerConfig.autograde_executor_class = KubeAutogradeExecutor
     c.KubeAutogradeExecutor.kube_context = None
-    c.KubeAutogradeExecutor.base_input_path = "/grader_service_dir/convert_in"
-    c.KubeAutogradeExecutor.base_output_path = "/grader_service_dir/convert_out"
+    c.KubeAutogradeExecutor.base_input_path = "/var/lib/grader_service/convert_in"
+    c.KubeAutogradeExecutor.base_output_path = "/var/lib/grader_service/convert_out"
     c.KubeAutogradeExecutor.default_image_name = lambda l, a: "s210.dl.hpc.tuwien.ac.at/grader/grader-notebook-minimal:latest"
-    c.KubeAutogradeExecutor.volume_mounts = [{"name": "data", "mountPath": "/grader_service_dir"}]
+    c.KubeAutogradeExecutor.volume_mounts = [{"name": "data", "mountPath": "/var/lib/grader_service"}]
     c.KubeAutogradeExecutor.volumes = [{"name": "data", "persistentVolumeClaim": {"claimName": "grader-service"}}]
 
 ---
@@ -107,9 +107,9 @@ spec:
           protocol: TCP
         volumeMounts:
           - name: data
-            mountPath: /grader_service_dir
+            mountPath: /var/lib/grader_service
           - name: config
-            mountPath: /grader_service_dir/grader_service_config.py
+            mountPath: /etc/grader-service/grader_service_config.py
             subPath: grader_service_config.py
         env:
           - name: JUPYTERHUB_API_TOKEN

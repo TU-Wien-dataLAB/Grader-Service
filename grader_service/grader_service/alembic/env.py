@@ -1,5 +1,5 @@
 from logging.config import fileConfig
-
+import os
 from sqlalchemy import engine_from_config
 from sqlalchemy import pool
 from alembic import context
@@ -12,16 +12,13 @@ config = context.config
 # This line sets up loggers basically.
 fileConfig(config.config_file_name)
 
+if not config.get_main_option('sqlalchemy.url'):
+    config.set_main_option('sqlalchemy.url', os.getenv("GRADER_DB_URL", "sqlite:///grader.db"))
 
-# imprt model.py
-import os
-import sys
-MODEL_PATH = os.path.join(os.path.abspath(os.path.dirname(__file__)), "../")
-sys.path.append(MODEL_PATH)
 
-import orm
+import grader_service.orm
 # edit this line and pass metadata
-target_metadata = orm.Base.metadata
+target_metadata = grader_service.orm.Base.metadata
 
 # add your model's MetaData object here
 # for 'autogenerate' support
