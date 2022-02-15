@@ -132,7 +132,7 @@ spec:
             readOnly: false
         - name: config
           configMap:
-            defaultMode: 440
+            defaultMode: 444
             name: grader-service
 ---
 apiVersion: v1
