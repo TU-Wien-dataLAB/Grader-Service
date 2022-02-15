@@ -169,8 +169,9 @@ export const GradingComponent = (props: IGradingProps) => {
   const openLogs = (params: GridRenderCellParams<string>) => {
     const submission: Submission = getSubmissionFromRow(params.row as IRowValues);
     let logs = submission.logs;
-    if (logs === undefined || logs === null) {
-      logs = "No Logs Available!"
+    if (logs === undefined || logs === null || logs === "") {
+      props.showAlert("error", "No logs for submission!");
+      return;
     }
     setLogs(logs);
     setShowLogs(true);
