@@ -15,7 +15,7 @@ class Submission(Model):
     Do not edit the class manually.
     """
 
-    def __init__(self, id=None, submitted_at=None, auto_status=None, manual_status=None, username=None, score=None, commit_hash=None, feedback_available=None):  # noqa: E501
+    def __init__(self, id=None, submitted_at=None, auto_status=None, manual_status=None, username=None, score=None, commit_hash=None, feedback_available=None, logs=None):  # noqa: E501
         """Submission - a model defined in OpenAPI
 
         :param id: The id of this Submission.  # noqa: E501
@@ -34,6 +34,8 @@ class Submission(Model):
         :type commit_hash: str
         :param feedback_available: The feedback_available of this Submission.  # noqa: E501
         :type feedback_available: bool
+        :param logs: The logs of this Submission.  # noqa: E501
+        :type logs: str
         """
         self.openapi_types = {
             'id': int,
@@ -43,7 +45,8 @@ class Submission(Model):
             'username': str,
             'score': float,
             'commit_hash': str,
-            'feedback_available': bool
+            'feedback_available': bool,
+            'logs': str
         }
 
         self.attribute_map = {
@@ -54,7 +57,8 @@ class Submission(Model):
             'username': 'username',
             'score': 'score',
             'commit_hash': 'commit_hash',
-            'feedback_available': 'feedback_available'
+            'feedback_available': 'feedback_available',
+            'logs': 'logs'
         }
 
         self._id = id
@@ -65,6 +69,7 @@ class Submission(Model):
         self._score = score
         self._commit_hash = commit_hash
         self._feedback_available = feedback_available
+        self._logs = logs
 
     @classmethod
     def from_dict(cls, dikt) -> 'Submission':
@@ -256,3 +261,24 @@ class Submission(Model):
         """
 
         self._feedback_available = feedback_available
+
+    @property
+    def logs(self):
+        """Gets the logs of this Submission.
+
+
+        :return: The logs of this Submission.
+        :rtype: str
+        """
+        return self._logs
+
+    @logs.setter
+    def logs(self, logs):
+        """Sets the logs of this Submission.
+
+
+        :param logs: The logs of this Submission.
+        :type logs: str
+        """
+
+        self._logs = logs
