@@ -20,6 +20,7 @@ export interface Submission {
     score?: number;
     commit_hash?: string;
     feedback_available?: boolean;
+    logs?: string;
 }
 export namespace Submission {
     export type AutoStatusEnum = 'not_graded' | 'automatically_graded' | 'grading_failed';
