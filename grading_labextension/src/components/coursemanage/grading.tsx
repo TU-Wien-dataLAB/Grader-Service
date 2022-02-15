@@ -1,21 +1,31 @@
-import { DataGrid, GridRenderCellParams } from '@mui/x-data-grid';
+import {DataGrid, GridRenderCellParams} from '@mui/x-data-grid';
 import * as React from 'react';
-import { Assignment } from '../../model/assignment';
-import { Lecture } from '../../model/lecture';
-import { utcToLocalFormat } from '../../services/datetime.service';
-import { Box, Button, Chip, FormControl, InputLabel, MenuItem } from '@mui/material';
-import Select, { SelectChangeEvent } from '@mui/material/Select';
-import { getAllSubmissions } from '../../services/submissions.service';
-import { AgreeDialog } from './dialog';
+import {Assignment} from '../../model/assignment';
+import {Lecture} from '../../model/lecture';
+import {utcToLocalFormat} from '../../services/datetime.service';
+import {
+  Box,
+  Button,
+  Chip, Dialog,
+  DialogActions,
+  DialogContent, DialogContentText,
+  DialogTitle,
+  FormControl,
+  InputLabel,
+  MenuItem, Typography
+} from '@mui/material';
+import Select, {SelectChangeEvent} from '@mui/material/Select';
+import {getAllSubmissions} from '../../services/submissions.service';
+import {AgreeDialog} from './dialog';
 import NavigateNextIcon from '@mui/icons-material/NavigateNext';
-import { ModalTitle } from "../util/modal-title";
-import { User } from "../../model/user";
-import { Submission } from "../../model/submission";
-import { autogradeSubmission, generateFeedback } from "../../services/grading.service";
+import {ModalTitle} from "../util/modal-title";
+import {User} from "../../model/user";
+import {Submission} from "../../model/submission";
+import {autogradeSubmission, generateFeedback} from "../../services/grading.service";
 import LoadingOverlay from "../util/overlay";
-import { getAssignment } from "../../services/assignments.service";
-import { ManualGrading } from "./manual-grading";
-import { PanoramaSharp } from '@mui/icons-material';
+import {getAssignment} from "../../services/assignments.service";
+import {ManualGrading} from "./manual-grading";
+import {PanoramaSharp} from '@mui/icons-material';
 
 
 export interface IGradingProps {
@@ -39,6 +49,8 @@ interface IRowValues {
 export const GradingComponent = (props: IGradingProps) => {
   const [option, setOption] = React.useState('latest');
   const [showDialog, setShowDialog] = React.useState(false);
+  const [showLogs, setShowLogs] = React.useState(false);
+  const [logs, setLogs] = React.useState(undefined);
   const [dialogContent, setDialogContent] = React.useState({
     title: '',
     message: '',
@@ -143,40 +155,54 @@ export const GradingComponent = (props: IGradingProps) => {
     })
   }, [option]);
 
-  const getColor = (value : string) => {
-    if(value === 'not_graded') {
+  const getColor = (value: string) => {
+    if (value === 'not_graded') {
       return 'warning';
-    } else if(value === 'automatically_graded' || value === 'manually_graded') {
+    } else if (value === 'automatically_graded' || value === 'manually_graded') {
       return 'success';
-    } else if(value === 'grading_failed') {
+    } else if (value === 'grading_failed') {
       return 'error';
     }
     return 'primary'
   }
 
+  const openLogs = (params: GridRenderCellParams<string>) => {
+    const submission: Submission = getSubmissionFromRow(params.row as IRowValues);
+    let logs = submission.logs;
+    if (logs === undefined || logs === null) {
+      logs = "No Logs Available!"
+    }
+    setLogs(logs);
+    setShowLogs(true);
+  }
 
   const columns = [
-    { field: 'id', headerName: 'Id', width: 110 },
-    { field: 'name', headerName: 'User', width: 130 },
-    { field: 'date', headerName: 'Date', width: 170 },
-    { field: 'auto_status', headerName: 'Autograde-Status', width: 170,
+    {field: 'id', headerName: 'Id', width: 110},
+    {field: 'name', headerName: 'User', width: 130},
+    {field: 'date', headerName: 'Date', width: 170},
+    {
+      field: 'auto_status', headerName: 'Autograde-Status', width: 170,
       renderCell: (params: GridRenderCellParams<string>) => (
 
-        <Chip variant='outlined' label={params.value} color={getColor(params.value)}/>
-      ), 
+        <Chip variant='outlined' label={params.value} color={getColor(params.value)} clickable={true}
+              onClick={() => openLogs(params)}/>
+      ),
     },
-    { field: 'manual_status', headerName: 'Manualgrade-Status', width: 170,
+    {
+      field: 'manual_status', headerName: 'Manualgrade-Status', width: 170,
       renderCell: (params: GridRenderCellParams<string>) => (
 
         <Chip variant='outlined' label={params.value} color={getColor(params.value)}/>
       ),
     },
-    { field: 'feedback_available', headerName: 'Feedback generated', width: 170,
+    {
+      field: 'feedback_available', headerName: 'Feedback generated', width: 170,
       renderCell: (params: GridRenderCellParams<boolean>) => (
-        <Chip variant='outlined' label={params.value ? 'Generated' : 'Not Generated'} color={params.value ? 'success' : 'error'}/>
+        <Chip variant='outlined' label={params.value ? 'Generated' : 'Not Generated'}
+              color={params.value ? 'success' : 'error'}/>
       ),
     },
-    { field: 'score', headerName: 'Score', width: 130 }
+    {field: 'score', headerName: 'Score', width: 130}
   ];
 
   const getSubmissionFromRow = (row: IRowValues): Submission => {
@@ -198,11 +224,11 @@ export const GradingComponent = (props: IGradingProps) => {
 
   return (
     <div>
-      <ModalTitle title="Grading" />
-      <div style={{ display: 'flex', height: '550px', marginTop: '90px' }}>
-        <div style={{ flexGrow: 1 }}>
+      <ModalTitle title="Grading"/>
+      <div style={{display: 'flex', height: '550px', marginTop: '90px'}}>
+        <div style={{flexGrow: 1}}>
           <DataGrid
-            sx={{ mb: 3, ml: 3, mr: 3 }}
+            sx={{mb: 3, ml: 3, mr: 3}}
             columns={columns}
             rows={rows}
             checkboxSelection
@@ -218,7 +244,7 @@ export const GradingComponent = (props: IGradingProps) => {
         </div>
       </div>
       <span>
-        <FormControl sx={{ m: 3 }}>
+        <FormControl sx={{m: 3}}>
           <InputLabel id="submission-select-label">View</InputLabel>
           <Select
             labelId="submission-select-label"
@@ -233,7 +259,7 @@ export const GradingComponent = (props: IGradingProps) => {
         </FormControl>
         <Button
           disabled={selectedRows.length === 0}
-          sx={{ m: 3 }}
+          sx={{m: 3}}
           variant='outlined'
           onClick={handleAutogradeSubmissions}>
           {`Autograde ${selectedRows.length} selected`}
@@ -242,10 +268,10 @@ export const GradingComponent = (props: IGradingProps) => {
           color={(selectedRows.length === 1 && selectedRows[0]?.auto_status !== "automatically_graded")
             ? "error" : (selectedRows.length !== 1 || selectedRows[0]?.auto_status !== "automatically_graded")
               ? "disabled" : "primary"}
-          sx={{ mb: -1 }} />
+          sx={{mb: -1}}/>
         <Button
           disabled={(selectedRows.length !== 1 || selectedRows[0]?.auto_status !== "automatically_graded")}
-          sx={{ m: 3 }}
+          sx={{m: 3}}
           onClick={() => setDisplayManualGrading(true)}
           variant='outlined'>
           {`Manualgrade selected`}
@@ -254,10 +280,10 @@ export const GradingComponent = (props: IGradingProps) => {
           color={selectedRows.length === 0 ?
             "disabled" : allManualGraded(selectedRows)
               ? "primary" : "error"}
-          sx={{ mb: -1 }} />
+          sx={{mb: -1}}/>
         <Button
           disabled={selectedRows.length === 0 || !allManualGraded(selectedRows)}
-          sx={{ m: 3 }}
+          sx={{m: 3}}
           onClick={handleGenerateFeedback}
           variant='outlined'>
           {`Generate Feedback for ${selectedRows.length} selected`}
@@ -271,11 +297,29 @@ export const GradingComponent = (props: IGradingProps) => {
         transition="zoom"
       >
         <ManualGrading lecture={props.lecture} assignment={props.assignment}
-          submission={getSubmissionFromRow(selectedRows[0])} username={selectedRows[0]?.name} />
+                       submission={getSubmissionFromRow(selectedRows[0])} username={selectedRows[0]?.name}/>
       </LoadingOverlay>
 
       {/* Dialog */}
       <AgreeDialog open={showDialog} {...dialogContent} />
+      <Dialog
+        open={showLogs}
+        onClose={() => setShowLogs(false)}
+        aria-labelledby="alert-dialog-title"
+        aria-describedby="alert-dialog-description"
+      >
+        <DialogTitle id="alert-dialog-title">
+          {"Logs"}
+        </DialogTitle>
+        <DialogContent>
+          <Typography id="alert-dialog-description" sx={{fontSize: 10, fontFamily: "'Roboto Mono', monospace"}}>
+            {logs}
+          </Typography>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setShowLogs(false)}>Close</Button>
+        </DialogActions>
+      </Dialog>
     </div>
   );
 };
