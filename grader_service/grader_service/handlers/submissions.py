@@ -27,6 +27,7 @@ def tuple_to_submission(t):
         s.assignid,
         s.commit_hash,
         s.feedback_available,
+        s.logs,
         s.date,
     ) = t
     return s
@@ -87,6 +88,7 @@ class SubmissionHandler(GraderBaseHandler):
                         Submission.assignid,
                         Submission.commit_hash,
                         Submission.feedback_available,
+                        Submission.logs,
                         func.max(Submission.date),
                     )
                     .filter(Submission.assignid == assignment_id)
@@ -108,6 +110,7 @@ class SubmissionHandler(GraderBaseHandler):
                         Submission.assignid,
                         Submission.commit_hash,
                         Submission.feedback_available,
+                        Submission.logs,
                         func.max(Submission.date),
                     )
                     .filter(

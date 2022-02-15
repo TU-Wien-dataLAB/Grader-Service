@@ -8,6 +8,7 @@ from datetime import datetime
 from pathlib import Path
 from re import S
 from subprocess import PIPE, CalledProcessError
+from typing import Optional
 
 from grader_convert.converters.autograde import Autograde
 from grader_convert.gradebook.models import GradeBookModel
@@ -62,9 +63,10 @@ class LocalAutogradeExecutor(LoggingConfigurable):
         self.submission = submission
         self.session: Session = Session.object_session(self.submission)
 
-        self.autograding_start: datetime = None
-        self.autograding_finished: datetime = None
-        self.autograding_status: str = None
+        self.autograding_start: Optional[datetime] = None
+        self.autograding_finished: Optional[datetime] = None
+        self.autograding_status: Optional[str] = None
+        self.grading_logs: Optional[str] = None
 
     async def start(self):
         """Starts the autograding job. This is the only method that is exposed to the client.
@@ -182,13 +184,13 @@ class LocalAutogradeExecutor(LoggingConfigurable):
         command = f'{self.convert_executable} autograde -i "{self.input_path}" -o "{self.output_path}" -p "*.ipynb"'
         self.log.info(f"Running {command}")
         process = await self._run_subprocess(command, None)
-        output = process.stderr.read().decode("utf-8")
-        self.log.info(output)
+        self.grading_logs = process.stderr.read().decode("utf-8")
+        self.log.info(self.grading_logs)
         if process.returncode == 0:
             self.log.info("Process has successfully completed execution!")
         else:
             self.log.info("Pod failed execution:")
-            self.log.info(output)
+            self.log.info(self.grading_logs)
             raise RuntimeError("Process has failed execution!")
         # autograder = Autograde(self.input_path, self.output_path, "*.ipynb")
         # autograder.force = True
@@ -285,6 +287,7 @@ class LocalAutogradeExecutor(LoggingConfigurable):
             self.submission.auto_status = "automatically_graded"
         else:
             self.submission.auto_status = "grading_failed"
+        self.submission.logs = self.grading_logs
         self.session.commit()
 
     def _cleanup(self):
@@ -300,8 +303,8 @@ class LocalAutogradeExecutor(LoggingConfigurable):
         try:
             await process.wait_for_exit()
         except CalledProcessError:
-            error = process.stderr.read().decode("utf-8")
-            self.log.error(error)
+            self.grading_logs = process.stderr.read().decode("utf-8")
+            self.log.error(self.grading_logs)
         return process
 
     @validate("base_input_path", "base_output_path")
@@ -311,7 +314,7 @@ class LocalAutogradeExecutor(LoggingConfigurable):
             raise TraitError("The path specified has to be absolute")
         if not os.path.exists(path):
             self.log.info(f"Path {path} not found, creating new directories.")
-            Path(path).mkdir(parents=True, exist_ok=True, mode=0o777)
+            Path(path).mkdir(parents=True, exist_ok=True)
         if not os.path.isdir(path):
             raise TraitError("The path has to be an existing directory")
         return path

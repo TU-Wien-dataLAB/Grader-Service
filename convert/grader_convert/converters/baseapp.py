@@ -1,7 +1,8 @@
+import logging
 import os
 import sys
 
-# from jupyter_core.application import JupyterApp
+from jupyter_core.application import JupyterApp
 from traitlets.config.application import Application
 from traitlets.traitlets import Unicode, validate, TraitError
 
@@ -38,6 +39,9 @@ class ConverterApp(Application):
     input_directory = Unicode(None, allow_none=False).tag(config=True)
     output_directory = Unicode(None, allow_none=False).tag(config=True)
     file_pattern = Unicode("*.ipynb", allow_none=False).tag(config=True)
+
+    def _log_level_default(self):
+        return logging.INFO
 
     @validate("input_directory", "output_directory")
     def _dir_exits(self, proposal) -> str:

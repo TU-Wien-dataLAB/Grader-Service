@@ -10,7 +10,6 @@ from sqlalchemy import (
     Text,
 )
 from sqlalchemy.orm import relationship
-from sqlalchemy.sql.expression import false
 
 from grader_service.orm.base import Base, Serializable
 
@@ -31,6 +30,7 @@ class Submission(Base, Serializable):
     commit_hash = Column(String(length=40), nullable=False)
     properties = Column(Text, nullable=True, unique=False)
     feedback_available = Column(Boolean, nullable=False)
+    logs = Column(Text, nullable=True)
 
     assignment = relationship("Assignment", back_populates="submissions")
     user = relationship("User", back_populates="submissions")
@@ -48,4 +48,5 @@ class Submission(Base, Serializable):
             score=self.score,
             commit_hash=self.commit_hash,
             feedback_available=self.feedback_available,
+            logs=self.logs
         )

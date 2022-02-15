@@ -100,7 +100,7 @@ class KubeAutogradeExecutor(LocalAutogradeExecutor):
 
     def start_pod(self) -> GraderPod:
         # The output path will not exist in the pod
-        Path(self.output_path).mkdir(parents=True, exist_ok=True, mode=0o666)
+        Path(self.output_path).mkdir(parents=True, exist_ok=True)
         command = f'{self.convert_executable} autograde ' \
                   f'-i "{self.input_path}" ' \
                   f'-o "{self.output_path}" ' \
@@ -110,7 +110,7 @@ class KubeAutogradeExecutor(LocalAutogradeExecutor):
             name=self.submission.commit_hash,
             cmd=shlex.split(command),
             image=self.get_image(),
-            image_pull_policy="Always",
+            image_pull_policy=None,
             working_dir="/",
             volumes=self.volumes,
             volume_mounts=self.volume_mounts,
@@ -128,12 +128,12 @@ class KubeAutogradeExecutor(LocalAutogradeExecutor):
             grader_pod = self.start_pod()
             self.log.info(f"Started pod {grader_pod.name} in namespace {grader_pod.namespace}")
             status = await grader_pod.polling
-            pod_logs = self._get_pod_logs(grader_pod)
+            self.grading_logs = self._get_pod_logs(grader_pod)
             if status == "Succeeded":
                 self.log.info("Pod has successfully completed execution!")
             else:
                 self.log.info("Pod has failed execution:")
-                self.log.info(pod_logs)
+                self.log.info(self.grading_logs)
                 self._delete_pod(grader_pod)
                 raise RuntimeError("Pod has failed execution!")
             # cleanup
