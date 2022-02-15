@@ -1,16 +1,16 @@
 from textwrap import dedent
 
-from .converters.autograde import AutogradeApp
-from .converters.baseapp import (
+from grader_convert.converters.autograde import AutogradeApp
+from grader_convert.converters.baseapp import (
     ConverterApp,
     base_converter_aliases,
     base_converter_flags,
 )
-from .converters.generate_assignment import GenerateAssignmentApp
-from .converters.generate_feedback import GenerateFeedbackApp
-from .converters.generate_solution import GenerateSolutionApp
-from .converters.updateapp import UpdateApp
-from .converters.validateapp import ValidateApp
+from grader_convert.converters.generate_assignment import GenerateAssignmentApp
+from grader_convert.converters.generate_feedback import GenerateFeedbackApp
+from grader_convert.converters.generate_solution import GenerateSolutionApp
+from grader_convert.converters.updateapp import UpdateApp
+from grader_convert.converters.validateapp import ValidateApp
 
 aliases = {}
 aliases.update(base_converter_aliases)

@@ -5,9 +5,9 @@ import traceback
 
 from traitlets import default
 
-from ..nbgraderformat import SchemaTooNewError, SchemaTooOldError
-from ..validator import Validator
-from .baseapp import ConverterApp
+from grader_convert.nbgraderformat import SchemaTooNewError, SchemaTooOldError
+from grader_convert.validator import Validator
+from grader_convert.converters.baseapp import ConverterApp
 
 aliases = {}
 flags = {

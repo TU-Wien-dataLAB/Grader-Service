@@ -10,8 +10,8 @@ from nbformat.notebooknode import NotebookNode
 from traitlets import Bool, Integer, List, Unicode
 from traitlets.config import LoggingConfigurable
 
-from . import utils
-from .preprocessors import CheckCellMetadata, ClearOutput, Execute
+from grader_convert import utils
+from grader_convert.preprocessors import CheckCellMetadata, ClearOutput, Execute
 
 
 class Validator(LoggingConfigurable):

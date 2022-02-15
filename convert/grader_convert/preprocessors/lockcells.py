@@ -4,8 +4,8 @@ from nbconvert.exporters.exporter import ResourcesDict
 from nbformat.notebooknode import NotebookNode
 from traitlets import Bool
 
-from .. import utils
-from . import NbGraderPreprocessor
+from grader_convert import utils
+from grader_convert.preprocessors.base import NbGraderPreprocessor
 
 
 class LockCells(NbGraderPreprocessor):

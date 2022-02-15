@@ -1,11 +1,16 @@
+from pathlib import Path
+
 from setuptools import find_packages
 from setuptools import setup
 import os
 from grader_convert.main import main
 
 _version = "0.1.0"
-HERE = os.path.dirname(__file__)
-package_dir = os.path.join(HERE, "grader_convert")
+
+source_root = Path(".")
+# Read the requirements
+with (source_root / "requirements.txt").open(encoding="utf8") as f:
+    requirements = f.readlines()
 
 setup(
     name="grader-convert",
@@ -15,7 +20,7 @@ setup(
     include_package_data=True,
     url="https://gitlab.tuwien.ac.at/hpc/datalab/jupyter/grader/grader.git",
     license="MIT",
-    author="Matthias Matt",
+    author='Elias Wimmer, Florian Jäger & Matthias Matt',
     author_email="",
     description="Grader convert",
     entry_points={
@@ -23,4 +28,5 @@ setup(
             f"grader-convert = {main.__module__}:main",
         ],
     },
+    install_requires=requirements,
 )

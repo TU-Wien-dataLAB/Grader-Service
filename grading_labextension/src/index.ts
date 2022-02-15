@@ -38,6 +38,7 @@ import { IFileBrowserFactory } from '@jupyterlab/filebrowser';
 import { UserPermissions } from './services/permission.service';
 import { CellPlayButton } from './components/notebook/create-assignment/widget';
 import { AssignmentList } from './widgets/assignment-list';
+import { CreationWidget } from './components/notebook/create-assignment/creation-widget';
 
 namespace AssignmentsCommandIDs {
   export const create = 'assignments:create';
@@ -165,38 +166,21 @@ const extension: JupyterFrontEndPlugin<void> = {
           return;
         }
         const switcher: any = (notebookPanel.toolbar.layout as PanelLayout)
-          .widgets[10]; // TODO: instead of indexing use search for instance of CreationmodeSwitch; maybe other plugins change index
-        // Remove the existing play button from
-        // the previously active cell. This may
-        // well introduce bugs down the road and
-        // there is likely a better way to do this
-        notebook.widgets.map((c: Cell) => {
-          const currentLayout = c.layout as PanelLayout;
-          currentLayout.widgets.map(w => {
-            if (w instanceof CellPlayButton) {
-              currentLayout.removeWidget(w);
-            }
-          });
-        });
+          .widgets[10];
 
         const cell: Cell = notebook.activeCell;
-        const newButton: CellPlayButton = new CellPlayButton(
-          cell,
-          notebookPanel.sessionContext,
-          switcher.mode
-        );
-        (cell.layout as PanelLayout).insertWidget(2, newButton);
+
         //check if in creationmode and new cell was inserted
         if (
           switcher.mode &&
           (cell.layout as PanelLayout).widgets.every(w => {
-            if (w instanceof CellWidget) {
+            if (w instanceof CreationWidget) {
               return false;
             }
             return true;
           })
         ) {
-          (cell.layout as PanelLayout).insertWidget(0, new CellWidget(cell));
+          (cell.layout as PanelLayout).insertWidget(0, new CreationWidget(cell));
         }
       }, this);
     };

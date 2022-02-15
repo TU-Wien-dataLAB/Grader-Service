@@ -6,7 +6,7 @@ from typing import Any, Optional, Union
 
 from nbconvert.exporters import notebook
 
-from .models import (
+from grader_convert.gradebook.models import (
     Comment,
     Grade,
     GradeBookModel,

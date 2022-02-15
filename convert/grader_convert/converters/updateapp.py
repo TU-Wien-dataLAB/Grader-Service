@@ -8,14 +8,14 @@ from nbformat import read as orig_read
 from nbformat import write as orig_write
 from traitlets import Bool
 
-from ..nbgraderformat import (
+from grader_convert.nbgraderformat import (
     MetadataValidator,
     SchemaTooNewError,
     ValidationError,
     write,
 )
-from ..utils import find_all_notebooks
-from .baseapp import ConverterApp
+from grader_convert.utils import find_all_notebooks
+from grader_convert.converters.baseapp import ConverterApp
 
 aliases = {
     "log-level": "Application.log_level",

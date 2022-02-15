@@ -24,10 +24,9 @@ from traitlets import (
 )
 from traitlets.config import Config, LoggingConfigurable
 
-from ..nbgraderformat import SchemaTooNewError, SchemaTooOldError
-from ..nbgraderformat.common import ValidationError
-from ..preprocessors.execute import UnresponsiveKernelError
-from ..utils import find_all_files, remove, rmtree
+from grader_convert.nbgraderformat import SchemaTooNewError, SchemaTooOldError
+from grader_convert.nbgraderformat.common import ValidationError
+from grader_convert.preprocessors.execute import UnresponsiveKernelError
 
 
 class GraderConvertException(Exception):

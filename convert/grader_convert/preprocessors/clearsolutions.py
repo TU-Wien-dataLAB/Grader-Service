@@ -7,8 +7,8 @@ from nbformat.notebooknode import NotebookNode
 from traitlets import Bool, Dict, Unicode
 from traitlets.config.loader import Config
 
-from .. import utils
-from . import NbGraderPreprocessor
+from grader_convert import utils
+from grader_convert.preprocessors.base import NbGraderPreprocessor
 
 
 class ClearSolutions(NbGraderPreprocessor):

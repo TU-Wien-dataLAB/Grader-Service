@@ -9,7 +9,6 @@ typing-extensions==3.10.0.2
 urllib3==1.26.6
 json5==0.9.6
 jsonschema==3.2.0
-jupyter-client==6.1.12
-nbconvert==5.6.1
 setuptools
+kubernetes>=17.17.0
 #missing local libs

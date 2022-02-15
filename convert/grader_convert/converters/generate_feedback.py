@@ -6,9 +6,9 @@ from nbconvert.preprocessors import CSSHTMLHeaderPreprocessor
 from traitlets import List, default
 from traitlets.config import Config
 
-from ..converters.baseapp import ConverterApp
-from ..preprocessors import GetGrades
-from .base import BaseConverter
+from grader_convert.converters.baseapp import ConverterApp
+from grader_convert.preprocessors import GetGrades
+from grader_convert.converters.base import BaseConverter
 
 
 class GenerateFeedback(BaseConverter):
@@ -35,17 +35,10 @@ class GenerateFeedback(BaseConverter):
             input_dir, output_dir, file_pattern, **kwargs
         )
         c = Config()
-        if "template_file" not in self.config.HTMLExporter:
-            c.HTMLExporter.template_file = "feedback.tpl"
-        if "template_path" not in self.config.HTMLExporter:
-            template_path = os.path.abspath(
-                os.path.join(
-                    os.path.dirname(__file__),
-                    "..",
-                    "templates",
-                )
-            )
-            c.HTMLExporter.template_path = [".", template_path]
+        # Note: nbconvert 6.0 completely changed how templates work: they can now be installed separately
+        #  and can be given by name (classic is default)
+        if "template" not in self.config.HTMLExporter:
+            c.HTMLExporter.template = "classic"
         self.update_config(c)
         self.force = True  # always overwrite generated assignments
 
@@ -58,4 +51,5 @@ class GenerateFeedbackApp(ConverterApp):
             input_dir=self.input_directory,
             output_dir=self.output_directory,
             file_pattern=self.file_pattern,
+            config=self.config
         ).start()

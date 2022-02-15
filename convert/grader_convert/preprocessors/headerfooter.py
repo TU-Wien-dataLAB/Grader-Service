@@ -8,8 +8,8 @@ from nbformat import current_nbformat
 from nbformat.notebooknode import NotebookNode
 from traitlets import Unicode
 
-from ..nbgraderformat import read as read_nb
-from . import NbGraderPreprocessor
+from grader_convert.nbgraderformat import read as read_nb
+from grader_convert.preprocessors.base import NbGraderPreprocessor
 
 
 class IncludeHeaderFooter(NbGraderPreprocessor):

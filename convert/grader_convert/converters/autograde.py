@@ -5,9 +5,9 @@ from typing import Any
 from traitlets import Bool, Dict, List
 from traitlets.config.loader import Config
 
-from .. import utils
-from ..gradebook.gradebook import Gradebook, MissingEntry
-from ..preprocessors import (
+from grader_convert import utils
+from grader_convert.gradebook.gradebook import Gradebook, MissingEntry
+from grader_convert.preprocessors import (
     CheckCellMetadata,
     ClearOutput,
     DeduplicateIds,
@@ -17,35 +17,11 @@ from ..preprocessors import (
     OverwriteKernelspec,
     SaveAutoGrades,
 )
-from .base import BaseConverter
-from .baseapp import ConverterApp
+from grader_convert.converters.base import BaseConverter
+from grader_convert.converters.baseapp import ConverterApp
 
 
 class Autograde(BaseConverter):
-
-    create_student = Bool(
-        True,
-        help=dedent(
-            """
-            Whether to create the student at runtime if it does not
-            already exist.
-            """
-        ),
-    ).tag(config=True)
-
-    exclude_overwriting = Dict(
-        {},
-        help=dedent(
-            """
-            A dictionary with keys corresponding to assignment names and values
-            being a list of filenames (relative to the assignment's source
-            directory) that should NOT be overwritten with the source version.
-            This is to allow students to e.g. edit a python file and submit it
-            alongside the notebooks in their assignment.
-            """
-        ),
-    ).tag(config=True)
-
     _sanitizing = True
 
     sanitize_preprocessors = List(
@@ -143,4 +119,5 @@ class AutogradeApp(ConverterApp):
             input_dir=self.input_directory,
             output_dir=self.output_directory,
             file_pattern=self.file_pattern,
+            config=self.config
         ).start()

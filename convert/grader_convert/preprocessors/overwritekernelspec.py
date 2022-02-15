@@ -4,8 +4,8 @@ from typing import Tuple
 from nbconvert.exporters.exporter import ResourcesDict
 from nbformat.notebooknode import NotebookNode
 
-from ..gradebook.gradebook import Gradebook
-from . import NbGraderPreprocessor
+from grader_convert.gradebook.gradebook import Gradebook
+from grader_convert.preprocessors.base import NbGraderPreprocessor
 
 
 class OverwriteKernelspec(NbGraderPreprocessor):

@@ -4,10 +4,9 @@ from nbconvert.exporters.exporter import ResourcesDict
 from nbformat.notebooknode import NotebookNode
 from nbformat.v4.nbbase import validate
 
-from .. import utils
-from ..gradebook.gradebook import Gradebook, MissingEntry
-from . import NbGraderPreprocessor
-
+from grader_convert.gradebook.gradebook import Gradebook, MissingEntry
+from grader_convert import utils
+from grader_convert.preprocessors.base import NbGraderPreprocessor
 
 class OverwriteCells(NbGraderPreprocessor):
     """A preprocessor to overwrite information about grade and solution cells."""

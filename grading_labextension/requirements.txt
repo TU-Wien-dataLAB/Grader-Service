@@ -1,5 +1,4 @@
 six==1.16.0
-traitlets==5.0.5
-grader-convert
+traitlets>=5.0.5
 jupyter_packaging==0.7.12
 jupyter_server==1.9.0

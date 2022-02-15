@@ -4,10 +4,9 @@ from nbconvert.exporters.exporter import ResourcesDict
 from nbformat.notebooknode import NotebookNode
 from traitlets import List
 
-from .. import utils
-from ..gradebook.gradebook import Gradebook
-from . import NbGraderPreprocessor
-
+from grader_convert.gradebook.gradebook import Gradebook
+from grader_convert import utils
+from grader_convert.preprocessors.base import NbGraderPreprocessor
 
 class GetGrades(NbGraderPreprocessor):
     """Preprocessor for saving grades from the database to the notebook"""

@@ -4,10 +4,10 @@ from typing import Tuple
 from nbconvert.exporters.exporter import ResourcesDict
 from nbformat.notebooknode import NotebookNode
 
-from .. import utils
-from ..gradebook.gradebook import Gradebook, MissingEntry
-from ..gradebook.models import GradeCell, SolutionCell, SourceCell, TaskCell
-from . import NbGraderPreprocessor
+from grader_convert.gradebook.gradebook import Gradebook, MissingEntry
+from grader_convert.gradebook.models import GradeCell, SolutionCell, SourceCell, TaskCell
+from grader_convert import utils
+from grader_convert.preprocessors.base import NbGraderPreprocessor
 
 
 class SaveCells(NbGraderPreprocessor):
