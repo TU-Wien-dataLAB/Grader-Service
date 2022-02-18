@@ -3,7 +3,7 @@ import * as React from 'react';
 import { Cell } from '@jupyterlab/cells';
 
 import { ReactElement, JSXElementConstructor } from 'react';
-import { GradeBook } from '../../../services/gradebook';
+import { GradeBook } from '../../../../services/gradebook';
 import { DataComponent } from './data-component';
 
 export class DataWidget extends ReactWidget {
