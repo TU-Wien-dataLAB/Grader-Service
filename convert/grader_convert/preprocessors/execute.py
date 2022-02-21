@@ -64,16 +64,6 @@ class Execute(NbGraderPreprocessor, ExecutePreprocessor):
 
         return output
 
-    def preprocess_cell(self, cell, resources, cell_index, store_history=True):
-        """
-        Need to override preprocess_cell to check reply for errors
-        """
-        if cell.cell_type != "code" or not cell.source.strip():
-            return cell, resources
-
-        cell = self.execute_cell(cell, cell_index, store_history=True)
-        return cell, resources
-
     async def _async_handle_timeout(self, timeout: int, cell: t.Optional[NotebookNode] = None) -> None:
         await super()._async_handle_timeout(timeout, cell)
 
