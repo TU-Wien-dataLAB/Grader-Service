@@ -38,7 +38,16 @@ class GenerateFeedback(BaseConverter):
         # Note: nbconvert 6.0 completely changed how templates work: they can now be installed separately
         #  and can be given by name (classic is default)
         if "template" not in self.config.HTMLExporter:
-            c.HTMLExporter.template = "classic"
+            template_path = os.path.abspath(
+                os.path.join(
+                    os.path.dirname(__file__),
+                    "..",
+                    "templates",
+                )
+            )
+            # '/Users/matthiasmatt/opt/miniconda3/envs/grader/share/jupyter/nbconvert/templates/classic/index.html.j2'
+            c.TemplateExporter.extra_template_basedirs = template_path
+            c.HTMLExporter.template_name = "feedback"
         self.update_config(c)
         self.force = True  # always overwrite generated assignments
 
