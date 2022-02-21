@@ -1,8 +1,8 @@
 import * as React from 'react';
 import { Cell } from '@jupyterlab/cells';
 import { Box, Divider, Grid, Typography } from '@mui/material';
-import { CellModel } from '../model';
-import { GradeBook } from '../../../services/gradebook';
+import { CellModel } from '../../model';
+import { GradeBook } from '../../../../services/gradebook';
 
 
 export interface DataComponentProps {

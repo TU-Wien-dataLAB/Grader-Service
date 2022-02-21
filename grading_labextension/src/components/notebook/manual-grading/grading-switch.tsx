@@ -14,8 +14,8 @@ import { Assignment } from '../../../model/assignment';
 import { IconNames } from '@blueprintjs/icons';
 import { getAllAssignments } from '../../../services/assignments.service';
 import { getAllLectures } from '../../../services/lectures.service';
-import { DataWidget } from './data-widget';
-import { GradeWidget } from './grade-widget';
+import { DataWidget } from './data-widget/data-widget';
+import { GradeWidget } from './grade-widget/grade-widget';
 
 
 export class GradingModeSwitch extends React.Component<ImodeSwitchProps> {

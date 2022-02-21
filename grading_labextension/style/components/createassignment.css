@@ -1,34 +1,51 @@
+.nbgrader-validate-button {
+    margin-top: 0px;
+    min-height: 8px;
+    font-size: 9pt;
+    background-color: white;
+}
+
+.nbgrader-validate-button svg {
+    width: 9pt;
+    height: 9pt;
+}
+
+
+/* old Widgets */
+
 .nbgrader-CreateAssignmentWidget {
     background: var(--jp-layout-color1);
     color: var(--jp-ui-font-color1);
     min-width: 251px;
+}
 
-  }
-  
-  .nbgrader-NotebookPanelWidget {
+.cell-error {
+    background-color: rgb(255, 112, 112);
+}
+
+.nbgrader-NotebookPanelWidget {
     height: 100%;
     display: flex;
     flex-direction: column;
-  }
-  
-  .nbgrader-NotebookHeaderWidget {
+}
+
+.nbgrader-NotebookHeaderWidget {
     padding-top: 12px;
     border-bottom: solid var(--jp-border-color1) var(--jp-border-width);
     box-shadow: var(--jp-toolbar-box-shadow);
-  }
-  
-  .nbgrader-NotebookHeaderWidget>* {
+}
+
+.nbgrader-NotebookHeaderWidget>* {
     padding: 0 12px;
-  }
-  
-  .nbgrader-TotalPointsInput {
+}
+
+.nbgrader-TotalPointsInput {
     width: 3em;
     height: 24px;
     text-align: right;
     line-height: 10px;
     margin-left: 0.3em;
     margin-right: 0.3em;
-  
     background: var(--jp-input-background);
     font-size: var(--jp-ui-font-size1);
     font-family: var(--jp-content-font-family);
@@ -37,37 +54,37 @@
     flex: 1 1 auto;
     padding: 0 8px 0 8px;
     outline: none;
-  }
-  
-  .nbgrader-NotebookWidget {
+}
+
+.nbgrader-NotebookWidget {
     overflow: auto;
     height: 100%;
-  }
-  
-  .nbgrader-CellWidget {
+}
+
+.nbgrader-CellWidget {
     margin-top: 12px;
     height: auto;
     border-style: solid;
     border-width: 0 0 var(--jp-border-width) 0;
     border-color: var(--jp-border-color2);
-  }
-  
-  .nbgrader-CellWidget:last-child {
+}
+
+.nbgrader-CellWidget:last-child {
     border-width: 0;
-  }
-  
-  .nbgrader-CellWidget>div {
+}
+
+.nbgrader-CellWidget>div {
     padding: 0 12px 0 6px;
     border-style: solid;
     border-width: 0 0 0 6px;
     border-color: #0000;
-  }
-  
-  .nbgrader-CellWidget.nbgrader-mod-active>div {
+}
+
+.nbgrader-CellWidget.nbgrader-mod-active>div {
     border-color: var(--jp-brand-color1);
-  }
-  
-  .nbgrader-CellWidget input {
+}
+
+.nbgrader-CellWidget input {
     background: var(--jp-input-background);
     font-size: var(--jp-ui-font-size1);
     font-family: var(--jp-content-font-family);
@@ -76,86 +93,90 @@
     flex: 1 1 auto;
     padding: 0 8px 0 8px;
     outline: none;
-  }
-  
-  .nbgrader-CellWidget .jp-select-wrapper {
+}
+
+.nbgrader-CellWidget .jp-select-wrapper {
     display: inline-flex;
     font-size: var(--jp-ui-font-size1);
     margin-bottom: 0;
-  }
-  
-  .nbgrader-CellWidget .jp-select-wrapper select.jp-mod-styled {
+}
+
+.nbgrader-CellWidget .jp-select-wrapper select.jp-mod-styled {
     font-size: var(--jp-ui-font-size1);
-  }
-  
-  .nbgrader-CellWidget .nbgrader-mod-uneditable {
+}
+
+.nbgrader-CellWidget .nbgrader-mod-uneditable {
     visibility: hidden;
-  }
-  
-  .nbgrader-CellWidget select {
+}
+
+.nbgrader-CellWidget select {
     padding-right: 25px;
-  }
-  
-  .nbgrader-CellWidget select:hover {
+}
+
+.nbgrader-CellWidget select:hover {
     cursor: pointer;
-  }
-  
-  .nbgrader-NotebookPoints, .nbgrader-CellHeader, .nbgrader-CellType, .nbgrader-CellPoints, .nbgrader-CellId {
+}
+
+.nbgrader-NotebookPoints,
+.nbgrader-CellHeader,
+.nbgrader-CellType,
+.nbgrader-CellPoints,
+.nbgrader-CellId {
     margin-bottom: 12px;
-  }
-  
-  .nbgrader-CellWidget>label {
+}
+
+.nbgrader-CellWidget>label {
     font-size: var(--jp-ui-font-size1);
-  }
-  
-  .nbgrader-CellHeader {
+}
+
+.nbgrader-CellHeader {
     display: grid;
     grid-template-columns: auto max-content;
     background-color: #EEE;
     padding: 0 0.5em;
-  }
-  
-  .nbgrader-mod-highlight .nbgrader-CellHeader {
+}
+
+.nbgrader-mod-highlight .nbgrader-CellHeader {
     background-color: #337AB7;
-  }
-  
-  .nbgrader-CellHeader>.jp-InputPrompt {
+}
+
+.nbgrader-CellHeader>.jp-InputPrompt {
     border-width: 0;
     padding-left: 0;
     text-align: left;
     margin: auto 0;
-  }
-  
-  .nbgrader-CellHeader>* {
+}
+
+.nbgrader-CellHeader>* {
     color: black;
-  }
-  
-  .nbgrader-mod-highlight .nbgrader-CellHeader>* {
+}
+
+.nbgrader-mod-highlight .nbgrader-CellHeader>* {
     color: white;
-  }
-  
-  .nbgrader-CellHeader>.nbgrader-LockButton {
+}
+
+.nbgrader-CellHeader>.nbgrader-LockButton {
     margin: auto 0;
     padding: 0.25em;
     cursor: default;
-  }
-  
-  .nbgrader-LockButton {
+}
+
+.nbgrader-LockButton {
     opacity: 0;
-  }
-  
-  .nbgrader-LockButton.nbgrader-mod-locked {
+}
+
+.nbgrader-LockButton.nbgrader-mod-locked {
     opacity: 1;
-  }
-  
-  .nbgrader-CellPoints input {
-      width: 3.5em;
-      height: 22px;
-      text-align: right;
-      line-height: 10px;
-  }
-  
-  .nbgrader-CellId input {
-      height: 22px;
-      text-align: left;
-  }
+}
+
+.nbgrader-CellPoints input {
+    width: 3.5em;
+    height: 22px;
+    text-align: right;
+    line-height: 10px;
+}
+
+.nbgrader-CellId input {
+    height: 22px;
+    text-align: left;
+}
