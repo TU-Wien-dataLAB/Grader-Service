@@ -12,10 +12,10 @@ export interface ErrorComponentProps {
 
 
 export const ErrorComponent = (props : ErrorComponentProps) => {
-    const alertStyle = { width: 250 };
+    //const alertStyle = { width: 250 };
 
     return (
-        <Alert variant='outlined' sx={alertStyle} severity='error'>
+        <Alert variant="filled" severity='error'>
         Duplicate ID
     </Alert>
     );

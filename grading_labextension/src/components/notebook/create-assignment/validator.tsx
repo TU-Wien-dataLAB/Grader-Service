@@ -3,7 +3,7 @@ import { Button } from '@blueprintjs/core';
 import { Cell } from '@jupyterlab/cells';
 import * as React from "react";
 import { NbgraderData } from "../model";
-import { PanelLayout } from "@lumino/widgets";
+import { PanelLayout, Widget } from "@lumino/widgets";
 import { CellWidget } from "./cellwidget";
 import { CreationWidget } from "./creation-widget";
 import { ErrorWidget } from "./error-widget";
@@ -21,6 +21,13 @@ export const Validator = (props : ValidatorProps) => {
         const ids = new Set()
         const errors = []
         console.log("started validation");
+        props.notebook.widgets.map((c : Cell) => {
+            (c.layout as PanelLayout).widgets.map( (w : Widget) => {
+                if(w instanceof ErrorWidget) {
+                    c.layout.removeWidget(w);
+                }
+            })
+        });
         props.notebook.widgets.map((c : Cell) => {
             const metadata : NbgraderData = c.model.metadata.get("nbgrader").valueOf() as NbgraderData;
             if(metadata !== null) {
