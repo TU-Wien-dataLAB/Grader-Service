@@ -86,7 +86,8 @@ class LocalAutogradeExecutor(LoggingConfigurable):
                 f"Successfully completed autograding job for submission {self.submission.id} in {self.__class__.__name__};"
                 + f" took {ts // 60}min {ts % 60}s")
         except Exception:
-            self.log.error(f"Failed autograding job for submission {self.submission.id} in {self.__class__.__name__}")
+            self.log.error(f"Failed autograding job for submission {self.submission.id} in {self.__class__.__name__}",
+                           exc_info=True)
             self._set_db_state(success=False)
             # raise
         finally:
@@ -190,7 +191,6 @@ class LocalAutogradeExecutor(LoggingConfigurable):
             self.log.info("Process has successfully completed execution!")
         else:
             self.log.info("Pod failed execution:")
-            self.log.info(self.grading_logs)
             raise RuntimeError("Process has failed execution!")
         # autograder = Autograde(self.input_path, self.output_path, "*.ipynb")
         # autograder.force = True
@@ -258,7 +258,7 @@ class LocalAutogradeExecutor(LoggingConfigurable):
                 self.output_path,
             )
         except CalledProcessError:
-            pass  # TODO: exit gracefully
+            raise RuntimeError(f"Failed to commit changes")
 
         self.log.info(
             f"Pushing to {git_repo_path} at branch submission_{self.submission.commit_hash}"
@@ -267,7 +267,7 @@ class LocalAutogradeExecutor(LoggingConfigurable):
         try:
             await self._run_subprocess(command, self.output_path)
         except CalledProcessError:
-            pass  # TODO: exit gracefully
+            raise RuntimeError(f"Failed to push to {git_repo_path}")
         self.log.info("Pushing complete")
 
     def _set_properties(self):
@@ -314,7 +314,7 @@ class LocalAutogradeExecutor(LoggingConfigurable):
             raise TraitError("The path specified has to be absolute")
         if not os.path.exists(path):
             self.log.info(f"Path {path} not found, creating new directories.")
-            Path(path).mkdir(parents=True, exist_ok=True)
+            Path(path).mkdir(parents=True, exist_ok=True, mode=664)
         if not os.path.isdir(path):
             raise TraitError("The path has to be an existing directory")
         return path

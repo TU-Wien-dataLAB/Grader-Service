@@ -62,10 +62,10 @@ data:
     from grader_service.autograding.kube.kube_grader import KubeAutogradeExecutor
     c.RequestHandlerConfig.autograde_executor_class = KubeAutogradeExecutor
     c.KubeAutogradeExecutor.kube_context = None
-    c.KubeAutogradeExecutor.base_input_path = "/var/lib/grader_service/convert_in"
-    c.KubeAutogradeExecutor.base_output_path = "/var/lib/grader_service/convert_out"
+    c.KubeAutogradeExecutor.base_input_path = "/var/lib/grader-service/convert_in"
+    c.KubeAutogradeExecutor.base_output_path = "/var/lib/grader-service/convert_out"
     c.KubeAutogradeExecutor.default_image_name = lambda l, a: "s210.dl.hpc.tuwien.ac.at/grader/grader-notebook-minimal:latest"
-    c.KubeAutogradeExecutor.volume_mounts = [{"name": "data", "mountPath": "/var/lib/grader_service"}]
+    c.KubeAutogradeExecutor.volume_mounts = [{"name": "data", "mountPath": "/var/lib/grader-service"}]
     c.KubeAutogradeExecutor.volumes = [{"name": "data", "persistentVolumeClaim": {"claimName": "grader-service"}}]
 
 ---
@@ -107,7 +107,7 @@ spec:
           protocol: TCP
         volumeMounts:
           - name: data
-            mountPath: /var/lib/grader_service
+            mountPath: /var/lib/grader-service
           - name: config
             mountPath: /etc/grader-service/grader_service_config.py
             subPath: grader_service_config.py

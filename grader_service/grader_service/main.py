@@ -2,7 +2,9 @@ import asyncio
 import logging
 import os
 import secrets
+import shlex
 import signal
+import subprocess
 import sys
 
 import tornado
@@ -45,6 +47,9 @@ class GraderService(config.Application):
     grader_service_dir = Unicode(os.getenv("GRADER_SERVICE_DIRECTORY"), allow_none=False).tag(config=True)
 
     db_url = Unicode(os.getenv("GRADER_DB_URL", "sqlite:///grader.db"), allow_none=False).tag(config=True)
+
+    service_git_username = Unicode("grader-service", allow_none=False).tag(config=True)
+    service_git_email = Unicode("", allow_none=False).tag(config=True)
 
     config_file = Unicode(
         "grader_service_config.py", help="The config file to load"
@@ -156,6 +161,8 @@ class GraderService(config.Application):
 
         if not os.path.exists(os.path.join(self.grader_service_dir, "git")):
             os.mkdir(os.path.join(self.grader_service_dir, "git"))
+        subprocess.run(shlex.split(f'git config --global user.name "{self.service_git_username}"'))
+        subprocess.run(shlex.split(f'git config --global user.email "{self.service_git_email}"'))
 
         # pass config to DataBaseManager and GraderExecutor
         GraderExecutor.config = self.config
@@ -261,7 +268,7 @@ class GraderService(config.Application):
         path = change["new"]
         git_path = os.path.join(path, "git")
         if not os.path.isdir(git_path):
-            os.mkdir(git_path)
+            os.mkdir(git_path, mode=664)
 
 
 main = GraderService.launch_instance

@@ -2,6 +2,7 @@ import asyncio
 import json
 import os
 import shlex
+import shutil
 from asyncio import Future, Task
 from contextlib import contextmanager
 from pathlib import Path
@@ -12,7 +13,7 @@ from traitlets.config import LoggingConfigurable
 from urllib3.exceptions import MaxRetryError
 
 from grader_service.autograding.kube.util import make_pod
-from grader_service.autograding.local_grader import LocalAutogradeExecutor
+from grader_service.autograding.local_grader import LocalAutogradeExecutor, rm_error
 from kubernetes import config, client
 
 from grader_service.orm import Lecture, Submission
@@ -100,12 +101,11 @@ class KubeAutogradeExecutor(LocalAutogradeExecutor):
 
     def start_pod(self) -> GraderPod:
         # The output path will not exist in the pod
-        Path(self.output_path).mkdir(parents=True, exist_ok=True)
         command = f'{self.convert_executable} autograde ' \
                   f'-i "{self.input_path}" ' \
                   f'-o "{self.output_path}" ' \
-                  f'-p "*.ipynb"'
-        command = "sleep 10000"
+                  f'-p "*.ipynb" --log-level=INFO'
+        # command = "sleep 10000"
         pod = make_pod(
             name=self.submission.commit_hash,
             cmd=shlex.split(command),
@@ -123,17 +123,23 @@ class KubeAutogradeExecutor(LocalAutogradeExecutor):
         return GraderPod(pod, self.client, config=self.config)
 
     async def _run(self):
+        if os.path.exists(self.output_path):
+            shutil.rmtree(self.output_path, onerror=rm_error)
+
+        os.mkdir(self.output_path)
+        self._write_gradebook()
+
         grader_pod = None
         try:
             grader_pod = self.start_pod()
             self.log.info(f"Started pod {grader_pod.name} in namespace {grader_pod.namespace}")
             status = await grader_pod.polling
             self.grading_logs = self._get_pod_logs(grader_pod)
+            self.log.info("Pod logs:\n" + self.grading_logs)
             if status == "Succeeded":
                 self.log.info("Pod has successfully completed execution!")
             else:
                 self.log.info("Pod has failed execution:")
-                self.log.info(self.grading_logs)
                 self._delete_pod(grader_pod)
                 raise RuntimeError("Pod has failed execution!")
             # cleanup
