@@ -4,9 +4,10 @@ import { Cell } from '@jupyterlab/cells';
 
 import { ReactElement, JSXElementConstructor } from 'react';
 import { CreationComponent } from './creation-component';
+import { ErrorComponent } from './error-component';
 
 
-export class CreationWidget extends ReactWidget {
+export class ErrorWidget extends ReactWidget {
     public cell: Cell;
 
     constructor(cell: Cell) {
@@ -16,6 +17,6 @@ export class CreationWidget extends ReactWidget {
         }
 
     protected render(): ReactElement<any, string | JSXElementConstructor<any>>[] | ReactElement<any, string | JSXElementConstructor<any>> {
-        return (<CreationComponent cell={this.cell}/>);
+        return (<ErrorComponent />);
     }
 }

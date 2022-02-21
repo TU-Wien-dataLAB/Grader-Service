@@ -10,6 +10,7 @@ import { NbgraderData } from '../model';
 import { ImodeSwitchProps } from "../slider";
 import { CellWidget } from './cellwidget';
 import { CreationWidget } from './creation-widget';
+import { ErrorWidget } from './error-widget';
 import { CellPlayButton } from './widget';
 
 export class CreationModeSwitch extends React.Component<ImodeSwitchProps> {
@@ -43,17 +44,11 @@ export class CreationModeSwitch extends React.Component<ImodeSwitchProps> {
                     
                 } else {
                     currentLayout.widgets.map(w => {
-                        if (w instanceof CreationWidget) {
+                        if (w instanceof CreationWidget || w instanceof ErrorWidget) {
                             currentLayout.removeWidget(w);
                         }
                     });
                 }
-                //old button remove
-                currentLayout.widgets.map(w => {
-                    if (w instanceof CellPlayButton) {
-                        currentLayout.removeWidget(w);
-                    }
-                });
             });
         });
     }

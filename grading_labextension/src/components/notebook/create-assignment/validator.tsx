@@ -1,12 +1,12 @@
 import { Notebook } from "@jupyterlab/notebook";
-import { Button, ButtonProps } from "@mui/material";
+import { Button } from '@blueprintjs/core';
 import { Cell } from '@jupyterlab/cells';
 import * as React from "react";
 import { NbgraderData } from "../model";
 import { PanelLayout } from "@lumino/widgets";
 import { CellWidget } from "./cellwidget";
-import { purple } from '@mui/material/colors';
-import { styled } from '@mui/material/styles';
+import { CreationWidget } from "./creation-widget";
+import { ErrorWidget } from "./error-widget";
 
 
 export interface ValidatorProps {
@@ -28,7 +28,7 @@ export const Validator = (props : ValidatorProps) => {
                     if(ids.has(metadata.grade_id)) {
                         console.log("duplicate id found");
                         const layout = c.layout as PanelLayout;
-                    const widget = layout.widgets[0] as CellWidget;
+                        layout.addWidget(new ErrorWidget(c))
                     } else {
                         ids.add(metadata.grade_id);
 
@@ -42,6 +42,6 @@ export const Validator = (props : ValidatorProps) => {
 
     }
     return (
-        <button className=".MuiButton-textSizeSmall" onClick={validateNotebook}>Validate</button>
+            <Button className="nbgrader-validate-button" onClick={validateNotebook} icon="automatic-updates" outlined intent="success">Validate</Button>
     );
 }
