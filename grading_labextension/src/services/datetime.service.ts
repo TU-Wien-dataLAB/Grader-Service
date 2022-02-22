@@ -14,3 +14,7 @@ export function utcToLocalFormat(time: string): string {
     const format = localeData.longDateFormat('L') + ' HH:mm:ss';
     return moment.utc(time).local().format(format)
 }
+
+export function utcToTimestamp(time: string): number {
+    return moment(time, 'YYYY-MM-DDTHH:mm:ss.sss').valueOf();
+}
