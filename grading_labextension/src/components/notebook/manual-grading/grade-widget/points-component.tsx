@@ -3,8 +3,11 @@ import { Cell } from '@jupyterlab/cells';
 import { Box, Divider, Grid, TextField, Typography } from '@mui/material';
 import { CellModel, NbgraderData, ToolData } from '../../model';
 import { GradeBook } from '../../../../services/gradebook';
+import { Notebook } from '@jupyterlab/notebook';
+import { IObservableJSON } from '@jupyterlab/observables';
 
 export interface PointsComponentProps {
+    metadata: IObservableJSON;
     gradebook: GradeBook;
     nbname: string;
     nbgraderData: NbgraderData;
@@ -15,6 +18,7 @@ export interface PointsComponentProps {
 export const PointsComponent = (props: PointsComponentProps) => {
     const [points, setPoints] = React.useState(props.gradebook.getAutoGradeScore(props.nbname, props.toolData.id));
     const [extraCredit, setExtraCredit] = React.useState(0);
+    
 
     return (
         <Grid item>
@@ -24,7 +28,8 @@ export const PointsComponent = (props: PointsComponentProps) => {
                 type="number"
                 value={points}
                 onChange={(e) => {
-                    setPoints(parseInt(e.target.value));
+                    setPoints(parseInt(e.target.value));    
+                    props.metadata.set('updated',true);
                     props.gradebook.setManualScore(props.nbname, props.toolData.id, parseInt(e.target.value));
                 }}
                 InputProps={{
@@ -52,6 +57,7 @@ export const ExtraCreditComponent = (props: PointsComponentProps) => {
                 value={extraCredit}
                 onChange={(e) => {
                     setExtraCredit(parseInt(e.target.value));
+                    props.metadata.set('updated',true);
                     props.gradebook.setExtraCredit(props.nbname, props.toolData.id, parseInt(e.target.value));
                 }}
                 InputProps={{

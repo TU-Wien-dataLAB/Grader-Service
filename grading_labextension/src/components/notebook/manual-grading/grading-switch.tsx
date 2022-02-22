@@ -1,5 +1,5 @@
 import { Cell } from '@jupyterlab/cells';
-import { PanelLayout } from "@lumino/widgets";
+import { CommandPalette, ContextMenu, PanelLayout } from "@lumino/widgets";
 import { GradeBook } from "../../../services/gradebook";
 import { getProperties, getSubmission, updateProperties, updateSubmission } from "../../../services/submissions.service";
 import { ImodeSwitchProps } from "../slider";
@@ -16,6 +16,7 @@ import { getAllAssignments } from '../../../services/assignments.service';
 import { getAllLectures } from '../../../services/lectures.service';
 import { DataWidget } from './data-widget/data-widget';
 import { GradeWidget } from './grade-widget/grade-widget';
+import { GlobalObjects } from '../../..';
 
 
 export class GradingModeSwitch extends React.Component<ImodeSwitchProps> {
@@ -53,9 +54,18 @@ export class GradingModeSwitch extends React.Component<ImodeSwitchProps> {
     
         const properties = await getProperties(this.lecture.id, this.assignment.id, this.subID);
         this.gradeBook = new GradeBook(properties);
+        this.notebookpanel.context.saveState.connect((sender, saveState) => {
+          if (saveState === 'started') {
+            this.saveProperties();
+            console.log("Saved");
+
+          }
+        })        
       }
 
     private async saveProperties() {
+        const metadata = this.notebook.model.metadata;
+        metadata.set('updated',false);
         this.setState({ transition: "" })
         this.setState({ saveButtonText: "Saving" })
         try {
@@ -82,7 +92,7 @@ export class GradingModeSwitch extends React.Component<ImodeSwitchProps> {
                 const currentLayout = c.layout as PanelLayout;
                 if (this.state.mode) {
                     currentLayout.insertWidget(0, new DataWidget(c, this.gradeBook, this.notebookPaths[4].split(".").slice(0, -1).join(".")));
-                    currentLayout.addWidget(new GradeWidget(c, this.gradeBook, this.notebookPaths[4].split(".").slice(0, -1).join(".")))
+                    currentLayout.addWidget(new GradeWidget(c, this.notebook, this.gradeBook, this.notebookPaths[4].split(".").slice(0, -1).join(".")))
                 } else {
                     currentLayout.widgets.map(w => {
                     if (w instanceof DataWidget || w instanceof GradeWidget) {
