@@ -65,6 +65,8 @@ export class GradingModeSwitch extends React.Component<ImodeSwitchProps> {
 
     private async saveProperties() {
         const metadata = this.notebook.model.metadata;
+        //if there were no updates return
+        if(!metadata.get('updated')) return;
         metadata.set('updated',false);
         this.setState({ transition: "" })
         this.setState({ saveButtonText: "Saving" })
