@@ -5,9 +5,11 @@ import { CellModel, NbgraderData, ToolData } from '../../model';
 import { GradeBook } from '../../../../services/gradebook';
 import { ExtraCreditComponent, PointsComponent } from './points-component';
 import { CommentComponent } from './comment-component';
+import { Notebook } from '@jupyterlab/notebook';
 
 
 export interface GradeComponentProps {
+    notebook: Notebook;
     gradebook: GradeBook;
     nbname: string;
     nbgraderData: NbgraderData;
@@ -16,7 +18,8 @@ export interface GradeComponentProps {
 }
 
 export const GradeComponent = (props: GradeComponentProps) => {
-
+    const metadata = props.notebook.model.metadata;
+    if(!metadata.has('updated')) metadata.set('updated',false);
     const gradableCell = (props.toolData.type !== "readonly" && props.toolData.type !== "solution" && props.toolData.type !== "");
     const showCommment = (props.toolData.type === "task" || props.toolData.type === "manual" || props.toolData.type === "solution");
 
@@ -27,16 +30,16 @@ export const GradeComponent = (props: GradeComponentProps) => {
                     <Grid container spacing={2}>
 
                         {showCommment &&
-                            <CommentComponent nbgraderData={props.nbgraderData} toolData={props.toolData} gradebook={props.gradebook} nbname={props.nbname}/>
+                            <CommentComponent metadata={metadata} nbgraderData={props.nbgraderData} toolData={props.toolData} gradebook={props.gradebook} nbname={props.nbname}/>
 
                         }
 
                         {gradableCell &&
-                            <PointsComponent nbgraderData={props.nbgraderData} toolData={props.toolData} gradebook={props.gradebook} nbname={props.nbname}/>
+                            <PointsComponent metadata={metadata} nbgraderData={props.nbgraderData} toolData={props.toolData} gradebook={props.gradebook} nbname={props.nbname}/>
                         }
 
                         {gradableCell &&
-                            <ExtraCreditComponent nbgraderData={props.nbgraderData} toolData={props.toolData} gradebook={props.gradebook} nbname={props.nbname}/>
+                            <ExtraCreditComponent metadata={metadata} nbgraderData={props.nbgraderData} toolData={props.toolData} gradebook={props.gradebook} nbname={props.nbname}/>
                         }
 
                     </Grid>
