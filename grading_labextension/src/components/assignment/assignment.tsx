@@ -44,11 +44,12 @@ export const AssignmentComponent = (props: IAssignmentComponentProps) => {
     getAllSubmissions(props.lecture, assignment, false, false).then(
       response => {
         setSubmissions(response);
-        setHasFeedback(submissions.reduce(
+        const feedback = response.reduce(
           (accum: boolean, curr: Submission) =>
             accum || curr.feedback_available,
           false
-        ))
+        )
+        setHasFeedback(feedback)
       }
     );
     getFiles(`${props.lecture.code}/${assignment.name}`).then(files => {
