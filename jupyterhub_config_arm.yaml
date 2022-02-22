@@ -13,8 +13,10 @@ hub:
       url: "http://grader-service:4010"
       oauth_client_id: "grader"
 singleuser:
+  defaultUrl: "/lab"
   image:
     name: s210.dl.hpc.tuwien.ac.at/grader/grader-notebook-minimal
     tag: arm
+    # pullPolicy: Always
   extraEnv:
     GRADER_HOST_URL: "grader-service"
