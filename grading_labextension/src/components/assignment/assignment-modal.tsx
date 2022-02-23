@@ -14,6 +14,7 @@ import {pullAssignment} from "../../services/assignments.service";
 import {getAllSubmissions, getSubmissions, submitAssignment} from "../../services/submissions.service";
 import LoadingOverlay from "../util/overlay";
 import {Feedback} from "./feedback";
+import {AssignmentStatus} from "./assignment-status";
 
 export interface IAssignmentModalProps {
   lecture: Lecture;
@@ -62,6 +63,8 @@ export const AssignmentModalComponent = (props: IAssignmentModalProps) => {
     <div style={{overflow: "scroll", height: "100%"}}>
       <ModalTitle title={props.assignment.name}/>
       <Box sx={{mt: 10}}>
+        <Typography variant={'h6'} sx={{ml: 2}}>Status</Typography>
+        <AssignmentStatus lecture={props.lecture} assignment={props.assignment} submissions={submissions} />
         <Typography variant={'h6'} sx={{ml: 2}}>Files</Typography>
         <FilesList path={path} sx={{m: 2, mt: 1}}/>
         <Stack direction={"row"} spacing={1} sx={{m: 1, ml: 2}}>

@@ -18,7 +18,7 @@ import {SxProps} from "@mui/system";
 import {Theme} from "@mui/material/styles";
 import {Submission} from "../../model/submission";
 import ChatRoundedIcon from "@mui/icons-material/ChatRounded";
-import {utcToLocalFormat} from "../../services/datetime.service";
+import {utcToLocalFormat, utcToTimestamp} from "../../services/datetime.service";
 import CloudDoneRoundedIcon from "@mui/icons-material/CloudDoneRounded";
 
 interface ISubmissionListProps {
@@ -31,23 +31,27 @@ export const SubmissionList = (props: ISubmissionListProps) => {
 
   // generateItems will be fed using the IIterator from the FilterFileBrowserModel
   const generateItems = (submissions: Submission[]) => {
-    return submissions.reverse().map(value => (
-      <Box>
-        <ListItem disablePadding
-                  secondaryAction={
-                    value.feedback_available
-                      ? <IconButton edge="end" aria-label="delete" onClick={() => props.openFeedback(value)}>
-                        <ChatRoundedIcon/>
-                      </IconButton>
-                      : null
-                  }>
-          <ListItemIcon>
-            <CloudDoneRoundedIcon sx={{ml: 1}}/>
-          </ListItemIcon>
-          <ListItemText primary={utcToLocalFormat(value.submitted_at)}/>
-        </ListItem>
-      </Box>
-    ));
+    return submissions
+      .sort(
+        (a, b) =>
+          utcToTimestamp(a.submitted_at) > utcToTimestamp(b.submitted_at) ? -1 : 1)
+      .map(value => (
+        <Box>
+          <ListItem disablePadding
+                    secondaryAction={
+                      value.feedback_available
+                        ? <IconButton edge="end" aria-label="delete" onClick={() => props.openFeedback(value)}>
+                          <ChatRoundedIcon/>
+                        </IconButton>
+                        : null
+                    }>
+            <ListItemIcon>
+              <CloudDoneRoundedIcon sx={{ml: 1}}/>
+            </ListItemIcon>
+            <ListItemText primary={utcToLocalFormat(value.submitted_at)}/>
+          </ListItem>
+        </Box>
+      ));
   };
 
   return (
