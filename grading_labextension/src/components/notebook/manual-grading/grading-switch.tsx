@@ -67,6 +67,7 @@ export class GradingModeSwitch extends React.Component<ImodeSwitchProps> {
         //if there were no updates return
         if(!metadata.get('updated')) return;
         metadata.set('updated',false);
+        //setting transition
         this.setState({ transition: "" })
         this.setState({ saveButtonText: "Saving" })
         try {
