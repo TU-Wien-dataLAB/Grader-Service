@@ -15,7 +15,7 @@ export interface CommentComponentProps {
 }
 
 export const CommentComponent = (props: CommentComponentProps) => {
-    const [comment, setComment] = React.useState("");
+    const [comment, setComment] = React.useState(props.gradebook.getComment(props.nbname,props.toolData.id));
 
 
     return (

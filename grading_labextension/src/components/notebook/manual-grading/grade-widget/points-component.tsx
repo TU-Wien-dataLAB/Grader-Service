@@ -16,9 +16,7 @@ export interface PointsComponentProps {
 }
 
 export const PointsComponent = (props: PointsComponentProps) => {
-    const [points, setPoints] = React.useState(props.gradebook.getAutoGradeScore(props.nbname, props.toolData.id));
-    const [extraCredit, setExtraCredit] = React.useState(0);
-    
+    const [points, setPoints] = React.useState(props.gradebook.getGradeScore(props.nbname,props.toolData.id));
 
     return (
         <Grid item>
@@ -46,7 +44,7 @@ export const PointsComponent = (props: PointsComponentProps) => {
 
 
 export const ExtraCreditComponent = (props: PointsComponentProps) => {
-    const [extraCredit, setExtraCredit] = React.useState(0);
+    const [extraCredit, setExtraCredit] = React.useState(props.gradebook.getExtraCredit(props.nbname,props.toolData.id));
 
     return (
         <Grid item>

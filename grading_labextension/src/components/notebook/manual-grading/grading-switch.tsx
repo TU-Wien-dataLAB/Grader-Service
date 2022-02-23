@@ -58,7 +58,6 @@ export class GradingModeSwitch extends React.Component<ImodeSwitchProps> {
           if (saveState === 'started') {
             this.saveProperties();
             console.log("Saved");
-
           }
         })        
       }
