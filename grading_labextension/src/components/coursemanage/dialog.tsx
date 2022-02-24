@@ -60,7 +60,6 @@ export interface IEditDialogProps {
   assignment: Assignment;
 }
 
-//TODO: Automatic grading still bugged
 export const EditDialog = (props: IEditDialogProps) => {
   const formik = useFormik({
     initialValues: {
@@ -168,6 +167,7 @@ export const EditDialog = (props: IEditDialogProps) => {
                       id='automatic_graded'
                       name='automatic_graded'
                       value={formik.values.automatic_grading}
+                      checked={formik.values.automatic_grading}
                       onChange={e => {
                         if (e.target.checked) {
                           formik.setFieldValue('automatic_grading', true);
@@ -465,6 +465,7 @@ export const CreateDialog = (props: ICreateDialogProps) => {
                     <Checkbox
                       id='automatic_graded'
                       name='automatic_graded'
+                      checked={formik.values.automatic_grading}
                       value={formik.values.automatic_grading}
                       onChange={e => {
                         if (e.target.checked) {
