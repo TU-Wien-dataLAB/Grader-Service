@@ -15,7 +15,7 @@ class Assignment(Model):
     Do not edit the class manually.
     """
 
-    def __init__(self, id=None, name=None, type=None, due_date=None, status=None, points=None):  # noqa: E501
+    def __init__(self, id=None, name=None, type=None, due_date=None, status=None, points=None, automatic_grading=None):  # noqa: E501
         """Assignment - a model defined in OpenAPI
 
         :param id: The id of this Assignment.  # noqa: E501
@@ -37,7 +37,8 @@ class Assignment(Model):
             'type': str,
             'due_date': datetime,
             'status': str,
-            'points': float
+            'points': float,
+            'automatic_grading': bool
         }
 
         self.attribute_map = {
@@ -46,7 +47,8 @@ class Assignment(Model):
             'type': 'type',
             'due_date': 'due_date',
             'status': 'status',
-            'points': 'points'
+            'points': 'points',
+            'automatic_grading': 'automatic_grading'
         }
 
         self._id = id
@@ -55,6 +57,7 @@ class Assignment(Model):
         self._due_date = due_date
         self._status = status
         self._points = points
+        self._automatic_grading = automatic_grading
 
     @classmethod
     def from_dict(cls, dikt) -> 'Assignment':
@@ -204,3 +207,24 @@ class Assignment(Model):
         """
 
         self._points = points
+
+    @property
+    def automatic_grading(self):
+        """Gets the points of this Assignment.
+
+
+        :return: The points of this Assignment.
+        :rtype: float
+        """
+        return self._automatic_grading
+
+    @automatic_grading.setter
+    def automatic_grading(self, automatic_grading):
+        """Sets the points of this Assignment.
+
+
+        :param points: The points of this Assignment.
+        :type points: float
+        """
+
+        self._automatic_grading = automatic_grading

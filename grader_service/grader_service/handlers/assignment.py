@@ -79,6 +79,7 @@ class AssignmentBaseHandler(GraderBaseHandler):
         assignment.type = assignment_model.type
         assignment.points = 0
         assignment.deleted = DeleteState.active
+        assignment.automatic_grading = assignment_model.automatic_graded
         self.session.add(assignment)
         try:
             self.session.commit()
@@ -121,6 +122,7 @@ class AssignmentObjectHandler(GraderBaseHandler):
         assignment.duedate = assignment_model.due_date
         assignment.status = assignment_model.status
         assignment.type = assignment_model.type
+        assignment.automatic_grading = assignment_model.automatic_grading
         self.session.commit()
         self.write_json(assignment)
 

@@ -38,6 +38,7 @@ def upgrade():
                     sa.Column('type', sa.Enum("user", "group"), nullable=False, server_default="user"),
                     sa.Column('lectid', sa.Integer(), nullable=True),
                     sa.Column('duedate', sa.DateTime(), nullable=True),
+                    sa.Column('automatic_grading', sa.Boolean(), nullable=False),
                     sa.Column('points', sa.Integer(), nullable=False),
                     sa.Column('status', sa.Enum('created', 'pushed', 'released', 'fetching', 'fetched', 'complete'),
                               nullable=True),

@@ -18,6 +18,7 @@ export interface Assignment {
     due_date?: string;
     status?: Assignment.StatusEnum;
     points?: number;
+    automatic_grading?: boolean;
 }
 export namespace Assignment {
     export type TypeEnum = 'user' | 'group';

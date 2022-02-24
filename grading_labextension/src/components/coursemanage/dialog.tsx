@@ -23,7 +23,8 @@ import {
   FormControlLabel,
   InputLabel,
   Select,
-  MenuItem
+  MenuItem,
+  Radio
 } from '@mui/material';
 import { Assignment } from '../../model/assignment';
 import { LoadingButton } from '@mui/lab';
@@ -47,7 +48,11 @@ const validationSchema = yup.object({
     .date()
     .min(new Date(), 'Deadline must be set in the future')
     .nullable(),
-  type: yup.mixed().oneOf(['user', 'group'])
+  type: yup
+    .mixed()
+    .oneOf(['user', 'group']),
+  automatic_grading: yup
+    .boolean()
 });
 
 export interface IEditDialogProps {
@@ -55,7 +60,7 @@ export interface IEditDialogProps {
   assignment: Assignment;
 }
 
-//TODO: props interface
+//TODO: Automatic grading still bugged
 export const EditDialog = (props: IEditDialogProps) => {
   const formik = useFormik({
     initialValues: {
@@ -64,7 +69,8 @@ export const EditDialog = (props: IEditDialogProps) => {
         props.assignment.due_date !== null
           ? new Date(props.assignment.due_date)
           : null,
-      type: props.assignment.type
+      type: props.assignment.type,
+      automatic_grading: props.assignment.automatic_grading
     },
     validationSchema: validationSchema,
     onSubmit: values => {
@@ -156,6 +162,24 @@ export const EditDialog = (props: IEditDialogProps) => {
                 />
               </LocalizationProvider>
 
+              <FormControlLabel
+                  control={
+                    <Checkbox
+                      id='automatic_graded'
+                      name='automatic_graded'
+                      value={formik.values.automatic_grading}
+                      onChange={e => {
+                        if (e.target.checked) {
+                          formik.setFieldValue('automatic_grading', true);
+                        } else {
+                          formik.setFieldValue('automatic_grading', false);
+                        }
+                      }}
+                    />
+                  }
+                  label="Grade submissions automatically"
+                />
+
               <InputLabel id="demo-simple-select-label">Type</InputLabel>
               <Select
                 labelId="assignment-type-select-label"
@@ -214,7 +238,8 @@ const validationSchemaLecture = yup.object({
     .min(4, 'Semester should be 4-12 characters long')
     .max(12, 'Semester should be 4-12 characters long')
     .required('Lecture code is required'),
-  complete: yup.boolean()
+  complete: yup
+    .boolean()
 });
 
 export interface IEditLectureProps {
@@ -338,14 +363,16 @@ export const CreateDialog = (props: ICreateDialogProps) => {
     initialValues: {
       name: 'Assignment',
       due_date: null,
-      type: 'user'
+      type: 'user',
+      automatic_grading: false
     },
     validationSchema: validationSchema,
     onSubmit: values => {
       const updatedAssignment: Assignment = {
         name: values.name,
         due_date: values.due_date,
-        type: values.type as TypeEnum
+        type: values.type as TypeEnum,
+        automatic_grading: values.automatic_grading
       };
       console.log(updatedAssignment);
       //TODO: either need lect id from assignment or need lecture hear
@@ -432,6 +459,24 @@ export const CreateDialog = (props: ICreateDialogProps) => {
                   }}
                 />
               </LocalizationProvider>
+              
+              <FormControlLabel
+                  control={
+                    <Checkbox
+                      id='automatic_graded'
+                      name='automatic_graded'
+                      value={formik.values.automatic_grading}
+                      onChange={e => {
+                        if (e.target.checked) {
+                          formik.setFieldValue('automatic_grading', true);
+                        } else {
+                          formik.setFieldValue('automatic_grading', false);
+                        }
+                      }}
+                    />
+                  }
+                  label="Grade submissions automatically"
+                />
 
               <InputLabel id="demo-simple-select-label">Type</InputLabel>
               <Select
