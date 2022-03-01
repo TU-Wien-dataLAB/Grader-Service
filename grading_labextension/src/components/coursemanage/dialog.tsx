@@ -399,7 +399,7 @@ export const CreateDialog = (props: ICreateDialogProps) => {
         <AddRoundedIcon /> New Assignment
       </Button>
       <Dialog open={openDialog} onBackdropClick={() => setOpen(false)}>
-        <DialogTitle>Edit Assignment</DialogTitle>
+        <DialogTitle>Create Assignment</DialogTitle>
         <form onSubmit={formik.handleSubmit}>
           <DialogContent>
             <Stack spacing={2}>

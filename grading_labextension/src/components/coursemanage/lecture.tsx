@@ -98,6 +98,7 @@ export const LectureComponent = (props: ILectureComponentProps) => {
               getAllAssignments(lecture.id).then(response => {
                 setAssignments(response);
               });
+              setExpanded(true);
             }}
           />
           <Button size="small" sx={{ ml: 'auto' }} onClick={handleExpandClick}>
