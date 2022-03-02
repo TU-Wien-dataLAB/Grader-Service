@@ -135,7 +135,8 @@ def test_assignment_serialization():
         "due_date": datetime.now(),
         "status": "created",
         'type': None,
-        'points': 0
+        'points': 0,
+        'automatic_grading': False,
     }
     a = Assignment(
         id=d["id"],
@@ -144,6 +145,7 @@ def test_assignment_serialization():
         duedate=d["due_date"],
         points=0,
         status=d["status"],
+        automatic_grading=d["automatic_grading"],
     )
 
     d["due_date"] = (d["due_date"].isoformat("T", "milliseconds") + "Z")

@@ -8,7 +8,7 @@ from nbconvert.exporters.exporter import ResourcesDict
 class TestExecute(BaseTestPreprocessor):
     def test_simple_execute_nbconvert(self):
         nb = self._read_nb(os.path.join("files", "simple.ipynb"))
-        pp = ExecutePreprocessor(timeout=6000, kernel_name='python3')
+        pp = ExecutePreprocessor(timeout=60, kernel_name='python3')
 
         nb, resources = pp.preprocess(nb, {})
         assert nb is not None

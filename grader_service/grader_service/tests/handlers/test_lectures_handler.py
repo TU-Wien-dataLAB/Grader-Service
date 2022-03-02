@@ -430,7 +430,7 @@ async def test_delete_lecture_assignment_complete(
     l_id = 3
     url = service_base_url + f"/lectures/{l_id}/assignments"
 
-    pre_assignment = Assignment(id=-1, name="pytest", type="user", due_date=None, status="complete", points=None)
+    pre_assignment = Assignment(id=-1, name="pytest", type="user", due_date=None, status="complete", points=None, automatic_grading=False)
     post_response = await http_server_client.fetch(
         url,
         method="POST",
