@@ -161,8 +161,9 @@ class GraderService(config.Application):
 
         if not os.path.exists(os.path.join(self.grader_service_dir, "git")):
             os.mkdir(os.path.join(self.grader_service_dir, "git"))
-        subprocess.run(shlex.split(f'git config --global user.name "{self.service_git_username}"'))
-        subprocess.run(shlex.split(f'git config --global user.email "{self.service_git_email}"'))
+        #TODO: Add check if config
+        #subprocess.run(shlex.split(f'git config --global user.name "{self.service_git_username}"'))
+        #subprocess.run(shlex.split(f'git config --global user.email "{self.service_git_email}"'))
 
         # pass config to DataBaseManager and GraderExecutor
         GraderExecutor.config = self.config

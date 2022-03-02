@@ -87,6 +87,8 @@ components:
         points:
           type: number
           format: float
+        automatic_grading:
+          type: boolean
       example:
         id: 1
         name: "assignment_1"
