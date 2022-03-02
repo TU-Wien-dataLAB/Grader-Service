@@ -2,7 +2,7 @@ image: "python:3.8"
 
 before_script:
   - python --version
-  - pip install -r test-requirements.txt
+  - pip install -r requirements-test.txt
 
 build-job:
   stage: build
