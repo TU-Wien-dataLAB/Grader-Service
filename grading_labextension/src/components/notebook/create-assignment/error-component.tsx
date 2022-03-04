@@ -7,6 +7,7 @@ import { Alert } from "@mui/material";
 
 
 export interface ErrorComponentProps {
+    err: string;
 }
 
 
@@ -16,7 +17,7 @@ export const ErrorComponent = (props : ErrorComponentProps) => {
 
     return (
         <Alert variant="filled" severity='error'>
-        Duplicate ID
+        {props.err}
     </Alert>
     );
 }

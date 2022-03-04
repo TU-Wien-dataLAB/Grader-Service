@@ -9,14 +9,16 @@ import { ErrorComponent } from './error-component';
 
 export class ErrorWidget extends ReactWidget {
     public cell: Cell;
+    public err: string;
 
-    constructor(cell: Cell) {
+    constructor(cell: Cell, err: string) {
         super();
         this.cell = cell;
+        this.err = err;
 
         }
 
     protected render(): ReactElement<any, string | JSXElementConstructor<any>>[] | ReactElement<any, string | JSXElementConstructor<any>> {
-        return (<ErrorComponent />);
+        return (<ErrorComponent err={this.err}/>);
     }
 }
