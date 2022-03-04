@@ -52,7 +52,6 @@ export const LectureListComponent = (props: ILectureListProps): JSX.Element => {
       <Portal container={document.body}>
         <Snackbar
           open={alert}
-          autoHideDuration={3000}
           onClose={handleAlertClose}
           sx={{mb: 2, ml: 2}}
         >

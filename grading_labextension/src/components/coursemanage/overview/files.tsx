@@ -51,10 +51,12 @@ export const Files = (props: FilesProps) => {
       message: `Do you want to push ${assignment.name}? This updates the state of the assignment on the server with your local state.`,
       handleAgree: async () => {
         try {
-          await pushAssignment(lecture.id, assignment.id, 'source');
           await pushAssignment(lecture.id, assignment.id, 'release');
+          await pushAssignment(lecture.id, assignment.id, 'source');
         } catch (err) {
           props.showAlert('error', 'Error Pushing Assignment');
+          closeDialog();
+          return;
         }
         //TODO: should be atomar with the pushAssignment function
         const a = assignment;

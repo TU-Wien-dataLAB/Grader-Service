@@ -54,7 +54,6 @@ export const CourseManageComponent = (props: CourseManageProps) => {
       <Portal container={document.body}>
         <Snackbar
           open={alert}
-          autoHideDuration={3000}
           onClose={handleAlertClose}
           sx={{mb: 2, ml: 2}}
         >
