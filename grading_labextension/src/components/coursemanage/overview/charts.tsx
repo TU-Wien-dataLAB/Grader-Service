@@ -1,11 +1,11 @@
-import { Card, CardHeader, CardContent, Box } from '@mui/material';
+import {Card, CardHeader, CardContent, Box} from '@mui/material';
 import * as React from 'react';
 import 'chart.js/auto';
-import { Pie } from 'react-chartjs-2';
-import { Submission } from '../../../model/submission';
-import { Lecture } from '../../../model/lecture';
-import { Assignment } from '../../../model/assignment';
-import { getAllSubmissions } from '../../../services/submissions.service';
+import {Pie} from 'react-chartjs-2';
+import {Submission} from '../../../model/submission';
+import {Lecture} from '../../../model/lecture';
+import {Assignment} from '../../../model/assignment';
+import {getAllSubmissions} from '../../../services/submissions.service';
 
 export interface ChartsProps {
   lecture: Lecture;
@@ -73,12 +73,12 @@ export const GradingChart = (props: ChartsProps) => {
 
   return (
     <Card elevation={3} className='flexbox-item'>
-      <CardHeader title="Grading Status" />
+      <CardHeader title="Grading Status"/>
       <CardContent>
-        <Box sx={{ height: '300px', width: '300px' }}>
-          { gradingData === [0,0,0,0] ?
-          <Pie data={gradingDataProps} /> :
-          <Card>No submissions found</Card>
+        <Box sx={{height: '300px', width: '300px'}}>
+          {gradingData === [0, 0, 0, 0] ?
+            <Pie data={gradingDataProps}/> :
+            <Card>No submissions found</Card>
           }
         </Box>
 
@@ -89,15 +89,16 @@ export const GradingChart = (props: ChartsProps) => {
 
 export const SubmittedChart = (props: ChartsProps) => {
 
-  const generateSubmittedData = (submissions: any) => {
+  const generateSubmittedData = (submissions: Submission[]) => {
     const data = [0, 0];
-    data[0] = props.users.students.length + props.users.instructors.length + props.users.tutors.length;
-    data[1] = submissions.length;
+    const uniqueUsers = new Set<string>()
+    submissions.forEach((s) => uniqueUsers.add(s.username))
+    data[0] = props.users.students.length + props.users.instructors.length + props.users.tutors.length - uniqueUsers.size;
+    data[1] = uniqueUsers.size;
     return data;
   }
 
   const [submittedData, setSubmittedData] = React.useState(generateSubmittedData(props.allSubmissions));
-
 
 
   const submittedDataProps = {
@@ -121,10 +122,10 @@ export const SubmittedChart = (props: ChartsProps) => {
 
   return (
     <Card elevation={3} className='flexbox-item'>
-      <CardHeader title="User Submission Status" />
+      <CardHeader title="User Submission Status"/>
       <CardContent>
-        <Box sx={{ height: '300px', width: '300px' }}>
-          <Pie data={submittedDataProps} />
+        <Box sx={{height: '300px', width: '300px'}}>
+          <Pie data={submittedDataProps}/>
         </Box>
 
       </CardContent>
