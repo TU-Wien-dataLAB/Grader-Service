@@ -51,9 +51,9 @@ You can verify the config by running `jupyterhub -f <config_file.py>` and you sh
 
 ### Specifying user roles
 
-Since the JupyterHub is the only source of authentication, the service has to rely on it to provide the necessary information. JupyterHub version 2.0 now supports RBAC which we will implement soon.
+Since the JupyterHub is the only source of authentication for the service, it has to rely on the JupyterHub to provide all the necessary information for user groups. JupyterHub version 2.0 now supports RBAC which will be implemented soon.
 
-Until then, we rely on the group configuration of JupyterHub version 1.5. Users have to be added to specific groups which maps the users to lectures and roles. They have to be separated by double underscores.
+Until then, the service relies on the group configuration of JupyterHub version 1.5. Users have to be added to specific groups which maps the users to lectures and roles. They have to be separated by double underscores.
 
 The config could look like this:
 
@@ -84,9 +84,9 @@ In order to start the grader service we have to provide a configuration file for
     c.LocalAutogradeExecutor.base_input_path = os.path.expanduser(os.path.join(service_dir, "convert_in"))
     c.LocalAutogradeExecutor.base_output_path = os.path.expanduser(os.path.join(service_dir, "convert_out"))
 
-The `<token>` has to be the same value as in the JupyterHub token specified earlier. The `grader_service_dir` directory has to be an existing directory with appropriate permissions to let the grader service read and write from it.
+The `<token>` has to be the same value as the JupyterHub service token specified earlier. The `grader_service_dir` directory has to be an existing directory with appropriate permissions to let the grader service read and write from it.
 
-Then we can start the grader service by specifying the config file as such:
+Then the grader service can be started by specifying the config file as such:
 
     grader-service -f <grader_service_config.py>
 
