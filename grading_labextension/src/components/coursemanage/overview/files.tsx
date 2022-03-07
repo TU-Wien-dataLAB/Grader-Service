@@ -1,16 +1,17 @@
 import * as React from 'react';
-import {Assignment} from '../../../model/assignment';
-import {Lecture} from '../../../model/lecture';
-import {getAssignment, pullAssignment, pushAssignment, updateAssignment} from '../../../services/assignments.service';
+import { Assignment } from '../../../model/assignment';
+import { Lecture } from '../../../model/lecture';
+import { getAssignment, pullAssignment, pushAssignment, updateAssignment } from '../../../services/assignments.service';
 import PublishRoundedIcon from '@mui/icons-material/PublishRounded';
 import GetAppRoundedIcon from '@mui/icons-material/GetAppRounded';
 import NewReleasesRoundedIcon from '@mui/icons-material/NewReleasesRounded';
 import MuiAlert from '@mui/material/Alert';
-import {AgreeDialog} from '../dialog';
+import { AgreeDialog } from '../dialog';
 import {
   AlertProps,
   Button,
   Card,
+  Grid,
   ToggleButton,
   ToggleButtonGroup,
   CardHeader,
@@ -19,10 +20,13 @@ import {
   Snackbar,
   Tabs,
   Tab,
-  Box
+  Box,
+  IconButton,
+  Tooltip
 } from '@mui/material';
-import {FilesList} from '../../util/file-list';
-import {Settings} from './settings-menu';
+import ReplayIcon from '@mui/icons-material/Replay';
+import { FilesList } from '../../util/file-list';
+import { Settings } from './settings-menu';
 
 export interface FilesProps {
   lecture: Lecture;
@@ -42,6 +46,7 @@ export const Files = (props: FilesProps) => {
     handleAgree: null,
     handleDisagree: null
   });
+  const [reloadFilesToogle, reloadFiles] = React.useState(false);
 
   const closeDialog = () => setShowDialog(false);
 
@@ -95,42 +100,57 @@ export const Files = (props: FilesProps) => {
     setShowDialog(true);
   };
 
+
+
   return (
     <Card className='flexbox-item' elevation={3}>
 
       <CardHeader title="Files"
-                  action={
-                    <Settings lecture={lecture} assignment={assignment} selectedDir={selectedDir}/>
-                  }/>
+        action={
+          <Grid container>
+            <Grid item>
+            <Tooltip title="Reload">
+              <IconButton aria-label='reload' onClick={() => reloadFiles(!reloadFiles)}>
+                <ReplayIcon />
+              </IconButton>
+              </Tooltip>
+            </Grid>
+            <Grid item>
+              <Settings lecture={lecture} assignment={assignment} selectedDir={selectedDir} />
+            </Grid>
 
-      <CardContent sx={{height: '270px', width: '300px', overflowY: "auto"}}>
+          </Grid>
+        } />
+
+      <CardContent sx={{ height: '270px', width: '300px', overflowY: "auto" }}>
         <Tabs variant='fullWidth' value={selectedDir} onChange={(e, dir) => setSelectedDir(dir)}>
-          <Tab label="Source" value="source"/>
-          <Tab label="Release" value="release"/>
+          <Tab label="Source" value="source" />
+          <Tab label="Release" value="release" />
         </Tabs>
-        <Box height={214} sx={{overflowY: 'auto'}}>
+        <Box height={214} sx={{ overflowY: 'auto' }}>
           <FilesList
             path={`${selectedDir}/${props.lecture.code}/${props.assignment.name}`}
+            reloadFiles={reloadFilesToogle}
           />
         </Box>
       </CardContent>
       <CardActions>
         <Button
-          sx={{mt: -1}}
+          sx={{ mt: -1 }}
           onClick={() => handlePushAssignment()}
           variant="outlined"
           size="small"
         >
-          <PublishRoundedIcon fontSize="small" sx={{mr: 1}}/>
+          <PublishRoundedIcon fontSize="small" sx={{ mr: 1 }} />
           Push
         </Button>
         <Button
-          sx={{mt: -1}}
+          sx={{ mt: -1 }}
           onClick={() => handlePullAssignment()}
           variant="outlined"
           size="small"
         >
-          <GetAppRoundedIcon fontSize="small" sx={{mr: 1}}/>
+          <GetAppRoundedIcon fontSize="small" sx={{ mr: 1 }} />
           Pull
         </Button>
       </CardActions>
