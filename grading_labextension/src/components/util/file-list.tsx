@@ -19,6 +19,7 @@ import {getFiles} from "../../services/file.service";
 
 interface IFileListProps {
   path: string;
+  reloadFiles?: boolean;
   sx?: SxProps<Theme>;
 }
 
