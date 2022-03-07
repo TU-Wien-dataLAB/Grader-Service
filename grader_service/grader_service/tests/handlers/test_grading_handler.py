@@ -13,6 +13,7 @@ from grader_service.autograding.local_grader import LocalAutogradeExecutor
 from grader_service.autograding.local_feedback import GenerateFeedbackExecutor
 
 # Imports are important otherwise they will not be found
+from .db_util import insert_assignments
 from .tornado_test_utils import *
 from grader_service.autograding.grader_executor import GraderExecutor
 

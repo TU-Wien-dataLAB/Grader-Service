@@ -40,9 +40,7 @@ def insert_assignments(ex, lecture_id=1):
         f'INSERT INTO "assignment" ("name","lectid","duedate","points","status","automatic_grading") VALUES ("assignment_1",{lecture_id},"2021-06-06 23:59:00.000",20,"released",false)')
     ex.execute(
         f'INSERT INTO "assignment" ("name","lectid","duedate","points","status","automatic_grading") VALUES ("assignment_2",{lecture_id},"2021-07-07 23:59:00.000",10,"created",false)')
-    ex.execute(
-        f'INSERT INTO "assignment" ("name","lectid","duedate","points","status","automatic_grading") VALUES ("assignment_3",{lecture_id},"2021-07-02 21:59:00.000",10,"created",false)')
-    num_inserts = 3
+    num_inserts = 2
     return num_inserts
 
 

@@ -83,7 +83,8 @@ class AssignmentBaseHandler(GraderBaseHandler):
         self.session.add(assignment)
         try:
             self.session.commit()
-        except IntegrityError:
+        except IntegrityError as e:
+            self.log.error(e)
             self.session.rollback()
             self.error_message = "Cannot add object to database."
             raise HTTPError(400)

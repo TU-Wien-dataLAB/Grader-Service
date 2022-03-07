@@ -1,14 +1,15 @@
 import os
 from re import S
 import pytest
+from grader_service import handlers  # need import to register handlers
 from grader_service.registry import HandlerPathRegistry
 from grader_service.server import GraderServer
 from tornado_sqlalchemy import SQLAlchemy
 from alembic.config import Config
 from alembic.command import upgrade
 from .db_util import insert_assignments
-import tornado
-from sqlalchemy.orm import sessionmaker
+
+__all__ = ["db_test_config", "sql_alchemy_db", "app", "service_base_url", "jupyter_hub_mock_server", "default_user", "default_token"]
 
 
 @pytest.fixture(scope="module")

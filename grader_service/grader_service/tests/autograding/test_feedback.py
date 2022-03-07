@@ -11,7 +11,8 @@ from sqlalchemy.orm.session import Session
 
 # Imports are important otherwise they will not be found
 from ..handlers.tornado_test_utils import *
-from ..handlers.db_util import insert_submission
+from ..handlers.db_util import insert_submission, insert_assignments
+from sqlalchemy.orm import sessionmaker
 
 
 async def test_feedback(

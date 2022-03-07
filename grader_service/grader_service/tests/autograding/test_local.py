@@ -10,8 +10,9 @@ from sqlalchemy.engine.base import Engine
 from sqlalchemy.orm.session import Session
 
 ## Imports are important otherwise they will not be found
-from ..handlers.tornado_test_utils import *
-from ..handlers.db_util import insert_submission
+from sqlalchemy.orm import sessionmaker
+from ..handlers.tornado_test_utils import default_user, sql_alchemy_db
+from ..handlers.db_util import insert_submission, insert_assignments
 
 
 async def test_auto_grading(

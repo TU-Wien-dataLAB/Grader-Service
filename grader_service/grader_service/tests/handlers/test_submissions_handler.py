@@ -12,6 +12,7 @@ from .db_util import insert_submission, insert_take_part
 
 # Imports are important otherwise they will not be found
 from .tornado_test_utils import *
+from .db_util import insert_assignments
 
 
 async def test_get_submissions(
