@@ -1,24 +1,38 @@
 # Grader Extensions
 
-  This repository contains the lab/server extensions and the grader service.
-
-# Installation
+  This repository contains the lab/server extensions, grader-convert package and the grader service.
 
 ## Requirements
 
-> conda
+> JupyterHub, Python 3.8,
+> pip,
+> npm
 
-## Creation of conda environment
+# Manual Installation
 
-Navigate to the `grader`-directory and create the environment:
+## 1. Grader Convert Installation
+Navigate to the `convert` directory and install the package requirements with the package manager `pip`
 
-    conda env create -f environment.yml
+    pip install -r requirements.txt
 
-## Install convert and lab package
-
-Start this command in both `convert`- and `grading_labextension`-directories to install them as packages
+Install the convert package
 
     pip install -e .
+
+## 2. Grader Service Installation
+
+Navigate to the `grader_service`-directory and install the package requirements:
+
+    pip install -r requirements.txt
+
+Install the grader service package
+
+    pip install -e .
+
+## 3. Jupyter Extensions Installation
+
+Navigate to the `grading_labextension`-directory and follow the instructions in the README file
+
 ## Testing
 In the root folder of the repository run
 
