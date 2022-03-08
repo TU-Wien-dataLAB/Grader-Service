@@ -32,7 +32,7 @@ export const OverviewCard = (props: OverviewCardProps) => {
                     <Chip color={'primary'} variant='outlined' label={props.users.instructors.length}/>
                 </Typography>
 
-                <Typography variant='body1'>Users that submitted the assignment
+                <Typography variant='body1'>Submission
                     <Chip color={'primary'} variant='outlined' label={props.allSubmissions.length}/>
                 </Typography>
 
