@@ -110,7 +110,7 @@ export const Files = (props: FilesProps) => {
           <Grid container>
             <Grid item>
             <Tooltip title="Reload">
-              <IconButton aria-label='reload' onClick={() => reloadFiles(!reloadFiles)}>
+              <IconButton aria-label='reload' onClick={() => reloadFiles(!reloadFilesToogle)}>
                 <ReplayIcon />
               </IconButton>
               </Tooltip>
