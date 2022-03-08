@@ -183,7 +183,7 @@ export const GradingComponent = (props: IGradingProps) => {
     {field: 'name', headerName: 'User', width: 130},
     {field: 'date', headerName: 'Date', width: 170},
     {
-      field: 'auto_status', headerName: 'Autograde-Status', width: 170,
+      field: 'auto_status', headerName: 'Autograde-Status', width: 200,
       renderCell: (params: GridRenderCellParams<string>) => (
 
         <Chip variant='outlined' label={params.value} color={getColor(params.value)} clickable={true}
@@ -227,7 +227,7 @@ export const GradingComponent = (props: IGradingProps) => {
   return (
     <div>
       <ModalTitle title="Grading"/>
-      <div style={{display: 'flex', height: '550px', marginTop: '90px'}}>
+      <div style={{display: 'flex', height: '65vh', marginTop: '90px'}}>
         <div style={{flexGrow: 1}}>
           <DataGrid
             sx={{mb: 3, ml: 3, mr: 3}}
