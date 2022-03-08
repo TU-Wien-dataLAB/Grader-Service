@@ -3,6 +3,8 @@ import os
 import sys
 from urllib.parse import unquote, quote
 
+from jsonschema.exceptions import ValidationError
+
 from grader_convert.converters.generate_assignment import GenerateAssignment
 from .base_handler import ExtensionBaseHandler
 from ..registry import register_handler
@@ -213,9 +215,13 @@ class PushHandler(ExtensionBaseHandler):
             )
             generator.force = True
             self.log.info("Starting GenerateAssignment converter")
-            generator.start()
-            self.log.info("GenerateAssignment conversion done")
-
+            try:
+                generator.start()
+                self.log.info("GenerateAssignment conversion done")
+            except ValidationError:
+                self.log.error("Converting failed: Could not validate notebook!", exc_info=True)
+            except (ValueError, RuntimeError):
+                self.log.error("Converting failed: Error converting notebook!", exc_info=True)
             try:
                 gradebook_path = os.path.join(git_service.path, "gradebook.json")
                 self.log.info(f"Reading gradebook file: {gradebook_path}")
