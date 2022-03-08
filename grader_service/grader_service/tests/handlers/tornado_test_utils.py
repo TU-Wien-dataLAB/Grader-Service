@@ -12,7 +12,7 @@ from .db_util import insert_assignments
 __all__ = ["db_test_config", "sql_alchemy_db", "app", "service_base_url", "jupyter_hub_mock_server", "default_user", "default_token"]
 
 
-@pytest.fixture(scope="module")
+@pytest.fixture(scope="function")
 def db_test_config():
     cfg = Config(
         os.path.abspath(os.path.dirname(__file__) + "../../../alembic_test.ini")

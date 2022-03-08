@@ -76,10 +76,9 @@ export const GradingChart = (props: ChartsProps) => {
       <CardHeader title="Grading Status"/>
       <CardContent>
         <Box sx={{height: '300px', width: '300px'}}>
-          {gradingData === [0, 0, 0, 0] ?
-            <Pie data={gradingDataProps}/> :
-            <Card>No submissions found</Card>
-          }
+          
+            <Pie data={gradingDataProps}/>
+          
         </Box>
 
       </CardContent>

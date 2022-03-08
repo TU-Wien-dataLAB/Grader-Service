@@ -117,6 +117,7 @@ components:
           enum:
             - "not_graded"
             - "manually_graded"
+            - "being_edited"
             - "grading_failed"
         username:
           type: string

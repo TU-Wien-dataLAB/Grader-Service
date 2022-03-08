@@ -29,10 +29,11 @@ export namespace Submission {
         AutomaticallyGraded: 'automatically_graded' as AutoStatusEnum,
         GradingFailed: 'grading_failed' as AutoStatusEnum
     };
-    export type ManualStatusEnum = 'not_graded' | 'manually_graded' | 'grading_failed';
+    export type ManualStatusEnum = 'not_graded' | 'manually_graded' | 'being_edited' | 'grading_failed';
     export const ManualStatusEnum = {
         NotGraded: 'not_graded' as ManualStatusEnum,
         ManuallyGraded: 'manually_graded' as ManualStatusEnum,
+        BeingEdited: 'being_edited' as ManualStatusEnum,
         GradingFailed: 'grading_failed' as ManualStatusEnum
     };
 }

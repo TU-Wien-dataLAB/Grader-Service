@@ -23,7 +23,7 @@ class Submission(Base, Serializable):
         default="not_graded",
         nullable=False,
     )
-    manual_status = Column(Enum("not_graded", "manually_graded"))
+    manual_status = Column(Enum("not_graded", "manually_graded","being_edited"))
     score = Column(Integer, nullable=True)
     assignid = Column(Integer, ForeignKey("assignment.id"))
     username = Column(String(255), ForeignKey("user.name"))

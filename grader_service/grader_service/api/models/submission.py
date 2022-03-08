@@ -169,7 +169,7 @@ class Submission(Model):
         :param manual_status: The manual_status of this Submission.
         :type manual_status: str
         """
-        allowed_values = ["not_graded", "manually_graded", "grading_failed"]  # noqa: E501
+        allowed_values = ["not_graded", "manually_graded", "being_edited", "grading_failed"]  # noqa: E501
         if manual_status not in allowed_values:
             raise ValueError(
                 "Invalid value for `manual_status` ({0}), must be one of {1}"
