@@ -4,12 +4,13 @@ import sys
 from urllib.parse import unquote, quote
 
 from jsonschema.exceptions import ValidationError
+from tornado.web import HTTPError
 
 from grader_convert.converters.generate_assignment import GenerateAssignment
 from .base_handler import ExtensionBaseHandler
 from ..registry import register_handler
 from ..services.git import GitError, GitService
-from tornado.httpclient import HTTPError, HTTPResponse
+from tornado.httpclient import HTTPClientError, HTTPResponse
 
 
 @register_handler(
@@ -35,7 +36,7 @@ class GenerateHandler(ExtensionBaseHandler):
                 f"{self.base_url}/lectures/{lecture_id}/assignments/{assignment_id}",
                 header=self.grader_authentication_header,
             )
-        except HTTPError as e:
+        except HTTPClientError as e:
             self.set_status(e.code)
             self.write_error(e.code)
             return
@@ -85,7 +86,7 @@ class GitLogHandler(ExtensionBaseHandler):
                 f"{self.base_url}/lectures/{lecture_id}/assignments/{assignment_id}",
                 header=self.grader_authentication_header,
             )
-        except HTTPError as e:
+        except HTTPClientError as e:
             self.set_status(e.code)
             self.write_error(e.code)
             return
@@ -129,7 +130,7 @@ class PullHandler(ExtensionBaseHandler):
                 f"{self.base_url}/lectures/{lecture_id}/assignments/{assignment_id}",
                 header=self.grader_authentication_header,
             )
-        except HTTPError as e:
+        except HTTPClientError as e:
             self.set_status(e.code)
             self.write_error(e.code)
             return
@@ -185,7 +186,7 @@ class PushHandler(ExtensionBaseHandler):
                 f"{self.base_url}/lectures/{lecture_id}/assignments/{assignment_id}",
                 header=self.grader_authentication_header,
             )
-        except HTTPError as e:
+        except HTTPClientError as e:
             self.set_status(e.code)
             self.write_error(e.code)
             return
@@ -218,10 +219,16 @@ class PushHandler(ExtensionBaseHandler):
             try:
                 generator.start()
                 self.log.info("GenerateAssignment conversion done")
-            except ValidationError:
+            except ValidationError as e:
                 self.log.error("Converting failed: Could not validate notebook!", exc_info=True)
-            except (ValueError, RuntimeError):
+                raise HTTPError(400, message=e.message)
+            except RuntimeError as e:
                 self.log.error("Converting failed: Error converting notebook!", exc_info=True)
+                try:
+                    msg = e.args[0]
+                except KeyError:
+                    msg = "Converting release version failed!"
+                raise HTTPError(400, message=msg)
             try:
                 gradebook_path = os.path.join(git_service.path, "gradebook.json")
                 self.log.info(f"Reading gradebook file: {gradebook_path}")
@@ -301,7 +308,7 @@ class NotebookAccessHandler(ExtensionBaseHandler):
                 f"{self.base_url}/lectures/{lecture_id}/assignments/{assignment_id}",
                 header=self.grader_authentication_header,
             )
-        except HTTPError as e:
+        except HTTPClientError as e:
             self.set_status(e.code)
             self.write_error(e.code)
             return
