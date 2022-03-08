@@ -16,7 +16,7 @@ setup(
     name="grader-convert",
     version=_version, 
     packages=find_packages(".", exclude=["grader_convert.tests", "grader_convert.tests.*"]),
-    package_data={"grader_convert": ["templates/**/*"]},
+    package_data={"grader_convert": ["templates/**/*"], "grader_convert.nbgraderformat": ["*.json"]},
     url="https://gitlab.tuwien.ac.at/hpc/datalab/jupyter/grader/grader.git",
     license="MIT",
     author='Elias Wimmer, Florian Jäger & Matthias Matt',
