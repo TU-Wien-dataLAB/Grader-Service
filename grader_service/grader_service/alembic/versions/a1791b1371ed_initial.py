@@ -70,7 +70,7 @@ def upgrade():
                     sa.Column('date', sa.DateTime(), nullable=True),
                     sa.Column('auto_status', sa.Enum('pending', 'not_graded', 'automatically_graded', 'grading_failed'),
                               nullable=False),
-                    sa.Column('manual_status', sa.Enum('not_graded', 'manually_graded'), nullable=False),
+                    sa.Column('manual_status', sa.Enum('not_graded', 'manually_graded','being_edited'), nullable=False),
                     sa.Column('score', sa.Integer(), nullable=True),
                     sa.Column('assignid', sa.Integer(), nullable=True),
                     sa.Column('username', sa.String(length=255), nullable=True),

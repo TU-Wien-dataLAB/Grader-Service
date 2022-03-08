@@ -11,7 +11,7 @@ from sqlalchemy.orm.session import Session
 
 ## Imports are important otherwise they will not be found
 from sqlalchemy.orm import sessionmaker
-from ..handlers.tornado_test_utils import default_user, sql_alchemy_db
+from ..handlers.tornado_test_utils import default_user, sql_alchemy_db, db_test_config
 from ..handlers.db_util import insert_submission, insert_assignments
 
 

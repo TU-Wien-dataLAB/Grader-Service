@@ -30,6 +30,8 @@ class Assignment(Model):
         :type status: str
         :param points: The points of this Assignment.  # noqa: E501
         :type points: float
+        :param automatic_grading: The automatic_grading of this Assignment.  # noqa: E501
+        :type automatic_grading: bool
         """
         self.openapi_types = {
             'id': int,
@@ -210,21 +212,21 @@ class Assignment(Model):
 
     @property
     def automatic_grading(self):
-        """Gets the points of this Assignment.
+        """Gets the automatic_grading of this Assignment.
 
 
-        :return: The points of this Assignment.
-        :rtype: float
+        :return: The automatic_grading of this Assignment.
+        :rtype: bool
         """
         return self._automatic_grading
 
     @automatic_grading.setter
     def automatic_grading(self, automatic_grading):
-        """Sets the points of this Assignment.
+        """Sets the automatic_grading of this Assignment.
 
 
-        :param points: The points of this Assignment.
-        :type points: float
+        :param automatic_grading: The automatic_grading of this Assignment.
+        :type automatic_grading: bool
         """
 
         self._automatic_grading = automatic_grading
