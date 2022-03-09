@@ -36,14 +36,8 @@ export interface IGradingProps {
   showAlert: (severity: string, msg: string) => void;
 }
 
-interface IRowValues {
-  id: number,
-  name: string,
-  date: string,
-  auto_status: string,
-  manual_status: string,
-  feedback_available: boolean,
-  score: number
+interface IRowValues extends Submission {
+  sub_id: number;
 }
 
 export const GradingComponent = (props: IGradingProps) => {
@@ -63,6 +57,7 @@ export const GradingComponent = (props: IGradingProps) => {
     setDisplayManualGrading(false);
   };
 
+
   const handleAutogradeSubmissions = async () => {
     setDialogContent({
       title: 'Autograde Selected Submissions',
@@ -71,7 +66,7 @@ export const GradingComponent = (props: IGradingProps) => {
         try {
           const numSubs = selectedRows.length
           await Promise.all(selectedRows.map(async (row) => {
-            await autogradeSubmission(props.lecture, props.assignment, row as Submission)
+            await autogradeSubmission(props.lecture, props.assignment, row)
             console.log("Autograded submission");
           }));
           const latest = option === 'latest' ? true : false;
@@ -124,14 +119,17 @@ export const GradingComponent = (props: IGradingProps) => {
     console.log(submissions);
     console.log("option: " + option);
     const rows: IRowValues[] = [];
-
+    let id: number = 1;
     submissions.forEach((sub: Submission) => {
       rows.push({
         id: sub.id,
-        name: sub.username,
-        date: utcToLocalFormat(sub.submitted_at),
+        sub_id: id++,
+        username: sub.username,
+        submitted_at: utcToLocalFormat(sub.submitted_at),
         auto_status: sub.auto_status,
         manual_status: sub.manual_status,
+        logs: sub.logs,
+        commit_hash: sub.commit_hash,
         feedback_available: sub.feedback_available,
         score: sub.score
       });
@@ -179,9 +177,9 @@ export const GradingComponent = (props: IGradingProps) => {
   }
 
   const columns = [
-    {field: 'id', headerName: 'Id', width: 110},
-    {field: 'name', headerName: 'User', width: 130},
-    {field: 'date', headerName: 'Date', width: 170},
+    {field: 'sub_id', headerName: 'No.', width: 110},
+    {field: 'username', headerName: 'User', width: 130},
+    {field: 'submitted_at', headerName: 'Date', width: 170},
     {
       field: 'auto_status', headerName: 'Autograde-Status', width: 200,
       renderCell: (params: GridRenderCellParams<string>) => (
@@ -207,9 +205,11 @@ export const GradingComponent = (props: IGradingProps) => {
     {field: 'score', headerName: 'Score', width: 130}
   ];
 
+  //TODO: Not perfomant 
   const getSubmissionFromRow = (row: IRowValues): Submission => {
     if (row === undefined) return null;
-    const id = row.id;
+    const id = row.sub_id;
+    console.log(id);
     for (const submission of submissions) {
       if (submission.id === id) {
         return submission;
@@ -299,7 +299,7 @@ export const GradingComponent = (props: IGradingProps) => {
         transition="zoom"
       >
         <ManualGrading lecture={props.lecture} assignment={props.assignment}
-                       submission={getSubmissionFromRow(selectedRows[0])} username={selectedRows[0]?.name}/>
+                       submission={getSubmissionFromRow(selectedRows[0])} username={selectedRows[0]?.username}/>
       </LoadingOverlay>
 
       {/* Dialog */}
