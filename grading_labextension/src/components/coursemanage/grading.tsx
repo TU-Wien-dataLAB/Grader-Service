@@ -12,7 +12,10 @@ import {
   DialogTitle,
   FormControl,
   InputLabel,
-  MenuItem, Typography
+  MenuItem, 
+  Typography,
+  Tooltip,
+  IconButton
 } from '@mui/material';
 import Select, {SelectChangeEvent} from '@mui/material/Select';
 import {getAllSubmissions} from '../../services/submissions.service';
@@ -26,6 +29,7 @@ import LoadingOverlay from "../util/overlay";
 import {getAssignment} from "../../services/assignments.service";
 import {ManualGrading} from "./manual-grading";
 import {PanoramaSharp} from '@mui/icons-material';
+import ReplayIcon from '@mui/icons-material/Replay';
 
 
 export interface IGradingProps {
@@ -153,15 +157,18 @@ export const GradingComponent = (props: IGradingProps) => {
     setOption(event.target.value as string);
   };
 
-
-
-  React.useEffect(() => {
+  const updateSubmissions = () => {
     const latest = option === 'latest' ? true : false;
     getAllSubmissions(props.lecture, props.assignment, latest, true).then(response => {
       setRows(generateRows(response));
       setSubmissions(response);
     })
+  }
+
+  React.useEffect(() => {
+    updateSubmissions();
   }, [option]);
+
 
   const getColor = (value: string) => {
     if (value === 'not_graded') {
@@ -235,7 +242,15 @@ export const GradingComponent = (props: IGradingProps) => {
 
   return (
     <div>
-      <ModalTitle title="Grading"/>
+      <ModalTitle title="Grading">
+      <Box sx={{ml: 2}} display="inline-block">
+      <Tooltip title="Reload">
+              <IconButton aria-label='reload' onClick={updateSubmissions}>
+                <ReplayIcon />
+              </IconButton>
+              </Tooltip>
+        </Box>
+        </ModalTitle>
       <div style={{display: 'flex', height: '65vh', marginTop: '90px'}}>
         <div style={{flexGrow: 1}}>
           <DataGrid
