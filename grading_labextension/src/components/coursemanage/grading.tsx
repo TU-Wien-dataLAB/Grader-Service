@@ -1,4 +1,4 @@
-import {DataGrid, GridRenderCellParams} from '@mui/x-data-grid';
+import {DataGrid, GridRenderCellParams, GridRowId, GridSelectionModel} from '@mui/x-data-grid';
 import * as React from 'react';
 import {Assignment} from '../../model/assignment';
 import {Lecture} from '../../model/lecture';
@@ -57,6 +57,9 @@ export const GradingComponent = (props: IGradingProps) => {
     setDisplayManualGrading(false);
   };
 
+  const cleanSelectedRows = () => {
+    setSelectedRows([]);
+  }
 
   const handleAutogradeSubmissions = async () => {
     setDialogContent({
@@ -64,8 +67,8 @@ export const GradingComponent = (props: IGradingProps) => {
       message: `Do you wish to autograde the seleceted submissions?`,
       handleAgree: async () => {
         try {
-          const numSubs = selectedRows.length
-          await Promise.all(selectedRows.map(async (row) => {
+          const numSubs = selectedRowsData.length
+          await Promise.all(selectedRowsData.map(async (row) => {
             await autogradeSubmission(props.lecture, props.assignment, row)
             console.log("Autograded submission");
           }));
@@ -78,6 +81,7 @@ export const GradingComponent = (props: IGradingProps) => {
           console.error(err);
           props.showAlert('error', 'Error Autograding Submissions');
         }
+        cleanSelectedRows()
         closeDialog();
       },
       handleDisagree: () => closeDialog()
@@ -91,8 +95,8 @@ export const GradingComponent = (props: IGradingProps) => {
       message: `Do you wish to generate Feedback of the selected submissions?`,
       handleAgree: async () => {
         try {
-          const numSubs = selectedRows.length
-          await Promise.all(selectedRows.map(async (row) => {
+          const numSubs = selectedRowsData.length
+          await Promise.all(selectedRowsData.map(async (row) => {
             await generateFeedback(props.lecture.id, props.assignment.id, row.id)
             console.log("Autograded submission");
           }));
@@ -104,6 +108,7 @@ export const GradingComponent = (props: IGradingProps) => {
           console.error(err);
           props.showAlert('error', 'Error Generating Feedback');
         }
+        cleanSelectedRows();
         closeDialog();
       },
       handleDisagree: () => closeDialog()
@@ -140,11 +145,15 @@ export const GradingComponent = (props: IGradingProps) => {
 
   const [submissions, setSubmissions] = React.useState(props.latest_submissions);
   const [rows, setRows] = React.useState(generateRows(props.latest_submissions));
-  const [selectedRows, setSelectedRows] = React.useState([] as IRowValues[]);
+  const [selectedRows, setSelectedRows] = React.useState<GridSelectionModel>([]);
+  const [selectedRowsData, setSelectedRowsData] = React.useState([] as IRowValues[]);
+
 
   const handleChange = (event: SelectChangeEvent) => {
     setOption(event.target.value as string);
   };
+
+
 
   React.useEffect(() => {
     const latest = option === 'latest' ? true : false;
@@ -235,12 +244,15 @@ export const GradingComponent = (props: IGradingProps) => {
             rows={rows}
             checkboxSelection
             disableSelectionOnClick
+            selectionModel={selectedRows}
+
             onSelectionModelChange={e => {
               const selectedIDs = new Set(e);
               const selectedRowData = rows.filter(row =>
                 selectedIDs.has(row.id)
               );
-              setSelectedRows(selectedRowData);
+              setSelectedRows(e);
+              setSelectedRowsData(selectedRowData);
             }}
           />
         </div>
@@ -267,12 +279,12 @@ export const GradingComponent = (props: IGradingProps) => {
           {`Autograde ${selectedRows.length} selected`}
         </Button>
         <NavigateNextIcon
-          color={(selectedRows.length === 1 && selectedRows[0]?.auto_status !== "automatically_graded")
-            ? "error" : (selectedRows.length !== 1 || selectedRows[0]?.auto_status !== "automatically_graded")
+          color={(selectedRowsData.length === 1 && selectedRowsData[0]?.auto_status !== "automatically_graded")
+            ? "error" : (selectedRowsData.length !== 1 || selectedRowsData[0]?.auto_status !== "automatically_graded")
               ? "disabled" : "primary"}
           sx={{mb: -1}}/>
         <Button
-          disabled={(selectedRows.length !== 1 || selectedRows[0]?.auto_status !== "automatically_graded")}
+          disabled={(selectedRowsData.length !== 1 || selectedRowsData[0]?.auto_status !== "automatically_graded")}
           sx={{m: 3}}
           onClick={() => setDisplayManualGrading(true)}
           variant='outlined'>
@@ -280,11 +292,11 @@ export const GradingComponent = (props: IGradingProps) => {
         </Button>
         <NavigateNextIcon
           color={selectedRows.length === 0 ?
-            "disabled" : allManualGraded(selectedRows)
+            "disabled" : allManualGraded(selectedRowsData)
               ? "primary" : "error"}
           sx={{mb: -1}}/>
         <Button
-          disabled={selectedRows.length === 0 || !allManualGraded(selectedRows)}
+          disabled={selectedRows.length === 0 || !allManualGraded(selectedRowsData)}
           sx={{m: 3}}
           onClick={handleGenerateFeedback}
           variant='outlined'>
@@ -299,7 +311,7 @@ export const GradingComponent = (props: IGradingProps) => {
         transition="zoom"
       >
         <ManualGrading lecture={props.lecture} assignment={props.assignment}
-                       submission={getSubmissionFromRow(selectedRows[0])} username={selectedRows[0]?.username}/>
+                       submission={getSubmissionFromRow(selectedRowsData[0])} username={selectedRowsData[0]?.username}/>
       </LoadingOverlay>
 
       {/* Dialog */}
