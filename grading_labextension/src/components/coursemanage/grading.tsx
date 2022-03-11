@@ -167,7 +167,7 @@ export const GradingComponent = (props: IGradingProps) => {
 
   React.useEffect(() => {
     updateSubmissions();
-  }, [option]);
+  }, [option,displayManualGrading]);
 
 
   const getColor = (value: string) => {
@@ -301,7 +301,9 @@ export const GradingComponent = (props: IGradingProps) => {
         <Button
           disabled={(selectedRowsData.length !== 1 || selectedRowsData[0]?.auto_status !== "automatically_graded")}
           sx={{m: 3}}
-          onClick={() => setDisplayManualGrading(true)}
+          onClick={() => {
+            cleanSelectedRows();
+            setDisplayManualGrading(true)}}
           variant='outlined'>
           {`Manualgrade selected`}
         </Button>
@@ -326,7 +328,7 @@ export const GradingComponent = (props: IGradingProps) => {
         transition="zoom"
       >
         <ManualGrading lecture={props.lecture} assignment={props.assignment}
-                       submission={selectedRowsData[0]} username={selectedRowsData[0]?.username}/>
+                       submission={selectedRowsData[0]} username={selectedRowsData[0]?.username} onClose={onManualGradingClose}/>
       </LoadingOverlay>
 
       {/* Dialog */}
