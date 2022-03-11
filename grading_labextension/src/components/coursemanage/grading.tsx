@@ -224,7 +224,7 @@ export const GradingComponent = (props: IGradingProps) => {
   //TODO: Not perfomant 
   const getSubmissionFromRow = (row: IRowValues): Submission => {
     if (row === undefined) return null;
-    const id = row.sub_id;
+    const id = row.id;
     console.log(id);
     for (const submission of submissions) {
       if (submission.id === id) {
@@ -326,7 +326,7 @@ export const GradingComponent = (props: IGradingProps) => {
         transition="zoom"
       >
         <ManualGrading lecture={props.lecture} assignment={props.assignment}
-                       submission={getSubmissionFromRow(selectedRowsData[0])} username={selectedRowsData[0]?.username}/>
+                       submission={selectedRowsData[0]} username={selectedRowsData[0]?.username}/>
       </LoadingOverlay>
 
       {/* Dialog */}
