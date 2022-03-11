@@ -1,5 +1,5 @@
 
-ARG BASE_IMAGE=ubuntu:focal-20200729
+ARG BASE_IMAGE=ubuntu:focal
 FROM ${BASE_IMAGE} as builder
 
 RUN apt-get update \
@@ -30,6 +30,8 @@ RUN groupadd -g 1000 grader-service && \
 USER grader-service
 
 WORKDIR /var/lib/grader-service
+
+COPY ./grader_service_config.py /var/lib/grader-service/grader_service_config.py
 
 ENV GRADER_SERVICE_HOST="0.0.0.0"
 ENV GRADER_SERVICE_DIRECTORY="/var/lib/grader-service"
