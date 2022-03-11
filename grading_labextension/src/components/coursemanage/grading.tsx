@@ -104,7 +104,8 @@ export const GradingComponent = (props: IGradingProps) => {
             await generateFeedback(props.lecture.id, props.assignment.id, row.id)
             console.log("Autograded submission");
           }));
-          getAllSubmissions(props.lecture, props.assignment, false, true).then(response => {
+          const latest = option === 'latest' ? true : false;
+          getAllSubmissions(props.lecture, props.assignment, latest, true).then(response => {
             setRows(generateRows(response));
             props.showAlert('success', `Generating Feedback for ${numSubs} Submissions`);
           })
