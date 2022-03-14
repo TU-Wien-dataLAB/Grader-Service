@@ -9,19 +9,24 @@ import Popper from '@mui/material/Popper';
 import MenuItem from '@mui/material/MenuItem';
 import MenuList from '@mui/material/MenuList';
 import {Box, SvgIcon} from "@mui/material";
+import {getFiles} from "../../services/file.service";
 
 export interface ISplitButtonProps {
   icon: React.ReactNode,
   options: { name: string, onClick: () => void }[],
   size?: 'small' | 'medium' | 'large',
-  variant?: 'text' | 'outlined' | 'contained'
+  variant?: 'text' | 'outlined' | 'contained',
+  selectedIndex?: number
 }
 
 export function SplitButton(props: ISplitButtonProps) {
   const [open, setOpen] = React.useState(false);
   const anchorRef = React.useRef<HTMLDivElement>(null);
-  const [selectedIndex, setSelectedIndex] = React.useState(0);
+  const [selectedIndex, setSelectedIndex] = React.useState(props.selectedIndex === undefined ? 0 : props.selectedIndex);
 
+  React.useEffect(() => {
+    setSelectedIndex(props.selectedIndex === undefined ? 0 : props.selectedIndex)
+  }, [props]);
   const handleMenuItemClick = (
     event: React.MouseEvent<HTMLLIElement, MouseEvent>,
     index: number,
