@@ -6,7 +6,7 @@ from urllib.parse import unquote, quote
 from jsonschema.exceptions import ValidationError
 from tornado.web import HTTPError
 
-from grader_convert.converters import GraderConvertException
+from grader_convert.converters.base import GraderConvertException
 from grader_convert.converters.generate_assignment import GenerateAssignment
 from .base_handler import ExtensionBaseHandler
 from ..registry import register_handler
@@ -57,7 +57,8 @@ class GenerateHandler(ExtensionBaseHandler):
             e = sys.exc_info()[0]
             self.log.error(e)
             self.set_status(400)
-            self.write_error(e)
+            self.write_error(400)
+            return
         try:
             gradebook_path = os.path.join(generator._output_directory, "gradebook.json")
             os.remove(gradebook_path)
