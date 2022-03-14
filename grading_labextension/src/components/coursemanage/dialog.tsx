@@ -24,7 +24,7 @@ import {
   InputLabel,
   Select,
   MenuItem,
-  Radio
+  Tooltip
 } from '@mui/material';
 import {Assignment} from '../../model/assignment';
 import {LoadingButton} from '@mui/lab';
@@ -38,6 +38,14 @@ import {Lecture} from '../../model/lecture';
 import TypeEnum = Assignment.TypeEnum;
 import AutomaticGradingEnum = Assignment.AutomaticGradingEnum;
 import {updateLecture} from '../../services/lectures.service';
+import HelpOutlineOutlinedIcon from '@mui/icons-material/HelpOutlineOutlined';
+
+
+const gradingBehaviourHelp = `Specifies the behaviour when a students submits an assignment.\n
+No Automatic Grading: No action is taken on submit.\n
+Automatic Grading: The assignment is being autograded as soon as the students makes a submission.\n
+Fully Automatic Grading: The assignment is autograded and feedback is generated as soon as the student makes a submission. 
+(requires all scores to be based on autograde results)`;
 
 const validationSchema = yup.object({
   name: yup
@@ -163,6 +171,12 @@ export const EditDialog = (props: IEditDialogProps) => {
                 />
               </LocalizationProvider>
 
+              <InputLabel id="demo-simple-select-label-auto">
+                Auto-Grading Behaviour
+                <Tooltip title={gradingBehaviourHelp}>
+                  <HelpOutlineOutlinedIcon fontSize={"small"} sx={{ml: 1.5, mt: 1.0}}/>
+                </Tooltip>
+              </InputLabel>
               <Select
                 labelId="assignment-type-select-label"
                 id="assignment-type-select"
@@ -457,6 +471,12 @@ export const CreateDialog = (props: ICreateDialogProps) => {
                 />
               </LocalizationProvider>
 
+              <InputLabel id="demo-simple-select-label-auto">
+                Auto-Grading Behaviour
+                <Tooltip title={gradingBehaviourHelp}>
+                  <HelpOutlineOutlinedIcon fontSize={"small"} sx={{ml: 1.5, mt: 1.0}}/>
+                </Tooltip>
+              </InputLabel>
               <Select
                 labelId="assignment-type-select-label"
                 id="assignment-type-select"

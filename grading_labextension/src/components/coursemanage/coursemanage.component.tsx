@@ -49,7 +49,7 @@ export const CourseManageComponent = (props: CourseManageProps) => {
       {lectures
         .filter(el => UserPermissions.getScope(el) > Scope.student)
         .map((el, index) => (
-          <LectureComponent lecture={el} root={props.root} showAlert={showAlert}/>
+          <LectureComponent lecture={el} root={props.root} showAlert={showAlert} expanded={true}/>
         ))}
       <Portal container={document.body}>
         <Snackbar
