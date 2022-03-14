@@ -1,7 +1,7 @@
 import pytest
 import json
 from grader_service.handlers.base_handler import GraderBaseHandler
-from grader_service.orm.assignment import Assignment
+from grader_service.orm.assignment import Assignment, AutoGradingBehaviour
 from datetime import datetime
 from grader_service.api.models.error_message import ErrorMessage
 from grader_service.orm.lecture import Lecture
@@ -137,7 +137,7 @@ def test_assignment_serialization():
         "status": "created",
         'type': None,
         'points': 0,
-        'automatic_grading': False,
+        'automatic_grading': AutoGradingBehaviour.unassisted,
     }
     a = Assignment(
         id=d["id"],
@@ -150,6 +150,7 @@ def test_assignment_serialization():
     )
 
     d["due_date"] = (d["due_date"].isoformat("T", "milliseconds") + "Z")
+    d["automatic_grading"] = d["automatic_grading"].name
     assert GraderBaseHandler._serialize(a) == d
 
 def test_nested_serialization():
