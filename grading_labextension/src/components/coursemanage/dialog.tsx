@@ -68,6 +68,7 @@ const validationSchema = yup.object({
 export interface IEditDialogProps {
   lecture: Lecture;
   assignment: Assignment;
+  onSubmit?: () => void;
 }
 
 export const EditDialog = (props: IEditDialogProps) => {
@@ -90,6 +91,9 @@ export const EditDialog = (props: IEditDialogProps) => {
       console.log(updatedAssignment);
       //TODO: either need lect id from assignment or need lecture hear
       updateAssignment(props.lecture.id, updatedAssignment);
+      if (props.onSubmit) {
+        props.onSubmit()
+      }
       setOpen(false);
     }
   });
