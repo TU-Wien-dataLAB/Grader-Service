@@ -1,6 +1,6 @@
 import * as React from 'react';
 import ReactDOM from 'react-dom';
-import { useFormik } from 'formik';
+import {useFormik} from 'formik';
 import * as yup from 'yup';
 
 import AdapterDateFns from '@mui/lab/AdapterDateFns';
@@ -26,17 +26,18 @@ import {
   MenuItem,
   Radio
 } from '@mui/material';
-import { Assignment } from '../../model/assignment';
-import { LoadingButton } from '@mui/lab';
+import {Assignment} from '../../model/assignment';
+import {LoadingButton} from '@mui/lab';
 import EditIcon from '@mui/icons-material/Edit';
 import AddRoundedIcon from '@mui/icons-material/AddRounded';
 import {
   createAssignment,
   updateAssignment
 } from '../../services/assignments.service';
-import { Lecture } from '../../model/lecture';
+import {Lecture} from '../../model/lecture';
 import TypeEnum = Assignment.TypeEnum;
-import { updateLecture } from '../../services/lectures.service';
+import AutomaticGradingEnum = Assignment.AutomaticGradingEnum;
+import {updateLecture} from '../../services/lectures.service';
 
 const validationSchema = yup.object({
   name: yup
@@ -52,7 +53,8 @@ const validationSchema = yup.object({
     .mixed()
     .oneOf(['user', 'group']),
   automatic_grading: yup
-    .boolean()
+    .mixed()
+    .oneOf(['unassisted', 'auto', 'full_auto'])
 });
 
 export interface IEditDialogProps {
@@ -89,7 +91,7 @@ export const EditDialog = (props: IEditDialogProps) => {
   return (
     <div>
       <IconButton
-        sx={{ mt: -1 }}
+        sx={{mt: -1}}
         onClick={e => {
           e.stopPropagation();
           setOpen(true);
@@ -97,7 +99,7 @@ export const EditDialog = (props: IEditDialogProps) => {
         onMouseDown={event => event.stopPropagation()}
         aria-label="edit"
       >
-        <EditIcon />
+        <EditIcon/>
       </IconButton>
       <Dialog open={openDialog} onBackdropClick={() => setOpen(false)}>
         <DialogTitle>Edit Assignment</DialogTitle>
@@ -161,24 +163,19 @@ export const EditDialog = (props: IEditDialogProps) => {
                 />
               </LocalizationProvider>
 
-              <FormControlLabel
-                  control={
-                    <Checkbox
-                      id='automatic_graded'
-                      name='automatic_graded'
-                      value={formik.values.automatic_grading}
-                      checked={formik.values.automatic_grading}
-                      onChange={e => {
-                        if (e.target.checked) {
-                          formik.setFieldValue('automatic_grading', true);
-                        } else {
-                          formik.setFieldValue('automatic_grading', false);
-                        }
-                      }}
-                    />
-                  }
-                  label="Grade submissions automatically"
-                />
+              <Select
+                labelId="assignment-type-select-label"
+                id="assignment-type-select"
+                value={formik.values.automatic_grading}
+                label="Auto-Grading Behaviour"
+                onChange={e => {
+                  formik.setFieldValue('automatic_grading', e.target.value);
+                }}
+              >
+                <MenuItem value={'unassisted'}>No Automatic Grading</MenuItem>
+                <MenuItem value={'auto'}>Automatic Grading</MenuItem>
+                <MenuItem value={'full_auto'}>Fully Automatic Grading</MenuItem>
+              </Select>
 
               <InputLabel id="demo-simple-select-label">Type</InputLabel>
               <Select
@@ -270,7 +267,7 @@ export const EditLectureDialog = (props: IEditLectureProps) => {
   return (
     <div>
       <IconButton
-        sx={{ mt: -1 }}
+        sx={{mt: -1}}
         onClick={e => {
           e.stopPropagation();
           setOpen(true);
@@ -278,7 +275,7 @@ export const EditLectureDialog = (props: IEditLectureProps) => {
         onMouseDown={event => event.stopPropagation()}
         aria-label="edit"
       >
-        <EditIcon />
+        <EditIcon/>
       </IconButton>
       <Dialog open={openDialog} onBackdropClick={() => setOpen(false)}>
         <DialogTitle>Edit Lecture</DialogTitle>
@@ -364,7 +361,7 @@ export const CreateDialog = (props: ICreateDialogProps) => {
       name: 'Assignment',
       due_date: null,
       type: 'user',
-      automatic_grading: false
+      automatic_grading: 'unassisted' as AutomaticGradingEnum
     },
     validationSchema: validationSchema,
     onSubmit: values => {
@@ -372,7 +369,7 @@ export const CreateDialog = (props: ICreateDialogProps) => {
         name: values.name,
         due_date: values.due_date,
         type: values.type as TypeEnum,
-        automatic_grading: values.automatic_grading
+        automatic_grading: values.automatic_grading as AutomaticGradingEnum
       };
       console.log(updatedAssignment);
       //TODO: either need lect id from assignment or need lecture hear
@@ -387,7 +384,7 @@ export const CreateDialog = (props: ICreateDialogProps) => {
   return (
     <div>
       <Button
-        sx={{ mt: -1 }}
+        sx={{mt: -1}}
         onClick={e => {
           e.stopPropagation();
           setOpen(true);
@@ -396,7 +393,7 @@ export const CreateDialog = (props: ICreateDialogProps) => {
         aria-label="create"
         size={'small'}
       >
-        <AddRoundedIcon /> New Assignment
+        <AddRoundedIcon/> New Assignment
       </Button>
       <Dialog open={openDialog} onBackdropClick={() => setOpen(false)}>
         <DialogTitle>Create Assignment</DialogTitle>
@@ -459,25 +456,20 @@ export const CreateDialog = (props: ICreateDialogProps) => {
                   }}
                 />
               </LocalizationProvider>
-              
-              <FormControlLabel
-                  control={
-                    <Checkbox
-                      id='automatic_graded'
-                      name='automatic_graded'
-                      checked={formik.values.automatic_grading}
-                      value={formik.values.automatic_grading}
-                      onChange={e => {
-                        if (e.target.checked) {
-                          formik.setFieldValue('automatic_grading', true);
-                        } else {
-                          formik.setFieldValue('automatic_grading', false);
-                        }
-                      }}
-                    />
-                  }
-                  label="Grade submissions automatically"
-                />
+
+              <Select
+                labelId="assignment-type-select-label"
+                id="assignment-type-select"
+                value={formik.values.automatic_grading}
+                label="Auto-Grading Behaviour"
+                onChange={e => {
+                  formik.setFieldValue('automatic_grading', e.target.value);
+                }}
+              >
+                <MenuItem value={'unassisted'}>No Automatic Grading</MenuItem>
+                <MenuItem value={'auto'}>Automatic Grading</MenuItem>
+                <MenuItem value={'full_auto'}>Fully Automatic Grading</MenuItem>
+              </Select>
 
               <InputLabel id="demo-simple-select-label">Type</InputLabel>
               <Select

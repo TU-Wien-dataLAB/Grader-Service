@@ -31,7 +31,7 @@ class Assignment(Model):
         :param points: The points of this Assignment.  # noqa: E501
         :type points: float
         :param automatic_grading: The automatic_grading of this Assignment.  # noqa: E501
-        :type automatic_grading: bool
+        :type automatic_grading: str
         """
         self.openapi_types = {
             'id': int,
@@ -40,7 +40,7 @@ class Assignment(Model):
             'due_date': datetime,
             'status': str,
             'points': float,
-            'automatic_grading': bool
+            'automatic_grading': str
         }
 
         self.attribute_map = {
@@ -216,7 +216,7 @@ class Assignment(Model):
 
 
         :return: The automatic_grading of this Assignment.
-        :rtype: bool
+        :rtype: str
         """
         return self._automatic_grading
 
@@ -226,7 +226,13 @@ class Assignment(Model):
 
 
         :param automatic_grading: The automatic_grading of this Assignment.
-        :type automatic_grading: bool
+        :type automatic_grading: str
         """
+        allowed_values = ["unassisted", "auto", "full_auto"]  # noqa: E501
+        if automatic_grading not in allowed_values:
+            raise ValueError(
+                "Invalid value for `automatic_grading` ({0}), must be one of {1}"
+                .format(automatic_grading, allowed_values)
+            )
 
         self._automatic_grading = automatic_grading

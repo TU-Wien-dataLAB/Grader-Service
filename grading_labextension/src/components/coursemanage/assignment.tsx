@@ -67,7 +67,7 @@ export const AssignmentComponent = (props: IAssignmentComponentProps) => {
           setLatestSubmissions(response);
         })
 
-      getFiles(`${props.lecture.code}/${assignment.name}`).then(files => {
+      getFiles(`source/${props.lecture.code}/${assignment.name}`).then(files => {
         setFiles(files)
       })
     }, [props]

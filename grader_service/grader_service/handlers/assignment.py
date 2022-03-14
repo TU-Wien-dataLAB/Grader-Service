@@ -69,7 +69,7 @@ class AssignmentBaseHandler(GraderBaseHandler):
             assignment_model = AssignmentModel.from_dict(body)
         except ValueError as e:
             self.error_message = str(e)
-            raise HTTPError(400)
+            raise HTTPError(400, log_message=self.error_message,)
         assignment = Assignment()
 
         assignment.name = assignment_model.name
