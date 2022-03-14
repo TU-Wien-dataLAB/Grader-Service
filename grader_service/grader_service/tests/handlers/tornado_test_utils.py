@@ -5,7 +5,7 @@ from grader_service import handlers  # need import to register handlers
 from grader_service.registry import HandlerPathRegistry
 from grader_service.server import GraderServer
 from tornado_sqlalchemy import SQLAlchemy
-from alembic.config import Config
+from alembic import config
 from alembic.command import upgrade
 from .db_util import insert_assignments
 
@@ -14,7 +14,7 @@ __all__ = ["db_test_config", "sql_alchemy_db", "app", "service_base_url", "jupyt
 
 @pytest.fixture(scope="function")
 def db_test_config():
-    cfg = Config(
+    cfg = config.Config(
         os.path.abspath(os.path.dirname(__file__) + "../../../alembic_test.ini")
     )
     cfg.set_main_option("script_location", os.path.abspath(os.path.dirname(__file__) + "../../../alembic"))

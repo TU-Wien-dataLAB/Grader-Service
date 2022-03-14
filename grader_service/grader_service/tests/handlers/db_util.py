@@ -1,12 +1,3 @@
-import os
-from alembic import autogenerate
-import pytest
-import alembic
-from sqlalchemy import create_engine
-from sqlalchemy.orm import Session
-from alembic.config import Config
-from alembic.command import downgrade, upgrade, autogen
-from unittest.mock import MagicMock
 import secrets
 from datetime import datetime
 

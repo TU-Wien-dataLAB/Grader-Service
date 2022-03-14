@@ -1,3 +1,4 @@
+import pytest
 import json
 from grader_service.handlers.base_handler import GraderBaseHandler
 from grader_service.orm.assignment import Assignment

@@ -32,7 +32,7 @@ async def test_feedback(
     submission = session.query(Submission).get(s_id)
     assert submission is not None
     gradebook_content = '{"notebooks":{}}'
-    submission.properties = gradebook_content # we do not actually run convert so the gradebook can be empty
+    submission.properties = gradebook_content  # we do not actually run convert so the gradebook can be empty
     session.commit()
 
     assert submission.score is None
