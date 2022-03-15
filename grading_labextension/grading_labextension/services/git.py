@@ -29,7 +29,7 @@ class GitService(Configurable):
     git_access_token = Unicode(os.environ.get("JUPYTERHUB_API_TOKEN"), allow_none=False).tag(config=True)
     git_http_scheme = Unicode(os.environ.get("GRADER_HTTP_SCHEME", 'http'), allow_none=False).tag(config=True)
     git_remote_url = Unicode(
-        f'{os.environ.get("GRADER_HOST_URL", "127.0.0.1")}:{os.environ.get("GRADER_HOST_PORT", "4010")}{os.environ.get("GRADER_GIT_BASE_URL", "/services/grader/git")}',
+        f'{os.environ.get("GRADER_HOST_URL", "grader_service")}:{os.environ.get("GRADER_HOST_PORT", "4010")}{os.environ.get("GRADER_GIT_BASE_URL", "/services/grader/git")}',
         allow_none=False).tag(config=True)
 
     def __init__(self, server_root_dir: str, lecture_code: str, assignment_name: str, repo_type: str,

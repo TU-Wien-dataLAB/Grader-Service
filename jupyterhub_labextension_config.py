@@ -1,7 +1,7 @@
 c.JupyterHub.services.append(
     {
         'name': 'grader',
-        'url': 'http://172.19.0.3:4010',
+        'url': 'http://grader_service:4010',
         'api_token': 'myapitoken'
     }
 )

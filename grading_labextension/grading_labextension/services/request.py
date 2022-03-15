@@ -15,7 +15,7 @@ class RequestService(LoggingConfigurable):
         help="The http scheme to use. Either 'http' or 'https'",
     ).tag(config=True)
     host = Unicode(
-        os.environ.get("GRADER_HOST_URL", "127.0.0.1"),
+        os.environ.get("GRADER_HOST_URL", "grader_service"),
         help="Host adress the service should make requests to",
     ).tag(config=True)
     port = Int(

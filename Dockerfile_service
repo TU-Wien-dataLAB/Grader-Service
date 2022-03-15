@@ -21,9 +21,10 @@ COPY ./grader_service.sh /usr/local/bin/grader_service.sh
 RUN python3 -m pip install -r /convert/requirements.txt && \
     python3 -m pip install -r /grader_service/requirements.txt && \
     python3 -m pip install  /convert/ && \
-    python3 -m pip install  /grader_service/ && \
-    rm -rf /convert/ && \
-    rm -rf /grader_service/
+    python3 -m pip install  /grader_service/
+    #&& \
+    #rm -rf /convert/ && \
+    #rm -rf /grader_service/
 
  # Create grader-service user
 RUN groupadd -g 1000 grader-service && \
@@ -35,7 +36,7 @@ WORKDIR /var/lib/grader-service
 
 COPY ./grader_service_config.py /var/lib/grader-service/grader_service_config.py
 
-ENV GRADER_SERVICE_HOST="172.19.0.3"
+ENV GRADER_SERVICE_HOST="0.0.0.0"
 ENV GRADER_SERVICE_DIRECTORY="/var/lib/grader-service"
 
 ENV GRADER_DB_DIALECT="sqlite"
@@ -44,5 +45,6 @@ ENV GRADER_DB_HOST="/var/lib/grader-service/grader.db"
 ENV GRADER_AUTOGRADE_IN_PATH="/var/lib/grader-service/convert_in"
 ENV GRADER_AUTOGRADE_OUT_PATH="/var/lib/grader-service/convert_out"
 
-ENTRYPOINT ["tini", "-g", "--"]
-CMD ["grader_service.sh" ]
+#ENTRYPOINT ["tini", "-g", "--"]
+#CMD ["grader_service.sh" ]
+ENTRYPOINT ["tail", "-f", "/dev/null"]

@@ -34,4 +34,5 @@ RUN echo "jovyan:jupyter" | chpasswd
 
 COPY ./jupyterhub_labextension_config.py /jupyterhub_labextension_config.py
 
-ENTRYPOINT ["jupyterhub", "-f", "/jupyterhub_labextension_config.py"]
+#ENTRYPOINT ["jupyterhub", "-f", "/jupyterhub_labextension_config.py"]
+ENTRYPOINT ["tail", "-f", "/dev/null"]
