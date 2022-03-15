@@ -10,7 +10,7 @@ import sys
 import tornado
 from tornado.httpserver import HTTPServer
 from tornado_sqlalchemy import SQLAlchemy
-from traitlets import config
+from traitlets import config, Bool
 from traitlets import log as traitlets_log
 from traitlets import Enum, Int, TraitError, Unicode, observe, validate, default
 
@@ -43,6 +43,8 @@ class GraderService(config.Application):
         config=True
     )
     service_port = Int(int(os.getenv("GRADER_SERVICE_PORT", "4010")), help="The port the service runs on").tag(config=True)
+
+    reuse_port = Bool(False, help="Whether to allow for the specified service port to be reused.").tag(config=True)
 
     grader_service_dir = Unicode(os.getenv("GRADER_SERVICE_DIRECTORY"), allow_none=False).tag(config=True)
 
@@ -186,7 +188,8 @@ class GraderService(config.Application):
             xheaders=True,
         )
         self.log.info(f"db_url - {self.db_url}")
-        self.http_server.listen(self.service_port, address=self.service_host)
+        self.http_server.bind(self.service_port, address=self.service_host, reuse_port=self.reuse_port)
+        self.http_server.start()
 
         for s in (signal.SIGTERM, signal.SIGINT):
             asyncio.get_event_loop().add_signal_handler(
