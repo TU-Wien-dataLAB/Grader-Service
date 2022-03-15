@@ -7,6 +7,8 @@ RUN apt-get update \
     python3 \
     python3-pip \
     git \
+    vim \
+    iputils-ping \
     tini && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
@@ -33,7 +35,7 @@ WORKDIR /var/lib/grader-service
 
 COPY ./grader_service_config.py /var/lib/grader-service/grader_service_config.py
 
-ENV GRADER_SERVICE_HOST="0.0.0.0"
+ENV GRADER_SERVICE_HOST="172.19.0.3"
 ENV GRADER_SERVICE_DIRECTORY="/var/lib/grader-service"
 
 ENV GRADER_DB_DIALECT="sqlite"
