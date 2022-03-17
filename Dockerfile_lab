@@ -36,7 +36,5 @@ RUN python3 -m pip install -r /grading_labextension/requirements.txt && \
 RUN useradd -m -s /bin/bash -N -u 1000 jovyan
 RUN echo "jovyan:jupyter" | chpasswd
 
-COPY ./jupyterhub_labextension_config.py /jupyterhub_labextension_config.py
-
-#ENTRYPOINT ["jupyterhub", "-f", "/jupyterhub_labextension_config.py"]
-ENTRYPOINT ["tail", "-f", "/dev/null"]
+ENTRYPOINT ["jupyterhub", "-f", "/jupyterhub_labextension_config.py"]
+# ENTRYPOINT ["tail", "-f", "/dev/null"]

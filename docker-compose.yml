@@ -8,6 +8,11 @@ services:
     image: "grader-lap:latest"
     ports:
       - "8000:8000"
+    volumes:
+        # used instead of COPY inside Dockerfile
+        # COPY ./jupyterhub_labextension_config.py /jupyterhub_labextension_config.py
+        # makes it easier to change the values.
+      - ./jupyterhub_labextension_config.py:/jupyterhub_labextension_config.py
     depends_on:
       - grader_service
 
@@ -19,3 +24,8 @@ services:
     image: "grader_service:latest"
     ports:
       - "4010:4010"
+    volumes:
+        # used instead of COPY inside Dockerfile
+        # COPY ./grader_service_config.py /var/lib/grader-service/grader_service_config.py
+        # makes it easier to change the values.
+      - ./grader_service_config.py:/var/lib/grader-service/grader_service_config.py
