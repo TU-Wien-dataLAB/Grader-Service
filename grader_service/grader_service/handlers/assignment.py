@@ -128,6 +128,10 @@ class AssignmentObjectHandler(GraderBaseHandler):
         assignment.status = assignment_model.status
         assignment.type = assignment_model.type
         assignment.automatic_grading = assignment_model.automatic_grading
+
+        if assignment.automatic_grading == AutoGradingBehaviour.full_auto.name:
+            model = GradeBookModel.from_dict(json.loads(assignment.properties))
+            _check_full_auto_grading(self, model)
         self.session.commit()
         self.write_json(assignment)
 
@@ -260,16 +264,20 @@ class AssignmentPropertiesHandler(GraderBaseHandler):
             raise HTTPError(404)
         properties_string: str = self.request.body.decode("utf-8")
         # Check if assignment contains no cells that need manual grading if assignment is fully auto graded
-        if assignment.automatic_grading == AutoGradingBehaviour.full_auto:
+        if assignment.automatic_grading == AutoGradingBehaviour.full_auto.name:
             model = GradeBookModel.from_dict(json.loads(properties_string))
-            for nb in model.notebooks.values():
-                if len(nb.task_cells_dict) > 0:
-                    self.error_message = "Fully autograded notebook cannot contain task cells!"
-                    raise HTTPError(400, self.error_message)
-                grades = set(nb.grade_cells_dict.keys())
-                solutions = set(nb.solution_cells_dict.keys())
-                if len(grades & solutions) > 0:
-                    self.error_message = "Fully autograded notebook cannot contain manually graded cells!"
-                    raise HTTPError(400, self.error_message)
+            _check_full_auto_grading(self, model)
         assignment.properties = properties_string
         self.session.commit()
+
+
+def _check_full_auto_grading(self: GraderBaseHandler, model):
+    for nb in model.notebooks.values():
+        if len(nb.task_cells_dict) > 0:
+            self.error_message = "Fully autograded notebook cannot contain task cells!"
+            raise HTTPError(400, self.error_message)
+        grades = set(nb.grade_cells_dict.keys())
+        solutions = set(nb.solution_cells_dict.keys())
+        if len(grades & solutions) > 0:
+            self.error_message = "Fully autograded notebook cannot contain manually graded cells!"
+            raise HTTPError(400, self.error_message)
