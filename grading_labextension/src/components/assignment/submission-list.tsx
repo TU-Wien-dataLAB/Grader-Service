@@ -40,7 +40,7 @@ export const SubmissionList = (props: ISubmissionListProps) => {
           <ListItem disablePadding
                     secondaryAction={
                       value.feedback_available
-                        ? <Button startIcon={<ChatRoundedIcon />} aria-label="delete" onClick={() => props.openFeedback(value)}>
+                        ? <Button startIcon={<ChatRoundedIcon />} size="small" onClick={() => props.openFeedback(value)}>
                           Open feedback
                         </Button>
                         : null
