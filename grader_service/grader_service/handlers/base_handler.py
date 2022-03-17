@@ -142,6 +142,7 @@ class GraderBaseHandler(SessionMixin, web.RequestHandler):
             self.finish()
             return
             # raise HTTPError(403)
+        self.set_secure_cookie(token, json.dumps(user), expires_days=self.application.max_token_cookie_age_days)
         self.log.info(f'User {user["name"]} has been authenticated (took {(time.monotonic() - start_time)*1e3:.2f}ms)')
 
         user_model = self.session.query(User).get(user["name"])
@@ -206,7 +207,6 @@ class GraderBaseHandler(SessionMixin, web.RequestHandler):
         token_user = self.get_secure_cookie(token, max_age_days=max_token_age)
         if not token_user:
             user = await self.get_current_user_async(token)
-            self.set_secure_cookie(token, json.dumps(user), expires_days=max_token_age)
             return user
         else:
             return json.loads(token_user)
