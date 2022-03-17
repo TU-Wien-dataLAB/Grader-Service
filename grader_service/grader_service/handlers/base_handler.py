@@ -3,6 +3,7 @@ import datetime
 import functools
 import json
 import logging
+import time
 from typing import Any, Awaitable, Callable, List, Optional
 from urllib.parse import ParseResult, urlparse
 
@@ -131,6 +132,8 @@ class GraderBaseHandler(SessionMixin, web.RequestHandler):
             return
             # raise HTTPError(403)
 
+        start_time = time.monotonic()
+
         user = await self.authenticate_token_user(token)
         if user is None:
             self.log.warn("Request from unauthenticated user")
@@ -139,7 +142,8 @@ class GraderBaseHandler(SessionMixin, web.RequestHandler):
             self.finish()
             return
             # raise HTTPError(403)
-        self.log.info(f'User {user["name"]} has been authenticated')
+        self.log.info(f'User {user["name"]} has been authenticated (took {(time.monotonic() - start_time)*1e3:.2f}ms)')
+
         user_model = self.session.query(User).get(user["name"])
         if user_model is None:
             self.log.info(f'User {user["name"]} does not exist and will be created.')
