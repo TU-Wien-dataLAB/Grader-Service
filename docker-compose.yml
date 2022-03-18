@@ -20,3 +20,8 @@ services:
     image: "grader_service:latest"
     ports:
       - "4010:4010"
+    volumes:
+        # used instead of COPY inside Dockerfile
+        # COPY ./grader_service_config.py /var/lib/grader-service/grader_service_config.py
+        # makes it easier to change the values.
+      - ./grader_service_config.py:/var/lib/grader-service/grader_service_config.py
