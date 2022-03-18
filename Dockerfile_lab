@@ -29,14 +29,11 @@ COPY ./convert /convert
 RUN python3 -m pip install -r /grading_labextension/requirements.txt && \
     python3 -m pip install -r /convert/requirements.txt && \
     python3 -m pip install  /convert/ && \
-    python3 -m pip install  /grading_labextension
-    # && \
-    # rm -rf /grading_labextension
+    python3 -m pip install  /grading_labextension && \
+    rm -rf /grading_labextension && \
+    rm -rf /convert
 
 RUN useradd -m -s /bin/bash -N -u 1000 jovyan
 RUN echo "jovyan:jupyter" | chpasswd
 
-COPY ./jupyterhub_labextension_config.py /jupyterhub_labextension_config.py
-
-#ENTRYPOINT ["jupyterhub", "-f", "/jupyterhub_labextension_config.py"]
-ENTRYPOINT ["tail", "-f", "/dev/null"]
+ENTRYPOINT ["jupyterhub", "-f", "/jupyterhub_labextension_config.py"]
