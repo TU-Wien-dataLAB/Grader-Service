@@ -479,7 +479,13 @@ grading_labextension/grading_labextension/labextension
 #Sqlite database
 *.db
 grading_labextension/grader/grading_labextension/labextension/build_log.json
+<<<<<<< HEAD
 #grader_service_config.py
+=======
+
+# configs
+# grader_service_config.py
+>>>>>>> 1decefd2ee9e01951337d602dbfb58433f6d8f1c
 
 
 #OpenAPI
