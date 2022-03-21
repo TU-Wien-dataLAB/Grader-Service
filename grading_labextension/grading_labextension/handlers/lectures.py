@@ -13,9 +13,10 @@ class LectureBaseHandler(ExtensionBaseHandler):
     async def get(self):
         """Sends a GET-request to the grader service and returns the autorized lectures
         """
-        query_params = RequestService.get_query_string(
-            {"semester": self.get_argument("semester", None)}
-        )
+        query_params = RequestService.get_query_string({
+            "semester": self.get_argument("semester", None),
+            "active": self.get_argument("active", None)
+        })
         try:
             response = await self.request_service.request(
                 "GET",
@@ -53,7 +54,7 @@ class LectureObjectHandler(ExtensionBaseHandler):
 
         :param lecture_id: id of the lecture
         :type lecture_id: int
-        """        
+        """
 
         data = tornado.escape.json_decode(self.request.body)
         try:
@@ -75,7 +76,7 @@ class LectureObjectHandler(ExtensionBaseHandler):
 
         :param lecture_id: id of the lecture
         :type lecture_id: int
-        """        
+        """
         try:
             response_data: dict = await self.request_service.request(
                 "GET",
@@ -94,8 +95,8 @@ class LectureObjectHandler(ExtensionBaseHandler):
 
         :param lecture_id: id of the lecture
         :type lecture_id: int
-        """        
-        
+        """
+
         try:
             await self.request_service.request(
                 "DELETE",
@@ -107,6 +108,7 @@ class LectureObjectHandler(ExtensionBaseHandler):
             self.write_error(e.code)
             return
         self.write("OK")
+
 
 @register_handler(
     path=r"\/lectures\/(?P<lecture_id>\d*)\/users\/?"
@@ -123,5 +125,5 @@ class LectureStudentsHandler(ExtensionBaseHandler):
             self.set_status(e.code)
             self.write_error(e.code)
             return
-        
+
         self.write(json.dumps(response))

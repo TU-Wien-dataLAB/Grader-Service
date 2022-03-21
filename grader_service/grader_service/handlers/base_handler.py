@@ -110,6 +110,9 @@ class GraderBaseHandler(SessionMixin, web.RequestHandler):
         self.has_auth = False
         self.log = self.application.log
 
+    def data_received(self, chunk: bytes) -> Optional[Awaitable[None]]:
+        pass
+
     async def prepare(self) -> Optional[Awaitable[None]]:
         await self.authenticate_user()
 
