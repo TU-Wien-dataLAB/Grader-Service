@@ -252,7 +252,7 @@ export const GradingComponent = (props: IGradingProps) => {
               </Tooltip>
         </Box>
         </ModalTitle>
-      <div style={{display: 'flex', height: '65vh', marginTop: '90px'}}>
+      <div style={{display: 'flex', height: '65vh', marginTop: '30px'}}>
         <div style={{flexGrow: 1}}>
           <DataGrid
             sx={{mb: 3, ml: 3, mr: 3}}
