@@ -24,7 +24,7 @@ import {
   InputLabel,
   Select,
   MenuItem,
-  Tooltip
+  Tooltip, Typography
 } from '@mui/material';
 import {Assignment} from '../../model/assignment';
 import {LoadingButton} from '@mui/lab';
@@ -577,7 +577,18 @@ export const CreateLectureDialog = (props: ICreateLectureDialogProps) => {
       >
         <AddRoundedIcon/> Activate Lecture
       </Button>
-      <Dialog open={openDialog} onBackdropClick={() => setOpen(false)}>
+      <Dialog open={openDialog && props.lectures.length == 0} onBackdropClick={() => setOpen(false)}
+              onClose={() => setOpen(false)}>
+        <DialogTitle>Activate Lecture</DialogTitle>
+        <DialogContent>
+          <Typography>No inactive lectures found!</Typography>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setOpen(false)}>Close</Button>
+        </DialogActions>
+      </Dialog>
+      <Dialog open={openDialog && props.lectures.length > 0} onBackdropClick={() => setOpen(false)}
+              onClose={() => setOpen(false)}>
         <DialogTitle>Activate Lecture</DialogTitle>
         <form onSubmit={formik.handleSubmit}>
           <DialogContent>
