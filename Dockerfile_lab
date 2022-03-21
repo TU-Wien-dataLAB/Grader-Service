@@ -36,4 +36,12 @@ RUN python3 -m pip install -r /grading_labextension/requirements.txt && \
 RUN useradd -m -s /bin/bash -N -u 1000 jovyan
 RUN echo "jovyan:jupyter" | chpasswd
 
+RUN useradd -m -s /bin/bash -N -u 1001 user1
+RUN echo "user1:password" | chpasswd
+RUN useradd -m -s /bin/bash -N -u 1002 user2
+RUN echo "user2:password" | chpasswd
+RUN useradd -m -s /bin/bash -N -u 1003 user3
+RUN echo "user3:password" | chpasswd
+
+
 ENTRYPOINT ["jupyterhub", "-f", "/jupyterhub_labextension_config.py"]
