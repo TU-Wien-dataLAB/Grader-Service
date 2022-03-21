@@ -48,7 +48,7 @@ class LocalAutogradeExecutor(LoggingConfigurable):
     convert_executable = Unicode("grader-convert", allow_none=False).tag(config=True)
     git_executable = Unicode("git", allow_none=False).tag(config=True)
 
-    def __init__(self, grader_service_dir: str, submission: Submission, **kwargs):
+    def __init__(self, grader_service_dir: str, submission: Submission, close_session=True, **kwargs):
         """Creates the executor in the input and output directories that are specified by :attr:`base_input_path` and :attr:`base_output_path`.
         The grader service directory is used for accessing the git repositories to push the grading results.
         All the necessary information and database session can be retrieved from the submission object. The associated session of the subission has to be available and must not be closed beforehand.
@@ -62,6 +62,7 @@ class LocalAutogradeExecutor(LoggingConfigurable):
         self.grader_service_dir = grader_service_dir
         self.submission = submission
         self.session: Session = Session.object_session(self.submission)
+        self.close_session = close_session  # close session after grading (might need session later)
 
         self.autograding_start: Optional[datetime] = None
         self.autograding_finished: Optional[datetime] = None
@@ -296,7 +297,8 @@ class LocalAutogradeExecutor(LoggingConfigurable):
             shutil.rmtree(self.output_path)
         except FileNotFoundError:
             pass
-        self.session.close()
+        if self.close_session:
+            self.session.close()
 
     async def _run_subprocess(self, command: str, cwd: str) -> Subprocess:
         process = Subprocess(shlex.split(command), stdout=PIPE, stderr=PIPE, cwd=cwd)

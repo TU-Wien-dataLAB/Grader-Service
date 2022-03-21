@@ -33,7 +33,8 @@ export const OverviewComponent = (props: IOverviewProps) => {
     <Box>
       <ModalTitle title={assignment.name}>
         <Box sx={{ml: 2}} display="inline-block">
-          <EditDialog lecture={props.lecture} assignment={assignment}/>
+          <EditDialog lecture={props.lecture} assignment={assignment}
+                      onSubmit={() => getAssignment(lecture.id, assignment).then(assignment => setAssignment(assignment))}/>
         </Box>
       </ModalTitle>
       <Box className='flexbox-panel' sx={{ml: 3, mr: 3, mb: 3, mt: 9}}>
@@ -50,9 +51,11 @@ export const OverviewComponent = (props: IOverviewProps) => {
 
         <GitLog lecture={lecture} assignment={assignment}/>
 
-        <SubmittedChart lecture={lecture} assignment={assignment} allSubmissions={props.allSubmissions} users={props.users}/>
+        <SubmittedChart lecture={lecture} assignment={assignment} allSubmissions={props.allSubmissions}
+                        users={props.users}/>
 
-        <GradingChart lecture={lecture} assignment={assignment} allSubmissions={props.allSubmissions} users={props.users}/>
+        <GradingChart lecture={lecture} assignment={assignment} allSubmissions={props.allSubmissions}
+                      users={props.users}/>
 
       </Box>
     </Box>

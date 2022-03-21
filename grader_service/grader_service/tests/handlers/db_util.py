@@ -1,12 +1,3 @@
-import os
-from alembic import autogenerate
-import pytest
-import alembic
-from sqlalchemy import create_engine
-from sqlalchemy.orm import Session
-from alembic.config import Config
-from alembic.command import downgrade, upgrade, autogen
-from unittest.mock import MagicMock
 import secrets
 from datetime import datetime
 
@@ -37,9 +28,9 @@ def insert_lectures(session):
 
 def insert_assignments(ex, lecture_id=1):
     ex.execute(
-        f'INSERT INTO "assignment" ("name","lectid","duedate","points","status","automatic_grading") VALUES ("assignment_1",{lecture_id},"2021-06-06 23:59:00.000",20,"released",false)')
+        f'INSERT INTO "assignment" ("name","lectid","duedate","points","status","automatic_grading") VALUES ("assignment_1",{lecture_id},"2021-06-06 23:59:00.000",20,"released","unassisted")')
     ex.execute(
-        f'INSERT INTO "assignment" ("name","lectid","duedate","points","status","automatic_grading") VALUES ("assignment_2",{lecture_id},"2021-07-07 23:59:00.000",10,"created",false)')
+        f'INSERT INTO "assignment" ("name","lectid","duedate","points","status","automatic_grading") VALUES ("assignment_2",{lecture_id},"2021-07-07 23:59:00.000",10,"created","unassisted")')
     num_inserts = 2
     return num_inserts
 

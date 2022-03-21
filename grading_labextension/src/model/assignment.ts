@@ -18,7 +18,7 @@ export interface Assignment {
     due_date?: string;
     status?: Assignment.StatusEnum;
     points?: number;
-    automatic_grading?: boolean;
+    automatic_grading?: Assignment.AutomaticGradingEnum;
 }
 export namespace Assignment {
     export type TypeEnum = 'user' | 'group';
@@ -32,6 +32,12 @@ export namespace Assignment {
         Pushed: 'pushed' as StatusEnum,
         Released: 'released' as StatusEnum,
         Complete: 'complete' as StatusEnum
+    };
+    export type AutomaticGradingEnum = 'unassisted' | 'auto' | 'full_auto';
+    export const AutomaticGradingEnum = {
+        Unassisted: 'unassisted' as AutomaticGradingEnum,
+        Auto: 'auto' as AutomaticGradingEnum,
+        FullAuto: 'full_auto' as AutomaticGradingEnum
     };
 }
 

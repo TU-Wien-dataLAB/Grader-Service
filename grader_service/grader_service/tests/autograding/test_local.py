@@ -1,18 +1,15 @@
-import secrets
 from grader_service.orm.assignment import Assignment
 import pytest
-from grader_service.server import GraderServer
-import json
 from grader_service.orm.submission import Submission
-from unittest.mock import AsyncMock, MagicMock, Mock, patch
+from unittest.mock import patch
 from grader_service.autograding.local_grader import LocalAutogradeExecutor
 from sqlalchemy.engine.base import Engine
 from sqlalchemy.orm.session import Session
 
-## Imports are important otherwise they will not be found
-from sqlalchemy.orm import sessionmaker
+# Imports are important otherwise they will not be found
 from ..handlers.tornado_test_utils import default_user, sql_alchemy_db, db_test_config
 from ..handlers.db_util import insert_submission, insert_assignments
+from sqlalchemy.orm import sessionmaker
 
 
 async def test_auto_grading(

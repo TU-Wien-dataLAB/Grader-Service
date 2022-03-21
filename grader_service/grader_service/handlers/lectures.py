@@ -17,21 +17,27 @@ class LectureBaseHandler(GraderBaseHandler):
     async def get(self):
         """Returns all lectures the user can access
         """
+        self.validate_parameters("semester", "active")
         semester = self.get_argument("semester", None)
-        self.validate_parameters("semester")
+        active = self.get_argument("active", "true") == "true"
+
+        state = LectureState.active if active else LectureState.inactive
         if semester is None:
             lectures = [
                 role.lecture
                 for role in self.user.roles
-                if role.lecture.state == LectureState.active
+                if role.lecture.state == state
+                   and role.lecture.deleted == DeleteState.active
+                   and (True if active else role.role == Scope.instructor)
             ]
         else:
             lectures = [
                 role.lecture
                 for role in self.user.roles
-                if role.lecture.state == LectureState.active
-                and role.lecture.deleted == DeleteState.active
-                and role.lecture.semester == semester
+                if role.lecture.state == state
+                   and role.lecture.deleted == DeleteState.active
+                   and role.lecture.semester == semester
+                   and (True if active else role.role == Scope.instructor)
             ]
         self.write_json(lectures)
 
@@ -47,8 +53,8 @@ class LectureBaseHandler(GraderBaseHandler):
         try:
             lecture = (
                 self.session.query(Lecture)
-                .filter(Lecture.code == lecture_model.code)
-                .one_or_none()
+                    .filter(Lecture.code == lecture_model.code)
+                    .one_or_none()
             )
         except NoResultFound:
             self.error_message = "Not found"
@@ -66,6 +72,18 @@ class LectureBaseHandler(GraderBaseHandler):
         lecture.deleted = DeleteState.active
 
         self.session.commit()
+        try:
+            lecture = (
+                self.session.query(Lecture)
+                    .filter(Lecture.code == lecture_model.code)
+                    .one_or_none()
+            )
+        except NoResultFound:
+            self.error_message = "Not found"
+            raise HTTPError(404)
+        except MultipleResultsFound:
+            self.error_message = "Error"
+            raise HTTPError(400)
         self.write_json(lecture)
 
 
@@ -124,7 +142,7 @@ class LectureObjectHandler(GraderBaseHandler):
             lecture.deleted = 1
             a: Assignment
             for a in lecture.assignments:
-                if(len(a.submissions)) > 0 or a.status in ["released", "complete"]:
+                if (len(a.submissions)) > 0 or a.status in ["released", "complete"]:
                     self.session.rollback()
                     raise HTTPError(400, "Cannot delete assignment")
                 a.deleted = 1
@@ -133,6 +151,7 @@ class LectureObjectHandler(GraderBaseHandler):
             raise HTTPError(404)
         self.write("OK")
 
+
 @register_handler(
     path=r"\/lectures\/(?P<lecture_id>\d*)\/users\/?",
     version_specifier=VersionSpecifier.ALL,
@@ -140,11 +159,10 @@ class LectureObjectHandler(GraderBaseHandler):
 class LectureStudentsHandler(GraderBaseHandler):
     @authorize([Scope.tutor, Scope.instructor])
     async def get(self, lecture_id: int):
-
         roles = self.session.query(Role).filter(Role.lectid == lecture_id).all()
         students = [r.username for r in roles if r.role == Scope.student]
         tutors = [r.username for r in roles if r.role == Scope.tutor]
         instructors = [r.username for r in roles if r.role == Scope.instructor]
 
-        counts = {"instructors": instructors, "tutors": tutors, "students": students }
+        counts = {"instructors": instructors, "tutors": tutors, "students": students}
         self.write_json(counts)

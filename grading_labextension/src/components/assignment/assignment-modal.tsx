@@ -15,6 +15,7 @@ import {getAllSubmissions, getSubmissions, submitAssignment} from "../../service
 import LoadingOverlay from "../util/overlay";
 import {Feedback} from "./feedback";
 import {AssignmentStatus} from "./assignment-status";
+import {getFiles} from "../../services/file.service";
 
 export interface IAssignmentModalProps {
   lecture: Lecture;
@@ -29,6 +30,11 @@ export const AssignmentModalComponent = (props: IAssignmentModalProps) => {
   const [path, setPath] = React.useState(`${props.lecture.code}/${props.assignment.name}`);
   const [showFeedback, setShowFeedback] = React.useState(false);
   const [feedbackSubmission, setFeedbackSubmission] = React.useState(null);
+  const [hasFiles, setHasFiles] = React.useState(false);
+
+  React.useEffect(() => {
+    getFiles(path).then(files => setHasFiles(files.length > 0));
+  }, [props]);
 
   const fetchAssignmentHandler = async (repo: "user" | "release") => {
     try {
@@ -64,7 +70,7 @@ export const AssignmentModalComponent = (props: IAssignmentModalProps) => {
       <ModalTitle title={props.assignment.name}/>
       <Box sx={{mt: 10}}>
         <Typography variant={'h6'} sx={{ml: 2}}>Status</Typography>
-        <AssignmentStatus lecture={props.lecture} assignment={props.assignment} submissions={submissions} />
+        <AssignmentStatus lecture={props.lecture} assignment={props.assignment} submissions={submissions}/>
         <Typography variant={'h6'} sx={{ml: 2}}>Files</Typography>
         <FilesList path={path} sx={{m: 2, mt: 1}}/>
         <Stack direction={"row"} spacing={1} sx={{m: 1, ml: 2}}>
@@ -84,6 +90,7 @@ export const AssignmentModalComponent = (props: IAssignmentModalProps) => {
               {name: "Pull User", onClick: () => fetchAssignmentHandler("user")},
               {name: "Pull Release", onClick: () => fetchAssignmentHandler("release")}
             ]}
+            selectedIndex={hasFiles ? 0 : 1}
           />
         </Stack>
         <Typography variant={'h6'} sx={{ml: 2, mt: 3}}>Submissions</Typography>

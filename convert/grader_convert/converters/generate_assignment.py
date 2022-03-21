@@ -20,7 +20,6 @@ from traitlets.config.loader import Config
 
 
 class GenerateAssignment(BaseConverter):
-
     create_assignment = Bool(
         True,
         help=dedent(
@@ -50,6 +49,7 @@ class GenerateAssignment(BaseConverter):
             CheckCellMetadata,
         ]
     ).tag(config=True)
+
     # NB: ClearHiddenTests must come after ComputeChecksums and SaveCells.
     # ComputerChecksums must come again after ClearHiddenTests.
 
@@ -57,7 +57,7 @@ class GenerateAssignment(BaseConverter):
         super(GenerateAssignment, self)._load_config(cfg, **kwargs)
 
     def __init__(
-        self, input_dir: str, output_dir: str, file_pattern: str, **kwargs: Any
+            self, input_dir: str, output_dir: str, file_pattern: str, **kwargs: Any
     ) -> None:
         super(GenerateAssignment, self).__init__(
             input_dir, output_dir, file_pattern, **kwargs

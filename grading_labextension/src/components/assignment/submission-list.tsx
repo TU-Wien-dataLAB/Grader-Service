@@ -1,7 +1,7 @@
 import * as React from 'react';
 import {
   Box,
-  Card, Divider, IconButton,
+  Card, Divider, Button,
   List,
   ListItem,
   ListItemButton,
@@ -40,9 +40,9 @@ export const SubmissionList = (props: ISubmissionListProps) => {
           <ListItem disablePadding
                     secondaryAction={
                       value.feedback_available
-                        ? <IconButton edge="end" aria-label="delete" onClick={() => props.openFeedback(value)}>
-                          <ChatRoundedIcon/>
-                        </IconButton>
+                        ? <Button startIcon={<ChatRoundedIcon />} size="small" onClick={() => props.openFeedback(value)}>
+                          Open feedback
+                        </Button>
                         : null
                     }>
             <ListItemIcon>

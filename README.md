@@ -96,3 +96,13 @@ When restarting the JupyterHub you should now see the following log message:
 
 Do not forget to set the log level to `INFO` in the JupyterHub config if you want to see this message.
 
+The last thing we have to configure is the server-side of the JupyterLab plugin which also needs information where to access the endpoints of the service. This can be done in the `jupyter_notebook_config.py` file. When using the defaults from above we do not need to explicitly configure this but it would look like this:
+
+    import os
+    c.GitService.git_access_token = os.environ.get("JUPYTERHUB_API_TOKEN")
+    c.GitService.git_remote_url = "127.0.0.1:4010/services/grader/git"
+    c.GitService.git_http_scheme = "http"
+    
+    c.RequestService.port = 4010
+    c.RequestService.host = "127.0.0.1"
+    c.RequestService.scheme = "http"

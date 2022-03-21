@@ -104,7 +104,8 @@ export const GradingComponent = (props: IGradingProps) => {
             await generateFeedback(props.lecture.id, props.assignment.id, row.id)
             console.log("Autograded submission");
           }));
-          getAllSubmissions(props.lecture, props.assignment, false, true).then(response => {
+          const latest = option === 'latest' ? true : false;
+          getAllSubmissions(props.lecture, props.assignment, latest, true).then(response => {
             setRows(generateRows(response));
             props.showAlert('success', `Generating Feedback for ${numSubs} Submissions`);
           })
@@ -167,7 +168,7 @@ export const GradingComponent = (props: IGradingProps) => {
 
   React.useEffect(() => {
     updateSubmissions();
-  }, [option]);
+  }, [option,displayManualGrading]);
 
 
   const getColor = (value: string) => {
@@ -224,7 +225,7 @@ export const GradingComponent = (props: IGradingProps) => {
   //TODO: Not perfomant 
   const getSubmissionFromRow = (row: IRowValues): Submission => {
     if (row === undefined) return null;
-    const id = row.sub_id;
+    const id = row.id;
     console.log(id);
     for (const submission of submissions) {
       if (submission.id === id) {
@@ -251,7 +252,7 @@ export const GradingComponent = (props: IGradingProps) => {
               </Tooltip>
         </Box>
         </ModalTitle>
-      <div style={{display: 'flex', height: '65vh', marginTop: '90px'}}>
+      <div style={{display: 'flex', height: '65vh', marginTop: '30px'}}>
         <div style={{flexGrow: 1}}>
           <DataGrid
             sx={{mb: 3, ml: 3, mr: 3}}
@@ -301,7 +302,9 @@ export const GradingComponent = (props: IGradingProps) => {
         <Button
           disabled={(selectedRowsData.length !== 1 || selectedRowsData[0]?.auto_status !== "automatically_graded")}
           sx={{m: 3}}
-          onClick={() => setDisplayManualGrading(true)}
+          onClick={() => {
+            cleanSelectedRows();
+            setDisplayManualGrading(true)}}
           variant='outlined'>
           {`Manualgrade selected`}
         </Button>
@@ -326,7 +329,7 @@ export const GradingComponent = (props: IGradingProps) => {
         transition="zoom"
       >
         <ManualGrading lecture={props.lecture} assignment={props.assignment}
-                       submission={getSubmissionFromRow(selectedRowsData[0])} username={selectedRowsData[0]?.username}/>
+                       submission={selectedRowsData[0]} username={selectedRowsData[0]?.username} onClose={onManualGradingClose}/>
       </LoadingOverlay>
 
       {/* Dialog */}

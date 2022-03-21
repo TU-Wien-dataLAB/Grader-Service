@@ -3,6 +3,7 @@ import datetime
 import functools
 import json
 import logging
+import time
 from typing import Any, Awaitable, Callable, List, Optional
 from urllib.parse import ParseResult, urlparse
 
@@ -109,6 +110,9 @@ class GraderBaseHandler(SessionMixin, web.RequestHandler):
         self.has_auth = False
         self.log = self.application.log
 
+    def data_received(self, chunk: bytes) -> Optional[Awaitable[None]]:
+        pass
+
     async def prepare(self) -> Optional[Awaitable[None]]:
         await self.authenticate_user()
 
@@ -131,6 +135,8 @@ class GraderBaseHandler(SessionMixin, web.RequestHandler):
             return
             # raise HTTPError(403)
 
+        start_time = time.monotonic()
+
         user = await self.authenticate_token_user(token)
         if user is None:
             self.log.warn("Request from unauthenticated user")
@@ -139,7 +145,9 @@ class GraderBaseHandler(SessionMixin, web.RequestHandler):
             self.finish()
             return
             # raise HTTPError(403)
-        self.log.info(f'User {user["name"]} has been authenticated')
+        self.set_secure_cookie(token, json.dumps(user), expires_days=self.application.max_token_cookie_age_days)
+        self.log.info(f'User {user["name"]} has been authenticated (took {(time.monotonic() - start_time)*1e3:.2f}ms)')
+
         user_model = self.session.query(User).get(user["name"])
         if user_model is None:
             self.log.info(f'User {user["name"]} does not exist and will be created.')
@@ -202,7 +210,6 @@ class GraderBaseHandler(SessionMixin, web.RequestHandler):
         token_user = self.get_secure_cookie(token, max_age_days=max_token_age)
         if not token_user:
             user = await self.get_current_user_async(token)
-            self.set_secure_cookie(token, json.dumps(user), expires_days=max_token_age)
             return user
         else:
             return json.loads(token_user)

@@ -137,8 +137,8 @@ class BaseConverter(LoggingConfigurable):
         self, input_dir: str, output_dir: str, file_pattern: str, **kwargs: typing.Any
     ) -> None:
         super(BaseConverter, self).__init__(**kwargs)
-        self._input_directory = os.path.normpath(os.path.expanduser(input_dir))
-        self._output_directory = os.path.normpath(os.path.expanduser(output_dir))
+        self._input_directory = os.path.abspath(os.path.expanduser(input_dir))
+        self._output_directory = os.path.abspath(os.path.expanduser(output_dir))
         self._file_pattern = file_pattern
         if self.parent and hasattr(self.parent, "logfile"):
             self.logfile = self.parent.logfile
@@ -297,18 +297,6 @@ class BaseConverter(LoggingConfigurable):
             )
             errors.append(e)
             _handle_failure(e)
-
-        except sqlalchemy.exc.OperationalError as e:
-            _handle_failure(e)
-            self.log.error(traceback.format_exc())
-            msg = (
-                "There was an error accessing the nbgrader database. This "
-                "may occur if you recently upgraded nbgrader. To resolve "
-                "the issue, first BACK UP your database and then run the "
-                "command `nbgrader db upgrade`."
-            )
-            self.log.error(msg)
-            raise GraderConvertException(msg)
 
         except SchemaTooOldError as e:
             _handle_failure(e)

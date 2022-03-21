@@ -25,6 +25,7 @@ class RequestService(LoggingConfigurable):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.http_client = AsyncHTTPClient()
+        self._service_cookie = None
 
     async def request(
         self,
@@ -35,6 +36,8 @@ class RequestService(LoggingConfigurable):
         decode_response: bool = True,
     ) -> Union[dict, list, HTTPResponse]:
         logging.getLogger(str(self.__class__)).info(self.url + endpoint)
+        if self._service_cookie:
+            header["Cookie"] = self._service_cookie
         if body:
             if isinstance(body, dict):
                 body = json.dumps(body)
@@ -48,6 +51,14 @@ class RequestService(LoggingConfigurable):
             response: HTTPResponse = await self.http_client.fetch(
                 self.url + endpoint, method=method, headers=header, body=body
             )
+        for cookie in response.headers.get_list("Set-Cookie"):
+            token = header.get("Authorization", None)
+            if token and token.startswith("Token "):
+                token = token[len("Token "):]
+            else:
+                continue
+            if cookie.startswith(token):
+                self._service_cookie = cookie
         if decode_response:
             return json_decode(response.body)
         else:

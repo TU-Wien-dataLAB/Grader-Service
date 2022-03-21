@@ -77,7 +77,7 @@ export class GradingModeSwitch extends React.Component<ImodeSwitchProps> {
           setTimeout(() => this.setState({ saveButtonText: "Save", transition: "show" }), 2000);
           const submission = await getSubmission(this.lecture.id,this.assignment.id,this.subID);
           console.log(submission)
-          submission.manual_status = "manually_graded"
+          submission.manual_status = "being_edited"
           updateSubmission(this.lecture.id,this.assignment.id,this.subID, submission);
         } catch (err) {
           this.setState({ saveButtonText: "Save", transition: "show" });

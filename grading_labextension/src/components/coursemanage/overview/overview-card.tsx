@@ -1,43 +1,117 @@
-import { Card, CardContent, CardHeader, Chip, Typography } from '@mui/material';
+import {Card, CardContent, CardHeader, Chip, Divider, Typography} from '@mui/material';
 import * as React from 'react';
-import { Assignment } from '../../../model/assignment';
-import { utcToLocalFormat } from '../../../services/datetime.service';
-import { DeadlineComponent } from '../../util/deadline';
+import {Assignment} from '../../../model/assignment';
+import {utcToLocalFormat} from '../../../services/datetime.service';
+import {DeadlineComponent} from '../../util/deadline';
 
 export interface OverviewCardProps {
-    assignment: Assignment;
-    allSubmissions: any[];
-    users : {students: string[], tutors: string[], instructors: string[]};
+  assignment: Assignment;
+  allSubmissions: any[];
+  users: { students: string[], tutors: string[], instructors: string[] };
 }
 
 export const OverviewCard = (props: OverviewCardProps) => {
 
+  let gradingBehaviour = "No Automatic Grading";
+  if (props.assignment.automatic_grading === Assignment.AutomaticGradingEnum.Auto) {
+    gradingBehaviour = "Automatic Grading";
+  } else if (props.assignment.automatic_grading === Assignment.AutomaticGradingEnum.FullAuto) {
+    gradingBehaviour = "Fully Automatic Grading";
+  }
 
-    return (
-        <Card elevation={3} className="flexbox-item">
-            <CardHeader title="Overview"/>
-            <CardContent sx={{alignItems:{xs: 'center'}}}>
-                <Typography variant='body1'>Deadline 
-                    <Chip color={'primary'} variant='outlined' label={utcToLocalFormat(props.assignment.due_date)}/>
-                </Typography>
-                <Typography variant='body1'>Students 
-                    <Chip color={'primary'} variant='outlined' label={props.users.students.length}/>
-                </Typography>
+  return (
+    <Card elevation={3} className="flexbox-item">
+      <CardHeader title="Overview"/>
+      <CardContent sx={{alignItems: {xs: 'center'}, height: '243px', minWidth: '150px', overflowY: "auto"}}>
+        <Typography sx={{fontSize: 15, mt: 0.5, ml: 0.5}}>
+          {props.users.students.length}
+          <Typography
+            color="text.secondary"
+            sx={{
+              display: "inline-block",
+              ml: 0.75,
+              fontSize: 13
+            }}
+          >
+            {'Student' + (props.users.students.length === 1 ? '' : 's')}
+          </Typography>
+        </Typography>
 
-                <Typography variant='body1'>Tutors
-                    <Chip color={'primary'} variant='outlined' label={props.users.tutors.length}/>
-                </Typography>
+        <Typography sx={{fontSize: 15, mt: 0.5, ml: 0.5}}>
+          {props.users.tutors.length}
+          <Typography
+            color="text.secondary"
+            sx={{
+              display: "inline-block",
+              ml: 0.75,
+              fontSize: 13
+            }}
+          >
+            {'Tutor' + (props.users.tutors.length === 1 ? '' : 's')}
+          </Typography>
+        </Typography>
 
-                <Typography variant='body1'>Instructors 
-                    <Chip color={'primary'} variant='outlined' label={props.users.instructors.length}/>
-                </Typography>
+        <Typography sx={{fontSize: 15, mt: 0.5, ml: 0.5}}>
+          {props.users.instructors.length}
+          <Typography
+            color="text.secondary"
+            sx={{
+              display: "inline-block",
+              ml: 0.75,
+              fontSize: 13
+            }}
+          >
+            {'Instructor' + (props.users.instructors.length === 1 ? '' : 's')}
+          </Typography>
+        </Typography>
 
-                <Typography variant='body1'>Submission
-                    <Chip color={'primary'} variant='outlined' label={props.allSubmissions.length}/>
-                </Typography>
+        <Typography sx={{fontSize: 15, mt: 0.5, ml: 0.5}}>
+          {props.allSubmissions.length}
+          <Typography
+            color="text.secondary"
+            sx={{
+              display: "inline-block",
+              ml: 0.75,
+              fontSize: 13
+            }}
+          >
+            {'Submission' + (props.allSubmissions.length === 1 ? '' : 's')}
+          </Typography>
+        </Typography>
+        <Divider sx={{mt: 1, mb: 1}}/>
+        <Typography
+          color="text.secondary"
+          sx={{
+            display: "inline-block",
+            fontSize: 13,
+            mb: -1,
+            ml: 0.5
+          }}
+        >
+          Grading Behaviour:
+        </Typography>
+        <Typography sx={{fontSize: 15, mt: 0.5, ml: 0.5}}>
+          {gradingBehaviour}
+        </Typography>
 
-            </CardContent>
+        <Typography
+          color="text.secondary"
+          sx={{
+            display: "inline-block",
+            fontSize: 13,
+            mt: 2,
+            mb: -1,
+            ml: 0.5
+          }}
+        >
+          Assignment Type:
+        </Typography>
+        <Typography sx={{fontSize: 15, mt: 0.5, ml: 0.5}}>
+          {(props.assignment.type === "user") ? "User" : "Group"}
+        </Typography>
 
-        </Card>
-    );
+      </CardContent>
+      <DeadlineComponent due_date={props.assignment.due_date} compact={false} component={"card"}/>
+    </Card>
+  );
 }

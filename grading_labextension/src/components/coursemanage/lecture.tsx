@@ -27,12 +27,13 @@ interface ILectureComponentProps {
   lecture: Lecture;
   root: HTMLElement;
   showAlert: (severity: string, msg: string) => void;
+  expanded?: boolean;
 }
 
 export const LectureComponent = (props: ILectureComponentProps) => {
   const [lecture, setLecture] = React.useState(props.lecture);
   const [assignments, setAssignments] = React.useState(null);
-  const [expanded, setExpanded] = React.useState(false);
+  const [expanded, setExpanded] = React.useState(props.expanded === undefined ? false : props.expanded);
   const [users, setUsers] = React.useState(null);
 
   React.useEffect(() => {

@@ -66,7 +66,8 @@ export const AssignmentStatus = (props: IAssignmentStatusProps) => {
       label: 'Feedback available',
       description: <Typography sx={{fontSize}}>You received feedback for one or more of your submissions!
         You can view the feedback in the list of submission when clicking on the <ChatRoundedIcon
-          sx={{fontSize}}/> icon.</Typography>,
+          sx={{fontSize}}/> icon. Within the deadline you can make more submissions, regardless of whether you already
+        received feedback.</Typography>,
     }
   ];
   getActiveStep().then(s => setActiveStep(s));
@@ -83,7 +84,8 @@ export const AssignmentStatus = (props: IAssignmentStatusProps) => {
             </Step>
           ))}
         </Stepper>
-        <Typography sx={{mt: 2, ml: 2, maxWidth: "50%"}}>{steps[activeStep < 3 ? activeStep : 3].description}</Typography>
+        <Typography
+          sx={{mt: 2, ml: 2, maxWidth: "50%"}}>{steps[activeStep < 3 ? activeStep : 3].description}</Typography>
       </CardContent>
     </Card>
   );

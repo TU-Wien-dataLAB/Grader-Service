@@ -5,8 +5,11 @@ import shlex
 import subprocess
 from urllib.parse import unquote
 
-from grader_service.handlers.base_handler import GraderBaseHandler
-from grader_service.orm.assignment import Assignment
+from grader_service.autograding.grader_executor import GraderExecutor
+from grader_service.autograding.local_feedback import GenerateFeedbackExecutor
+
+from grader_service.handlers.base_handler import GraderBaseHandler, RequestHandlerConfig
+from grader_service.orm.assignment import Assignment, AutoGradingBehaviour
 from grader_service.orm.group import Group
 from grader_service.orm.lecture import Lecture
 from grader_service.orm.submission import Submission
@@ -37,7 +40,7 @@ class GitBaseHandler(GraderBaseHandler):
 
     def on_finish(self):
         if hasattr(
-            self, "process"
+                self, "process"
         ):  # if we exit from super prepare (authentication) the process is not created
             if self.process.stdin is not None:
                 self.process.stdin.close()
@@ -93,9 +96,9 @@ class GitBaseHandler(GraderBaseHandler):
 
         # no push to release allowed for students
         if (
-            repo_type == "release"
-            and role.role == Scope.student
-            and rpc in ["send-pack", "receive-pack"]
+                repo_type == "release"
+                and role.role == Scope.student
+                and rpc in ["send-pack", "receive-pack"]
         ):
             self.error_message = "Unauthorized"
             raise HTTPError(403)
@@ -110,18 +113,18 @@ class GitBaseHandler(GraderBaseHandler):
 
         # no pull allowed for autograde for students
         if (
-            repo_type == "autograde"
-            and role.role == Scope.student
-            and rpc == "upload-pack"
+                repo_type == "autograde"
+                and role.role == Scope.student
+                and rpc == "upload-pack"
         ):
             self.error_message = "Unauthorized"
             raise HTTPError(403)
 
         # students should not be able to pull other submissions -> add query param for sub_id
         if (
-            repo_type == "feedback"
-            and role.role == Scope.student
-            and rpc == "upload-pack"
+                repo_type == "feedback"
+                and role.role == Scope.student
+                and rpc == "upload-pack"
         ):
             try:
                 sub_id = int(pathlets[3])
@@ -136,11 +139,11 @@ class GitBaseHandler(GraderBaseHandler):
         try:
             assignment = (
                 self.session.query(Assignment)
-                .filter(
+                    .filter(
                     Assignment.lectid == lecture.id,
                     Assignment.name == unquote(pathlets[1]),
                 )
-                .one()
+                    .one()
             )
         except NoResultFound:
             self.error_message = "Not Found"
@@ -225,6 +228,11 @@ class RPCHandler(GitBaseHandler):
 
     Use this handler to handle example.git/git-upload-pack and example.git/git-receive-pack URLs"""
 
+    def on_finish(self):
+        # we do not close the session we just commit because LocalAutogradeExecutor still needs it
+        if self.session:
+            self.session.commit()
+
     async def prepare(self):
         await super().prepare()
         self.rpc = self.path_args[0]
@@ -248,16 +256,15 @@ class RPCHandler(GitBaseHandler):
             try:
                 lecture = (
                     self.session.query(Lecture)
-                    .filter(Lecture.code == pathlets[0])
-                    .one()
+                        .filter(Lecture.code == pathlets[0])
+                        .one()
                 )
-                assignment = (
+                assignment: Assignment = (
                     self.session.query(Assignment)
-                    .filter(
+                        .filter(
                         Assignment.lectid == lecture.id,
                         Assignment.name == unquote(pathlets[1]),
-                    )
-                    .one()
+                    ).one()
                 )
             except NoResultFound:
                 self.error_message = "Not Found"
@@ -296,19 +303,39 @@ class RPCHandler(GitBaseHandler):
             self.session.add(submission)
             self.session.commit()
 
+            # If the assignment has automatic grading or fully automatic grading perform necessary operations
+            if assignment.automatic_grading in [AutoGradingBehaviour.auto, AutoGradingBehaviour.full_auto]:
+                executor = RequestHandlerConfig.instance().autograde_executor_class(
+                    self.application.grader_service_dir, submission, close_session=False, config=self.application.config
+                )
+                if assignment.automatic_grading == AutoGradingBehaviour.full_auto:
+                    feedback_executor = GenerateFeedbackExecutor(
+                        self.application.grader_service_dir, submission, config=self.application.config
+                    )
+                    GraderExecutor.instance().submit(
+                        executor.start,
+                        on_finish=lambda: GraderExecutor.instance().submit(feedback_executor.start)
+                    )
+                else:
+                    GraderExecutor.instance().submit(
+                        executor.start,
+                        lambda: self.log.info(f"Autograding task of submission {submission.id} exited!")
+                    )
+
             self.set_header("Content-Type", "application/x-git-%s-result" % rpc)
             self.set_header(
                 "Cache-Control", "no-store, no-cache, must-revalidate, max-age=0"
             )
-
-            self.finish()
+            if assignment.automatic_grading == AutoGradingBehaviour.unassisted:
+                self.session.close()
+            await self.finish()
         else:
             self.set_header("Content-Type", "application/x-git-%s-result" % rpc)
             self.set_header(
                 "Cache-Control", "no-store, no-cache, must-revalidate, max-age=0"
             )
             await self.git_response()
-            self.finish()
+            await self.finish()
 
 
 @register_handler(path="/.*/info/refs", version_specifier=VersionSpecifier.NONE)

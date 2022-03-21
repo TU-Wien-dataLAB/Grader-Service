@@ -46,6 +46,13 @@ lectures:
         example: "SS21"
         schema:
           type: string
+      - name: active
+        in: query
+        description: The state of the lectures to query (active or inactive)
+        required: false
+        example: "true"
+        schema:
+          type: string
     responses:
       200:
         description: OK
