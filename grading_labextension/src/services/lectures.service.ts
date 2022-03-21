@@ -5,8 +5,15 @@ export function createLecture(lecture: Lecture): Promise<Lecture> {
   return request<Lecture>(HTTPMethod.POST, '/lectures', lecture);
 }
 
-export function getAllLectures(): Promise<Lecture[]> {
-  return request<Lecture[]>(HTTPMethod.GET, '/lectures');
+export function getAllLectures(active: boolean = true): Promise<Lecture[]> {
+  let url = '/lectures'
+  if (!active) {
+      let searchParams = new URLSearchParams({
+        "active": String(active)
+      })
+      url += '?' + searchParams;
+    }
+  return request<Lecture[]>(HTTPMethod.GET, url);
 }
 
 export function updateLecture(lecture: Lecture): Promise<Lecture> {

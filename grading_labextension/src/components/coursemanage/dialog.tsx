@@ -37,7 +37,7 @@ import {
 import {Lecture} from '../../model/lecture';
 import TypeEnum = Assignment.TypeEnum;
 import AutomaticGradingEnum = Assignment.AutomaticGradingEnum;
-import {updateLecture} from '../../services/lectures.service';
+import {createLecture, updateLecture} from '../../services/lectures.service';
 import HelpOutlineOutlinedIcon from '@mui/icons-material/HelpOutlineOutlined';
 
 
@@ -530,6 +530,120 @@ export const CreateDialog = (props: ICreateDialogProps) => {
     </div>
   );
 };
+
+
+interface ICreateLectureDialogProps {
+  lectures: Lecture[];
+  handleSubmit: () => void;
+}
+
+export const CreateLectureDialog = (props: ICreateLectureDialogProps) => {
+  const formik = useFormik({
+    initialValues: {
+      code: "",
+      name: "",
+      semester: "",
+    },
+    validationSchema: validationSchema,
+    onSubmit: values => {
+      const updatedLecture: Lecture = {
+        id: undefined,
+        code: values.code,
+        name: values.name,
+        semester: values.semester,
+        complete: false,
+      };
+      console.log(values);
+      createLecture(updatedLecture);
+      setOpen(false);
+      props.handleSubmit();
+    }
+  });
+
+  const [openDialog, setOpen] = React.useState(false);
+  const [selectedCode, setSelectedCode] = React.useState(null);
+
+  return (
+    <div>
+      <Button
+        sx={{mt: -1}}
+        onClick={e => {
+          e.stopPropagation();
+          setOpen(true);
+        }}
+        onMouseDown={event => event.stopPropagation()}
+        aria-label="create"
+        size={'small'}
+      >
+        <AddRoundedIcon/> Activate Lecture
+      </Button>
+      <Dialog open={openDialog} onBackdropClick={() => setOpen(false)}>
+        <DialogTitle>Activate Lecture</DialogTitle>
+        <form onSubmit={formik.handleSubmit}>
+          <DialogContent>
+            <Stack spacing={2}>
+              <Select
+                labelId="lecture-code-select-label"
+                id="lecture-code-select"
+                value={formik.values.code}
+                label="Lecture Code"
+                onChange={e => {
+                  formik.setFieldValue('code', e.target.value);
+                  setSelectedCode(e.target.value)
+                }}
+              >
+                {props.lectures.map(l => <MenuItem value={l.code}>{l.code}</MenuItem>)}
+              </Select>
+
+              <TextField
+                variant="outlined"
+                fullWidth
+                id="name"
+                name="name"
+                label="Lecture Name"
+                value={formik.values.name}
+                disabled={selectedCode === null}
+                onChange={formik.handleChange}
+                error={formik.touched.name && Boolean(formik.errors.name)}
+                helperText={formik.touched.name && formik.errors.name}
+              />
+
+              <TextField
+                variant="outlined"
+                fullWidth
+                id="semester"
+                name="semester"
+                label="Semester"
+                value={formik.values.semester}
+                disabled={selectedCode === null}
+                onChange={formik.handleChange}
+                error={formik.touched.semester && Boolean(formik.errors.semester)}
+                helperText={formik.touched.semester && formik.errors.semester}
+              />
+
+            </Stack>
+          </DialogContent>
+          <DialogActions>
+            <Button
+              color="primary"
+              variant="outlined"
+              onClick={() => {
+                setOpen(false);
+              }}
+            >
+              Cancel
+            </Button>
+
+            <Button color="primary" variant="contained" type="submit">
+              Activate
+            </Button>
+          </DialogActions>
+        </form>
+      </Dialog>
+    </div>
+  );
+};
+
 
 export interface IAgreeDialogProps {
   open: boolean;

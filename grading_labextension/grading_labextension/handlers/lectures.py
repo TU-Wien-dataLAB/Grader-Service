@@ -33,10 +33,12 @@ class LectureBaseHandler(ExtensionBaseHandler):
     async def post(self):
         """Sends a POST-request to the grader service to create a lecture
         """
+        data = tornado.escape.json_decode(self.request.body)
         try:
             response = await self.request_service.request(
                 "POST",
                 f"{self.base_url}/lectures",
+                body=data,
                 header=self.grader_authentication_header,
             )
         except HTTPError as e:

@@ -6,6 +6,7 @@ import {showErrorMessage} from '@jupyterlab/apputils';
 import {LectureComponent} from './lecture';
 import {AlertProps, Portal, Snackbar} from "@mui/material";
 import MuiAlert from "@mui/material/Alert";
+import {CreateLectureDialog} from "./dialog";
 
 export interface CourseManageProps {
   // lectures: Array<Lecture>;
@@ -33,10 +34,12 @@ export const CourseManageComponent = (props: CourseManageProps) => {
   };
 
   const [lectures, setLectures] = React.useState([] as Lecture[]);
+  const [inactiveLectures, setInactiveLectures] = React.useState([] as Lecture[])
   React.useEffect(() => {
     UserPermissions.loadPermissions()
       .then(() => {
-        getAllLectures().then(l => setLectures(l))
+        getAllLectures().then(l => setLectures(l));
+        getAllLectures(false).then(l => setInactiveLectures(l));
       })
       .catch(() => showAlert("error", "Error Loading Permissions"))
   }, [props])
@@ -51,6 +54,10 @@ export const CourseManageComponent = (props: CourseManageProps) => {
         .map((el, index) => (
           <LectureComponent lecture={el} root={props.root} showAlert={showAlert} expanded={true}/>
         ))}
+      <CreateLectureDialog lectures={inactiveLectures} handleSubmit={() => {
+        getAllLectures().then(l => setLectures(l));
+        getAllLectures(false).then(l => setInactiveLectures(l));
+      }}/>
       <Portal container={document.body}>
         <Snackbar
           open={alert}
