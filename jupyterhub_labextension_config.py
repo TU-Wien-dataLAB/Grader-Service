@@ -1,3 +1,12 @@
+import os
+c.GitService.git_access_token = os.environ.get("JUPYTERHUB_API_TOKEN")
+c.GitService.git_remote_url = "grader_service:4010/services/grader/git"
+c.GitService.git_http_scheme = "http"
+    
+c.RequestService.port = 4010
+c.RequestService.host = "grader_service"
+c.RequestService.scheme = "http"
+
 c.JupyterHub.services.append(
     {
         'name': 'grader',
@@ -7,8 +16,8 @@ c.JupyterHub.services.append(
 )
 
 c.JupyterHub.load_groups ={
-    "lect1__instructor": ["jovyan"],
-    "lect1__tutor": ["user1"],
-    "lect1__student": ["user2", "user3"]
+    "lect1__instructor": ["user1"],
+    "lect1__tutor": ["user2"],
+    "lect1__student": ["jovyanuser2", "user3"]
     }
     
