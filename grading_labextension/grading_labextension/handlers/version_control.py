@@ -101,6 +101,8 @@ class GitLogHandler(ExtensionBaseHandler):
             config=self.config,
             force_user_repo=True if repo == "release" else False,
         )
+        git_service.set_remote(f"grader_{repo}")
+        git_service.fetch_all()
         logs = git_service.get_log(n_history)
         self.write(json.dumps(logs))
 
