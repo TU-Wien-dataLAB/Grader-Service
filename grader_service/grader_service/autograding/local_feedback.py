@@ -87,17 +87,18 @@ class GenerateFeedbackExecutor(LocalAutogradeExecutor):
         os.mkdir(self.output_path)
         self._write_gradebook()
 
-        # command = f'{self.convert_executable} generate_feedback -i "{self.input_path}" -o "{self.output_path}" -p "*.ipynb"'
-        # self.log.info(f"Running {command}")
-        # try:
-        #     process = await self._run_subprocess(command, None)
-        # except CalledProcessError:
-        #     raise # TODO: exit gracefully
-        # output = process.stderr.read().decode("utf-8")
-        # self.log.info(output)
-        autograder = GenerateFeedback(self.input_path, self.output_path, "*.ipynb")
-        autograder.force = True
-        autograder.start()
+        command = f'{self.convert_executable} generate_feedback -i "{self.input_path}" -o "{self.output_path}" -p "*.ipynb"'
+        self.log.info(f"Running {command}")
+        process = await self._run_subprocess(command, None)
+        self.grading_logs = process.stderr.read().decode("utf-8")
+        self.log.info(self.grading_logs)
+        if process.returncode == 0:
+            self.log.info("Process has successfully completed execution!")
+        else:
+            raise RuntimeError("Process has failed execution!")
+        # autograder = GenerateFeedback(self.input_path, self.output_path, "*.ipynb")
+        # autograder.force = True
+        # autograder.start()
 
     async def _push_results(self):
         os.unlink(os.path.join(self.output_path, "gradebook.json"))
@@ -152,25 +153,18 @@ class GenerateFeedbackExecutor(LocalAutogradeExecutor):
         self.log.info(f"Now at branch feedback_{self.submission.commit_hash}")
 
         self.log.info(f"Commiting all files in {self.output_path}")
-        try:
-            await self._run_subprocess(
-                f"{self.git_executable} add -A", self.output_path
-            )
-            await self._run_subprocess(
-                f'{self.git_executable} commit -m "{self.submission.commit_hash}"',
-                self.output_path,
-            )
-        except CalledProcessError:
-            pass  # TODO: exit gracefully
-
+        await self._run_subprocess(
+            f"{self.git_executable} add -A", self.output_path
+        )
+        await self._run_subprocess(
+            f'{self.git_executable} commit -m "{self.submission.commit_hash}"',
+            self.output_path,
+        )
         self.log.info(
             f"Pushing to {git_repo_path} at branch feedback_{self.submission.commit_hash}"
         )
         command = f'{self.git_executable} push -uf "{git_repo_path}" feedback_{self.submission.commit_hash}'
-        try:
-            await self._run_subprocess(command, self.output_path)
-        except CalledProcessError:
-            pass  # TODO: exit gracefully
+        await self._run_subprocess(command, self.output_path)
         self.log.info("Pushing complete")
 
     def _set_properties(self):
