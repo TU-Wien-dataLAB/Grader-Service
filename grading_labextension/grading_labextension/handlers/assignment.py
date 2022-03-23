@@ -47,10 +47,6 @@ class AssignmentBaseHandler(ExtensionBaseHandler):
                     dirs.remove(assignment["name"])
                 except KeyError:
                     pass
-            # TODO: should we really remove all dirs that are not listed as an assignment?
-            for orphan_dir in dirs:
-                self.log.warn(f'Deleting directory {self.root_dir}/{lecture["code"]}/{orphan_dir}')
-                shutil.rmtree(os.path.expanduser(f'{self.root_dir}/{lecture["code"]}/{orphan_dir}'), ignore_errors=True)
         except FileNotFoundError:
             pass
             
