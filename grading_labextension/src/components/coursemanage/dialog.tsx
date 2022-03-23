@@ -247,11 +247,6 @@ const validationSchemaLecture = yup.object({
     .min(4, 'Name should be 4-50 characters long')
     .max(50, 'Name should be 4-50 characters long')
     .required('Name is required'),
-  semester: yup
-    .string()
-    .min(4, 'Semester should be 4-12 characters long')
-    .max(12, 'Semester should be 4-12 characters long')
-    .required('Lecture code is required'),
   complete: yup
     .boolean()
 });
@@ -265,7 +260,6 @@ export const EditLectureDialog = (props: IEditLectureProps) => {
   const formik = useFormik({
     initialValues: {
       name: props.lecture.name,
-      semester: props.lecture.semester,
       complete: props.lecture.complete
     },
     validationSchema: validationSchemaLecture,
@@ -309,19 +303,6 @@ export const EditLectureDialog = (props: IEditLectureProps) => {
                 onChange={formik.handleChange}
                 error={formik.touched.name && Boolean(formik.errors.name)}
                 helperText={formik.touched.name && formik.errors.name}
-              />
-              <TextField
-                variant="outlined"
-                fullWidth
-                id="semester"
-                name="semester"
-                label="Semester"
-                value={formik.values.semester}
-                onChange={formik.handleChange}
-                error={
-                  formik.touched.semester && Boolean(formik.errors.semester)
-                }
-                helperText={formik.touched.semester && formik.errors.semester}
               />
               <FormControlLabel
                 control={
@@ -559,7 +540,6 @@ export const CreateLectureDialog = (props: ICreateLectureDialogProps) => {
     initialValues: {
       code: "",
       name: "",
-      semester: "",
     },
     validationSchema: validationSchema,
     onSubmit: values => {
@@ -567,7 +547,6 @@ export const CreateLectureDialog = (props: ICreateLectureDialogProps) => {
         id: undefined,
         code: values.code,
         name: values.name,
-        semester: values.semester,
         complete: false,
       };
       console.log(values);
@@ -634,19 +613,6 @@ export const CreateLectureDialog = (props: ICreateLectureDialogProps) => {
                 onChange={formik.handleChange}
                 error={formik.touched.name && Boolean(formik.errors.name)}
                 helperText={formik.touched.name && formik.errors.name}
-              />
-
-              <TextField
-                variant="outlined"
-                fullWidth
-                id="semester"
-                name="semester"
-                label="Semester"
-                value={formik.values.semester}
-                disabled={selectedCode === null}
-                onChange={formik.handleChange}
-                error={formik.touched.semester && Boolean(formik.errors.semester)}
-                helperText={formik.touched.semester && formik.errors.semester}
               />
 
             </Stack>

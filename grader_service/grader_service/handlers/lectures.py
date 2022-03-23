@@ -17,28 +17,18 @@ class LectureBaseHandler(GraderBaseHandler):
     async def get(self):
         """Returns all lectures the user can access
         """
-        self.validate_parameters("semester", "active")
-        semester = self.get_argument("semester", None)
+        self.validate_parameters("active")
         active = self.get_argument("active", "true") == "true"
 
         state = LectureState.active if active else LectureState.inactive
-        if semester is None:
-            lectures = [
-                role.lecture
-                for role in self.user.roles
-                if role.lecture.state == state
-                   and role.lecture.deleted == DeleteState.active
-                   and (True if active else role.role == Scope.instructor)
-            ]
-        else:
-            lectures = [
-                role.lecture
-                for role in self.user.roles
-                if role.lecture.state == state
-                   and role.lecture.deleted == DeleteState.active
-                   and role.lecture.semester == semester
-                   and (True if active else role.role == Scope.instructor)
-            ]
+        lectures = [
+            role.lecture
+            for role in self.user.roles
+            if role.lecture.state == state
+               and role.lecture.deleted == DeleteState.active
+               and (True if active else role.role == Scope.instructor)
+        ]
+
         self.write_json(lectures)
 
     @authorize([Scope.instructor])
@@ -68,7 +58,6 @@ class LectureBaseHandler(GraderBaseHandler):
         lecture.state = (
             LectureState.complete if lecture_model.complete else LectureState.active
         )
-        lecture.semester = lecture_model.semester
         lecture.deleted = DeleteState.active
 
         self.session.commit()
@@ -105,7 +94,6 @@ class LectureObjectHandler(GraderBaseHandler):
         lecture.state = (
             LectureState.complete if lecture_model.complete else LectureState.active
         )
-        lecture.semester = lecture_model.semester
 
         self.session.commit()
         self.write_json(lecture)

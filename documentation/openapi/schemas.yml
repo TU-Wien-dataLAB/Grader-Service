@@ -50,15 +50,11 @@ components:
         complete:
           type: "boolean"
           default: false
-        semester:
-          type: "string"
-          example: "SS21"
       example:
         id: 1
         name: "Informationsvisualisierung"
         code: "ivs21"
         complete: false
-        semester: "SS21"
     Assignment:
       type: "object"
       properties:

@@ -16,6 +16,5 @@ export interface Lecture {
     name?: string;
     code?: string;
     complete?: boolean;
-    semester?: string;
 }
 
