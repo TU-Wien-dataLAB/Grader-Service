@@ -179,6 +179,7 @@ class GraderBaseHandler(SessionMixin, web.RequestHandler):
                 )
                 lecture = Lecture()
                 lecture.code = lecture_code
+                lecture.name = lecture_code
                 lecture.state = LectureState.inactive
                 lecture.deleted = DeleteState.active
                 self.session.add(lecture)
