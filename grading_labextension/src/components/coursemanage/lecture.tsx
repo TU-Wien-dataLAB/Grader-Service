@@ -22,9 +22,11 @@ import {getAllAssignments} from '../../services/assignments.service';
 import {AssignmentComponent} from './assignment';
 import {CreateDialog, EditLectureDialog} from './dialog';
 import {getLecture, getUsers} from '../../services/lectures.service';
+import {red} from "@mui/material/colors";
 
 interface ILectureComponentProps {
   lecture: Lecture;
+  active: boolean;
   root: HTMLElement;
   showAlert: (severity: string, msg: string) => void;
   expanded?: boolean;
@@ -32,6 +34,7 @@ interface ILectureComponentProps {
 
 export const LectureComponent = (props: ILectureComponentProps) => {
   const [lecture, setLecture] = React.useState(props.lecture);
+  const [active, setActive] = React.useState(props.active);
   const [assignments, setAssignments] = React.useState(null);
   const [expanded, setExpanded] = React.useState(props.expanded === undefined ? false : props.expanded);
   const [users, setUsers] = React.useState(null);
@@ -67,12 +70,36 @@ export const LectureComponent = (props: ILectureComponentProps) => {
       >
         <CardContent sx={{mb: -1, display: 'flex'}}>
           <Typography variant={'h5'} sx={{mr: 2}}>
+            <Typography
+              color={"text.secondary"}
+              sx={{
+                display: "inline-block",
+                mr: 0.75,
+                fontSize: 16,
+              }}
+            >
+              Lecture:
+            </Typography>
             {lecture.name}
+            {(!active)
+              ? <Typography
+                sx={{
+                  display: "inline-block",
+                  ml: 0.75,
+                  fontSize: 16,
+                  color: red[400]
+                }}
+              >
+                inactive
+              </Typography>
+              : null
+            }
           </Typography>
           <EditLectureDialog
             lecture={lecture}
             handleSubmit={async () => {
               setLecture(await getLecture(lecture.id));
+              setActive(true); // once we PUT lecture we know it is active
             }}
           />
         </CardContent>
