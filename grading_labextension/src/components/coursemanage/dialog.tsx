@@ -24,7 +24,7 @@ import {
   InputLabel,
   Select,
   MenuItem,
-  Tooltip
+  Tooltip, Typography, Card, CardActionArea
 } from '@mui/material';
 import {Assignment} from '../../model/assignment';
 import {LoadingButton} from '@mui/lab';
@@ -39,6 +39,7 @@ import TypeEnum = Assignment.TypeEnum;
 import AutomaticGradingEnum = Assignment.AutomaticGradingEnum;
 import {createLecture, updateLecture} from '../../services/lectures.service';
 import HelpOutlineOutlinedIcon from '@mui/icons-material/HelpOutlineOutlined';
+import AddIcon from "@mui/icons-material/Add";
 
 
 const gradingBehaviourHelp = `Specifies the behaviour when a students submits an assignment.\n
@@ -368,6 +369,32 @@ export const EditLectureDialog = (props: IEditLectureProps) => {
   );
 };
 
+interface INewAssignmentCardProps {
+  onClick: React.MouseEventHandler<HTMLButtonElement>
+}
+
+export default function NewAssignmentCard(props: INewAssignmentCardProps) {
+  return (
+    <Card sx={{width: 225, height: 225, m: 1.5, backgroundColor: '#fcfcfc'}}>
+      <Tooltip title={"New Assignment"}>
+        <CardActionArea
+          onClick={props.onClick}
+          sx={{
+            width: "100%",
+            height: "100%",
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center"
+          }}
+        >
+          <AddIcon sx={{fontSize: 50}} color="disabled"/>
+        </CardActionArea>
+      </Tooltip>
+    </Card>
+  );
+}
+
+
 interface ICreateDialogProps {
   lecture: Lecture;
   handleSubmit: () => void;
@@ -401,19 +428,13 @@ export const CreateDialog = (props: ICreateDialogProps) => {
 
   return (
     <div>
-      <Button
-        sx={{mt: -1}}
+      <NewAssignmentCard
         onClick={e => {
           e.stopPropagation();
           setOpen(true);
         }}
-        onMouseDown={event => event.stopPropagation()}
-        aria-label="create"
-        size={'small'}
-      >
-        <AddRoundedIcon/> New Assignment
-      </Button>
-      <Dialog open={openDialog} onBackdropClick={() => setOpen(false)}>
+      />
+      <Dialog open={openDialog} onBackdropClick={() => setOpen(false)} onClose={() => setOpen(false)}>
         <DialogTitle>Create Assignment</DialogTitle>
         <form onSubmit={formik.handleSubmit}>
           <DialogContent>
@@ -577,7 +598,18 @@ export const CreateLectureDialog = (props: ICreateLectureDialogProps) => {
       >
         <AddRoundedIcon/> Activate Lecture
       </Button>
-      <Dialog open={openDialog} onBackdropClick={() => setOpen(false)}>
+      <Dialog open={openDialog && props.lectures.length == 0} onBackdropClick={() => setOpen(false)}
+              onClose={() => setOpen(false)}>
+        <DialogTitle>Activate Lecture</DialogTitle>
+        <DialogContent>
+          <Typography>No inactive lectures found!</Typography>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setOpen(false)}>Close</Button>
+        </DialogActions>
+      </Dialog>
+      <Dialog open={openDialog && props.lectures.length > 0} onBackdropClick={() => setOpen(false)}
+              onClose={() => setOpen(false)}>
         <DialogTitle>Activate Lecture</DialogTitle>
         <form onSubmit={formik.handleSubmit}>
           <DialogContent>

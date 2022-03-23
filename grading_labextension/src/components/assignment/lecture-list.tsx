@@ -45,7 +45,6 @@ export const LectureListComponent = (props: ILectureListProps): JSX.Element => {
         <p className="course-header">Assignments</p>
       </h1>
       {lectures
-        .filter(el => UserPermissions.getScope(el) > Scope.student)
         .map((el, index) => (
           <LectureComponent lecture={el} root={props.root} open={index === 0} showAlert={showAlert}/>
         ))}
