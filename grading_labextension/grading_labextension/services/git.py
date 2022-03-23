@@ -191,7 +191,7 @@ class GitService(Configurable):
                     shutil.rmtree(os.path.join(root, d))
                     self.log.info(f"Deleted {os.path.join(root, d)} from {self.git_root_dir}")
 
-    # ATTENTION: dirs_exist_ok was only added in Python 3.8
+    # Note: dirs_exist_ok was only added in Python 3.8
     def copy_repo_contents(self, src: str):
         """copies repo contents from src to the git path
 

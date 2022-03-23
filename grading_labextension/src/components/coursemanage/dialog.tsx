@@ -89,9 +89,7 @@ export const EditDialog = (props: IEditDialogProps) => {
         props.assignment,
         values
       );
-      console.log(updatedAssignment);
-      //TODO: either need lect id from assignment or need lecture hear
-      updateAssignment(props.lecture.id, updatedAssignment);
+      updateAssignment(props.lecture.id, updatedAssignment).then(a => console.log(a));
       if (props.onSubmit) {
         props.onSubmit()
       }
@@ -416,9 +414,7 @@ export const CreateDialog = (props: ICreateDialogProps) => {
         type: values.type as TypeEnum,
         automatic_grading: values.automatic_grading as AutomaticGradingEnum
       };
-      console.log(updatedAssignment);
-      //TODO: either need lect id from assignment or need lecture hear
-      createAssignment(props.lecture.id, updatedAssignment);
+      createAssignment(props.lecture.id, updatedAssignment).then(a => console.log(a));
       setOpen(false);
       props.handleSubmit();
     }
