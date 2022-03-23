@@ -162,7 +162,7 @@ class GraderBaseHandler(SessionMixin, web.RequestHandler):
 
         lecture_roles = {
             code: {"role": role}
-            for code, role in [tuple(g.split("__", 1)) for g in user["groups"]]
+            for code, role in [tuple(g.split(":", 1)) for g in user["groups"]]
         }
 
         for lecture_code in lecture_roles.keys():
