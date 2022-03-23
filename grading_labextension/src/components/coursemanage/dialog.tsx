@@ -40,6 +40,7 @@ import AutomaticGradingEnum = Assignment.AutomaticGradingEnum;
 import {createLecture, updateLecture} from '../../services/lectures.service';
 import HelpOutlineOutlinedIcon from '@mui/icons-material/HelpOutlineOutlined';
 import AddIcon from "@mui/icons-material/Add";
+import PublishRoundedIcon from "@mui/icons-material/PublishRounded";
 
 
 const gradingBehaviourHelp = `Specifies the behaviour when a students submits an assignment.\n
@@ -528,6 +529,65 @@ export const CreateDialog = (props: ICreateDialogProps) => {
     </div>
   );
 };
+
+export interface ICommitDialogProps {
+  handleSubmit: (msg: string) => void;
+}
+
+export const CommitDialog = (props: ICommitDialogProps) => {
+  const [open, setOpen] = React.useState(false);
+  const [message, setMessage] = React.useState("");
+
+  return (
+    <div>
+      <Button
+        sx={{mt: -1}}
+        onClick={() => setOpen(true)}
+        variant="outlined"
+        size="small"
+      >
+        <PublishRoundedIcon fontSize="small" sx={{mr: 1}}/>
+        Commit
+      </Button>
+      <Dialog open={open}
+              onBackdropClick={() => setOpen(false)}
+              onClose={() => setOpen(false)}
+              fullWidth={true}
+              maxWidth={"sm"}>
+        <DialogTitle>Commit Files</DialogTitle>
+        <DialogContent>
+          <TextField
+            sx={{mt: 2, width: "100%"}}
+            id="outlined-textarea"
+            label="Commit Message"
+            placeholder="Commit Message"
+            value={message}
+            onChange={(event => setMessage(event.target.value))}
+            multiline
+          />
+        </DialogContent>
+        <DialogActions>
+          <Button
+            color="primary"
+            variant="outlined"
+            onClick={() => {
+              setOpen(false);
+            }}
+          >
+            Cancel
+          </Button>
+
+          <Button color="primary" variant="contained" type="submit" disabled={message === ""} onClick={() => {
+            props.handleSubmit(message);
+            setOpen(false);
+          }}>
+            Commit
+          </Button>
+        </DialogActions>
+      </Dialog>
+    </div>
+  )
+}
 
 export interface IAgreeDialogProps {
   open: boolean;

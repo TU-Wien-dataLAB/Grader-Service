@@ -179,6 +179,10 @@ class PushHandler(ExtensionBaseHandler):
         """
         if repo not in {"assignment", "source", "release"}:
             self.write_error(404)
+        commit_message = self.get_argument("commit-message", None)
+        if repo == "source" and (commit_message is None or commit_message == ""):
+            self.write_error(400)
+
         try:
             lecture = await self.request_service.request(
                 "GET",
@@ -279,7 +283,7 @@ class PushHandler(ExtensionBaseHandler):
             return
 
         try:
-            git_service.commit()
+            git_service.commit(m=commit_message)
         except GitError as e:
             self.log.error("GitError:\n" + e.error)
         ## committing might fail because there is nothing to commit -> try to push regardless
