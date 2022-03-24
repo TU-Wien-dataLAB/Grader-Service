@@ -3,6 +3,7 @@ import logging
 import os
 import shlex
 import subprocess
+from typing import Optional
 from urllib.parse import unquote
 
 from grader_service.autograding.grader_executor import GraderExecutor
@@ -24,9 +25,6 @@ from grader_service.server import GraderServer
 
 
 class GitBaseHandler(GraderBaseHandler):
-    def initialize(self):
-        app: GraderServer = self.application
-        self.gitbase = os.path.join(app.grader_service_dir, "git")
 
     async def data_received(self, chunk: bytes):
         return self.process.stdin.write(chunk)
@@ -160,30 +158,8 @@ class GitBaseHandler(GraderBaseHandler):
         if not os.path.exists(assignment_path):
             os.mkdir(assignment_path)
 
-        # construct final path from repo type
-        if repo_type == "source" or repo_type == "release":
-            path = os.path.join(assignment_path, repo_type)
-        elif repo_type in ["autograde", "feedback"]:
-            type_path = os.path.join(assignment_path, repo_type, assignment.type)
-            if assignment.type == "user":
-                path = os.path.join(type_path, self.user.name)
-            else:
-                group = self.session.query(Group).get((self.user.name, lecture.id))
-                if group is None:
-                    self.error_message = "Not Found"
-                    raise HTTPError(404)
-                path = os.path.join(type_path, group.name)
-        elif repo_type == "user":
-            user_path = os.path.join(assignment_path, repo_type)
-            path = os.path.join(user_path, self.user.name)
-        elif repo_type == "group":
-            group = self.session.query(Group).get((self.user.name, lecture.id))
-            if group is None:
-                self.error_message = "Not Found"
-                raise HTTPError(404)
-            group_path = os.path.join(assignment_path, repo_type)
-            path = os.path.join(group_path, group.name)
-        else:
+        path = self.construct_git_dir(repo_type, lecture, assignment)
+        if path is None:
             return None
 
         os.makedirs(os.path.dirname(path), exist_ok=True)

@@ -1,6 +1,10 @@
+import datetime
 import json
+import os.path
+import subprocess
 
 from grader_service.handlers.handler_utils import parse_ids
+from grader_service.orm import Lecture
 from grader_service.orm.user import User
 import tornado
 from grader_service.api.models.submission import Submission as SubmissionModel
@@ -71,9 +75,9 @@ class SubmissionHandler(GraderBaseHandler):
 
         if instructor_version:
             if (
-                assignment is None
-                or assignment.deleted == DeleteState.deleted
-                or assignment.lectid != lecture_id
+                    assignment is None
+                    or assignment.deleted == DeleteState.deleted
+                    or assignment.lectid != lecture_id
             ):
                 self.error_message = "Not Found"
                 raise HTTPError(404)
@@ -91,9 +95,9 @@ class SubmissionHandler(GraderBaseHandler):
                         Submission.logs,
                         func.max(Submission.date),
                     )
-                    .filter(Submission.assignid == assignment_id)
-                    .group_by(Submission.username)
-                    .all()
+                        .filter(Submission.assignid == assignment_id)
+                        .group_by(Submission.username)
+                        .all()
                 )
                 submissions = [tuple_to_submission(t) for t in submissions]
             else:
@@ -113,12 +117,12 @@ class SubmissionHandler(GraderBaseHandler):
                         Submission.logs,
                         func.max(Submission.date),
                     )
-                    .filter(
+                        .filter(
                         Submission.assignid == assignment_id,
                         Submission.username == role.username,
                     )
-                    .group_by(Submission.username)
-                    .all()
+                        .group_by(Submission.username)
+                        .all()
                 )
                 submissions = [tuple_to_submission(t) for t in submissions]
             else:
@@ -126,14 +130,65 @@ class SubmissionHandler(GraderBaseHandler):
                     self.session.query(
                         Submission
                     )
-                    .filter(
+                        .filter(
                         Submission.assignid == assignment_id,
                         Submission.username == role.username,
                     )
-                    .all()
+                        .all()
                 )
-            
+
         self.write_json(submissions)
+
+    async def post(self, lecture_id: int, assignment_id: int):
+        """Create submission based on commit hash.
+
+        :param lecture_id: id of the lecture
+        :type lecture_id: int
+        :param assignment_id: id of the assignment
+        :type assignment_id: int
+        :raises HTTPError: throws err if user is not authorized or the assignment was not found
+        """
+        lecture_id, assignment_id = parse_ids(lecture_id, assignment_id)
+        self.validate_parameters()
+        body = tornado.escape.json_decode(self.request.body)
+        sub_model = SubmissionModel.from_dict(body)
+
+        assignment = self.session.query(Assignment).get(assignment_id)
+        if (
+                assignment is None
+                or assignment.deleted == DeleteState.deleted
+                or assignment.lectid != lecture_id
+        ):
+            self.error_message = "Not Found!"
+            raise HTTPError(404)
+
+        submission = Submission()
+        submission.assignid = assignment.id
+        submission.date = datetime.datetime.utcnow()
+        submission.username = self.user.name
+        submission.feedback_available = False
+
+        if assignment.duedate is not None and submission.date > assignment.duedate:
+            self.write({"message": "Cannot submit assignment: Past due date!"})
+            self.write_error(400)
+
+        git_repo_path = self.construct_git_dir(repo_type=assignment.type, lecture=assignment.lecture,
+                                               assignment=assignment)
+        if git_repo_path is None or not os.path.exists(git_repo_path):
+            raise HTTPError(404)
+
+        try:
+            subprocess.run(["git", "branch", "main", "--contains", sub_model.commit_hash], cwd=git_repo_path)
+        except subprocess.CalledProcessError:
+            raise HTTPError(404)
+
+        submission.commit_hash = sub_model.commit_hash
+        submission.auto_status = "not_graded"
+        submission.manual_status = "not_graded"
+
+        self.session.add(submission)
+        self.session.commit()
+        self.write_json(submission)
 
 
 @register_handler(
@@ -157,9 +212,9 @@ class SubmissionObjectHandler(GraderBaseHandler):
         )
         submission = self.session.query(Submission).get(submission_id)
         if (
-            submission is None
-            or submission.assignid != assignment_id
-            or submission.assignment.lectid != lecture_id
+                submission is None
+                or submission.assignid != assignment_id
+                or submission.assignment.lectid != lecture_id
         ):
             self.error_message = "Not Found!"
             raise HTTPError(404)
@@ -183,9 +238,9 @@ class SubmissionObjectHandler(GraderBaseHandler):
         sub_model = SubmissionModel.from_dict(body)
         sub = self.session.query(Submission).get(submission_id)
         if (
-            sub is None
-            or sub.assignid != assignment_id
-            or sub.assignment.lectid != lecture_id
+                sub is None
+                or sub.assignid != assignment_id
+                or sub.assignment.lectid != lecture_id
         ):
             self.error_message = "Not Found!"
             raise HTTPError(404)
@@ -222,9 +277,9 @@ class SubmissionPropertiesHandler(GraderBaseHandler):
         )
         submission = self.session.query(Submission).get(submission_id)
         if (
-            submission is None
-            or submission.assignid != assignment_id
-            or submission.assignment.lectid != lecture_id
+                submission is None
+                or submission.assignid != assignment_id
+                or submission.assignment.lectid != lecture_id
         ):
             self.error_message = "Not Found!"
             raise HTTPError(404)
@@ -252,9 +307,9 @@ class SubmissionPropertiesHandler(GraderBaseHandler):
         )
         submission = self.session.query(Submission).get(submission_id)
         if (
-            submission is None
-            or submission.assignid != assignment_id
-            or submission.assignment.lectid != lecture_id
+                submission is None
+                or submission.assignid != assignment_id
+                or submission.assignment.lectid != lecture_id
         ):
             self.error_message = "Not Found!"
             raise HTTPError(404)
