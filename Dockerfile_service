@@ -32,6 +32,9 @@ RUN groupadd -g 1000 grader-service && \
 
 USER grader-service
 
+RUN git config --global user.name "graderservice"
+RUN git config --global user.email "graderservice@mail.com"
+
 WORKDIR /var/lib/grader-service
 
 ENV GRADER_SERVICE_HOST="0.0.0.0"

@@ -43,5 +43,19 @@ RUN echo "user2:password" | chpasswd
 RUN useradd -m -s /bin/bash -N -u 1003 user3
 RUN echo "user3:password" | chpasswd
 
+USER jovyan
+RUN git config --global user.name "jovyan"
+RUN git config --global user.email "jovyan@mail.com"
+USER user1
+RUN git config --global user.name "user1"
+RUN git config --global user.email "user1@mail.com"
+USER user2
+RUN git config --global user.name "user2"
+RUN git config --global user.email "user2@mail.com"
+USER user2
+RUN git config --global user.name "user3"
+RUN git config --global user.email "user3@mail.com"
+USER root
+
 
 ENTRYPOINT ["jupyterhub", "-f", "/jupyterhub_labextension_config.py"]
