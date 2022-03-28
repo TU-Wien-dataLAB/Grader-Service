@@ -15,7 +15,7 @@ class Lecture(Model):
     Do not edit the class manually.
     """
 
-    def __init__(self, id=None, name=None, code=None, complete=False, semester=None):  # noqa: E501
+    def __init__(self, id=None, name=None, code=None, complete=False):  # noqa: E501
         """Lecture - a model defined in OpenAPI
 
         :param id: The id of this Lecture.  # noqa: E501
@@ -26,30 +26,25 @@ class Lecture(Model):
         :type code: str
         :param complete: The complete of this Lecture.  # noqa: E501
         :type complete: bool
-        :param semester: The semester of this Lecture.  # noqa: E501
-        :type semester: str
         """
         self.openapi_types = {
             'id': int,
             'name': str,
             'code': str,
-            'complete': bool,
-            'semester': str
+            'complete': bool
         }
 
         self.attribute_map = {
             'id': 'id',
             'name': 'name',
             'code': 'code',
-            'complete': 'complete',
-            'semester': 'semester'
+            'complete': 'complete'
         }
 
         self._id = id
         self._name = name
         self._code = code
         self._complete = complete
-        self._semester = semester
 
     @classmethod
     def from_dict(cls, dikt) -> 'Lecture':
@@ -145,24 +140,3 @@ class Lecture(Model):
         """
 
         self._complete = complete
-
-    @property
-    def semester(self):
-        """Gets the semester of this Lecture.
-
-
-        :return: The semester of this Lecture.
-        :rtype: str
-        """
-        return self._semester
-
-    @semester.setter
-    def semester(self, semester):
-        """Sets the semester of this Lecture.
-
-
-        :param semester: The semester of this Lecture.
-        :type semester: str
-        """
-
-        self._semester = semester

@@ -34,40 +34,6 @@ async def test_get_lectures(
     [Lecture.from_dict(l) for l in lectures]  # assert no errors
 
 
-async def test_get_lectures_with_semester(
-    app: GraderServer,
-    service_base_url,
-    http_server_client,
-    jupyter_hub_mock_server,
-    default_user,
-    default_token,
-):
-    http_server = jupyter_hub_mock_server(default_user, default_token)
-    app.hub_api_url = http_server.url_for("")[0:-1]
-
-    url = service_base_url + "/lectures"
-    response = await http_server_client.fetch(
-        url, method="GET", headers={"Authorization": f"Token {default_token}"}
-    )
-    assert response.code == 200
-    lectures = json.loads(response.body.decode())
-    assert isinstance(lectures, list)
-    assert len(lectures) > 0
-    all_lectures = len(lectures)
-    [Lecture.from_dict(l) for l in lectures]  # assert no errors
-
-    url = service_base_url + "/lectures?semester=WS21"
-    response = await http_server_client.fetch(
-        url, method="GET", headers={"Authorization": f"Token {default_token}"}
-    )
-    assert response.code == 200
-    lectures = json.loads(response.body.decode())
-    assert isinstance(lectures, list)
-    assert len(lectures) > 0
-    assert len(lectures) < all_lectures
-    [Lecture.from_dict(l) for l in lectures]  # assert no errors
-
-
 async def test_get_lectures_with_some_parameter(
     app: GraderServer,
     service_base_url,
@@ -112,7 +78,7 @@ async def test_post_lectures(
 
     # same code as in group of user
     pre_lecture = Lecture(
-        id=-1, name="pytest_lecture", code="pt", complete=False, semester=None
+        id=-1, name="pytest_lecture", code="pt", complete=False
     )
     post_response = await http_server_client.fetch(
         url,
@@ -126,7 +92,6 @@ async def test_post_lectures(
     assert post_lecture.name == pre_lecture.name
     assert post_lecture.code == pre_lecture.code
     assert not post_lecture.complete
-    assert post_lecture.semester is None
 
     get_response = await http_server_client.fetch(
         url, method="GET", headers={"Authorization": f"Token {default_token}"}
@@ -149,7 +114,7 @@ async def test_post_not_found(
     url = service_base_url + "/lectures"
     # same code not in user groups
     pre_lecture = Lecture(
-        id=-1, name="pytest_lecture", code="pt", complete=False, semester=None
+        id=-1, name="pytest_lecture", code="pt", complete=False
     )
     with pytest.raises(HTTPClientError) as exc_info:
         await http_server_client.fetch(
@@ -177,7 +142,7 @@ async def test_post_unknown_parameter(
     url = service_base_url + "/lectures?some_param=asdf"
     # same code not in user groups
     pre_lecture = Lecture(
-        id=-1, name="pytest_lecture", code="pt", complete=False, semester=None
+        id=-1, name="pytest_lecture", code="pt", complete=False
     )
     with pytest.raises(HTTPClientError) as exc_info:
         await http_server_client.fetch(
@@ -211,7 +176,6 @@ async def test_put_lecture(
     lecture = Lecture.from_dict(json.loads(get_response.body.decode()))
     lecture.name = "new name"
     lecture.complete = not lecture.complete
-    lecture.semester = "new"
     # lecture code will not be updated
     lecture.code = "some"
 
@@ -226,8 +190,6 @@ async def test_put_lecture(
     put_lecture = Lecture.from_dict(json.loads(put_response.body.decode()))
     assert put_lecture.name == lecture.name
     assert put_lecture.complete == lecture.complete
-    assert put_lecture.semester == lecture.semester
-
     assert put_lecture.code != lecture.code
 
 

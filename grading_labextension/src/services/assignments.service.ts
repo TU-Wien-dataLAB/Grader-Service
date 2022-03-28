@@ -1,6 +1,6 @@
-import { Assignment } from '../model/assignment';
-import { Lecture } from '../model/lecture';
-import { request, HTTPMethod } from './request.service'
+import {Assignment} from '../model/assignment';
+import {Lecture} from '../model/lecture';
+import {request, HTTPMethod} from './request.service'
 
 export function createAssignment(lectureId: number, assignment: Assignment): Promise<Assignment> {
   return request<Assignment>(HTTPMethod.POST, `/lectures/${lectureId}/assignments`, assignment)
@@ -19,7 +19,7 @@ export function updateAssignment(lectureId: number, assignment: Assignment): Pro
 }
 
 export function generateAssignment(lectureId: number, assignment: Assignment): Promise<any> {
-  return request<any>(HTTPMethod.PUT,`/lectures/${lectureId}/assignments/${assignment.id}/generate`)
+  return request<any>(HTTPMethod.PUT, `/lectures/${lectureId}/assignments/${assignment.id}/generate`)
 }
 
 export function fetchAssignment(lectureId: number, assignmentId: number, instructor: boolean = false, metadataOnly: boolean = false): Promise<Assignment> {
@@ -39,8 +39,15 @@ export function deleteAssignment(lectureId: number, assignmentId: number): Promi
   return request<void>(HTTPMethod.DELETE, `/lectures/${lectureId}/assignments/${assignmentId}`)
 }
 
-export function pushAssignment(lectureId: number, assignmentId: number, repoType: string): Promise<void> {
-  return request<void>(HTTPMethod.PUT, `/lectures/${lectureId}/assignments/${assignmentId}/push/${repoType}`)
+export function pushAssignment(lectureId: number, assignmentId: number, repoType: string, commitMessage?: string): Promise<void> {
+  let url = `/lectures/${lectureId}/assignments/${assignmentId}/push/${repoType}`;
+  if (commitMessage) {
+    let searchParams = new URLSearchParams({
+      "commit-message": commitMessage
+    })
+    url += '?' + searchParams;
+  }
+  return request<void>(HTTPMethod.PUT, url)
 }
 
 export function pullAssignment(lectureId: number, assignmentId: number, repoType: string): Promise<void> {

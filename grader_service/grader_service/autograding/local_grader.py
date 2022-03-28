@@ -152,25 +152,16 @@ class LocalAutogradeExecutor(LoggingConfigurable):
 
         command = f"{self.git_executable} init"
         self.log.info(f"Running {command}")
-        try:
-            await self._run_subprocess(command, self.input_path)
-        except CalledProcessError:
-            pass
+        await self._run_subprocess(command, self.input_path)
 
         command = f'{self.git_executable} pull "{git_repo_path}" main'
         self.log.info(f"Running {command}")
-        try:
-            await self._run_subprocess(command, self.input_path)
-        except CalledProcessError:
-            pass
+        await self._run_subprocess(command, self.input_path)
         self.log.info("Successfully cloned repo")
 
         command = f"{self.git_executable} checkout {self.submission.commit_hash}"
         self.log.info(f"Running {command}")
-        try:
-            await self._run_subprocess(command, self.input_path)
-        except CalledProcessError:
-            pass
+        await self._run_subprocess(command, self.input_path)
         self.log.info(f"Now at commit {self.submission.commit_hash}")
 
         self.submission.auto_status = "pending"
@@ -191,7 +182,6 @@ class LocalAutogradeExecutor(LoggingConfigurable):
         if process.returncode == 0:
             self.log.info("Process has successfully completed execution!")
         else:
-            self.log.info("Pod failed execution:")
             raise RuntimeError("Process has failed execution!")
         # autograder = Autograde(self.input_path, self.output_path, "*.ipynb")
         # autograder.force = True

@@ -12,6 +12,7 @@ export interface IFeedbackProps {
   lecture: Lecture;
   assignment: Assignment;
   submission: Submission;
+  showAlert: (severity: string, msg: string) => void;
 }
 
 export const Feedback = (props: IFeedbackProps) => {
@@ -34,7 +35,7 @@ export const Feedback = (props: IFeedbackProps) => {
       <ModalTitle title={"Feedback for " + props.assignment.name}/>
       <Box sx={{m: 2, mt: 12}}>
         <Stack direction="row" spacing={2} sx={{ml: 2}}>
-          <Stack  sx={{mt: 0.5}}>
+          <Stack sx={{mt: 0.5}}>
             <Typography textAlign="right" color="text.secondary" sx={{fontSize: 12, height: 35}}>
               Lecture
             </Typography>
@@ -73,7 +74,7 @@ export const Feedback = (props: IFeedbackProps) => {
       <Typography sx={{m: 2, mb: 0}}>
         Feedback Files
       </Typography>
-      <FilesList path={path} sx={{m: 2}}/>
+      <FilesList path={path} showAlert={props.showAlert} sx={{m: 2}}/>
     </Box>
   )
 }

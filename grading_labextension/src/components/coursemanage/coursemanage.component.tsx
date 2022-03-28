@@ -6,7 +6,6 @@ import {showErrorMessage} from '@jupyterlab/apputils';
 import {LectureComponent} from './lecture';
 import {AlertProps, Portal, Snackbar} from "@mui/material";
 import MuiAlert from "@mui/material/Alert";
-import {CreateLectureDialog} from "./dialog";
 
 export interface CourseManageProps {
   // lectures: Array<Lecture>;
@@ -52,12 +51,13 @@ export const CourseManageComponent = (props: CourseManageProps) => {
       {lectures
         .filter(el => UserPermissions.getScope(el) > Scope.student)
         .map((el, index) => (
-          <LectureComponent lecture={el} root={props.root} showAlert={showAlert} expanded={true}/>
+          <LectureComponent lecture={el} active={true} root={props.root} showAlert={showAlert} expanded={true}/>
         ))}
-      <CreateLectureDialog lectures={inactiveLectures} handleSubmit={() => {
-        getAllLectures().then(l => setLectures(l));
-        getAllLectures(false).then(l => setInactiveLectures(l));
-      }}/>
+      {inactiveLectures
+        .filter(el => UserPermissions.getScope(el) > Scope.student)
+        .map((el, index) => (
+          <LectureComponent lecture={el} active={false} root={props.root} showAlert={showAlert} expanded={true}/>
+        ))}
       <Portal container={document.body}>
         <Snackbar
           open={alert}

@@ -44,7 +44,6 @@ export function request<T>(method: HTTPMethod, endPoint: string, body: object = 
       console.log(data)
       return data
     })
-      //FIXME: this is only a hotfix to change type to promise
   ).toPromise()
 
 }

@@ -109,6 +109,10 @@ class GitService(Configurable):
         self.log.info(f"Switching to branch {branch} at path {self.path}")
         self._run_command(f"git checkout {branch}", cwd=self.path)
 
+    def fetch_all(self):
+        self.log.info(f"Fetching all at path {self.path}")
+        self._run_command(f"git fetch --all", cwd=self.path)
+
     def pull(self, origin: str, branch="main", force=False):
         """Pulls a repository
 
@@ -160,7 +164,7 @@ class GitService(Configurable):
         # self.log.info("Committing repository")
         # self._run_command(f'git commit -m "{m}"', cwd=self.path)
         self.log.info(f"Adding all files and committing in {self.path}")
-        self._run_command(f'sh -c "git add -A && git commit --allow-empty -m "{m}""', cwd=self.path)
+        self._run_command(f'sh -c \'git add -A && git commit --allow-empty -m "{m}"\'', cwd=self.path)
 
     def set_author(self, author=getpass.getuser()):
         self._run_command(f'git config user.name "{author}"', cwd=self.path)
@@ -191,7 +195,7 @@ class GitService(Configurable):
                     shutil.rmtree(os.path.join(root, d))
                     self.log.info(f"Deleted {os.path.join(root, d)} from {self.git_root_dir}")
 
-    # ATTENTION: dirs_exist_ok was only added in Python 3.8
+    # Note: dirs_exist_ok was only added in Python 3.8
     def copy_repo_contents(self, src: str):
         """copies repo contents from src to the git path
 

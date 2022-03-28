@@ -17,7 +17,6 @@ class Lecture(Base, Serializable):
     __tablename__ = "lecture"
     id = Column(Integer, primary_key=True, autoincrement=True)
     name = Column(String(255), nullable=True, unique=False)
-    semester = Column(String(255), nullable=False, unique=False)
     code = Column(String(255), nullable=True, unique=True)
     state = Column(Enum(LectureState), nullable=False, unique=False)
     deleted = Column(Enum(DeleteState), nullable=False, unique=False)
@@ -33,5 +32,4 @@ class Lecture(Base, Serializable):
             name=self.name,
             code=self.code,
             complete=self.state == LectureState.complete,
-            semester=self.semester,
         )

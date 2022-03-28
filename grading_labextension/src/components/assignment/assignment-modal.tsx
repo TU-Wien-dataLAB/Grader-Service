@@ -72,7 +72,7 @@ export const AssignmentModalComponent = (props: IAssignmentModalProps) => {
         <Typography variant={'h6'} sx={{ml: 2}}>Status</Typography>
         <AssignmentStatus lecture={props.lecture} assignment={props.assignment} submissions={submissions}/>
         <Typography variant={'h6'} sx={{ml: 2}}>Files</Typography>
-        <FilesList path={path} sx={{m: 2, mt: 1}}/>
+        <FilesList path={path} showAlert={props.showAlert} sx={{m: 2, mt: 1}}/>
         <Stack direction={"row"} spacing={1} sx={{m: 1, ml: 2}}>
           <Button
             variant="outlined"
@@ -98,7 +98,8 @@ export const AssignmentModalComponent = (props: IAssignmentModalProps) => {
 
       </Box>
       <LoadingOverlay onClose={() => setShowFeedback(false)} open={showFeedback} container={props.root}>
-        <Feedback lecture={props.lecture} assignment={props.assignment} submission={feedbackSubmission}/>
+        <Feedback lecture={props.lecture} assignment={props.assignment} submission={feedbackSubmission}
+                  showAlert={props.showAlert}/>
       </LoadingOverlay>
     </div>
   );

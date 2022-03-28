@@ -18,26 +18,23 @@ export const GradingChart = (props: ChartsProps) => {
 
   const generateGradingData = (submissions: Submission[]) => {
     const data = [0, 0, 0, 0];
-    let auto = 0;
-    let manual = 0;
+    let grading = 0;
+    let done = 0;
     let failed = 0;
     let not = 0;
     for (let sub of submissions) {
-      if (sub.auto_status == "automatically_graded") {
-        if (sub.manual_status == "manually_graded") {
-          manual++;
-        } else {
-          auto++;
-        }
+      if (sub.feedback_available) {
+        done++;
+      } else if (sub.auto_status == "automatically_graded" || sub.manual_status == "manually_graded") {
+        grading++;
       } else if (sub.auto_status == "grading_failed") {
         failed++;
       } else {
         not++;
       }
     }
-
-    data[0] = auto;
-    data[1] = manual;
+    data[0] = done;
+    data[1] = grading;
     data[2] = failed;
     data[3] = not;
     console.log(data);
@@ -48,22 +45,22 @@ export const GradingChart = (props: ChartsProps) => {
 
 
   const gradingDataProps = {
-    labels: ['Only autograded submissions', 'Autograded and manualgraded submissions', 'grading failed', 'not graded'],
+    labels: ['Feedback Published', 'Being Graded', 'Grading Failed', 'Not Yet Graded'],
     datasets: [
       {
         label: 'Grading status',
         data: gradingData,
         backgroundColor: [
-          'rgba(255, 99, 132, 0.2)',
-          'rgba(54, 162, 235, 0.2)',
-          'rgba(153, 102, 255, 0.2)',
-          'rgba(255, 159, 64, 0.2)',
+          'rgba(71,157,13,0.25)',
+          'rgba(255,86,0,0.25)',
+          'rgba(153,102,255,0.25)',
+          'rgba(194,0,0,0.25)',
         ],
         borderColor: [
-          'rgba(255, 99, 132, 1)',
-          'rgba(54, 162, 235, 1)',
-          'rgba(153, 102, 255, 1)',
-          'rgba(255, 159, 64, 1)',
+          'rgb(71,157,13)',
+          'rgb(255,86,0)',
+          'rgb(153,102,255)',
+          'rgb(194,0,0)',
         ],
         borderWidth: 1,
       },
@@ -76,9 +73,9 @@ export const GradingChart = (props: ChartsProps) => {
       <CardHeader title="Grading Status"/>
       <CardContent>
         <Box sx={{height: '300px', width: '300px'}}>
-          
-            <Pie data={gradingDataProps}/>
-          
+
+          <Pie data={gradingDataProps}/>
+
         </Box>
 
       </CardContent>

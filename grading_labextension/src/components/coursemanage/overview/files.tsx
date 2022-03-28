@@ -12,7 +12,7 @@ import PublishRoundedIcon from '@mui/icons-material/PublishRounded';
 import GetAppRoundedIcon from '@mui/icons-material/GetAppRounded';
 import NewReleasesRoundedIcon from '@mui/icons-material/NewReleasesRounded';
 import MuiAlert from '@mui/material/Alert';
-import {AgreeDialog} from '../dialog';
+import {AgreeDialog, CommitDialog} from '../dialog';
 import {
   AlertProps,
   Button,
@@ -56,7 +56,7 @@ export const Files = (props: FilesProps) => {
     handleAgree: null,
     handleDisagree: null
   });
-  const [reloadFilesToogle, reloadFiles] = React.useState(false);
+  const [reloadFilesToggle, reloadFiles] = React.useState(false);
 
   const [srcChangedTimestamp, setSrcChangeTimestamp] = React.useState(moment().valueOf()) // now
   const [generateTimestamp, setGenerateTimestamp] = React.useState(null);
@@ -95,20 +95,20 @@ export const Files = (props: FilesProps) => {
 
   const closeDialog = () => setShowDialog(false);
 
-  const handlePushAssignment = async () => {
+  const handlePushAssignment = async (commitMessage: string) => {
     setDialogContent({
       title: 'Push Assignment',
       message: `Do you want to push ${assignment.name}? This updates the state of the assignment on the server with your local state.`,
       handleAgree: async () => {
         try {
+          // Note: has to be in this order (release -> source)
           await pushAssignment(lecture.id, assignment.id, 'release');
-          await pushAssignment(lecture.id, assignment.id, 'source');
+          await pushAssignment(lecture.id, assignment.id, 'source', commitMessage);
         } catch (err) {
           props.showAlert('error', 'Error Pushing Assignment');
           closeDialog();
           return;
         }
-        //TODO: should be atomar with the pushAssignment function
         const a = assignment;
         a.status = 'pushed';
         updateAssignment(lecture.id, a).then(
@@ -137,7 +137,7 @@ export const Files = (props: FilesProps) => {
         } catch (err) {
           props.showAlert('error', 'Error Pulling Assignment');
         }
-        // TODO: update file list
+        reloadFiles(!reloadFilesToggle)
         closeDialog();
       },
       handleDisagree: () => closeDialog()
@@ -154,7 +154,7 @@ export const Files = (props: FilesProps) => {
                     <Grid container>
                       <Grid item>
                         <Tooltip title="Reload">
-                          <IconButton aria-label='reload' onClick={() => reloadFiles(!reloadFilesToogle)}>
+                          <IconButton aria-label='reload' onClick={() => reloadFiles(!reloadFilesToggle)}>
                             <ReplayIcon/>
                           </IconButton>
                         </Tooltip>
@@ -174,22 +174,15 @@ export const Files = (props: FilesProps) => {
         <Box height={214} sx={{overflowY: 'auto'}}>
           <FilesList
             path={`${selectedDir}/${props.lecture.code}/${props.assignment.name}`}
-            reloadFiles={reloadFilesToogle}
+            reloadFiles={reloadFilesToggle}
+            showAlert={props.showAlert}
           />
         </Box>
       </CardContent>
       <CardActions>
+        <CommitDialog handleSubmit={(msg) => handlePushAssignment(msg)} />
         <Button
-          sx={{mt: -1}}
-          onClick={() => handlePushAssignment()}
-          variant="outlined"
-          size="small"
-        >
-          <PublishRoundedIcon fontSize="small" sx={{mr: 1}}/>
-          Push
-        </Button>
-        <Button
-          sx={{mt: -1}}
+          sx={{mt: -1, ml: 2}}
           onClick={() => handlePullAssignment()}
           variant="outlined"
           size="small"

@@ -3,6 +3,7 @@ import datetime
 import functools
 import json
 import logging
+import os
 import time
 from typing import Any, Awaitable, Callable, List, Optional
 from urllib.parse import ParseResult, urlparse
@@ -13,6 +14,7 @@ from traitlets.config import SingletonConfigurable
 from grader_service.api.models.base_model_ import Model
 from grader_service.api.models.error_message import ErrorMessage
 from grader_service.autograding.local_grader import LocalAutogradeExecutor
+from grader_service.orm import Group, Assignment
 from grader_service.orm.base import DeleteState, Serializable
 from grader_service.orm.lecture import Lecture, LectureState
 from grader_service.orm.takepart import Role, Scope
@@ -31,6 +33,7 @@ from tornado_sqlalchemy import SessionMixin
 def authorize(scopes: List[Scope]):
     if not set(scopes).issubset({Scope.student, Scope.tutor, Scope.instructor}):
         return ValueError("Invalid scopes")
+
     # needs_auth = set(scopes) != {Scope.student, Scope.tutor, Scope.instructor}
 
     def wrapper(handler_method):
@@ -40,18 +43,18 @@ def authorize(scopes: List[Scope]):
             if "/permissions" in self.request.path:
                 return await handler_method(self, *args, **kwargs)
             if (
-                lect_id is None
-                and "/lectures" in self.request.path
-                and self.request.method == "POST"
+                    lect_id is None
+                    and "/lectures" in self.request.path
+                    and self.request.method == "POST"
             ):
                 # lecture name and semester is in post body
                 try:
                     data = json_decode(self.request.body)
                     lect_id = (
                         self.session.query(Lecture)
-                        .filter(Lecture.code == data["code"])
-                        .one()
-                        .id
+                            .filter(Lecture.code == data["code"])
+                            .one()
+                            .id
                     )
                 except MultipleResultsFound:
                     self.error_message = "Unauthorized"
@@ -63,9 +66,9 @@ def authorize(scopes: List[Scope]):
                     self.error_message = "Unauthorized"
                     raise HTTPError(403)
             elif (
-                lect_id is None
-                and "/lectures" in self.request.path
-                and self.request.method == "GET"
+                    lect_id is None
+                    and "/lectures" in self.request.path
+                    and self.request.method == "GET"
             ):
                 return await handler_method(self, *args, **kwargs)
 
@@ -88,10 +91,10 @@ class GraderBaseHandler(SessionMixin, web.RequestHandler):
     hub_request_service = RequestService()
 
     def __init__(
-        self,
-        application: GraderServer,
-        request: httputil.HTTPServerRequest,
-        **kwargs: Any,
+            self,
+            application: GraderServer,
+            request: httputil.HTTPServerRequest,
+            **kwargs: Any,
     ) -> None:
         super().__init__(application, request, **kwargs)
 
@@ -122,6 +125,45 @@ class GraderBaseHandler(SessionMixin, web.RequestHandler):
         if len(set(self.request.arguments.keys()) - set(self.request.body_arguments) - set(args)) != 0:
             raise HTTPError(400, "Unknown arguments")
 
+    @property
+    def gitbase(self):
+        app: GraderServer = self.application
+        return os.path.join(app.grader_service_dir, "git")
+
+    def construct_git_dir(self, repo_type: str, lecture: Lecture, assignment: Assignment) -> Optional[str]:
+        """Helper method for every handler that needs to access git directories which returns
+        the path of the repository based on the inputs or None if the repo_type is not recognized.
+        """
+        assignment_path = os.path.abspath(
+            os.path.join(self.gitbase, lecture.code, assignment.name)
+        )
+        if repo_type == "source" or repo_type == "release":
+            path = os.path.join(assignment_path, repo_type)
+        elif repo_type in ["autograde", "feedback"]:
+            type_path = os.path.join(assignment_path, repo_type, assignment.type)
+            if assignment.type == "user":
+                path = os.path.join(type_path, self.user.name)
+            else:
+                group = self.session.query(Group).get((self.user.name, lecture.id))
+                if group is None:
+                    self.error_message = "Not Found"
+                    raise HTTPError(404)
+                path = os.path.join(type_path, group.name)
+        elif repo_type == "user":
+            user_path = os.path.join(assignment_path, repo_type)
+            path = os.path.join(user_path, self.user.name)
+        elif repo_type == "group":
+            group = self.session.query(Group).get((self.user.name, lecture.id))
+            if group is None:
+                self.error_message = "Not Found"
+                raise HTTPError(404)
+            group_path = os.path.join(assignment_path, repo_type)
+            path = os.path.join(group_path, group.name)
+        else:
+            return None
+
+        return path
+
     async def authenticate_user(self):
         """
         This is a workaround for async authentication. `get_current_user` cannot be asynchronous and a request cannot be made in a blocking manner.
@@ -146,7 +188,8 @@ class GraderBaseHandler(SessionMixin, web.RequestHandler):
             return
             # raise HTTPError(403)
         self.set_secure_cookie(token, json.dumps(user), expires_days=self.application.max_token_cookie_age_days)
-        self.log.info(f'User {user["name"]} has been authenticated (took {(time.monotonic() - start_time)*1e3:.2f}ms)')
+        self.log.info(
+            f'User {user["name"]} has been authenticated (took {(time.monotonic() - start_time) * 1e3:.2f}ms)')
 
         user_model = self.session.query(User).get(user["name"])
         if user_model is None:
@@ -162,23 +205,24 @@ class GraderBaseHandler(SessionMixin, web.RequestHandler):
 
         lecture_roles = {
             code: {"role": role}
-            for code, role in [tuple(g.split("__", 1)) for g in user["groups"]]
+            for code, role in [tuple(g.split(":", 1)) for g in user["groups"]]
         }
 
         for lecture_code in lecture_roles.keys():
             lecture = (
                 self.session.query(Lecture)
-                .filter(Lecture.code == lecture_code)
-                .one_or_none()
+                    .filter(Lecture.code == lecture_code)
+                    .one_or_none()
             )
             if (
-                lecture is None
+                    lecture is None
             ):  # create inactive lecture if no lecture with that name exists yet (code is set in create)
                 self.log.info(
                     f"Adding inactive lecture with lecture_code {lecture_code}"
                 )
                 lecture = Lecture()
                 lecture.code = lecture_code
+                lecture.name = lecture_code
                 lecture.state = LectureState.inactive
                 lecture.deleted = DeleteState.active
                 self.session.add(lecture)
@@ -188,8 +232,8 @@ class GraderBaseHandler(SessionMixin, web.RequestHandler):
         for lecture_code, obj in lecture_roles.items():
             lecture = (
                 self.session.query(Lecture)
-                .filter(Lecture.code == lecture_code)
-                .one_or_none()
+                    .filter(Lecture.code == lecture_code)
+                    .one_or_none()
             )
             if lecture is None:
                 raise HTTPError(
@@ -301,7 +345,7 @@ class GraderBaseHandler(SessionMixin, web.RequestHandler):
 
 
 def authenticated(
-    method: Callable[..., Optional[Awaitable[None]]]
+        method: Callable[..., Optional[Awaitable[None]]]
 ) -> Callable[..., Optional[Awaitable[None]]]:
     """Decorate methods with this to require that the user be logged in.
 
@@ -310,7 +354,7 @@ def authenticated(
 
     @functools.wraps(method)
     def wrapper(  # type: ignore
-        self: GraderBaseHandler, *args, **kwargs
+            self: GraderBaseHandler, *args, **kwargs
     ) -> Optional[Awaitable[None]]:
         if not self.current_user:
             raise HTTPError(403)
