@@ -18,6 +18,6 @@ c.JupyterHub.services.append(
 c.JupyterHub.load_groups ={
     "lect1__instructor": ["user1"],
     "lect1__tutor": ["user2"],
-    "lect1__student": ["jovyanuser2", "user3"]
+    "lect1__student": ["jovyan", "user3"]
     }
     
