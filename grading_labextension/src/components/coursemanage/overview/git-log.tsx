@@ -12,10 +12,12 @@ import * as React from "react";
 import {getGitLog, IGitLogObject} from "../../../services/file.service";
 import {utcToLocalFormat} from "../../../services/datetime.service";
 import {TimelineOppositeContent} from "@mui/lab";
+import { RepoType } from "../../util/repo-type";
 
 interface IGitLogProps {
   lecture: Lecture;
   assignment: Assignment;
+  repoType: RepoType;
 }
 
 const getTimelineItem = (logItem: IGitLogObject) => {
@@ -52,7 +54,7 @@ const getTimelineItem = (logItem: IGitLogObject) => {
 export const GitLog = (props: IGitLogProps) => {
   const [gitLogs, setGitLogs] = React.useState([] as IGitLogObject[]);
   React.useEffect(() => {
-    getGitLog(props.lecture, props.assignment, "source", 10).then(logs => setGitLogs(logs))
+    getGitLog(props.lecture, props.assignment, props.repoType, 10).then(logs => setGitLogs(logs))
   }, [props])
 
   return (

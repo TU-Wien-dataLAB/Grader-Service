@@ -5,6 +5,7 @@ import IModel = Contents.IModel;
 import {Assignment} from "../model/assignment";
 import {HTTPMethod, request} from "./request.service";
 import {Lecture} from "../model/lecture";
+import { RepoType } from "../components/util/repo-type";
 
 export const getFiles = async (path: string): Promise<IModel[]> => {
   if (path === null) return [];
@@ -33,7 +34,7 @@ export interface IGitLogObject {
   pre_commit: string
 }
 
-export function getGitLog(lecture: Lecture, assignment: Assignment, repo: "assignment" | "source" | "release", nCommits: number): Promise<IGitLogObject[]> {
+export function getGitLog(lecture: Lecture, assignment: Assignment, repo: RepoType, nCommits: number): Promise<IGitLogObject[]> {
   let url = `/lectures/${lecture.id}/assignments/${assignment.id}/log/${repo}/`;
   let searchParams = new URLSearchParams({
     "n": String(nCommits)

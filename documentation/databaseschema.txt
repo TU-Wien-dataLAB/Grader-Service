@@ -5,7 +5,6 @@ Table user as U {
 Table lecture as L {
   id int [pk, increment] // auto-increment
   name varchar
-  semester varchar
   code varchar
   state varchar
   deleted enum

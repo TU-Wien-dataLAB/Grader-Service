@@ -11,6 +11,7 @@ import {Files} from './files';
 import {GitLog} from "./git-log";
 import {getAssignment} from "../../../services/assignments.service";
 import {AssignmentStatus} from "./assignment-status";
+import { RepoType } from "../../util/repo-type";
 
 export interface IOverviewProps {
   assignment: Assignment;
@@ -49,7 +50,7 @@ export const OverviewComponent = (props: IOverviewProps) => {
                showAlert={props.showAlert}
         />
 
-        <GitLog lecture={lecture} assignment={assignment}/>
+        <GitLog lecture={lecture} assignment={assignment} repoType={RepoType.SOURCE}/>
 
         <SubmittedChart lecture={lecture} assignment={assignment} allSubmissions={props.allSubmissions}
                         users={props.users}/>
