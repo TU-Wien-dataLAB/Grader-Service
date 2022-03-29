@@ -297,6 +297,15 @@ class PushHandler(ExtensionBaseHandler):
 
 
 @register_handler(
+    path=r"\/lectures\/(?P<lecture_id>\d*)\/assignments\/(?P<assignment_id>)\/reset\/?"
+)
+class ResetHandler(ExtensionBaseHandler):
+    async def get(self, lecture_id: int, assignment_id: int):
+        #TODO: Reset Assignment
+        self.write("OK")
+
+
+@register_handler(
     path=r"\/(?P<lecture_id>\d*)\/(?P<assignment_id>\d*)\/(?P<notebook_name>.*)"
 )
 class NotebookAccessHandler(ExtensionBaseHandler):

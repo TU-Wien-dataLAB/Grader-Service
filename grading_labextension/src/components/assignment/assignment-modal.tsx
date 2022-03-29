@@ -10,12 +10,15 @@ import GetAppRoundedIcon from "@mui/icons-material/GetAppRounded";
 import {SplitButton} from "../util/split-button";
 import MuiAlert from "@mui/material/Alert";
 import {SubmissionList} from "./submission-list";
-import {pullAssignment} from "../../services/assignments.service";
+import {pullAssignment, pushAssignment, resetAssignment} from "../../services/assignments.service";
 import {getAllSubmissions, getSubmissions, submitAssignment} from "../../services/submissions.service";
 import LoadingOverlay from "../util/overlay";
 import {Feedback} from "./feedback";
 import {AssignmentStatus} from "./assignment-status";
 import {getFiles} from "../../services/file.service";
+import { AgreeDialog } from '../coursemanage/dialog';
+import RestartAltIcon from '@mui/icons-material/RestartAlt';
+import { RepoType } from '../util/repo-type';
 
 export interface IAssignmentModalProps {
   lecture: Lecture;
@@ -31,6 +34,7 @@ export const AssignmentModalComponent = (props: IAssignmentModalProps) => {
   const [showFeedback, setShowFeedback] = React.useState(false);
   const [feedbackSubmission, setFeedbackSubmission] = React.useState(null);
   const [hasFiles, setHasFiles] = React.useState(false);
+  const [dialog, setDialog] = React.useState(false);
 
   React.useEffect(() => {
     getFiles(path).then(files => setHasFiles(files.length > 0));
@@ -43,6 +47,12 @@ export const AssignmentModalComponent = (props: IAssignmentModalProps) => {
     } catch (e) {
       props.showAlert('error', 'Error Fetching Assignment');
     }
+  }
+
+  const resetAssignmentHandler = async () => {
+    setDialog(false);
+    await pushAssignment(props.lecture.id, props.assignment.id, RepoType.ASSIGNMENT, "Commit before reset");
+    await resetAssignment(props.lecture,props.assignment);
   }
 
   const submitAssignmentHandler = async () => {
@@ -92,7 +102,17 @@ export const AssignmentModalComponent = (props: IAssignmentModalProps) => {
             ]}
             selectedIndex={hasFiles ? 0 : 1}
           />
+          <Button
+            variant="outlined"
+            size="small"
+            color="error"
+            onClick={() => setDialog(true)}
+          >
+            <RestartAltIcon fontSize="small" sx={{mr: 1}}/>
+            Reset
+          </Button>
         </Stack>
+
         <Typography variant={'h6'} sx={{ml: 2, mt: 3}}>Submissions</Typography>
         <SubmissionList submissions={submissions} openFeedback={openFeedback} sx={{m: 2, mt: 1}}/>
 
@@ -101,6 +121,15 @@ export const AssignmentModalComponent = (props: IAssignmentModalProps) => {
         <Feedback lecture={props.lecture} assignment={props.assignment} submission={feedbackSubmission}
                   showAlert={props.showAlert}/>
       </LoadingOverlay>
+      {/* AgreeDialog for assignment reset */}
+      <AgreeDialog 
+      open={dialog} 
+      title={'Reset Assignment'} 
+      message={'This action will delete your current progress and reset the assignment! \n' +
+      'Therefore you should copy and paste your work to a different directory before progressing. '} 
+      handleAgree={resetAssignmentHandler} 
+      handleDisagree={() => setDialog(false)} />
     </div>
+    
   );
 };
