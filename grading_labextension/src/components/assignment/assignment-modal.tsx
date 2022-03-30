@@ -50,9 +50,14 @@ export const AssignmentModalComponent = (props: IAssignmentModalProps) => {
   }
 
   const resetAssignmentHandler = async () => {
+    //await pushAssignment(props.lecture.id, props.assignment.id, RepoType.ASSIGNMENT, "Commit before reset");
+    try {
+      await resetAssignment(props.lecture,props.assignment);
+      props.showAlert('success', 'Successfully Reset Assignment');
+    } catch (e) {
+      props.showAlert('error', 'Error Reseting Assignment');
+    }
     setDialog(false);
-    await pushAssignment(props.lecture.id, props.assignment.id, RepoType.ASSIGNMENT, "Commit before reset");
-    await resetAssignment(props.lecture,props.assignment);
   }
 
   const submitAssignmentHandler = async () => {

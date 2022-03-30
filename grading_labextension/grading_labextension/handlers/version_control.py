@@ -297,11 +297,20 @@ class PushHandler(ExtensionBaseHandler):
 
 
 @register_handler(
-    path=r"\/lectures\/(?P<lecture_id>\d*)\/assignments\/(?P<assignment_id>)\/reset\/?"
+    path=r"\/lectures\/(?P<lecture_id>\d*)\/assignments\/(?P<assignment_id>\d*)\/reset\/?"
 )
 class ResetHandler(ExtensionBaseHandler):
     async def get(self, lecture_id: int, assignment_id: int):
-        #TODO: Reset Assignment
+        try:
+            await self.request_service.request(
+                "GET",
+                f"{self.base_url}/lectures/{lecture_id}/assignments/{assignment_id}/reset",
+                header=self.grader_authentication_header,
+            )
+        except HTTPClientError as e:
+            self.set_status(e.code)
+            self.write_error(e.code)
+            return
         self.write("OK")
 
 

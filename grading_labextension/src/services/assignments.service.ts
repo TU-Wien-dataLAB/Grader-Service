@@ -55,6 +55,6 @@ export function pullAssignment(lectureId: number, assignmentId: number, repoType
 }
 
 export function resetAssignment(lecture: Lecture, assignment: Assignment) : Promise<void> {
-  return request<void>(HTTPMethod.GET, `/lectures/${lecture.id}/assignment/${assignment.id}/reset`);
+  return request<void>(HTTPMethod.GET, `/lectures/${lecture.id}/assignments/${assignment.id}/reset`);
 }
 

@@ -4,6 +4,8 @@ import functools
 import json
 import logging
 import os
+import shlex
+import subprocess
 import time
 from typing import Any, Awaitable, Callable, List, Optional
 from urllib.parse import ParseResult, urlparse
@@ -163,6 +165,32 @@ class GraderBaseHandler(SessionMixin, web.RequestHandler):
             return None
 
         return path
+
+    def _run_command(self, command, cwd=None, capture_output=False):
+        """Starts a sub process and runs an cmd command
+
+        Args:
+            command str: command that is getting run.
+            cwd (str, optional): states where the command is getting run. Defaults to None.
+            capture_output (bool, optional): states if output is getting saved. Defaults to False.
+
+        Raises:
+            GitError: returns appropriate git error 
+
+        Returns:
+            str: command output
+        """
+        try:
+            self.log.info(f"Running: {command}")
+            ret = subprocess.run(shlex.split(command), check=True, cwd=cwd, capture_output=True)
+            if capture_output:
+                return str(ret.stdout, 'utf-8')
+        except subprocess.CalledProcessError as e:
+            self.log.error(e)
+            raise HTTPError(500)
+        except FileNotFoundError as e:
+            self.log.error(e)
+            raise HTTPError(404)
 
     async def authenticate_user(self):
         """
