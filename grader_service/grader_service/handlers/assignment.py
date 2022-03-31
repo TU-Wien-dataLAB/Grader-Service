@@ -1,7 +1,9 @@
 import json
-
+import shutil
+import sys
 import tornado
-
+import os
+import subprocess
 from grader_convert.gradebook.models import GradeBookModel
 from grader_service.api.models.assignment import Assignment as AssignmentModel
 from grader_service.orm.assignment import Assignment, AutoGradingBehaviour
@@ -210,6 +212,69 @@ class AssignmentObjectHandler(GraderBaseHandler):
         except ObjectDeletedError:
             raise HTTPError(404)
 
+@register_handler(
+    path=r"\/lectures\/(?P<lecture_id>\d*)\/assignments\/(?P<assignment_id>\d*)\/reset\/?",
+    version_specifier=VersionSpecifier.ALL,
+    )
+class AssignmentResetHandler(GraderBaseHandler):
+    @authorize([Scope.instructor, Scope.tutor, Scope.student])
+    async def get(self, lecture_id: int, assignment_id: int):
+        
+        assignment = self.session.query(Assignment).get(assignment_id)
+        #if (
+        #    assignment is None
+        #    or assignment.deleted == DeleteState.deleted
+        #    or assignment.lectid != lecture_id
+        #):
+        #    self.error_message = "Not Found!"
+        #    raise HTTPError(404)
+        dir = f'tmp/{assignment.lecture.code}/{assignment.name}/{self.user.name}'
+        self.log.info(f"DIR {dir}")
+        os.makedirs(dir,exist_ok=True)
+        git_path_base = os.path.abspath(os.getcwd())+"/"+dir
+        git_path_release = git_path_base+"/release"
+        git_path_user = git_path_base+"/"+self.user.name
+        self.log.info(f"GIT BASE {git_path_base}")
+        self.log.info(f"GIT RELEASE {git_path_release}")
+        self.log.info(f"GIT USER {git_path_release}")
+
+
+        repo_path_release = self.construct_git_dir('release',assignment.lecture,assignment)
+        repo_path_user = self.construct_git_dir(assignment.type,assignment.lecture,assignment)
+
+        self._run_command(f"git clone {repo_path_release}",git_path_base)
+        self._run_command(f"git clone {repo_path_user}",git_path_base)
+        self._run_command("git pull",git_path_release)
+        self._run_command(f"git pull",git_path_user)
+
+
+
+       
+        self.log.info(f"Copying repository contents from {git_path_release} to {git_path_user}")
+        ignore = shutil.ignore_patterns(".git", "__pycache__")
+        if sys.version_info.major == 3 and sys.version_info.minor >= 8:
+            shutil.copytree(git_path_release, git_path_user, ignore=ignore, dirs_exist_ok=True)
+        else:
+            for item in os.listdir(git_path_release):
+                s = os.path.join(git_path_release, item)
+                d = os.path.join(git_path_user, item)
+                if os.path.isdir(s):
+                    shutil.copytree(s, d, ignore=ignore)
+                else:
+                    shutil.copy2(s, d)
+        
+        try:
+            self.log.info("ADD")
+            subprocess.run(["git","add","."],cwd=git_path_user)
+            self.log.info("COMMIT")
+            subprocess.run(["git","commit","-m","Reset"],cwd=git_path_user)
+            self.log.info("PUSH")
+            subprocess.run(["git","push","origin","master"],cwd=git_path_user)
+        except subprocess.CalledProcessError:
+            raise HTTPError(404)
+
+        shutil.rmtree(git_path_base)
+        self.write_json(assignment)
 
 @register_handler(
     path=r"\/lectures\/(?P<lecture_id>\d*)\/assignments\/(?P<assignment_id>\d*)\/properties\/?",
