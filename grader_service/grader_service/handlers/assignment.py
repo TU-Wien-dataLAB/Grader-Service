@@ -228,7 +228,12 @@ class AssignmentResetHandler(GraderBaseHandler):
         #):
         #    self.error_message = "Not Found!"
         #    raise HTTPError(404)
+        
         dir = f'tmp/{assignment.lecture.code}/{assignment.name}/{self.user.name}'
+        #Deleting dir
+        if(os.path.exists(dir)):
+            shutil.rmtree(dir)
+
         self.log.info(f"DIR {dir}")
         os.makedirs(dir,exist_ok=True)
         git_path_base = os.path.abspath(os.getcwd())+"/"+dir
@@ -263,15 +268,8 @@ class AssignmentResetHandler(GraderBaseHandler):
                 else:
                     shutil.copy2(s, d)
         
-        try:
-            self.log.info("ADD")
-            subprocess.run(["git","add","."],cwd=git_path_user)
-            self.log.info("COMMIT")
-            subprocess.run(["git","commit","-m","Reset"],cwd=git_path_user)
-            self.log.info("PUSH")
-            subprocess.run(["git","push","origin","master"],cwd=git_path_user)
-        except subprocess.CalledProcessError:
-            raise HTTPError(404)
+        self._run_command(f'sh -c \'git add -A && git commit --allow-empty -m "Reset"\'', git_path_user)
+        self._run_command("git push origin master",git_path_user)
 
         shutil.rmtree(git_path_base)
         self.write_json(assignment)
