@@ -132,6 +132,12 @@ class GraderBaseHandler(SessionMixin, web.RequestHandler):
         app: GraderServer = self.application
         return os.path.join(app.grader_service_dir, "git")
 
+    def get_assignment(self,lecture_id: int, assignment_id: int) -> Optional[Assignment] :
+        assignment = self.session.query(Assignment).get(assignment_id)
+        if assignment is None or assignment.deleted == 1 or assignment.lectid != lecture_id:
+            raise HTTPError(404)
+        return assignment
+
     def construct_git_dir(self, repo_type: str, lecture: Lecture, assignment: Assignment) -> Optional[str]:
         """Helper method for every handler that needs to access git directories which returns
         the path of the repository based on the inputs or None if the repo_type is not recognized.
