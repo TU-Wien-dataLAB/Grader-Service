@@ -371,7 +371,12 @@ class GraderBaseHandler(SessionMixin, web.RequestHandler):
         if status_code == 403 and not self.has_auth:
             status_code = 401
         self.set_status(status_code)
-        self.write_json(ErrorMessage(self.error_message))
+        _, e, _ = kwargs.get("exc_info", (None, None, None))
+        if e and isinstance(e, HTTPError) and e.reason:
+            self.write_json(ErrorMessage(e.reason))
+        else:
+            msg = httputil.responses.get(status_code, "Unknown")
+            self.write_json(ErrorMessage(msg))
 
     @classmethod
     def _serialize(cls, obj: object):
