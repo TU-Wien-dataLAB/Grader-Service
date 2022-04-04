@@ -39,14 +39,7 @@ class GradingAutoHandler(GraderBaseHandler):
         """
         lecture_id, assignment_id, sub_id = parse_ids(lecture_id, assignment_id, sub_id)
         self.validate_parameters()
-        submission = self.session.query(Submission).get(sub_id)
-        if (
-                submission is None
-                or submission.assignid != assignment_id
-                or submission.assignment.lectid != lecture_id
-        ):
-            self.error_message = "Not Found!"
-            raise HTTPError(404)
+        submission = self.get_submission(lecture_id, assignment_id, sub_id)
         executor = RequestHandlerConfig.instance().autograde_executor_class(
             self.application.grader_service_dir, submission, config=self.application.config
         )
@@ -81,14 +74,7 @@ class GenerateFeedbackHandler(GraderBaseHandler):
         """
         lecture_id, assignment_id, sub_id = parse_ids(lecture_id, assignment_id, sub_id)
         self.validate_parameters()
-        submission = self.session.query(Submission).get(sub_id)
-        if (
-                submission is None
-                or submission.assignid != assignment_id
-                or submission.assignment.lectid != lecture_id
-        ):
-            self.error_message = "Not Found!"
-            raise HTTPError(404)
+        submission = self.get_submission(lecture_id, assignment_id, sub_id)
         executor = GenerateFeedbackExecutor(
             self.application.grader_service_dir, submission, config=self.application.config
         )

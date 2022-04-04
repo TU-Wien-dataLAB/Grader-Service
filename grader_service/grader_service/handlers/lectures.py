@@ -101,10 +101,7 @@ class LectureObjectHandler(GraderBaseHandler):
     @authorize([Scope.student, Scope.tutor, Scope.instructor])
     async def get(self, lecture_id: int):
         self.validate_parameters()
-        role = self.session.query(Role).get((self.user.name, lecture_id))
-        if role is None:
-            self.error_message = "Unauthorized"
-            raise HTTPError(403)
+        role = self.get_role(lecture_id)
         if role.lecture.deleted == DeleteState.deleted:
             self.error_message = "Not found"
             raise HTTPError(404)

@@ -63,24 +63,13 @@ class SubmissionHandler(GraderBaseHandler):
         latest = self.get_argument("latest", None) == "true"
         instructor_version = self.get_argument("instructor-version", None) == "true"
 
-        role: Role = self.session.query(Role).get((self.user.name, lecture_id))
+        role: Role = self.get_role(lecture_id)
         if instructor_version and role.role < Scope.tutor:
             self.error_message = "Unauthorized"
             raise HTTPError(403)
-
-        assignment = self.session.query(Assignment).get(assignment_id)
-        if assignment is None or assignment.lectid != lecture_id:
-            self.error_message = "Not Found!"
-            raise HTTPError(404)
+        assignment = self.get_assignment(lecture_id, assignment_id)
 
         if instructor_version:
-            if (
-                    assignment is None
-                    or assignment.deleted == DeleteState.deleted
-                    or assignment.lectid != lecture_id
-            ):
-                self.error_message = "Not Found"
-                raise HTTPError(404)
             if latest:
                 submissions = (
                     self.session.query(
@@ -153,14 +142,7 @@ class SubmissionHandler(GraderBaseHandler):
         body = tornado.escape.json_decode(self.request.body)
         sub_model = SubmissionModel.from_dict(body)
 
-        assignment = self.session.query(Assignment).get(assignment_id)
-        if (
-                assignment is None
-                or assignment.deleted == DeleteState.deleted
-                or assignment.lectid != lecture_id
-        ):
-            self.error_message = "Not Found!"
-            raise HTTPError(404)
+        assignment = self.get_assignment(lecture_id, assignment_id)
 
         submission = Submission()
         submission.assignid = assignment.id
@@ -210,14 +192,7 @@ class SubmissionObjectHandler(GraderBaseHandler):
         lecture_id, assignment_id, submission_id = parse_ids(
             lecture_id, assignment_id, submission_id
         )
-        submission = self.session.query(Submission).get(submission_id)
-        if (
-                submission is None
-                or submission.assignid != assignment_id
-                or submission.assignment.lectid != lecture_id
-        ):
-            self.error_message = "Not Found!"
-            raise HTTPError(404)
+        submission = self.get_submission(lecture_id, assignment_id, submission_id)
         self.write_json(submission)
 
     @authorize([Scope.tutor, Scope.instructor])
@@ -236,14 +211,7 @@ class SubmissionObjectHandler(GraderBaseHandler):
         )
         body = tornado.escape.json_decode(self.request.body)
         sub_model = SubmissionModel.from_dict(body)
-        sub = self.session.query(Submission).get(submission_id)
-        if (
-                sub is None
-                or sub.assignid != assignment_id
-                or sub.assignment.lectid != lecture_id
-        ):
-            self.error_message = "Not Found!"
-            raise HTTPError(404)
+        sub = self.get_submission(lecture_id, assignment_id, submission_id)
         sub.date = sub_model.submitted_at
         sub.assignid = assignment_id
         sub.username = self.user.name
@@ -275,14 +243,7 @@ class SubmissionPropertiesHandler(GraderBaseHandler):
         lecture_id, assignment_id, submission_id = parse_ids(
             lecture_id, assignment_id, submission_id
         )
-        submission = self.session.query(Submission).get(submission_id)
-        if (
-                submission is None
-                or submission.assignid != assignment_id
-                or submission.assignment.lectid != lecture_id
-        ):
-            self.error_message = "Not Found!"
-            raise HTTPError(404)
+        submission = self.get_submission(lecture_id, assignment_id, submission_id)
         if submission.properties is not None:
             self.write(submission.properties)
         else:
@@ -305,14 +266,7 @@ class SubmissionPropertiesHandler(GraderBaseHandler):
         lecture_id, assignment_id, submission_id = parse_ids(
             lecture_id, assignment_id, submission_id
         )
-        submission = self.session.query(Submission).get(submission_id)
-        if (
-                submission is None
-                or submission.assignid != assignment_id
-                or submission.assignment.lectid != lecture_id
-        ):
-            self.error_message = "Not Found!"
-            raise HTTPError(404)
+        submission = self.get_submission(lecture_id, assignment_id, submission_id)
         properties_string: str = self.request.body.decode("utf-8")
         try:
             score = GradeBookModel.from_dict(json.loads(properties_string)).score

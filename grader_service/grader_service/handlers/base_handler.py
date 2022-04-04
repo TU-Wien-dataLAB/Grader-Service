@@ -16,7 +16,7 @@ from traitlets.config import SingletonConfigurable
 from grader_service.api.models.base_model_ import Model
 from grader_service.api.models.error_message import ErrorMessage
 from grader_service.autograding.local_grader import LocalAutogradeExecutor
-from grader_service.orm import Group, Assignment
+from grader_service.orm import Group, Assignment, Submission
 from grader_service.orm.base import DeleteState, Serializable
 from grader_service.orm.lecture import Lecture, LectureState
 from grader_service.orm.takepart import Role, Scope
@@ -127,16 +127,34 @@ class GraderBaseHandler(SessionMixin, web.RequestHandler):
         if len(set(self.request.arguments.keys()) - set(self.request.body_arguments) - set(args)) != 0:
             raise HTTPError(400, "Unknown arguments")
 
-    @property
-    def gitbase(self):
-        app: GraderServer = self.application
-        return os.path.join(app.grader_service_dir, "git")
+    def get_role(self, lecture_id: int) -> Role:
+        role = self.session.query(Role).get((self.user.name, lecture_id))
+        if role is None:
+            self.error_message = "Unauthorized"
+            raise HTTPError(403)
+        return role
 
-    def get_assignment(self,lecture_id: int, assignment_id: int) -> Optional[Assignment] :
+    def get_assignment(self, lecture_id: int, assignment_id: int) -> Assignment:
         assignment = self.session.query(Assignment).get(assignment_id)
         if assignment is None or assignment.deleted == 1 or assignment.lectid != lecture_id:
             raise HTTPError(404)
         return assignment
+
+    def get_submission(self, lecture_id: int, assignment_id: int, submission_id: int) -> Submission:
+        submission = self.session.query(Submission).get(submission_id)
+        if (
+                submission is None
+                or submission.assignid != assignment_id
+                or submission.assignment.lectid != lecture_id
+        ):
+            self.error_message = "Not Found!"
+            raise HTTPError(404)
+        return submission
+
+    @property
+    def gitbase(self):
+        app: GraderServer = self.application
+        return os.path.join(app.grader_service_dir, "git")
 
     def construct_git_dir(self, repo_type: str, lecture: Lecture, assignment: Assignment) -> Optional[str]:
         """Helper method for every handler that needs to access git directories which returns
