@@ -3,7 +3,6 @@ import shutil
 import sys
 import tornado
 import os
-import subprocess
 from grader_convert.gradebook.models import GradeBookModel
 from grader_service.api.models.assignment import Assignment as AssignmentModel
 from grader_service.orm.assignment import Assignment, AutoGradingBehaviour
@@ -34,7 +33,7 @@ class AssignmentBaseHandler(GraderBaseHandler):
         """
         lecture_id = parse_ids(lecture_id)
         self.validate_parameters()
-        role = self.session.query(Role).get((self.user.name, lecture_id))
+        role = self.get_role(lecture_id)
         if role.lecture.deleted == DeleteState.deleted:
             self.error_message = "Not Found"
             raise HTTPError(404)
@@ -66,7 +65,7 @@ class AssignmentBaseHandler(GraderBaseHandler):
         """
         lecture_id = parse_ids(lecture_id)
         self.validate_parameters()
-        role = self.session.query(Role).get((self.user.name, lecture_id))
+        role = self.get_role(lecture_id)
         if role.lecture.deleted == DeleteState.deleted:
             self.error_message = "Not Found"
             raise HTTPError(404)
@@ -116,14 +115,7 @@ class AssignmentObjectHandler(GraderBaseHandler):
         self.validate_parameters()
         body = tornado.escape.json_decode(self.request.body)
         assignment_model = AssignmentModel.from_dict(body)
-        assignment = self.session.query(Assignment).get(assignment_id)
-        if (
-            assignment is None
-            or assignment.deleted == DeleteState.deleted
-            or assignment.lectid != lecture_id
-        ):
-            self.error_message = "Not Found!"
-            raise HTTPError(404)
+        assignment = self.get_assignment(lecture_id, assignment_id)
 
         assignment.name = assignment_model.name
         assignment.duedate = assignment_model.due_date
@@ -178,11 +170,7 @@ class AssignmentObjectHandler(GraderBaseHandler):
         lecture_id, assignment_id = parse_ids(lecture_id, assignment_id)
         self.validate_parameters()
         try:
-            assignment = self.session.query(Assignment).get(assignment_id)
-            if assignment is None or assignment.lectid != lecture_id:
-                raise HTTPError(404)
-            if assignment.deleted == 1:
-                raise HTTPError(404)
+            assignment = self.get_assignment(lecture_id, assignment_id)
 
             if len(assignment.submissions) > 0:
                 self.error_message = "Cannot delete assignment that has submissions"
@@ -212,6 +200,7 @@ class AssignmentObjectHandler(GraderBaseHandler):
         except ObjectDeletedError:
             raise HTTPError(404)
 
+
 @register_handler(
     path=r"\/lectures\/(?P<lecture_id>\d*)\/assignments\/(?P<assignment_id>\d*)\/reset\/?",
     version_specifier=VersionSpecifier.ALL,
@@ -219,16 +208,10 @@ class AssignmentObjectHandler(GraderBaseHandler):
 class AssignmentResetHandler(GraderBaseHandler):
     @authorize([Scope.instructor, Scope.tutor, Scope.student])
     async def get(self, lecture_id: int, assignment_id: int):
-        
-        assignment = self.session.query(Assignment).get(assignment_id)
-        #if (
-        #    assignment is None
-        #    or assignment.deleted == DeleteState.deleted
-        #    or assignment.lectid != lecture_id
-        #):
-        #    self.error_message = "Not Found!"
-        #    raise HTTPError(404)
-        
+        self.validate_parameters()
+        lecture_id, assignment_id = parse_ids(lecture_id, assignment_id)
+        assignment = self.get_assignment(lecture_id, assignment_id)
+
         dir = f'tmp/{assignment.lecture.code}/{assignment.name}/{self.user.name}'
         #Deleting dir
         if(os.path.exists(dir)):
@@ -291,14 +274,7 @@ class AssignmentPropertiesHandler(GraderBaseHandler):
         """
         lecture_id, assignment_id = parse_ids(lecture_id, assignment_id)
         self.validate_parameters()
-        assignment = self.session.query(Assignment).get(assignment_id)
-        if (
-            assignment is None
-            or assignment.deleted == DeleteState.deleted
-            or assignment.lectid != lecture_id
-        ):
-            self.error_message = "Not Found!"
-            raise HTTPError(404)
+        assignment = self.get_assignment(lecture_id, assignment_id)
         if assignment.properties is not None:
             self.write(assignment.properties)
         else:
@@ -317,14 +293,7 @@ class AssignmentPropertiesHandler(GraderBaseHandler):
         """
         lecture_id, assignment_id = parse_ids(lecture_id, assignment_id)
         self.validate_parameters()
-        assignment = self.session.query(Assignment).get(assignment_id)
-        if (
-            assignment is None
-            or assignment.deleted == DeleteState.deleted
-            or assignment.lectid != lecture_id
-        ):
-            self.error_message = "Not Found!"
-            raise HTTPError(404)
+        assignment = self.get_assignment(lecture_id, assignment_id)
         properties_string: str = self.request.body.decode("utf-8")
         # Check if assignment contains no cells that need manual grading if assignment is fully auto graded
         if assignment.automatic_grading == AutoGradingBehaviour.full_auto.name:
