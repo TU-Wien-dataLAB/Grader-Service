@@ -174,6 +174,48 @@ def test_git_lookup_release_push_student_error(tmpdir):
     assert e.value.status_code == 403
 
 
+def test_git_lookup_source_push_student_error(tmpdir):
+    path = "services/grader/git/iv21s/assign_1/source"
+    pathlets = path.strip("/").split("/")[3:]
+    git_dir = str(tmpdir.mkdir("git"))
+
+    handler_mock = Mock()
+    handler_mock.request.path = path
+    handler_mock.gitbase = git_dir
+    handler_mock.user.name = "test_user"
+    # handler_mock.session = session
+
+    # orm mocks
+    sf = get_query_side_effect(code="iv21s", a_type="user", scope=Scope.student)
+    handler_mock.session.query = Mock(side_effect=sf)
+    role = sf(Role).get()
+
+    with pytest.raises(HTTPError) as e, pytest.warns(DeprecationWarning):  # some deprecation warning in jupyter_server
+        GitBaseHandler._check_git_repo_permissions(handler_mock, "send-pack", role, pathlets)
+    assert e.value.status_code == 403
+
+
+def test_git_lookup_source_pull_student_error(tmpdir):
+    path = "services/grader/git/iv21s/assign_1/source"
+    pathlets = path.strip("/").split("/")[3:]
+    git_dir = str(tmpdir.mkdir("git"))
+
+    handler_mock = Mock()
+    handler_mock.request.path = path
+    handler_mock.gitbase = git_dir
+    handler_mock.user.name = "test_user"
+    # handler_mock.session = session
+
+    # orm mocks
+    sf = get_query_side_effect(code="iv21s", a_type="user", scope=Scope.student)
+    handler_mock.session.query = Mock(side_effect=sf)
+    role = sf(Role).get()
+
+    with pytest.raises(HTTPError) as e, pytest.warns(DeprecationWarning):  # some deprecation warning in jupyter_server
+        GitBaseHandler._check_git_repo_permissions(handler_mock, "upload-pack", role, pathlets)
+    assert e.value.status_code == 403
+
+
 def test_git_lookup_push_autograde_instructor_error():
     path = "services/grader/git/iv21s/assign_1/autograde"
     pathlets = path.strip("/").split("/")[3:]
