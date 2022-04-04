@@ -59,13 +59,10 @@ def authorize(scopes: List[Scope]):
                             .id
                     )
                 except MultipleResultsFound:
-                    self.error_message = "Unauthorized"
                     raise HTTPError(403)
                 except NoResultFound:
-                    self.error_message = "Not Found"
                     raise HTTPError(404)
                 except json.decoder.JSONDecodeError:
-                    self.error_message = "Unauthorized"
                     raise HTTPError(403)
             elif (
                     lect_id is None
@@ -79,7 +76,6 @@ def authorize(scopes: List[Scope]):
                 self.log.warn(
                     f"User {self.user.name} tried to access {self.request.path} with insufficient privileges"
                 )
-                self.error_message = "Unauthorized"
                 raise HTTPError(403)
             return await handler_method(self, *args, **kwargs)
 
@@ -111,7 +107,6 @@ class GraderBaseHandler(SessionMixin, web.RequestHandler):
         ) = httputil.split_host_and_port(hub_api_parsed.netloc)
         self.hub_api_base_path: str = hub_api_parsed.path
 
-        self.error_message = "Unknown Error"
         self.has_auth = False
         self.log = self.application.log
 
@@ -130,7 +125,6 @@ class GraderBaseHandler(SessionMixin, web.RequestHandler):
     def get_role(self, lecture_id: int) -> Role:
         role = self.session.query(Role).get((self.user.name, lecture_id))
         if role is None:
-            self.error_message = "Unauthorized"
             raise HTTPError(403)
         return role
 
@@ -147,7 +141,6 @@ class GraderBaseHandler(SessionMixin, web.RequestHandler):
                 or submission.assignid != assignment_id
                 or submission.assignment.lectid != lecture_id
         ):
-            self.error_message = "Not Found!"
             raise HTTPError(404)
         return submission
 
@@ -172,7 +165,6 @@ class GraderBaseHandler(SessionMixin, web.RequestHandler):
             else:
                 group = self.session.query(Group).get((self.user.name, lecture.id))
                 if group is None:
-                    self.error_message = "Not Found"
                     raise HTTPError(404)
                 path = os.path.join(type_path, group.name)
         elif repo_type == "user":
@@ -181,7 +173,6 @@ class GraderBaseHandler(SessionMixin, web.RequestHandler):
         elif repo_type == "group":
             group = self.session.query(Group).get((self.user.name, lecture.id))
             if group is None:
-                self.error_message = "Not Found"
                 raise HTTPError(404)
             group_path = os.path.join(assignment_path, repo_type)
             path = os.path.join(group_path, group.name)
@@ -223,9 +214,8 @@ class GraderBaseHandler(SessionMixin, web.RequestHandler):
         """
         token = self.get_request_token()
         if token is None:
-            self.error_message = "Unauthorized"
             self.write_error(403)
-            self.finish()
+            await self.finish()
             return
             # raise HTTPError(403)
 
@@ -234,9 +224,8 @@ class GraderBaseHandler(SessionMixin, web.RequestHandler):
         user = await self.authenticate_token_user(token)
         if user is None:
             self.log.warn("Request from unauthenticated user")
-            self.error_message = "Unauthorized"
             self.write_error(403)
-            self.finish()
+            await self.finish()
             return
             # raise HTTPError(403)
         self.set_secure_cookie(token, json.dumps(user), expires_days=self.application.max_token_cookie_age_days)

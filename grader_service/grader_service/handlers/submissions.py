@@ -65,7 +65,6 @@ class SubmissionHandler(GraderBaseHandler):
 
         role: Role = self.get_role(lecture_id)
         if instructor_version and role.role < Scope.tutor:
-            self.error_message = "Unauthorized"
             raise HTTPError(403)
         assignment = self.get_assignment(lecture_id, assignment_id)
 
@@ -247,7 +246,6 @@ class SubmissionPropertiesHandler(GraderBaseHandler):
         if submission.properties is not None:
             self.write(submission.properties)
         else:
-            self.error_message = "Not Found!"
             raise HTTPError(404)
 
     @authorize([Scope.tutor, Scope.instructor])
@@ -271,8 +269,7 @@ class SubmissionPropertiesHandler(GraderBaseHandler):
         try:
             score = GradeBookModel.from_dict(json.loads(properties_string)).score
         except:
-            self.error_message = "Cannot parse properties file!"
-            raise HTTPError(400)
+            raise HTTPError(400, reason="Cannot parse properties file!")
         submission.score = score
         submission.properties = properties_string
         self.session.commit()

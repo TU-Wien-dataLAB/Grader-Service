@@ -69,7 +69,6 @@ class GitBaseHandler(GraderBaseHandler):
             if (repo_type == "source") or \
                     (repo_type == "release" and rpc in ["send-pack", "receive-pack"]) or \
                     (repo_type == "autograde" and rpc == "upload-pack"):
-                self.error_message = "Unauthorized"
                 raise HTTPError(403)
 
             # 4. students should not be able to pull other submissions -> add query param for sub_id
@@ -77,16 +76,13 @@ class GitBaseHandler(GraderBaseHandler):
                 try:
                     sub_id = int(pathlets[3])
                 except (ValueError, IndexError):
-                    self.error_message = "Unauthorized"
                     raise HTTPError(403)
                 submission = self.session.query(Submission).get(sub_id)
                 if submission is None or submission.username != self.user.name:
-                    self.error_message = "Unauthorized"
                     raise HTTPError(403)
 
         # 5. no push allowed for autograde and feedback -> the autograder executor can push locally (will bypass this)
         if repo_type in ["autograde", "feedback"] and rpc in ["send-pack", "receive-pack"]:
-            self.error_message = "Unauthorized"
             raise HTTPError(403)
 
     def gitlookup(self, rpc: str):
@@ -116,7 +112,6 @@ class GitBaseHandler(GraderBaseHandler):
                 self.session.query(Lecture).filter(Lecture.code == pathlets[0]).one()
             )
         except NoResultFound:
-            self.error_message = "Not Found"
             raise HTTPError(404)
         except MultipleResultsFound:
             raise HTTPError(400)
@@ -134,7 +129,6 @@ class GitBaseHandler(GraderBaseHandler):
                     .one()
             )
         except NoResultFound:
-            self.error_message = "Not Found"
             raise HTTPError(404)
         except MultipleResultsFound:
             raise HTTPError(400)
@@ -234,7 +228,6 @@ class RPCHandler(GitBaseHandler):
                     ).one()
                 )
             except NoResultFound:
-                self.error_message = "Not Found"
                 raise HTTPError(404)
             except MultipleResultsFound:
                 raise HTTPError(400)
