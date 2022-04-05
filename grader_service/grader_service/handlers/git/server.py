@@ -2,6 +2,7 @@ import datetime
 import logging
 import os
 import shlex
+import shutil
 import subprocess
 from typing import Optional, List
 from urllib.parse import unquote
@@ -162,7 +163,28 @@ class GitBaseHandler(GraderBaseHandler):
             try:
                 self.log.info("Running: git init --bare")
                 subprocess.run(["git", "init", "--bare", path], check=True)
-                # TODO: initialize repo with release repo
+
+                if repo_type == assignment.type:
+                    git_path_base = os.path.join(self.application.grader_service_dir, "tmp", assignment.lecture.code,
+                                                 assignment.name, self.user.name)
+                    # Deleting dir
+                    if os.path.exists(git_path_base):
+                        shutil.rmtree(git_path_base)
+
+                    self.log.info(f"DIR {git_path_base}")
+                    os.makedirs(git_path_base, exist_ok=True)
+                    git_path_release = os.path.join(git_path_base, "release")
+                    git_path_user = os.path.join(git_path_base, self.user.name)
+                    self.log.info(f"GIT BASE {git_path_base}")
+                    self.log.info(f"GIT RELEASE {git_path_release}")
+                    self.log.info(f"GIT USER {git_path_user}")
+
+                    repo_path_release = self.construct_git_dir('release', assignment.lecture, assignment)
+                    repo_path_user = path
+
+                    self.overwrite_user_repository(tmp_path_base=git_path_base, tmp_path_release=git_path_release,
+                                                   tmp_path_user=git_path_user, repo_path_release=repo_path_release,
+                                                   repo_path_user=repo_path_user)
             except subprocess.CalledProcessError:
                 return None
             return path
