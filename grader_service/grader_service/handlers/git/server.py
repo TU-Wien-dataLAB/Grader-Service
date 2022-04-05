@@ -3,7 +3,7 @@ import logging
 import os
 import shlex
 import subprocess
-from typing import Optional
+from typing import Optional, List
 from urllib.parse import unquote
 
 from grader_service.autograding.grader_executor import GraderExecutor
@@ -25,6 +25,9 @@ from grader_service.server import GraderServer
 
 
 class GitBaseHandler(GraderBaseHandler):
+
+    def create_assignment_repo(self):
+        pass
 
     async def data_received(self, chunk: bytes):
         return self.process.stdin.write(chunk)
@@ -56,6 +59,32 @@ class GitBaseHandler(GraderBaseHandler):
         except:
             pass
 
+    def _check_git_repo_permissions(self, rpc: str, role: Role, pathlets: List[str]):
+        repo_type = pathlets[2]
+
+        if role.role == Scope.student:
+            # 1. no source interaction with the source repo for students
+            # 2. no push to release allowed for students TODO: change to no access for students after git refactor
+            # 3. no pull allowed for autograde for students
+            if (repo_type == "source") or \
+                    (repo_type == "release" and rpc in ["send-pack", "receive-pack"]) or \
+                    (repo_type == "autograde" and rpc == "upload-pack"):
+                raise HTTPError(403)
+
+            # 4. students should not be able to pull other submissions -> add query param for sub_id
+            if repo_type == "feedback" and rpc == "upload-pack":
+                try:
+                    sub_id = int(pathlets[3])
+                except (ValueError, IndexError):
+                    raise HTTPError(403)
+                submission = self.session.query(Submission).get(sub_id)
+                if submission is None or submission.username != self.user.name:
+                    raise HTTPError(403)
+
+        # 5. no push allowed for autograde and feedback -> the autograder executor can push locally (will bypass this)
+        if repo_type in ["autograde", "feedback"] and rpc in ["send-pack", "receive-pack"]:
+            raise HTTPError(403)
+
     def gitlookup(self, rpc: str):
         pathlets = self.request.path.strip("/").split("/")
         # pathlets = ['services', 'grader', 'git', 'lecture_code', 'assignment_name', 'repo_type', ...]
@@ -83,56 +112,12 @@ class GitBaseHandler(GraderBaseHandler):
                 self.session.query(Lecture).filter(Lecture.code == pathlets[0]).one()
             )
         except NoResultFound:
-            self.error_message = "Not Found"
             raise HTTPError(404)
         except MultipleResultsFound:
             raise HTTPError(400)
+
         role = self.session.query(Role).get((self.user.name, lecture.id))
-        if repo_type == "source" and role.role == Scope.student:
-            self.error_message = "Unauthorized"
-            raise HTTPError(403)
-
-        # no push to release allowed for students
-        if (
-                repo_type == "release"
-                and role.role == Scope.student
-                and rpc in ["send-pack", "receive-pack"]
-        ):
-            self.error_message = "Unauthorized"
-            raise HTTPError(403)
-
-        # no push allowed for autograde and feedback -> the autograder executor can push locally so it will not be affected by this
-        if repo_type in ["autograde", "feedback"] and rpc in [
-            "send-pack",
-            "receive-pack",
-        ]:
-            self.error_message = "Unauthorized"
-            raise HTTPError(403)
-
-        # no pull allowed for autograde for students
-        if (
-                repo_type == "autograde"
-                and role.role == Scope.student
-                and rpc == "upload-pack"
-        ):
-            self.error_message = "Unauthorized"
-            raise HTTPError(403)
-
-        # students should not be able to pull other submissions -> add query param for sub_id
-        if (
-                repo_type == "feedback"
-                and role.role == Scope.student
-                and rpc == "upload-pack"
-        ):
-            try:
-                sub_id = int(pathlets[3])
-            except (ValueError, IndexError):
-                self.error_message = "Unauthorized"
-                raise HTTPError(403)
-            submission = self.session.query(Submission).get(sub_id)
-            if submission is None or submission.username != self.user.name:
-                self.error_message = "Unauthorized"
-                raise HTTPError(403)
+        self._check_git_repo_permissions(rpc, role, pathlets)
 
         try:
             assignment = (
@@ -144,7 +129,6 @@ class GitBaseHandler(GraderBaseHandler):
                     .one()
             )
         except NoResultFound:
-            self.error_message = "Not Found"
             raise HTTPError(404)
         except MultipleResultsFound:
             raise HTTPError(400)
@@ -178,6 +162,7 @@ class GitBaseHandler(GraderBaseHandler):
             try:
                 self.log.info("Running: git init --bare")
                 subprocess.run(["git", "init", "--bare", path], check=True)
+                # TODO: initialize repo with release repo
             except subprocess.CalledProcessError:
                 return None
             return path
@@ -243,7 +228,6 @@ class RPCHandler(GitBaseHandler):
                     ).one()
                 )
             except NoResultFound:
-                self.error_message = "Not Found"
                 raise HTTPError(404)
             except MultipleResultsFound:
                 raise HTTPError(400)

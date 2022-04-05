@@ -47,10 +47,8 @@ class LectureBaseHandler(GraderBaseHandler):
                     .one_or_none()
             )
         except NoResultFound:
-            self.error_message = "Not found"
             raise HTTPError(404)
         except MultipleResultsFound:
-            self.error_message = "Error"
             raise HTTPError(400)
 
         lecture.name = lecture_model.name
@@ -68,10 +66,8 @@ class LectureBaseHandler(GraderBaseHandler):
                     .one_or_none()
             )
         except NoResultFound:
-            self.error_message = "Not found"
             raise HTTPError(404)
         except MultipleResultsFound:
-            self.error_message = "Error"
             raise HTTPError(400)
         self.write_json(lecture)
 
@@ -103,7 +99,6 @@ class LectureObjectHandler(GraderBaseHandler):
         self.validate_parameters()
         role = self.get_role(lecture_id)
         if role.lecture.deleted == DeleteState.deleted:
-            self.error_message = "Not found"
             raise HTTPError(404)
 
         self.write_json(role.lecture)

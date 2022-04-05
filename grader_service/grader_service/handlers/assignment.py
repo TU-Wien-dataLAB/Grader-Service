@@ -35,7 +35,6 @@ class AssignmentBaseHandler(GraderBaseHandler):
         self.validate_parameters()
         role = self.get_role(lecture_id)
         if role.lecture.deleted == DeleteState.deleted:
-            self.error_message = "Not Found"
             raise HTTPError(404)
 
         if (
@@ -67,14 +66,12 @@ class AssignmentBaseHandler(GraderBaseHandler):
         self.validate_parameters()
         role = self.get_role(lecture_id)
         if role.lecture.deleted == DeleteState.deleted:
-            self.error_message = "Not Found"
             raise HTTPError(404)
         body = tornado.escape.json_decode(self.request.body)
         try:
             assignment_model = AssignmentModel.from_dict(body)
         except ValueError as e:
-            self.error_message = str(e)
-            raise HTTPError(400, log_message=self.error_message,)
+            raise HTTPError(400, log_message=str(e))
         assignment = Assignment()
 
         assignment.name = assignment_model.name
@@ -91,8 +88,7 @@ class AssignmentBaseHandler(GraderBaseHandler):
         except IntegrityError as e:
             self.log.error(e)
             self.session.rollback()
-            self.error_message = "Cannot add object to database."
-            raise HTTPError(400)
+            raise HTTPError(400, reason="Cannot add object to database.")
         self.write_json(assignment)
 
 
@@ -153,7 +149,6 @@ class AssignmentObjectHandler(GraderBaseHandler):
             or (role.role == Scope.student and assignment.status == "created")
             or assignment.lectid != lecture_id
         ):
-            self.error_message = "Not Found!"
             raise HTTPError(404)
         self.write_json(assignment)
 
@@ -173,14 +168,10 @@ class AssignmentObjectHandler(GraderBaseHandler):
             assignment = self.get_assignment(lecture_id, assignment_id)
 
             if len(assignment.submissions) > 0:
-                self.error_message = "Cannot delete assignment that has submissions"
-                raise HTTPError(400)
+                raise HTTPError(400, reason="Cannot delete assignment that has submissions")
 
             if assignment.status in ["released", "complete"]:
-                self.error_message = (
-                    f'Cannot delete assignment with status "{assignment.status}"'
-                )
-                raise HTTPError(400)
+                raise HTTPError(400, reason=f'Cannot delete assignment with status "{assignment.status}"')
 
             previously_deleted = (
                 self.session.query(Assignment)
@@ -278,7 +269,6 @@ class AssignmentPropertiesHandler(GraderBaseHandler):
         if assignment.properties is not None:
             self.write(assignment.properties)
         else:
-            self.error_message = "Not Found!"
             raise HTTPError(404)
 
     @authorize([Scope.tutor, Scope.instructor])
@@ -306,10 +296,8 @@ class AssignmentPropertiesHandler(GraderBaseHandler):
 def _check_full_auto_grading(self: GraderBaseHandler, model):
     for nb in model.notebooks.values():
         if len(nb.task_cells_dict) > 0:
-            self.error_message = "Fully autograded notebook cannot contain task cells!"
-            raise HTTPError(400, self.error_message)
+            raise HTTPError(400, reason="Fully autograded notebook cannot contain task cells!")
         grades = set(nb.grade_cells_dict.keys())
         solutions = set(nb.solution_cells_dict.keys())
         if len(grades & solutions) > 0:
-            self.error_message = "Fully autograded notebook cannot contain manually graded cells!"
-            raise HTTPError(400, self.error_message)
+            raise HTTPError(400, reason="Fully autograded notebook cannot contain manually graded cells!")
