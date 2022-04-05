@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { Assignment } from '../../model/assignment';
 import { Lecture } from '../../model/lecture';
-import { pullAssignment, resetAssignment } from '../../services/assignments.service';
+import {pullAssignment, pushAssignment, resetAssignment} from '../../services/assignments.service';
 import { getAllSubmissions, submitAssignment } from '../../services/submissions.service';
 import { Button, Stack } from '@mui/material';
 import { FilesList } from "../util/file-list";
@@ -32,7 +32,7 @@ export const AssignmentFilesComponent = (props: IAssignmentFilesComponentProps) 
         getFiles(path).then(files => setHasFiles(files.length > 0));
     }, [props]);
 
-    const fetchAssignmentHandler = async (repo: "assignment" | "release" | "user") => {
+    const fetchAssignmentHandler = async (repo: "assignment" | "release") => {
         try {
             await pullAssignment(props.lecture.id, props.assignment.id, repo);
             props.showAlert('success', 'Successfully Pulled Repo');
@@ -43,7 +43,9 @@ export const AssignmentFilesComponent = (props: IAssignmentFilesComponentProps) 
 
     const resetAssignmentHandler = async () => {
         try {
+            // await pushAssignment(props.lecture.id, props.assignment.id, "assignment", "Pre-Reset");
             await resetAssignment(props.lecture, props.assignment);
+            await pullAssignment(props.lecture.id, props.assignment.id, "assignment")
             props.showAlert('success', 'Successfully Reset Assignment');
         } catch (e) {
             props.showAlert('error', 'Error Reseting Assignment');
@@ -65,9 +67,6 @@ export const AssignmentFilesComponent = (props: IAssignmentFilesComponentProps) 
             props.showAlert('error', 'Error Updating Submissions');
         }
     }
-
-
-
 
     return (
         <div>
@@ -94,7 +93,7 @@ export const AssignmentFilesComponent = (props: IAssignmentFilesComponentProps) 
                     size="small"
                     icon={<GetAppRoundedIcon fontSize="small" sx={{ mr: 1 }} />}
                     options={[
-                        { name: "Pull User", onClick: () => fetchAssignmentHandler("user") },
+                        { name: "Pull User", onClick: () => fetchAssignmentHandler("assignment") },
                         { name: "Pull Release", onClick: () => fetchAssignmentHandler("release") }
                     ]}
                     selectedIndex={hasFiles ? 0 : 1}
