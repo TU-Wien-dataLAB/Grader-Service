@@ -5,11 +5,11 @@ export function createLecture(lecture: Lecture): Promise<Lecture> {
   return request<Lecture>(HTTPMethod.POST, '/lectures', lecture);
 }
 
-export function getAllLectures(active: boolean = true): Promise<Lecture[]> {
+export function getAllLectures(complete: boolean = false): Promise<Lecture[]> {
   let url = '/lectures'
-  if (!active) {
+  if (complete) {
       let searchParams = new URLSearchParams({
-        "active": String(active)
+        "complete": String(complete)
       })
       url += '?' + searchParams;
     }

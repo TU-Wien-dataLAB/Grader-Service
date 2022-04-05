@@ -33,12 +33,10 @@ export const CourseManageComponent = (props: CourseManageProps) => {
   };
 
   const [lectures, setLectures] = React.useState([] as Lecture[]);
-  const [inactiveLectures, setInactiveLectures] = React.useState([] as Lecture[])
   React.useEffect(() => {
     UserPermissions.loadPermissions()
       .then(() => {
         getAllLectures().then(l => setLectures(l));
-        getAllLectures(false).then(l => setInactiveLectures(l));
       })
       .catch(() => showAlert("error", "Error Loading Permissions"))
   }, [props])
@@ -52,11 +50,6 @@ export const CourseManageComponent = (props: CourseManageProps) => {
         .filter(el => UserPermissions.getScope(el) > Scope.student)
         .map((el, index) => (
           <LectureComponent lecture={el} active={true} root={props.root} showAlert={showAlert} expanded={true}/>
-        ))}
-      {inactiveLectures
-        .filter(el => UserPermissions.getScope(el) > Scope.student)
-        .map((el, index) => (
-          <LectureComponent lecture={el} active={false} root={props.root} showAlert={showAlert} expanded={true}/>
         ))}
       <Portal container={document.body}>
         <Snackbar

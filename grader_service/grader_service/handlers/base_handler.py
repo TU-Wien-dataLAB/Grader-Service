@@ -259,12 +259,12 @@ class GraderBaseHandler(SessionMixin, web.RequestHandler):
                     lecture is None
             ):  # create inactive lecture if no lecture with that name exists yet (code is set in create)
                 self.log.info(
-                    f"Adding inactive lecture with lecture_code {lecture_code}"
+                    f"Adding new lecture with lecture_code {lecture_code}"
                 )
                 lecture = Lecture()
                 lecture.code = lecture_code
                 lecture.name = lecture_code
-                lecture.state = LectureState.inactive
+                lecture.state = LectureState.active
                 lecture.deleted = DeleteState.active
                 self.session.add(lecture)
         self.session.commit()

@@ -17,16 +17,15 @@ class LectureBaseHandler(GraderBaseHandler):
     async def get(self):
         """Returns all lectures the user can access
         """
-        self.validate_parameters("active")
-        active = self.get_argument("active", "true") == "true"
+        self.validate_parameters()
+        complete = self.get_argument("complete", "false") == "true"
 
-        state = LectureState.active if active else LectureState.inactive
+        state = LectureState.complete if complete else LectureState.active
         lectures = [
             role.lecture
             for role in self.user.roles
             if role.lecture.state == state
                and role.lecture.deleted == DeleteState.active
-               and (True if active else role.role == Scope.instructor)
         ]
 
         self.write_json(lectures)

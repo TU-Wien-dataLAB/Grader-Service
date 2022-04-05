@@ -8,9 +8,8 @@ from grader_service.orm.base import Base, DeleteState, Serializable
 
 
 class LectureState(enum.IntEnum):
-    inactive = 0
-    active = 1
-    complete = 2
+    active = 0
+    complete = 1
 
 
 class Lecture(Base, Serializable):
