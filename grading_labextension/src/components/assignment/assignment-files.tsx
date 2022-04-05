@@ -15,14 +15,14 @@ import { getFiles } from '../../services/file.service';
 import { Submission } from '../../model/submission';
 
 
-export interface IAssignmentControlComponentProps {
+export interface IAssignmentFilesComponentProps {
     lecture: Lecture;
     assignment: Assignment;
     showAlert: (severity: string, msg: string) => void;
     setSubmissions: React.Dispatch<React.SetStateAction<Submission[]>>;
 }
 
-export const AssignmentControlComponent = (props: IAssignmentControlComponentProps) => {
+export const AssignmentFilesComponent = (props: IAssignmentFilesComponentProps) => {
 
     const [dialog, setDialog] = React.useState(false);
     const [path, setPath] = React.useState(`${props.lecture.code}/${props.assignment.name}`);

@@ -20,7 +20,7 @@ import { AgreeDialog } from '../coursemanage/dialog';
 import RestartAltIcon from '@mui/icons-material/RestartAlt';
 import GradingIcon from '@mui/icons-material/Grading';
 import { RepoType } from '../util/repo-type';
-import { AssignmentControlComponent } from './assignment-control';
+import { AssignmentFilesComponent } from './assignment-files';
 
 export interface IAssignmentModalProps {
   lecture: Lecture;
@@ -49,7 +49,7 @@ export const AssignmentModalComponent = (props: IAssignmentModalProps) => {
         <AssignmentStatus lecture={props.lecture} assignment={props.assignment} submissions={submissions}/>
         
         <Typography variant={'h6'} sx={{ml: 2}}>Files</Typography>
-        <AssignmentControlComponent lecture={props.lecture} assignment={props.assignment} showAlert={props.showAlert} setSubmissions={setSubmissions}/>
+        <AssignmentFilesComponent lecture={props.lecture} assignment={props.assignment} showAlert={props.showAlert} setSubmissions={setSubmissions}/>
 
         <Typography variant={'h6'} sx={{ml: 2, mt: 3}}>Submissions</Typography>
         <SubmissionList submissions={submissions} openFeedback={openFeedback} sx={{m: 2, mt: 1}}/>
