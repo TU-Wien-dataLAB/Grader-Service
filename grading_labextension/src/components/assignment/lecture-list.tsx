@@ -1,10 +1,9 @@
 import * as React from 'react';
-import {getAllLectures} from '../../services/lectures.service';
-import {Lecture} from '../../model/lecture';
-import {Scope, UserPermissions} from '../../services/permission.service';
-import {LectureComponent} from './lecture';
-import {AlertProps, Snackbar, Portal} from "@mui/material";
-import MuiAlert from "@mui/material/Alert";
+import { getAllLectures } from '../../services/lectures.service';
+import { Lecture } from '../../model/lecture';
+import { LectureComponent } from './lecture';
+import { AlertProps, Snackbar, Portal } from '@mui/material';
+import MuiAlert from '@mui/material/Alert';
 
 export interface ILectureListProps {
   root: HTMLElement;
@@ -44,20 +43,20 @@ export const LectureListComponent = (props: ILectureListProps): JSX.Element => {
       <h1>
         <p className="course-header">Assignments</p>
       </h1>
-      {lectures
-        .map((el, index) => (
-          <LectureComponent lecture={el} root={props.root} open={index === 0} showAlert={showAlert}/>
-        ))}
+      {lectures.map((el, index) => (
+        <LectureComponent
+          lecture={el}
+          root={props.root}
+          open={index === 0}
+          showAlert={showAlert}
+        />
+      ))}
       <Portal container={document.body}>
-        <Snackbar
-          open={alert}
-          onClose={handleAlertClose}
-          sx={{mb: 2, ml: 2}}
-        >
+        <Snackbar open={alert} onClose={handleAlertClose} sx={{ mb: 2, ml: 2 }}>
           <MuiAlert
             onClose={handleAlertClose}
             severity={severity as AlertProps['severity']}
-            sx={{width: '100%'}}
+            sx={{ width: '100%' }}
           >
             {alertMessage}
           </MuiAlert>

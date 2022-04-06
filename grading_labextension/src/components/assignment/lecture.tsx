@@ -22,12 +22,11 @@ interface ILectureComponentProps {
 }
 
 export const LectureComponent = (props: ILectureComponentProps) => {
-  const [lecture, setLecture] = React.useState(props.lecture);
   const [assignments, setAssignments] = React.useState(null);
   const [expanded, setExpanded] = React.useState(props.open);
 
   React.useEffect(() => {
-    getAllAssignments(lecture.id).then(response => {
+    getAllAssignments(props.lecture.id).then(response => {
       setAssignments(response);
     });
   }, []);
@@ -53,7 +52,7 @@ export const LectureComponent = (props: ILectureComponentProps) => {
       >
         <CardContent sx={{ mb: -1, display: 'flex' }}>
           <Typography variant={'h5'} sx={{ mr: 2 }}>
-            {lecture.name}
+            {props.lecture.name}
           </Typography>
         </CardContent>
 
@@ -62,7 +61,7 @@ export const LectureComponent = (props: ILectureComponentProps) => {
             <Box sx={{ display: 'flex', flexWrap: 'wrap' }}>
               {assignments.map((el: Assignment) => (
                 <AssignmentComponent
-                  lecture={lecture}
+                  lecture={props.lecture}
                   assignment={el}
                   root={props.root}
                   showAlert={props.showAlert}
