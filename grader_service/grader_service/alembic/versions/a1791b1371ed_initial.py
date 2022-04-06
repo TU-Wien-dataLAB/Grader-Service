@@ -57,14 +57,21 @@ def upgrade():
                     sa.ForeignKeyConstraint(['username'], ['user.name'], ),
                     sa.PrimaryKeyConstraint('username', 'lectid')
                     )
+
     op.create_table('group',
-                    sa.Column('username', sa.String(length=255), nullable=False),
-                    sa.Column('lectid', sa.Integer(), nullable=False),
                     sa.Column('name', sa.String(length=255), nullable=False),
+                    sa.Column('lectid', sa.Integer(), nullable=False),
                     sa.ForeignKeyConstraint(['lectid'], ['lecture.id'], ),
-                    sa.ForeignKeyConstraint(['username'], ['user.name'], ),
-                    sa.PrimaryKeyConstraint('username', 'lectid')
+                    sa.PrimaryKeyConstraint('name','lectid')
                     )
+    op.create_table('partof',
+                    sa.Column('username', sa.String(length=255), nullable=False),
+                    sa.Column('groupname', sa.String(length=255), nullable=False),
+                    sa.ForeignKeyConstraint(['groupname'], ['group.name'], ),
+                    sa.ForeignKeyConstraint(['username'], ['user.name'], ),
+                    sa.PrimaryKeyConstraint('username', 'groupname')
+                    )
+
     op.create_table('submission',
                     sa.Column('id', sa.Integer(), autoincrement=True, nullable=False),
                     sa.Column('date', sa.DateTime(), nullable=True),

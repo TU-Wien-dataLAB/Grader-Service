@@ -32,11 +32,14 @@ export function fetchAssignment(lectureId: number, assignmentId: number, instruc
     url += '?' + searchParams;
   }
 
-  return request<Assignment>(HTTPMethod.GET, url)
+  return request<Assignment>(HTTPMethod.GET, url);
 }
 
 export function deleteAssignment(lectureId: number, assignmentId: number): Promise<void> {
-  return request<void>(HTTPMethod.DELETE, `/lectures/${lectureId}/assignments/${assignmentId}`)
+  return request<void>(
+    HTTPMethod.DELETE,
+    `/lectures/${lectureId}/assignments/${assignmentId}`
+  );
 }
 
 export function pushAssignment(lectureId: number, assignmentId: number, repoType: string, commitMessage?: string): Promise<void> {
@@ -47,14 +50,20 @@ export function pushAssignment(lectureId: number, assignmentId: number, repoType
     })
     url += '?' + searchParams;
   }
-  return request<void>(HTTPMethod.PUT, url)
+  return request<void>(HTTPMethod.PUT, url);
 }
 
 export function pullAssignment(lectureId: number, assignmentId: number, repoType: string): Promise<void> {
-  return request<void>(HTTPMethod.GET, `/lectures/${lectureId}/assignments/${assignmentId}/pull/${repoType}`)
+  return request<void>(
+    HTTPMethod.GET,
+    `/lectures/${lectureId}/assignments/${assignmentId}/pull/${repoType}`
+  );
 }
 
 export function resetAssignment(lecture: Lecture, assignment: Assignment) : Promise<void> {
-  return request<void>(HTTPMethod.GET, `/lectures/${lecture.id}/assignments/${assignment.id}/reset`);
+  return request<void>(
+    HTTPMethod.GET,
+    `/lectures/${lecture.id}/assignments/${assignment.id}/reset`
+  );
 }
 

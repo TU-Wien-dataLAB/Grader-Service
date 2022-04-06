@@ -37,6 +37,11 @@ def upgrade():
     op.execute('INSERT INTO "takepart" ("username","lectid","role") VALUES ("user2",1,"student")')
     op.execute('INSERT INTO "takepart" ("username","lectid","role") VALUES ("user2",2,"student")')
 
+    op.execute('INSERT INTO "group" ("name","lectid") VALUES ("Group 1",1)')
+    op.execute('INSERT INTO "partof" ("username","groupname") VALUES ("fjaeger","Group 1")')
+    op.execute('INSERT INTO "partof" ("username","groupname") VALUES ("ubuntu","Group 1")')
+    op.execute('INSERT INTO "partof" ("username","groupname") VALUES ("matthiasmatt","Group 1")')
+
     op.execute('INSERT INTO "takepart" ("username","lectid","role") VALUES ("fjaeger",1,"instructor")')
     op.execute('INSERT INTO "takepart" ("username","lectid","role") VALUES ("ubuntu",1,"instructor")')
     op.execute('INSERT INTO "takepart" ("username","lectid","role") VALUES ("matthiasmatt",1,"instructor")')
@@ -46,7 +51,8 @@ def upgrade():
 
     # ## Assignments
     # op.execute('INSERT INTO "assignment" ("name","lectid","duedate","points","status", "type") VALUES ("assignment_1",1,"2021-09-21 23:59:00.000",20,"released","user")')
-    # op.execute('INSERT INTO "assignment" ("name","lectid","duedate","points","status", "type") VALUES ("assignment_2",1,"2021-09-22 23:59:00.000",10,"created","user")')
+    op.execute('INSERT INTO "assignment" ("name","lectid","duedate","points","status", "type") VALUES ("assignment_1",1,"2021-09-22 23:59:00.000",10,"created","user")')
+
     # ## Submissions
     # op.execute('INSERT INTO "submission" ("date","status","assignid","username","commit_hash") VALUES ("2021-05-05 14:43:35.863","not_graded",1,"user1", "e93ae2b2369cb0ddb647f1c608148ccda59e22a1")')
     # op.execute('INSERT INTO "submission" ("date","status","assignid","username","score","commit_hash") VALUES ("2021-05-07 14:44:35.863","manually_graded",1,"user1",10, "e93ae2b2369cb0ddb647f1c608148ccda59e22a1")')
