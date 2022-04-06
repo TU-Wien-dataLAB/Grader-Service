@@ -3,12 +3,15 @@ import json
 import os.path
 import subprocess
 
+from grader_service.autograding.grader_executor import GraderExecutor
+
+from grader_service.autograding.local_feedback import GenerateFeedbackExecutor
 from grader_service.handlers.handler_utils import parse_ids
 from grader_service.orm import Lecture
 from grader_service.orm.user import User
 import tornado
 from grader_service.api.models.submission import Submission as SubmissionModel
-from grader_service.orm.assignment import Assignment
+from grader_service.orm.assignment import Assignment, AutoGradingBehaviour
 from grader_service.orm.base import DeleteState
 from grader_service.orm.submission import Submission
 from grader_service.orm.takepart import Role, Scope
@@ -17,7 +20,7 @@ from sqlalchemy.sql.expression import func
 from tornado.web import HTTPError
 from grader_convert.gradebook.models import GradeBookModel
 
-from grader_service.handlers.base_handler import GraderBaseHandler, authorize
+from grader_service.handlers.base_handler import GraderBaseHandler, authorize, RequestHandlerConfig
 
 
 def tuple_to_submission(t):
@@ -42,6 +45,12 @@ def tuple_to_submission(t):
     version_specifier=VersionSpecifier.ALL,
 )
 class SubmissionHandler(GraderBaseHandler):
+
+    def on_finish(self):
+        # we do not close the session we just commit because we might run
+        # LocalAutogradeExecutor or GenerateFeedbackExecutor in POST which still need it
+        super().on_finish()
+
     @authorize([Scope.student, Scope.tutor, Scope.instructor])
     async def get(self, lecture_id: int, assignment_id: int):
         """Return the submissions of an assignment
@@ -126,6 +135,7 @@ class SubmissionHandler(GraderBaseHandler):
                 )
 
         self.write_json(submissions)
+        self.session.close()  # manually close here because on_finish overwrite
 
     async def post(self, lecture_id: int, assignment_id: int):
         """Create submission based on commit hash.
@@ -139,7 +149,10 @@ class SubmissionHandler(GraderBaseHandler):
         lecture_id, assignment_id = parse_ids(lecture_id, assignment_id)
         self.validate_parameters()
         body = tornado.escape.json_decode(self.request.body)
-        sub_model = SubmissionModel.from_dict(body)
+        try:
+            commit_hash = body["commit_hash"]
+        except KeyError:
+            raise HTTPError(400)
 
         assignment = self.get_assignment(lecture_id, assignment_id)
 
@@ -159,17 +172,38 @@ class SubmissionHandler(GraderBaseHandler):
             raise HTTPError(404)
 
         try:
-            subprocess.run(["git", "branch", "main", "--contains", sub_model.commit_hash], cwd=git_repo_path)
+            subprocess.run(["git", "branch", "main", "--contains", commit_hash], cwd=git_repo_path)
         except subprocess.CalledProcessError:
             raise HTTPError(404)
 
-        submission.commit_hash = sub_model.commit_hash
+        submission.commit_hash = commit_hash
         submission.auto_status = "not_graded"
         submission.manual_status = "not_graded"
 
         self.session.add(submission)
         self.session.commit()
         self.write_json(submission)
+
+        # If the assignment has automatic grading or fully automatic grading perform necessary operations
+        if assignment.automatic_grading in [AutoGradingBehaviour.auto, AutoGradingBehaviour.full_auto]:
+            executor = RequestHandlerConfig.instance().autograde_executor_class(
+                self.application.grader_service_dir, submission, close_session=False, config=self.application.config
+            )
+            if assignment.automatic_grading == AutoGradingBehaviour.full_auto:
+                feedback_executor = GenerateFeedbackExecutor(
+                    self.application.grader_service_dir, submission, config=self.application.config
+                )
+                GraderExecutor.instance().submit(
+                    executor.start,
+                    on_finish=lambda: GraderExecutor.instance().submit(feedback_executor.start)
+                )
+            else:
+                GraderExecutor.instance().submit(
+                    executor.start,
+                    lambda: self.log.info(f"Autograding task of submission {submission.id} exited!")
+                )
+        if assignment.automatic_grading == AutoGradingBehaviour.unassisted:
+            self.session.close()
 
 
 @register_handler(

@@ -1,13 +1,17 @@
-import { Assignment } from '../model/assignment';
-import { Lecture } from '../model/lecture';
-import { Submission } from '../model/submission';
-import { request, HTTPMethod } from './request.service';
+import {Assignment} from '../model/assignment';
+import {Lecture} from '../model/lecture';
+import {Submission} from '../model/submission';
+import {request, HTTPMethod} from './request.service';
 
-export function submitAssignment(lecture: Lecture, assignment: Assignment) {
-  return request<void>(
-    HTTPMethod.PUT,
-    `/lectures/${lecture.id}/assignments/${assignment.id}/push/assignment`
-  );
+export function submitAssignment(lecture: Lecture, assignment: Assignment, submit = false) {
+  let url = `/lectures/${lecture.id}/assignments/${assignment.id}/push/assignment`;
+  if (submit) {
+    const searchParams = new URLSearchParams({
+      submit: String(submit)
+    });
+    url += '?' + searchParams;
+  }
+  return request<void>(HTTPMethod.PUT, url);
 }
 
 export async function pullFeedback(

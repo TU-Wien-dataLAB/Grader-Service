@@ -9,6 +9,7 @@ from tornado.web import HTTPError
 from grader_convert.converters.base import GraderConvertException
 from grader_convert.converters.generate_assignment import GenerateAssignment
 from .base_handler import ExtensionBaseHandler
+from ..api.models.submission import Submission
 from ..registry import register_handler
 from ..services.git import GitError, GitService
 from tornado.httpclient import HTTPClientError, HTTPResponse
@@ -180,6 +181,7 @@ class PushHandler(ExtensionBaseHandler):
         if repo not in {"assignment", "source", "release"}:
             self.write_error(404)
         commit_message = self.get_argument("commit-message", None)
+        submit = self.get_argument("submit", "false") == "true"
         if repo == "source" and (commit_message is None or commit_message == ""):
             self.write_error(400)
 
@@ -286,13 +288,34 @@ class PushHandler(ExtensionBaseHandler):
             git_service.commit(m=commit_message)
         except GitError as e:
             self.log.error("GitError:\n" + e.error)
-        ## committing might fail because there is nothing to commit -> try to push regardless
+        # committing might fail because there is nothing to commit -> try to push regardless
         try:
             git_service.push(f"grader_{repo}", force=True)
         except GitError as e:
             self.log.error("GitError:\n" + e.error)
             self.write_error(400)
             return
+
+        if submit and repo == "assignment":
+            self.log.info(f"Submitting assignment {assignment_id}!")
+            try:
+                latest_commit_hash = git_service.get_log(history_count=1)[0]["commit"]
+                submission = Submission(commit_hash=latest_commit_hash)
+                await self.request_service.request(
+                    "POST",
+                    f"{self.base_url}/lectures/{lecture_id}/assignments/{assignment_id}/submissions",
+                    body=submission.to_dict(),
+                    header=self.grader_authentication_header,
+                )
+            except (KeyError, IndexError):
+                self.set_status(500)
+                self.write_error(500)
+                return
+            except HTTPClientError as e:
+                self.set_status(e.code)
+                self.write_error(e.code)
+                return
+
         self.write("OK")
 
 

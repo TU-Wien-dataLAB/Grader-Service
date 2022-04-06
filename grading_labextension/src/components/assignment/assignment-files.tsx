@@ -56,7 +56,7 @@ export const AssignmentFilesComponent = (
 
   const submitAssignmentHandler = async () => {
     try {
-      await submitAssignment(props.lecture, props.assignment);
+      await submitAssignment(props.lecture, props.assignment, true);
       props.showAlert('success', 'Successfully Submitted Assignment');
     } catch (e) {
       props.showAlert('error', 'Error Submitting Assignment');
