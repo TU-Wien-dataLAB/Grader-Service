@@ -1,4 +1,4 @@
-import {Assignment} from "../../../model/assignment";
+import { Assignment } from '../../../model/assignment';
 import {
   Box,
   Button,
@@ -10,15 +10,14 @@ import {
   StepLabel,
   Stepper,
   Typography
-} from "@mui/material";
-import Timeline from "@mui/lab/Timeline";
-import * as React from "react";
-import NewReleasesRoundedIcon from "@mui/icons-material/NewReleasesRounded";
+} from '@mui/material';
+import * as React from 'react';
+import NewReleasesRoundedIcon from '@mui/icons-material/NewReleasesRounded';
 import TaskIcon from '@mui/icons-material/Task';
 
-import {AgreeDialog} from "../dialog";
-import {updateAssignment} from "../../../services/assignments.service";
-import {Lecture} from "../../../model/lecture";
+import { AgreeDialog } from '../dialog';
+import { updateAssignment } from '../../../services/assignments.service';
+import { Lecture } from '../../../model/lecture';
 
 export interface IAssignmentStatusProps {
   lecture: Lecture;
@@ -29,16 +28,16 @@ export interface IAssignmentStatusProps {
 
 const getActiveStep = (status: Assignment.StatusEnum) => {
   switch (status) {
-    case "created":
+    case 'created':
       return 0;
-    case "pushed":
+    case 'pushed':
       return 1;
-    case "released":
+    case 'released':
       return 2;
-    case "complete":
+    case 'complete':
       return 4;
   }
-}
+};
 
 export const AssignmentStatus = (props: IAssignmentStatusProps) => {
   const [assignment, setAssignment] = React.useState(props.assignment);
@@ -54,50 +53,64 @@ export const AssignmentStatus = (props: IAssignmentStatusProps) => {
   const steps = [
     {
       label: 'Created',
-      description: <Typography sx={{fontSize: 12}}>The assignment has been created and files can now be added to be
-        pushed. By pushing files
-        you will progress to the next step.</Typography>,
+      description: (
+        <Typography sx={{ fontSize: 12 }}>
+          The assignment has been created and files can now be added to be
+          pushed. By pushing files you will progress to the next step.
+        </Typography>
+      )
     },
     {
       label: 'Pushed',
-      description:
+      description: (
         <Box>
-          <Typography sx={{fontSize: 12}}>Files have been pushed to the source repository. If you are happy with
-            the assignments you can release them or make further changes to the files and push them again!</Typography>
+          <Typography sx={{ fontSize: 12 }}>
+            Files have been pushed to the source repository. If you are happy
+            with the assignments you can release them or make further changes to
+            the files and push them again!
+          </Typography>
           <Button
-            sx={{mt: 1}}
+            sx={{ mt: 1 }}
             onClick={() => handleReleaseAssignment()}
             variant="outlined"
             size="small"
           >
-            <NewReleasesRoundedIcon fontSize="small" sx={{mr: 1}}/>
+            <NewReleasesRoundedIcon fontSize="small" sx={{ mr: 1 }} />
             Release
           </Button>
-        </Box>,
+        </Box>
+      )
     },
     {
       label: 'Released',
-      description:
+      description: (
         <Box>
-          <Typography sx={{fontSize: 12}}>The assignment has been released to students and it is not advised to
-            push further changes since this would probably reset most of the students progress.
-            If the assignment is over you can mark it as complete
-            in the edit menu or right here.</Typography>
+          <Typography sx={{ fontSize: 12 }}>
+            The assignment has been released to students and it is not advised
+            to push further changes since this would probably reset most of the
+            students progress. If the assignment is over you can mark it as
+            complete in the edit menu or right here.
+          </Typography>
           <Button
-            sx={{mt: 1}}
+            sx={{ mt: 1 }}
             onClick={() => completeAssignment()}
             variant="outlined"
             size="small"
           >
-            <TaskIcon fontSize="small" sx={{mr: 1}}/>
+            <TaskIcon fontSize="small" sx={{ mr: 1 }} />
             Complete
           </Button>
-        </Box>,
+        </Box>
+      )
     },
     {
       label: 'Assignment Completed',
-      description: <Typography sx={{fontSize: 12}}>The assignment has been completed and is not visible to students
-        anymore. You can change the status in the edit menu.</Typography>,
+      description: (
+        <Typography sx={{ fontSize: 12 }}>
+          The assignment has been completed and is not visible to students
+          anymore. You can change the status in the edit menu.
+        </Typography>
+      )
     }
   ];
 
@@ -154,10 +167,13 @@ export const AssignmentStatus = (props: IAssignmentStatusProps) => {
   };
 
   return (
-    <Card elevation={3} className='flexbox-item'>
-      <CardHeader title="Assignment Status"/>
-      <CardContent sx={{height: '300px', width: '300px', overflowY: "auto"}}>
-        <Stepper activeStep={getActiveStep(assignment.status)} orientation="vertical">
+    <Card elevation={3} className="flexbox-item">
+      <CardHeader title="Assignment Status" />
+      <CardContent sx={{ height: '300px', width: '300px', overflowY: 'auto' }}>
+        <Stepper
+          activeStep={getActiveStep(assignment.status)}
+          orientation="vertical"
+        >
           {steps.map((step, index) => (
             <Step key={step.label}>
               <StepLabel
@@ -179,4 +195,4 @@ export const AssignmentStatus = (props: IAssignmentStatusProps) => {
       <AgreeDialog open={showDialog} {...dialogContent} />
     </Card>
   );
-}
+};

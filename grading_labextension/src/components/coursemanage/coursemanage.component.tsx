@@ -1,18 +1,17 @@
 import * as React from 'react';
-import {Lecture} from '../../model/lecture';
-import {getAllLectures} from '../../services/lectures.service';
-import {Scope, UserPermissions} from '../../services/permission.service';
-import {showErrorMessage} from '@jupyterlab/apputils';
-import {LectureComponent} from './lecture';
-import {AlertProps, Portal, Snackbar} from "@mui/material";
-import MuiAlert from "@mui/material/Alert";
+import { Lecture } from '../../model/lecture';
+import { getAllLectures } from '../../services/lectures.service';
+import { Scope, UserPermissions } from '../../services/permission.service';
+import { LectureComponent } from './lecture';
+import { AlertProps, Portal, Snackbar } from '@mui/material';
+import MuiAlert from '@mui/material/Alert';
 
-export interface CourseManageProps {
+export interface ICourseManageProps {
   // lectures: Array<Lecture>;
   root: HTMLElement;
 }
 
-export const CourseManageComponent = (props: CourseManageProps) => {
+export const CourseManageComponent = (props: ICourseManageProps) => {
   const [alert, setAlert] = React.useState(false);
   const [severity, setSeverity] = React.useState('success');
   const [alertMessage, setAlertMessage] = React.useState('');
@@ -38,8 +37,8 @@ export const CourseManageComponent = (props: CourseManageProps) => {
       .then(() => {
         getAllLectures().then(l => setLectures(l));
       })
-      .catch(() => showAlert("error", "Error Loading Permissions"))
-  }, [props])
+      .catch(() => showAlert('error', 'Error Loading Permissions'));
+  }, [props]);
 
   return (
     <div className="course-list">
@@ -49,18 +48,20 @@ export const CourseManageComponent = (props: CourseManageProps) => {
       {lectures
         .filter(el => UserPermissions.getScope(el) > Scope.student)
         .map((el, index) => (
-          <LectureComponent lecture={el} active={true} root={props.root} showAlert={showAlert} expanded={true}/>
+          <LectureComponent
+            lecture={el}
+            active={true}
+            root={props.root}
+            showAlert={showAlert}
+            expanded={true}
+          />
         ))}
       <Portal container={document.body}>
-        <Snackbar
-          open={alert}
-          onClose={handleAlertClose}
-          sx={{mb: 2, ml: 2}}
-        >
+        <Snackbar open={alert} onClose={handleAlertClose} sx={{ mb: 2, ml: 2 }}>
           <MuiAlert
             onClose={handleAlertClose}
             severity={severity as AlertProps['severity']}
-            sx={{width: '100%'}}
+            sx={{ width: '100%' }}
           >
             {alertMessage}
           </MuiAlert>
@@ -68,4 +69,4 @@ export const CourseManageComponent = (props: CourseManageProps) => {
       </Portal>
     </div>
   );
-}
+};

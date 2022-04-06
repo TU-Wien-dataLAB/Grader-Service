@@ -1,34 +1,50 @@
-import {Card, CardContent, CardHeader, Chip, Divider, Typography} from '@mui/material';
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  Divider,
+  Typography
+} from '@mui/material';
 import * as React from 'react';
-import {Assignment} from '../../../model/assignment';
-import {utcToLocalFormat} from '../../../services/datetime.service';
-import {DeadlineComponent} from '../../util/deadline';
+import { Assignment } from '../../../model/assignment';
+import { DeadlineComponent } from '../../util/deadline';
 
-export interface OverviewCardProps {
+export interface IOverviewCardProps {
   assignment: Assignment;
   allSubmissions: any[];
-  users: { students: string[], tutors: string[], instructors: string[] };
+  users: { students: string[]; tutors: string[]; instructors: string[] };
 }
 
-export const OverviewCard = (props: OverviewCardProps) => {
-
-  let gradingBehaviour = "No Automatic Grading";
-  if (props.assignment.automatic_grading === Assignment.AutomaticGradingEnum.Auto) {
-    gradingBehaviour = "Automatic Grading";
-  } else if (props.assignment.automatic_grading === Assignment.AutomaticGradingEnum.FullAuto) {
-    gradingBehaviour = "Fully Automatic Grading";
+export const OverviewCard = (props: IOverviewCardProps) => {
+  let gradingBehaviour = 'No Automatic Grading';
+  if (
+    props.assignment.automatic_grading === Assignment.AutomaticGradingEnum.Auto
+  ) {
+    gradingBehaviour = 'Automatic Grading';
+  } else if (
+    props.assignment.automatic_grading ===
+    Assignment.AutomaticGradingEnum.FullAuto
+  ) {
+    gradingBehaviour = 'Fully Automatic Grading';
   }
 
   return (
     <Card elevation={3} className="flexbox-item">
-      <CardHeader title="Overview"/>
-      <CardContent sx={{alignItems: {xs: 'center'}, height: '243px', minWidth: '150px', overflowY: "auto"}}>
-        <Typography sx={{fontSize: 15, mt: 0.5, ml: 0.5}}>
+      <CardHeader title="Overview" />
+      <CardContent
+        sx={{
+          alignItems: { xs: 'center' },
+          height: '243px',
+          minWidth: '150px',
+          overflowY: 'auto'
+        }}
+      >
+        <Typography sx={{ fontSize: 15, mt: 0.5, ml: 0.5 }}>
           {props.users.students.length}
           <Typography
             color="text.secondary"
             sx={{
-              display: "inline-block",
+              display: 'inline-block',
               ml: 0.75,
               fontSize: 13
             }}
@@ -37,12 +53,12 @@ export const OverviewCard = (props: OverviewCardProps) => {
           </Typography>
         </Typography>
 
-        <Typography sx={{fontSize: 15, mt: 0.5, ml: 0.5}}>
+        <Typography sx={{ fontSize: 15, mt: 0.5, ml: 0.5 }}>
           {props.users.tutors.length}
           <Typography
             color="text.secondary"
             sx={{
-              display: "inline-block",
+              display: 'inline-block',
               ml: 0.75,
               fontSize: 13
             }}
@@ -51,12 +67,12 @@ export const OverviewCard = (props: OverviewCardProps) => {
           </Typography>
         </Typography>
 
-        <Typography sx={{fontSize: 15, mt: 0.5, ml: 0.5}}>
+        <Typography sx={{ fontSize: 15, mt: 0.5, ml: 0.5 }}>
           {props.users.instructors.length}
           <Typography
             color="text.secondary"
             sx={{
-              display: "inline-block",
+              display: 'inline-block',
               ml: 0.75,
               fontSize: 13
             }}
@@ -65,12 +81,12 @@ export const OverviewCard = (props: OverviewCardProps) => {
           </Typography>
         </Typography>
 
-        <Typography sx={{fontSize: 15, mt: 0.5, ml: 0.5}}>
+        <Typography sx={{ fontSize: 15, mt: 0.5, ml: 0.5 }}>
           {props.allSubmissions.length}
           <Typography
             color="text.secondary"
             sx={{
-              display: "inline-block",
+              display: 'inline-block',
               ml: 0.75,
               fontSize: 13
             }}
@@ -78,11 +94,11 @@ export const OverviewCard = (props: OverviewCardProps) => {
             {'Submission' + (props.allSubmissions.length === 1 ? '' : 's')}
           </Typography>
         </Typography>
-        <Divider sx={{mt: 1, mb: 1}}/>
+        <Divider sx={{ mt: 1, mb: 1 }} />
         <Typography
           color="text.secondary"
           sx={{
-            display: "inline-block",
+            display: 'inline-block',
             fontSize: 13,
             mb: -1,
             ml: 0.5
@@ -90,14 +106,14 @@ export const OverviewCard = (props: OverviewCardProps) => {
         >
           Grading Behaviour:
         </Typography>
-        <Typography sx={{fontSize: 15, mt: 0.5, ml: 0.5}}>
+        <Typography sx={{ fontSize: 15, mt: 0.5, ml: 0.5 }}>
           {gradingBehaviour}
         </Typography>
 
         <Typography
           color="text.secondary"
           sx={{
-            display: "inline-block",
+            display: 'inline-block',
             fontSize: 13,
             mt: 2,
             mb: -1,
@@ -106,12 +122,15 @@ export const OverviewCard = (props: OverviewCardProps) => {
         >
           Assignment Type:
         </Typography>
-        <Typography sx={{fontSize: 15, mt: 0.5, ml: 0.5}}>
-          {(props.assignment.type === "user") ? "User" : "Group"}
+        <Typography sx={{ fontSize: 15, mt: 0.5, ml: 0.5 }}>
+          {props.assignment.type === 'user' ? 'User' : 'Group'}
         </Typography>
-
       </CardContent>
-      <DeadlineComponent due_date={props.assignment.due_date} compact={false} component={"card"}/>
+      <DeadlineComponent
+        due_date={props.assignment.due_date}
+        compact={false}
+        component={'card'}
+      />
     </Card>
   );
-}
+};

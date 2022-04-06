@@ -1,14 +1,17 @@
-import {ModalTitle} from "../util/modal-title";
-import {Box, Button, Dialog, Stack, Typography} from "@mui/material";
-import * as React from "react";
-import {Lecture} from "../../model/lecture";
-import {Assignment} from "../../model/assignment";
-import {Submission} from "../../model/submission";
-import {getProperties, updateSubmission} from "../../services/submissions.service";
-import {GradeBook} from "../../services/gradebook";
-import {createManualFeedback} from "../../services/grading.service";
-import {FilesList} from "../util/file-list";
-import { AgreeDialog } from "./dialog";
+import { ModalTitle } from '../util/modal-title';
+import { Box, Button, Stack, Typography } from '@mui/material';
+import * as React from 'react';
+import { Lecture } from '../../model/lecture';
+import { Assignment } from '../../model/assignment';
+import { Submission } from '../../model/submission';
+import {
+  getProperties,
+  updateSubmission
+} from '../../services/submissions.service';
+import { GradeBook } from '../../services/gradebook';
+import { createManualFeedback } from '../../services/grading.service';
+import { FilesList } from '../util/file-list';
+import { AgreeDialog } from './dialog';
 
 export interface IManualGradingProps {
   lecture: Lecture;
@@ -30,89 +33,152 @@ export const ManualGrading = (props: IManualGradingProps) => {
     handleDisagree: null
   });
   React.useEffect(() => {
-    getProperties(props.lecture.id, props.assignment.id, props.submission.id).then((properties) => {
+    getProperties(
+      props.lecture.id,
+      props.assignment.id,
+      props.submission.id
+    ).then(properties => {
       const gradeBook = new GradeBook(properties);
       setGradeBook(gradeBook);
     });
-    createManualFeedback(props.lecture.id, props.assignment.id, props.submission.id).then(() => {
-      const manualPath = `manualgrade/${props.lecture.code}/${props.assignment.name}/${props.submission.id}`
+    createManualFeedback(
+      props.lecture.id,
+      props.assignment.id,
+      props.submission.id
+    ).then(() => {
+      const manualPath = `manualgrade/${props.lecture.code}/${props.assignment.name}/${props.submission.id}`;
       setPath(manualPath);
     });
-  }, [props])
+  }, [props]);
 
   const openFinishDialog = () => {
     setDialogContent({
       title: 'Confirm Grading',
       message: 'Do you want to save the assignment grading?',
       handleAgree: finishGrading,
-      handleDisagree: () => {setShowDialog(false)}
+      handleDisagree: () => {
+        setShowDialog(false);
+      }
     });
     setShowDialog(true);
-  }
+  };
 
   const finishGrading = () => {
-    props.submission.manual_status="manually_graded";
-    updateSubmission(props.lecture.id,props.assignment.id,props.submission.id,props.submission).then(response => {
-      props.onClose();
-    },
-    err => {
-      props.showAlert("error", "Error updating submission!")
-    });
-  }
- 
+    props.submission.manual_status = 'manually_graded';
+    updateSubmission(
+      props.lecture.id,
+      props.assignment.id,
+      props.submission.id,
+      props.submission
+    ).then(
+      response => {
+        props.onClose();
+      },
+      err => {
+        props.showAlert('error', 'Error updating submission!');
+      }
+    );
+  };
+
   return (
     <Box>
-      <ModalTitle title={"Manual Grading " + props.assignment.name}/>
-      <Box sx={{m: 2, mt: 12}}>
-        <Stack direction="row" spacing={2} sx={{ml: 2}}>
-          <Stack  sx={{mt: 0.5}}>
-            <Typography textAlign="right" color="text.secondary" sx={{fontSize: 12, height: 35}}>
+      <ModalTitle title={'Manual Grading ' + props.assignment.name} />
+      <Box sx={{ m: 2, mt: 12 }}>
+        <Stack direction="row" spacing={2} sx={{ ml: 2 }}>
+          <Stack sx={{ mt: 0.5 }}>
+            <Typography
+              textAlign="right"
+              color="text.secondary"
+              sx={{ fontSize: 12, height: 35 }}
+            >
               Username
             </Typography>
-            <Typography textAlign="right" color="text.secondary" sx={{fontSize: 12, height: 35}}>
+            <Typography
+              textAlign="right"
+              color="text.secondary"
+              sx={{ fontSize: 12, height: 35 }}
+            >
               Lecture
             </Typography>
-            <Typography textAlign="right" color="text.secondary" sx={{fontSize: 12, height: 35}}>
+            <Typography
+              textAlign="right"
+              color="text.secondary"
+              sx={{ fontSize: 12, height: 35 }}
+            >
               Assignment
             </Typography>
-            <Typography textAlign="right" color="text.secondary" sx={{fontSize: 12, height: 35}}>
+            <Typography
+              textAlign="right"
+              color="text.secondary"
+              sx={{ fontSize: 12, height: 35 }}
+            >
               Points
             </Typography>
-            <Typography textAlign="right" color="text.secondary" sx={{fontSize: 12, height: 35}}>
+            <Typography
+              textAlign="right"
+              color="text.secondary"
+              sx={{ fontSize: 12, height: 35 }}
+            >
               Extra Credit
             </Typography>
           </Stack>
           <Stack>
-            <Typography color="text.primary" sx={{display: "inline-block", fontSize: 16, height: 35}}>
+            <Typography
+              color="text.primary"
+              sx={{ display: 'inline-block', fontSize: 16, height: 35 }}
+            >
               {props.username}
             </Typography>
-            <Typography color="text.primary" sx={{display: "inline-block", fontSize: 16, height: 35}}>
+            <Typography
+              color="text.primary"
+              sx={{ display: 'inline-block', fontSize: 16, height: 35 }}
+            >
               {props.lecture.name}
             </Typography>
-            <Typography color="text.primary" sx={{display: "inline-block", fontSize: 16, height: 35}}>
+            <Typography
+              color="text.primary"
+              sx={{ display: 'inline-block', fontSize: 16, height: 35 }}
+            >
               {props.assignment.name}
-              <Typography color="text.secondary" sx={{display: "inline-block", fontSize: 14, ml: 2, height: 35}}>
+              <Typography
+                color="text.secondary"
+                sx={{
+                  display: 'inline-block',
+                  fontSize: 14,
+                  ml: 2,
+                  height: 35
+                }}
+              >
                 {props.assignment.type}
               </Typography>
             </Typography>
-            <Typography color="text.primary" sx={{display: "inline-block", fontSize: 16, height: 35}}>
+            <Typography
+              color="text.primary"
+              sx={{ display: 'inline-block', fontSize: 16, height: 35 }}
+            >
               {gradeBook?.getPoints()}
-              <Typography color="text.secondary" sx={{display: "inline-block", fontSize: 14, ml: 0.25}}>
+              <Typography
+                color="text.secondary"
+                sx={{ display: 'inline-block', fontSize: 14, ml: 0.25 }}
+              >
                 /{gradeBook?.getMaxPoints()}
               </Typography>
             </Typography>
-            <Typography color="text.primary" sx={{display: "inline-block", fontSize: 16, height: 35}}>
+            <Typography
+              color="text.primary"
+              sx={{ display: 'inline-block', fontSize: 16, height: 35 }}
+            >
               {gradeBook?.getExtraCredits()}
             </Typography>
           </Stack>
         </Stack>
       </Box>
-      <Typography sx={{m: 2, mb: 0}}>
-        Submission Files
-      </Typography>
-      <FilesList path={path} showAlert={props.showAlert} sx={{m: 2}}/>
-      <Button variant="outlined" color="success" onClick={openFinishDialog}>Confirm Manualgrade</Button>
+      <Typography sx={{ m: 2, mb: 0 }}>Submission Files</Typography>
+      <FilesList path={path} showAlert={props.showAlert} sx={{ m: 2 }} />
+      <Button variant="outlined" color="success" onClick={openFinishDialog}>
+        Confirm Manualgrade
+      </Button>
       <AgreeDialog open={showDialog} {...dialogContent} />
     </Box>
-  )
-}
+  );
+};

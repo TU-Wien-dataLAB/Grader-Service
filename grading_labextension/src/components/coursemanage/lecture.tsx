@@ -2,27 +2,20 @@ import {
   Box,
   Button,
   Card,
-  CardActionArea,
   CardActions,
   CardContent,
-  CardHeader,
-  CircularProgress,
   Collapse,
-  createTheme,
-  IconButton,
   LinearProgress,
-  styled,
-  ThemeProvider,
   Typography
 } from '@mui/material';
 import * as React from 'react';
-import {Assignment} from '../../model/assignment';
-import {Lecture} from '../../model/lecture';
-import {getAllAssignments} from '../../services/assignments.service';
-import {AssignmentComponent} from './assignment';
-import {CreateDialog, EditLectureDialog} from './dialog';
-import {getLecture, getUsers} from '../../services/lectures.service';
-import {red} from "@mui/material/colors";
+import { Assignment } from '../../model/assignment';
+import { Lecture } from '../../model/lecture';
+import { getAllAssignments } from '../../services/assignments.service';
+import { AssignmentComponent } from './assignment';
+import { CreateDialog, EditLectureDialog } from './dialog';
+import { getLecture, getUsers } from '../../services/lectures.service';
+import { red } from '@mui/material/colors';
 
 interface ILectureComponentProps {
   lecture: Lecture;
@@ -36,7 +29,9 @@ export const LectureComponent = (props: ILectureComponentProps) => {
   const [lecture, setLecture] = React.useState(props.lecture);
   const [active, setActive] = React.useState(props.active);
   const [assignments, setAssignments] = React.useState(null);
-  const [expanded, setExpanded] = React.useState(props.expanded === undefined ? false : props.expanded);
+  const [expanded, setExpanded] = React.useState(
+    props.expanded === undefined ? false : props.expanded
+  );
   const [users, setUsers] = React.useState(null);
 
   React.useEffect(() => {
@@ -45,7 +40,7 @@ export const LectureComponent = (props: ILectureComponentProps) => {
     });
 
     getUsers(lecture).then(response => {
-      setUsers(response)
+      setUsers(response);
     });
   }, []);
 
@@ -56,7 +51,7 @@ export const LectureComponent = (props: ILectureComponentProps) => {
     return (
       <div>
         <Card>
-          <LinearProgress/>
+          <LinearProgress />
         </Card>
       </div>
     );
@@ -64,27 +59,27 @@ export const LectureComponent = (props: ILectureComponentProps) => {
   return (
     <div>
       <Card
-        sx={{backgroundColor: expanded ? '#fafafa' : 'background.paper'}}
+        sx={{ backgroundColor: expanded ? '#fafafa' : 'background.paper' }}
         elevation={expanded ? 0 : 2}
         className="lecture-card"
       >
-        <CardContent sx={{mb: -1, display: 'flex'}}>
-          <Typography variant={'h5'} sx={{mr: 2}}>
+        <CardContent sx={{ mb: -1, display: 'flex' }}>
+          <Typography variant={'h5'} sx={{ mr: 2 }}>
             <Typography
-              color={"text.secondary"}
+              color={'text.secondary'}
               sx={{
-                display: "inline-block",
+                display: 'inline-block',
                 mr: 0.75,
-                fontSize: 16,
+                fontSize: 16
               }}
             >
               Lecture:
             </Typography>
             {lecture.name}
-            {(!active)
-              ? <Typography
+            {!active ? (
+              <Typography
                 sx={{
-                  display: "inline-block",
+                  display: 'inline-block',
                   ml: 0.75,
                   fontSize: 16,
                   color: red[400]
@@ -92,8 +87,7 @@ export const LectureComponent = (props: ILectureComponentProps) => {
               >
                 inactive
               </Typography>
-              : null
-            }
+            ) : null}
           </Typography>
           <EditLectureDialog
             lecture={lecture}
@@ -106,7 +100,7 @@ export const LectureComponent = (props: ILectureComponentProps) => {
 
         <Collapse in={expanded} timeout="auto" unmountOnExit>
           <CardContent>
-            <Box sx={{display: 'flex', flexWrap: 'wrap'}}>
+            <Box sx={{ display: 'flex', flexWrap: 'wrap' }}>
               {assignments.map((el: Assignment) => (
                 <AssignmentComponent
                   lecture={lecture}
@@ -129,7 +123,7 @@ export const LectureComponent = (props: ILectureComponentProps) => {
           </CardContent>
         </Collapse>
         <CardActions>
-          <Button size="small" sx={{ml: 'auto'}} onClick={handleExpandClick}>
+          <Button size="small" sx={{ ml: 'auto' }} onClick={handleExpandClick}>
             {(expanded ? 'Hide' : 'Show') + ' Assignments'}
           </Button>
         </CardActions>
