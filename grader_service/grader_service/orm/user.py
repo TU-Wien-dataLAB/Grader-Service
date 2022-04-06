@@ -2,6 +2,7 @@ from sqlalchemy import Column, String
 from sqlalchemy.orm import relationship
 
 from grader_service.orm.base import Base, Serializable
+from grader_service.orm.group import group_assignment_table
 
 
 class User(Base, Serializable):
@@ -10,7 +11,7 @@ class User(Base, Serializable):
 
     roles = relationship("Role", back_populates="user")
     submissions = relationship("Submission", back_populates="user")
-    groups = relationship("Group", back_populates="user")
+    groups = relationship("Group", secondary=group_assignment_table, back_populates="users")
 
     def serialize(self):
         return {"name": self.name}
