@@ -22,7 +22,7 @@ interface ILectureComponentProps {
 }
 
 export const LectureComponent = (props: ILectureComponentProps) => {
-  const [assignments, setAssignments] = React.useState(null);
+  const [assignments, setAssignments] = React.useState(null as Assignment[]);
   const [expanded, setExpanded] = React.useState(props.open);
 
   React.useEffect(() => {
@@ -42,6 +42,9 @@ export const LectureComponent = (props: ILectureComponentProps) => {
         </Card>
       </div>
     );
+  }
+  if (assignments.length === 0) {
+    return null;
   }
   return (
     <div>

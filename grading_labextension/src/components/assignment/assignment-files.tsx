@@ -44,7 +44,7 @@ export const AssignmentFilesComponent = (
 
   const resetAssignmentHandler = async () => {
     try {
-      // await pushAssignment(props.lecture.id, props.assignment.id, "assignment", "Pre-Reset");
+      await pushAssignment(props.lecture.id, props.assignment.id, "assignment", "Pre-Reset");
       await resetAssignment(props.lecture, props.assignment);
       await pullAssignment(props.lecture.id, props.assignment.id, 'assignment');
       props.showAlert('success', 'Successfully Reset Assignment');

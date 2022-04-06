@@ -41,8 +41,7 @@ export const FilesList = (props: IFileListProps) => {
         }
       })
       .catch(error => {
-        // TODO: refactor showAlert to work in all components
-        // showAlert('error', 'Error Opening File');
+        props.showAlert('error', 'Error Opening File');
         console.log(error);
       });
   };
@@ -51,7 +50,7 @@ export const FilesList = (props: IFileListProps) => {
   const generateItems = (files: IModel[]) => {
     return files.map(value => (
       <ListItem disablePadding>
-        <ListItemButton onDoubleClick={() => openFile(value.path)} dense={true}>
+        <ListItemButton onClick={() => openFile(value.path)} dense={true}>
           <ListItemIcon>
             <InsertDriveFileRoundedIcon />
           </ListItemIcon>

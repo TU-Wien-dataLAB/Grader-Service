@@ -47,7 +47,7 @@ export const LectureListComponent = (props: ILectureListProps): JSX.Element => {
         <LectureComponent
           lecture={el}
           root={props.root}
-          open={index === 0}
+          open={true}
           showAlert={showAlert}
         />
       ))}
