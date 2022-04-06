@@ -63,15 +63,13 @@ class GitBaseHandler(GraderBaseHandler):
         repo_type = pathlets[2]
 
         if role.role == Scope.student:
-            # 1. no source interaction with the source repo for students
-            # 2. no push to release allowed for students TODO: change to no access for students after git refactor
-            # 3. no pull allowed for autograde for students
-            if (repo_type == "source") or \
-                    (repo_type == "release" and rpc in ["send-pack", "receive-pack"]) or \
+            # 1. no source or release interaction with the source repo for students
+            # 2. no pull allowed for autograde for students
+            if (repo_type in ["source", "release"]) or \
                     (repo_type == "autograde" and rpc == "upload-pack"):
                 raise HTTPError(403)
 
-            # 4. students should not be able to pull other submissions -> add query param for sub_id
+            # 3. students should not be able to pull other submissions -> add query param for sub_id
             if repo_type == "feedback" and rpc == "upload-pack":
                 try:
                     sub_id = int(pathlets[3])
@@ -81,7 +79,7 @@ class GitBaseHandler(GraderBaseHandler):
                 if submission is None or submission.username != self.user.name:
                     raise HTTPError(403)
 
-        # 5. no push allowed for autograde and feedback -> the autograder executor can push locally (will bypass this)
+        # 4. no push allowed for autograde and feedback -> the autograder executor can push locally (will bypass this)
         if repo_type in ["autograde", "feedback"] and rpc in ["send-pack", "receive-pack"]:
             raise HTTPError(403)
 
@@ -212,6 +210,7 @@ class RPCHandler(GitBaseHandler):
         # pathlets = ['services', 'grader', 'git', 'lecture_code', 'assignment_name', 'repo_type', ...]
         pathlets = self.request.path.strip("/").split("/")
         pathlets = pathlets[3:]
+        # TODO: move all this code to submission POST including fully automatic grading
         if pathlets[-1] == "git-receive-pack" and pathlets[-2] == "assignment":
             # get lecture and assignment if they exist
             try:

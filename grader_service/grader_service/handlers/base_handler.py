@@ -115,6 +115,7 @@ class GraderBaseHandler(SessionMixin, web.RequestHandler):
 
     async def prepare(self) -> Optional[Awaitable[None]]:
         await self.authenticate_user()
+        return super().prepare()
 
     def validate_parameters(self, *args):
         if len(self.request.arguments) == 0:
@@ -277,10 +278,7 @@ class GraderBaseHandler(SessionMixin, web.RequestHandler):
                     .one_or_none()
             )
             if lecture is None:
-                raise HTTPError(
-                    500,
-                    f"Could not find lecture with code: {lecture_code}. Inconsistent database state!",
-                )
+                raise HTTPError(500, f"Could not find lecture with code: {lecture_code}. Inconsistent database state!")
             role = Role()
             role.username = user["name"]
             role.lectid = lecture.id
