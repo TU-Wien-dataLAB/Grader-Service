@@ -98,7 +98,8 @@ def downgrade():
     op.drop_table('submission')
     op.drop_table('takepart')
     op.drop_table('assignment')
-    op.drop_table('user')
-    op.drop_table('lecture')
+    op.drop_table('partof')
     op.drop_table('group')
+    op.drop_table('lecture')
+    op.drop_table('user')
     # ### end Alembic commands ###
