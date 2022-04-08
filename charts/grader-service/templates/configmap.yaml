@@ -1,0 +1,23 @@
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "grader-service.fullname" . }}
+  namespace: {{ .Values.namespace }}
+  labels:
+    {{- include "grader-service.labels" . | nindent 4 }}
+data:
+  grader_service_config.py: |
+    from grader_service.autograding.kube.kube_grader import KubeAutogradeExecutor
+    c.RequestHandlerConfig.autograde_executor_class = KubeAutogradeExecutor
+    c.KubeAutogradeExecutor.kube_context = None
+    c.KubeAutogradeExecutor.base_input_path = "/var/lib/grader-service/convert_in"
+    c.KubeAutogradeExecutor.base_output_path = "/var/lib/grader-service/convert_out"
+    c.KubeAutogradeExecutor.default_image_name = lambda l, a: "mbwali/grader-service:latest"
+    c.KubeAutogradeExecutor.volume_mounts = [{"name": "data", "mountPath": "/var/lib/grader-service"}]
+    c.KubeAutogradeExecutor.volumes = [{"name": "data", "persistentVolumeClaim": {"claimName": "grader-service"}}]
+
+  .gitconfig: |
+    [user]
+      name = {{ .Values.gitUser }}
+      email = {{ .Values.gitEmail }}
