@@ -6,8 +6,10 @@ stages:
 build-grader-image:
   stage: build
   tags:
-  - demo
-  - dind
+  # - demo
+  # - dind
+  # - docker
+  - bootstrap
   only:
     changes:
       - ./Dockerfile_service
