@@ -75,12 +75,13 @@ export const GradingComponent = (props: IGradingProps) => {
   const handleAutogradeSubmissions = async () => {
     setDialogContent({
       title: 'Autograde Selected Submissions',
-      message: 'Do you wish to autograde the seleceted submissions?',
+      message: 'Do you wish to autograde the selected submissions?',
       handleAgree: async () => {
         try {
           const numSubs = selectedRowsData.length;
           await Promise.all(
             selectedRowsData.map(async row => {
+              row.auto_status = 'pending';
               await autogradeSubmission(props.lecture, props.assignment, row);
               console.log('Autograded submission');
             })
