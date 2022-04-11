@@ -150,7 +150,7 @@ export const Files = (props: IFilesProps) => {
   };
 
   return (
-    <Card className="flexbox-item" elevation={3}>
+    <Card elevation={3}>
       <CardHeader
         title="Files"
         action={
@@ -176,7 +176,7 @@ export const Files = (props: IFilesProps) => {
         }
       />
 
-      <CardContent sx={{ height: '270px', width: '300px', overflowY: 'auto' }}>
+      <CardContent sx={{ height: '270px', overflowY: 'auto' }}>
         <Tabs
           variant="fullWidth"
           value={selectedDir}

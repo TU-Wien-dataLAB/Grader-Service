@@ -4,7 +4,7 @@ import {
   Button,
   Card,
   CardContent,
-  CardHeader,
+  CardHeader, Paper,
   Step,
   StepContent,
   StepLabel,
@@ -48,6 +48,9 @@ export const AssignmentStatus = (props: IAssignmentStatusProps) => {
     handleAgree: null,
     handleDisagree: null
   });
+  const [activeStep, setActiveStep] = React.useState(
+    getActiveStep(assignment.status)
+  );
   const closeDialog = () => setShowDialog(false);
 
   const steps = [
@@ -167,13 +170,9 @@ export const AssignmentStatus = (props: IAssignmentStatusProps) => {
   };
 
   return (
-    <Card elevation={3} className="flexbox-item">
-      <CardHeader title="Assignment Status" />
-      <CardContent sx={{ height: '300px', width: '300px', overflowY: 'auto' }}>
-        <Stepper
-          activeStep={getActiveStep(assignment.status)}
-          orientation="vertical"
-        >
+    <Paper elevation={3}>
+      <Box sx={{ overflowX: 'auto', p: 3 }}>
+        <Stepper activeStep={activeStep} orientation="horizontal">
           {steps.map((step, index) => (
             <Step key={step.label}>
               <StepLabel
@@ -185,14 +184,12 @@ export const AssignmentStatus = (props: IAssignmentStatusProps) => {
               >
                 {step.label}
               </StepLabel>
-              <StepContent>
-                <Typography>{step.description}</Typography>
-              </StepContent>
             </Step>
           ))}
         </Stepper>
-      </CardContent>
+        <Typography>{steps[activeStep].description}</Typography>
+      </Box>
       <AgreeDialog open={showDialog} {...dialogContent} />
-    </Card>
+    </Paper>
   );
 };

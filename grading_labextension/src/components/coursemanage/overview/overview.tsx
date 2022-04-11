@@ -6,7 +6,7 @@ import { EditDialog } from '../dialog';
 import { ModalTitle } from '../../util/modal-title';
 import { GradingChart, SubmittedChart } from './charts';
 import { OverviewCard } from './overview-card';
-import { Box } from '@mui/material';
+import { Box, Grid } from '@mui/material';
 import { Files } from './files';
 import { GitLog } from './git-log';
 import { getAssignment } from '../../../services/assignments.service';
@@ -45,46 +45,60 @@ export const OverviewComponent = (props: IOverviewProps) => {
           />
         </Box>
       </ModalTitle>
-      <Box className="flexbox-panel" sx={{ ml: 3, mr: 3, mb: 3, mt: 3 }}>
-        <OverviewCard
-          assignment={assignment}
-          allSubmissions={props.allSubmissions}
-          users={props.users}
-        />
+      <Box sx={{ ml: 3, mr: 3, mb: 3, mt: 3 }}>
+        <Grid container spacing={2}>
+          <Grid item xs={12} md={12} lg={12}>
+            <AssignmentStatus
+              lecture={props.lecture}
+              assignment={assignment}
+              onAssignmentChange={onAssignmentChange}
+              showAlert={props.showAlert}
+            />
+          </Grid>
 
-        <AssignmentStatus
-          lecture={props.lecture}
-          assignment={assignment}
-          onAssignmentChange={onAssignmentChange}
-          showAlert={props.showAlert}
-        />
+          <Grid item xs={12} md={6} lg={4}>
+            <OverviewCard
+              assignment={assignment}
+              allSubmissions={props.allSubmissions}
+              users={props.users}
+            />
+          </Grid>
 
-        <Files
-          lecture={lecture}
-          assignment={assignment}
-          onAssignmentChange={onAssignmentChange}
-          showAlert={props.showAlert}
-        />
+          <Grid item xs={12} md={6} lg={4}>
+            <Files
+              lecture={lecture}
+              assignment={assignment}
+              onAssignmentChange={onAssignmentChange}
+              showAlert={props.showAlert}
+            />
+          </Grid>
 
-        <GitLog
-          lecture={lecture}
-          assignment={assignment}
-          repoType={RepoType.SOURCE}
-        />
+          <Grid item xs={12} md={6} lg={4}>
+            <GitLog
+              lecture={lecture}
+              assignment={assignment}
+              repoType={RepoType.SOURCE}
+            />
+          </Grid>
 
-        <SubmittedChart
-          lecture={lecture}
-          assignment={assignment}
-          allSubmissions={props.allSubmissions}
-          users={props.users}
-        />
+          <Grid item xs={12} md={3} lg={3}>
+            <SubmittedChart
+              lecture={lecture}
+              assignment={assignment}
+              allSubmissions={props.allSubmissions}
+              users={props.users}
+            />
+          </Grid>
 
-        <GradingChart
-          lecture={lecture}
-          assignment={assignment}
-          allSubmissions={props.allSubmissions}
-          users={props.users}
-        />
+          <Grid item xs={12} md={3} lg={3}>
+            <GradingChart
+              lecture={lecture}
+              assignment={assignment}
+              allSubmissions={props.allSubmissions}
+              users={props.users}
+            />
+          </Grid>
+        </Grid>
       </Box>
     </Box>
   );

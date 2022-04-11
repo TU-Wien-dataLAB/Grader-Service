@@ -63,7 +63,7 @@ export const GitLog = (props: IGitLogProps) => {
   }, [props]);
 
   return (
-    <Card elevation={3} className="flexbox-item">
+    <Card elevation={3}>
       <CardHeader title="Git Log" />
       <CardContent sx={{ height: '300px', width: '300px', overflowY: 'auto' }}>
         <Timeline sx={{ m: 0, p: 0, ml: -2 }}>

@@ -29,7 +29,7 @@ export const OverviewCard = (props: IOverviewCardProps) => {
   }
 
   return (
-    <Card elevation={3} className="flexbox-item">
+    <Card elevation={3}>
       <CardHeader title="Overview" />
       <CardContent
         sx={{
