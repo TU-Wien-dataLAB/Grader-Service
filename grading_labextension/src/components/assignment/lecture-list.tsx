@@ -2,8 +2,7 @@ import * as React from 'react';
 import { getAllLectures } from '../../services/lectures.service';
 import { Lecture } from '../../model/lecture';
 import { LectureComponent } from './lecture';
-import { AlertProps, Snackbar, Portal } from '@mui/material';
-import MuiAlert from '@mui/material/Alert';
+import { AlertProps, Alert, Portal, AlertTitle } from '@mui/material';
 
 export interface ILectureListProps {
   root: HTMLElement;
@@ -52,15 +51,15 @@ export const LectureListComponent = (props: ILectureListProps): JSX.Element => {
         />
       ))}
       <Portal container={document.body}>
-        <Snackbar open={alert} onClose={handleAlertClose} sx={{ mb: 2, ml: 2 }}>
-          <MuiAlert
+        {alert && (
+          <Alert
             onClose={handleAlertClose}
             severity={severity as AlertProps['severity']}
-            sx={{ width: '100%' }}
+            sx={{ position: 'fixed', left: '50%', ml: '-50px', mt: 10 }}
           >
-            {alertMessage}
-          </MuiAlert>
-        </Snackbar>
+            <AlertTitle>{alertMessage}</AlertTitle>
+          </Alert>
+        )}
       </Portal>
     </div>
   );

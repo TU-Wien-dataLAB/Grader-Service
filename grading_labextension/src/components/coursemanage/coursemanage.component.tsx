@@ -3,8 +3,7 @@ import { Lecture } from '../../model/lecture';
 import { getAllLectures } from '../../services/lectures.service';
 import { Scope, UserPermissions } from '../../services/permission.service';
 import { LectureComponent } from './lecture';
-import { AlertProps, Portal, Snackbar } from '@mui/material';
-import MuiAlert from '@mui/material/Alert';
+import { Alert, AlertProps, AlertTitle, Portal } from '@mui/material';
 
 export interface ICourseManageProps {
   // lectures: Array<Lecture>;
@@ -21,6 +20,7 @@ export const CourseManageComponent = (props: ICourseManageProps) => {
     setAlertMessage(msg);
     setAlert(true);
   };
+
   const handleAlertClose = (
     event?: React.SyntheticEvent | Event,
     reason?: string
@@ -57,15 +57,15 @@ export const CourseManageComponent = (props: ICourseManageProps) => {
           />
         ))}
       <Portal container={document.body}>
-        <Snackbar open={alert} onClose={handleAlertClose} sx={{ mb: 2, ml: 2 }}>
-          <MuiAlert
+        {alert && (
+          <Alert
             onClose={handleAlertClose}
             severity={severity as AlertProps['severity']}
-            sx={{ width: '100%' }}
+            sx={{ position: 'fixed', left: '50%', ml: '-50px', mt: 10 }}
           >
-            {alertMessage}
-          </MuiAlert>
-        </Snackbar>
+            <AlertTitle>{alertMessage}</AlertTitle>
+          </Alert>
+        )}
       </Portal>
     </div>
   );
