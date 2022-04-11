@@ -6,8 +6,6 @@ package-job-1:
   # image: ${REGISTRY_URL}/devops/helm-kubectl-rootles:latest
   image: mbwali/helm-cmpush:latest
   tags:
-  # - demo
-  # - dind
   - bootstrap
   before_script:
   - helm --help
