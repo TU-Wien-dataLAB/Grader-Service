@@ -44,7 +44,12 @@ export const AssignmentFilesComponent = (
 
   const resetAssignmentHandler = async () => {
     try {
-      await pushAssignment(props.lecture.id, props.assignment.id, "assignment", "Pre-Reset");
+      await pushAssignment(
+        props.lecture.id,
+        props.assignment.id,
+        'assignment',
+        'Pre-Reset'
+      );
       await resetAssignment(props.lecture, props.assignment);
       await pullAssignment(props.lecture.id, props.assignment.id, 'assignment');
       props.showAlert('success', 'Successfully Reset Assignment');
@@ -94,25 +99,25 @@ export const AssignmentFilesComponent = (
 
       <Stack direction={'row'} spacing={1} sx={{ m: 1, ml: 2 }}>
         {props.assignment.type === 'group' && (
-          <div>
-            <Button
-              variant="outlined"
-              size="small"
-              onClick={pushAssignmentHandler}
-            >
-              <PublishRoundedIcon fontSize="small" sx={{ mr: 1 }} />
-              Push
-            </Button>
+          <Button
+            variant="outlined"
+            size="small"
+            onClick={pushAssignmentHandler}
+          >
+            <PublishRoundedIcon fontSize="small" sx={{ mr: 1 }} />
+            Push
+          </Button>
+        )}
 
-            <Button
-              variant="outlined"
-              size="small"
-              onClick={() => fetchAssignmentHandler('assignment')}
-            >
-              <GetAppRoundedIcon fontSize="small" sx={{ mr: 1 }} />
-              Pull
-            </Button>
-          </div>
+        {props.assignment.type === 'group' && (
+          <Button
+            variant="outlined"
+            size="small"
+            onClick={() => fetchAssignmentHandler('assignment')}
+          >
+            <GetAppRoundedIcon fontSize="small" sx={{ mr: 1 }} />
+            Pull
+          </Button>
         )}
         <Button
           variant="outlined"

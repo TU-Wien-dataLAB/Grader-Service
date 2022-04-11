@@ -203,6 +203,10 @@ export const EditDialog = (props: IEditDialogProps) => {
                 id="assignment-type-select"
                 value={formik.values.type}
                 label="Type"
+                disabled={
+                  props.assignment.status === 'complete' ||
+                  props.assignment.status === 'released'
+                }
                 onChange={e => {
                   formik.setFieldValue('type', e.target.value);
                 }}

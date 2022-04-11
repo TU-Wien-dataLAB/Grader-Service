@@ -42,7 +42,7 @@ export const AssignmentModalComponent = (props: IAssignmentModalProps) => {
           overflowY: 'auto'
         }}
       >
-        {navigation == 0 && (
+        {navigation === 0 && (
           <OverviewComponent
             lecture={props.lecture}
             assignment={props.assignment}
@@ -53,7 +53,7 @@ export const AssignmentModalComponent = (props: IAssignmentModalProps) => {
           />
         )}
 
-        {navigation == 1 && (
+        {navigation === 1 && (
           <GradingComponent
             lecture={props.lecture}
             assignment={props.assignment}
