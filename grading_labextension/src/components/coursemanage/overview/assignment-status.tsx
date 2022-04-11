@@ -2,11 +2,8 @@ import { Assignment } from '../../../model/assignment';
 import {
   Box,
   Button,
-  Card,
-  CardContent,
-  CardHeader, Paper,
+  Paper,
   Step,
-  StepContent,
   StepLabel,
   Stepper,
   Typography
@@ -35,7 +32,7 @@ const getActiveStep = (status: Assignment.StatusEnum) => {
     case 'released':
       return 2;
     case 'complete':
-      return 4;
+      return 3;
   }
 };
 
@@ -48,9 +45,7 @@ export const AssignmentStatus = (props: IAssignmentStatusProps) => {
     handleAgree: null,
     handleDisagree: null
   });
-  const [activeStep, setActiveStep] = React.useState(
-    getActiveStep(assignment.status)
-  );
+
   const closeDialog = () => setShowDialog(false);
 
   const steps = [
@@ -150,7 +145,7 @@ export const AssignmentStatus = (props: IAssignmentStatusProps) => {
   const completeAssignment = async () => {
     setDialogContent({
       title: 'Complete Assignment',
-      message: `Do you want to mark ${assignment.name} as complete?`,
+      message: `Do you want to mark ${assignment.name} as complete? This action will hide the assignment for all students!`,
       handleAgree: async () => {
         try {
           let a = assignment;
@@ -172,7 +167,10 @@ export const AssignmentStatus = (props: IAssignmentStatusProps) => {
   return (
     <Paper elevation={3}>
       <Box sx={{ overflowX: 'auto', p: 3 }}>
-        <Stepper activeStep={activeStep} orientation="horizontal">
+        <Stepper
+          activeStep={getActiveStep(assignment.status)}
+          orientation="horizontal"
+        >
           {steps.map((step, index) => (
             <Step key={step.label}>
               <StepLabel
@@ -187,7 +185,9 @@ export const AssignmentStatus = (props: IAssignmentStatusProps) => {
             </Step>
           ))}
         </Stepper>
-        <Typography>{steps[activeStep].description}</Typography>
+        <Typography>
+          {steps[getActiveStep(assignment.status)].description}
+        </Typography>
       </Box>
       <AgreeDialog open={showDialog} {...dialogContent} />
     </Paper>

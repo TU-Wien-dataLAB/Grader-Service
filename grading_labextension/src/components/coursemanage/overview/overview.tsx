@@ -81,7 +81,7 @@ export const OverviewComponent = (props: IOverviewProps) => {
             />
           </Grid>
 
-          <Grid item xs={12} md={3} lg={3}>
+          <Grid item xs={12} md={6} lg={3}>
             <SubmittedChart
               lecture={lecture}
               assignment={assignment}
@@ -90,7 +90,7 @@ export const OverviewComponent = (props: IOverviewProps) => {
             />
           </Grid>
 
-          <Grid item xs={12} md={3} lg={3}>
+          <Grid item xs={12} md={6} lg={3}>
             <GradingChart
               lecture={lecture}
               assignment={assignment}
