@@ -2,19 +2,35 @@ stages:
 - build
 - charts
 
+variables:
+  RIMAGE:      "adlsregistrydev.azurecr.io/devops/alldevops:latest"
+
+  #Azure
+  KV:          "kv-admin-os-k8s"
+  KV_SVC:      "kv-service-os-k8s"
+  REGISTRY:    "adlsregistrydev"
+
 
 build-grader-image:
   stage: build
-  tags:
-  - bootstrap
+  tags: [docker,core]
   only:
     changes:
       - ./Dockerfile_service
   before_script:
-  - docker login -u ${REGISTRY_USER} -p ${REGISTRY_KEY} ${REGISTRY_URL}
+  - export targetname="${REGISTRY}.azurecr.io/grader-service:latest"
+  - echo $targetname
   script:
-  - echo "TODO:add building image command"
-  - echo "TODO:push image to registry command"
+  # build image
+  - docker build -t ${targetname} -f Dockerfile_service .
+  # push image
+  - az login -u ${service_az_tuw_client_id} -p ${service_az_tuw_client_secret} --service-principal -t ${azure_tenant_id}
+  - az acr login --name $REGISTRY
+  - docker push ${targetname}
+  after_script:
+  # logout
+  - docker logout
+  - az logout
 
 
 trigger_charts_package:
