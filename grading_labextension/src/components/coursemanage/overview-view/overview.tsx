@@ -2,7 +2,7 @@ import * as React from 'react';
 
 import { Assignment } from '../../../model/assignment';
 import { Lecture } from '../../../model/lecture';
-import { EditDialog } from '../dialog';
+import { EditDialog } from '../../util/dialog';
 import { ModalTitle } from '../../util/modal-title';
 import { GradingChart, SubmittedChart } from './charts';
 import { OverviewCard } from './overview-card';
@@ -24,7 +24,6 @@ export interface IOverviewProps {
 
 export const OverviewComponent = (props: IOverviewProps) => {
   const [assignment, setAssignment] = React.useState(props.assignment);
-  const lecture = props.lecture;
 
   const onAssignmentChange = (assignment: Assignment) => {
     setAssignment(assignment);
@@ -38,7 +37,7 @@ export const OverviewComponent = (props: IOverviewProps) => {
             lecture={props.lecture}
             assignment={assignment}
             onSubmit={() =>
-              getAssignment(lecture.id, assignment).then(assignment =>
+              getAssignment(props.lecture.id, assignment).then(assignment =>
                 setAssignment(assignment)
               )
             }
@@ -46,7 +45,7 @@ export const OverviewComponent = (props: IOverviewProps) => {
         </Box>
       </ModalTitle>
       <Box sx={{ ml: 3, mr: 3, mb: 3, mt: 3 }}>
-        <Grid container spacing={2}>
+        <Grid container spacing={2} alignItems="stretch">
           <Grid item xs={12} md={12} lg={12}>
             <AssignmentStatus
               lecture={props.lecture}
@@ -56,17 +55,18 @@ export const OverviewComponent = (props: IOverviewProps) => {
             />
           </Grid>
 
-          <Grid item xs={12} md={6} lg={4}>
+          <Grid item xs={12} md={6} lg={3}>
             <OverviewCard
+              lecture={props.lecture}
               assignment={assignment}
               allSubmissions={props.allSubmissions}
               users={props.users}
             />
           </Grid>
 
-          <Grid item xs={12} md={6} lg={4}>
+          <Grid item xs={12} md={6} lg={5}>
             <Files
-              lecture={lecture}
+              lecture={props.lecture}
               assignment={assignment}
               onAssignmentChange={onAssignmentChange}
               showAlert={props.showAlert}
@@ -75,27 +75,9 @@ export const OverviewComponent = (props: IOverviewProps) => {
 
           <Grid item xs={12} md={6} lg={4}>
             <GitLog
-              lecture={lecture}
+              lecture={props.lecture}
               assignment={assignment}
               repoType={RepoType.SOURCE}
-            />
-          </Grid>
-
-          <Grid item xs={12} md={6} lg={3}>
-            <SubmittedChart
-              lecture={lecture}
-              assignment={assignment}
-              allSubmissions={props.allSubmissions}
-              users={props.users}
-            />
-          </Grid>
-
-          <Grid item xs={12} md={6} lg={3}>
-            <GradingChart
-              lecture={lecture}
-              assignment={assignment}
-              allSubmissions={props.allSubmissions}
-              users={props.users}
             />
           </Grid>
         </Grid>

@@ -1,4 +1,4 @@
-import { Card, CardHeader, CardContent, Box } from '@mui/material';
+import { Card, CardHeader, CardContent, Box, Paper } from '@mui/material';
 import * as React from 'react';
 import 'chart.js/auto';
 import { Pie } from 'react-chartjs-2';
@@ -24,11 +24,11 @@ export const GradingChart = (props: IChartsProps) => {
       if (sub.feedback_available) {
         done++;
       } else if (
-        sub.auto_status == 'automatically_graded' ||
-        sub.manual_status == 'manually_graded'
+        sub.auto_status === 'automatically_graded' ||
+        sub.manual_status === 'manually_graded'
       ) {
         grading++;
-      } else if (sub.auto_status == 'grading_failed') {
+      } else if (sub.auto_status === 'grading_failed') {
         failed++;
       } else {
         not++;
@@ -75,14 +75,9 @@ export const GradingChart = (props: IChartsProps) => {
   };
 
   return (
-    <Card elevation={3} className="flexbox-item">
-      <CardHeader title="Grading Status" />
-      <CardContent>
-        <Box sx={{ height: '300px', width: '300px' }}>
+        <Box sx={{ height: '200px', width: '350px' }}>
           <Pie data={gradingDataProps} />
         </Box>
-      </CardContent>
-    </Card>
   );
 };
 
@@ -118,13 +113,8 @@ export const SubmittedChart = (props: IChartsProps) => {
   };
 
   return (
-    <Card elevation={3} className="flexbox-item">
-      <CardHeader title="User Submission Status" />
-      <CardContent>
-        <Box sx={{ height: '300px', width: '300px' }}>
-          <Pie data={submittedDataProps} />
-        </Box>
-      </CardContent>
-    </Card>
+    <Box sx={{ height: '200px', width: '350px' }}>
+      <Pie data={submittedDataProps} />
+    </Box>
   );
 };

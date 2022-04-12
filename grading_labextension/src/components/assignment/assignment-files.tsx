@@ -14,7 +14,7 @@ import { Button, Stack } from '@mui/material';
 import { FilesList } from '../util/file-list';
 import PublishRoundedIcon from '@mui/icons-material/PublishRounded';
 import GetAppRoundedIcon from '@mui/icons-material/GetAppRounded';
-import { AgreeDialog } from '../coursemanage/dialog';
+import { AgreeDialog } from '../util/dialog';
 import RestartAltIcon from '@mui/icons-material/RestartAlt';
 import GradingIcon from '@mui/icons-material/Grading';
 import { Submission } from '../../model/submission';

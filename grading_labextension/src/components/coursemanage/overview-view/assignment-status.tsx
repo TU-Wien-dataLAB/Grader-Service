@@ -12,7 +12,7 @@ import * as React from 'react';
 import NewReleasesRoundedIcon from '@mui/icons-material/NewReleasesRounded';
 import TaskIcon from '@mui/icons-material/Task';
 
-import { AgreeDialog } from '../dialog';
+import { AgreeDialog } from '../../util/dialog';
 import { updateAssignment } from '../../../services/assignments.service';
 import { Lecture } from '../../../model/lecture';
 

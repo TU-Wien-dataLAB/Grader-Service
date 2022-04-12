@@ -10,8 +10,8 @@ import MoreVertIcon from '@mui/icons-material/MoreVert';
 import { Assignment } from '../../model/assignment';
 import { Lecture } from '../../model/lecture';
 import { getAllSubmissions } from '../../services/submissions.service';
-import { GradingComponent } from './grading';
-import { OverviewComponent } from './overview/overview';
+import { GradingComponent } from './grading-view/grading';
+import { OverviewComponent } from './overview-view/overview';
 import { Submission } from '../../model/submission';
 
 export interface IAssignmentModalProps {

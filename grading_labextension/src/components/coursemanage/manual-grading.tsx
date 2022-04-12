@@ -11,7 +11,7 @@ import {
 import { GradeBook } from '../../services/gradebook';
 import { createManualFeedback } from '../../services/grading.service';
 import { FilesList } from '../util/file-list';
-import { AgreeDialog } from './dialog';
+import { AgreeDialog } from '../util/dialog';
 
 export interface IManualGradingProps {
   lecture: Lecture;

@@ -4,9 +4,9 @@ import {
   GridSelectionModel
 } from '@mui/x-data-grid';
 import * as React from 'react';
-import { Assignment } from '../../model/assignment';
-import { Lecture } from '../../model/lecture';
-import { utcToLocalFormat } from '../../services/datetime.service';
+import { Assignment } from '../../../model/assignment';
+import { Lecture } from '../../../model/lecture';
+import { utcToLocalFormat } from '../../../services/datetime.service';
 import {
   Box,
   Button,
@@ -23,19 +23,19 @@ import {
   IconButton
 } from '@mui/material';
 import Select, { SelectChangeEvent } from '@mui/material/Select';
-import { getAllSubmissions } from '../../services/submissions.service';
-import { AgreeDialog } from './dialog';
+import { getAllSubmissions } from '../../../services/submissions.service';
+import { AgreeDialog } from '../../util/dialog';
 import NavigateNextIcon from '@mui/icons-material/NavigateNext';
-import { ModalTitle } from '../util/modal-title';
-import { User } from '../../model/user';
-import { Submission } from '../../model/submission';
+import { ModalTitle } from '../../util/modal-title';
+import { User } from '../../../model/user';
+import { Submission } from '../../../model/submission';
 import {
   autogradeSubmission,
   generateFeedback
-} from '../../services/grading.service';
-import LoadingOverlay from '../util/overlay';
-import { getAssignment } from '../../services/assignments.service';
-import { ManualGrading } from './manual-grading';
+} from '../../../services/grading.service';
+import LoadingOverlay from '../../util/overlay';
+import { getAssignment } from '../../../services/assignments.service';
+import { ManualGrading } from '../manual-grading';
 import { PanoramaSharp } from '@mui/icons-material';
 import ReplayIcon from '@mui/icons-material/Replay';
 

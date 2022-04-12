@@ -8,7 +8,7 @@ import {
   updateAssignment
 } from '../../../services/assignments.service';
 import GetAppRoundedIcon from '@mui/icons-material/GetAppRounded';
-import { AgreeDialog, CommitDialog } from '../dialog';
+import { AgreeDialog, CommitDialog } from '../../util/dialog';
 import {
   Button,
   Card,

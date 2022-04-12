@@ -13,7 +13,7 @@ import { Assignment } from '../../model/assignment';
 import { Lecture } from '../../model/lecture';
 import { getAllAssignments } from '../../services/assignments.service';
 import { AssignmentComponent } from './assignment';
-import { CreateDialog, EditLectureDialog } from './dialog';
+import { CreateDialog, EditLectureDialog } from '../util/dialog';
 import { getLecture, getUsers } from '../../services/lectures.service';
 import { red } from '@mui/material/colors';
 

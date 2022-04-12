@@ -2,7 +2,7 @@ import { Box, IconButton, Menu, MenuItem } from '@mui/material';
 import * as React from 'react';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import { PageConfig } from '@jupyterlab/coreutils';
-import { GlobalObjects } from '../../..';
+import { GlobalObjects } from '../../../index';
 import { MainAreaWidget } from '@jupyterlab/apputils';
 import { ITerminal } from '@jupyterlab/terminal';
 import { Terminal } from '@jupyterlab/services';
