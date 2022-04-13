@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { useFormik } from 'formik';
+import {useFormik} from 'formik';
 import * as yup from 'yup';
 
 import AdapterDateFns from '@mui/lab/AdapterDateFns';
@@ -28,21 +28,22 @@ import {
   Card,
   CardActionArea
 } from '@mui/material';
-import { Assignment } from '../../model/assignment';
-import { LoadingButton } from '@mui/lab';
+import {Assignment} from '../../model/assignment';
+import {LoadingButton} from '@mui/lab';
 import EditIcon from '@mui/icons-material/Edit';
 import AddRoundedIcon from '@mui/icons-material/AddRounded';
 import {
   createAssignment,
   updateAssignment
 } from '../../services/assignments.service';
-import { Lecture } from '../../model/lecture';
+import {Lecture} from '../../model/lecture';
 import TypeEnum = Assignment.TypeEnum;
 import AutomaticGradingEnum = Assignment.AutomaticGradingEnum;
-import { updateLecture } from '../../services/lectures.service';
+import {updateLecture} from '../../services/lectures.service';
 import HelpOutlineOutlinedIcon from '@mui/icons-material/HelpOutlineOutlined';
 import AddIcon from '@mui/icons-material/Add';
 import PublishRoundedIcon from '@mui/icons-material/PublishRounded';
+import NewReleasesRoundedIcon from "@mui/icons-material/NewReleasesRounded";
 
 const gradingBehaviourHelp = `Specifies the behaviour when a students submits an assignment.\n
 No Automatic Grading: No action is taken on submit.\n
@@ -102,7 +103,7 @@ export const EditDialog = (props: IEditDialogProps) => {
   return (
     <div>
       <IconButton
-        sx={{ mt: -1 }}
+        sx={{mt: -1}}
         onClick={e => {
           e.stopPropagation();
           setOpen(true);
@@ -110,7 +111,7 @@ export const EditDialog = (props: IEditDialogProps) => {
         onMouseDown={event => event.stopPropagation()}
         aria-label="edit"
       >
-        <EditIcon />
+        <EditIcon/>
       </IconButton>
       <Dialog open={openDialog} onBackdropClick={() => setOpen(false)}>
         <DialogTitle>Edit Assignment</DialogTitle>
@@ -179,7 +180,7 @@ export const EditDialog = (props: IEditDialogProps) => {
                 <Tooltip title={gradingBehaviourHelp}>
                   <HelpOutlineOutlinedIcon
                     fontSize={'small'}
-                    sx={{ ml: 1.5, mt: 1.0 }}
+                    sx={{ml: 1.5, mt: 1.0}}
                   />
                 </Tooltip>
               </InputLabel>
@@ -284,7 +285,7 @@ export const EditLectureDialog = (props: IEditLectureProps) => {
   return (
     <div>
       <IconButton
-        sx={{ mt: -1 }}
+        sx={{mt: -1}}
         onClick={e => {
           e.stopPropagation();
           setOpen(true);
@@ -292,7 +293,7 @@ export const EditLectureDialog = (props: IEditLectureProps) => {
         onMouseDown={event => event.stopPropagation()}
         aria-label="edit"
       >
-        <EditIcon />
+        <EditIcon/>
       </IconButton>
       <Dialog open={openDialog} onBackdropClick={() => setOpen(false)}>
         <DialogTitle>Edit Lecture</DialogTitle>
@@ -360,7 +361,7 @@ interface INewAssignmentCardProps {
 
 export default function NewAssignmentCard(props: INewAssignmentCardProps) {
   return (
-    <Card sx={{ width: 225, height: 225, m: 1.5, backgroundColor: '#fcfcfc' }}>
+    <Card sx={{width: 225, height: 225, m: 1.5, backgroundColor: '#fcfcfc'}}>
       <Tooltip title={'New Assignment'}>
         <CardActionArea
           onClick={props.onClick}
@@ -372,7 +373,7 @@ export default function NewAssignmentCard(props: INewAssignmentCardProps) {
             alignItems: 'center'
           }}
         >
-          <AddIcon sx={{ fontSize: 50 }} color="disabled" />
+          <AddIcon sx={{fontSize: 50}} color="disabled"/>
         </CardActionArea>
       </Tooltip>
     </Card>
@@ -489,7 +490,7 @@ export const CreateDialog = (props: ICreateDialogProps) => {
                 <Tooltip title={gradingBehaviourHelp}>
                   <HelpOutlineOutlinedIcon
                     fontSize={'small'}
-                    sx={{ ml: 1.5, mt: 1.0 }}
+                    sx={{ml: 1.5, mt: 1.0}}
                   />
                 </Tooltip>
               </InputLabel>
@@ -544,7 +545,7 @@ export const CreateDialog = (props: ICreateDialogProps) => {
 };
 
 export interface ICommitDialogProps {
-  handleSubmit: (msg: string) => void;
+  handleCommit: (msg: string) => void;
 }
 
 export const CommitDialog = (props: ICommitDialogProps) => {
@@ -554,12 +555,12 @@ export const CommitDialog = (props: ICommitDialogProps) => {
   return (
     <div>
       <Button
-        sx={{ mt: -1 }}
+        sx={{mt: -1}}
         onClick={() => setOpen(true)}
         variant="outlined"
         size="small"
       >
-        <PublishRoundedIcon fontSize="small" sx={{ mr: 1 }} />
+        <PublishRoundedIcon fontSize="small" sx={{mr: 1}}/>
         Commit
       </Button>
       <Dialog
@@ -572,7 +573,7 @@ export const CommitDialog = (props: ICommitDialogProps) => {
         <DialogTitle>Commit Files</DialogTitle>
         <DialogContent>
           <TextField
-            sx={{ mt: 2, width: '100%' }}
+            sx={{mt: 2, width: '100%'}}
             id="outlined-textarea"
             label="Commit Message"
             placeholder="Commit Message"
@@ -598,7 +599,7 @@ export const CommitDialog = (props: ICommitDialogProps) => {
             type="submit"
             disabled={message === ''}
             onClick={() => {
-              props.handleSubmit(message);
+              props.handleCommit(message);
               setOpen(false);
             }}
           >
@@ -654,4 +655,83 @@ export const AgreeDialog = (props: IAgreeDialogProps) => {
     </Dialog>
   );
 };
-//ReactDOM.render(<EditDialog />, document.getElementById("root"));
+
+export interface IReleaseDialogProps extends ICommitDialogProps {
+  assignment: Assignment,
+  handleRelease: () => void;
+}
+
+export const ReleaseDialog = (props: IReleaseDialogProps) => {
+  const [agreeOpen, setAgreeOpen] = React.useState(false);
+  const [commitOpen, setCommitOpen] = React.useState(false);
+  const [message, setMessage] = React.useState('');
+  const [loading, setLoading] = React.useState(false);
+
+  const agreeMessage = `Do you want to release "${props.assignment.name}" for all students? Before releasing, all changes are pushed again as the release version.`;
+
+  return (
+    <div>
+      <Button
+        sx={{mt: 1}}
+        onClick={() => setAgreeOpen(true)}
+        variant="outlined"
+        size="small"
+      >
+        <NewReleasesRoundedIcon fontSize="small" sx={{mr: 1}}/>
+        Release
+      </Button>
+      <AgreeDialog open={agreeOpen} title={'Release Assignment'} message={agreeMessage} handleAgree={() => {
+        setAgreeOpen(false);
+        setCommitOpen(true);
+      }} handleDisagree={() => setAgreeOpen(false)}/>
+      <Dialog
+        open={commitOpen}
+        onBackdropClick={() => setCommitOpen(false)}
+        onClose={() => setCommitOpen(false)}
+        fullWidth={true}
+        maxWidth={'sm'}
+      >
+        <DialogTitle>Commit Files</DialogTitle>
+        <DialogContent>
+          <TextField
+            sx={{mt: 2, width: '100%'}}
+            id="outlined-textarea"
+            label="Commit Message"
+            placeholder="Commit Message"
+            value={message}
+            onChange={event => setMessage(event.target.value)}
+            multiline
+          />
+        </DialogContent>
+        <DialogActions>
+          <Button
+            color="primary"
+            variant="outlined"
+            onClick={() => {
+              setCommitOpen(false);
+            }}
+          >
+            Cancel
+          </Button>
+
+          <LoadingButton
+            loading={loading}
+            color="primary"
+            variant="contained"
+            type="submit"
+            disabled={message === ''}
+            onClick={async () => {
+              setLoading(true);
+              await props.handleCommit(message);
+              await props.handleRelease();
+              setLoading(false);
+              setCommitOpen(false);
+            }}
+          >
+            Commit and Release
+          </LoadingButton>
+        </DialogActions>
+      </Dialog>
+    </div>
+  )
+}

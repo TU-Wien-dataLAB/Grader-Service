@@ -194,7 +194,7 @@ export const Files = (props: IFilesProps) => {
         </Box>
       </CardContent>
       <CardActions>
-        <CommitDialog handleSubmit={msg => handlePushAssignment(msg)} />
+        <CommitDialog handleCommit={msg => handlePushAssignment(msg)} />
         <Button
           sx={{ mt: -1, ml: 2 }}
           onClick={() => handlePullAssignment()}
