@@ -146,17 +146,14 @@ class PullHandler(ExtensionBaseHandler):
             assignment_name=assignment["name"],
             repo_type=repo,
             config=self.config,
-            force_user_repo=True if repo == "release" else False,
+            force_user_repo=repo == "release",
         )
         try:
             if not git_service.is_git():
                 git_service.init()
                 git_service.set_author()
             git_service.set_remote(f"grader_{repo}")
-            try:
-                git_service.pull(f"grader_{repo}", force=True)
-            except GitError as e:
-                self.log.error("GitError:\n" + e.error)
+            git_service.pull(f"grader_{repo}", force=True)
             self.write("OK")
         except GitError as e:
             self.log.error("GitError:\n" + e.error)

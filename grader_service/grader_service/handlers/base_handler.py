@@ -182,6 +182,15 @@ class GraderBaseHandler(SessionMixin, web.RequestHandler):
 
         return path
 
+    @staticmethod
+    def is_base_git_dir(path: str) -> bool:
+        try:
+            out = subprocess.run(["git", "rev-parse", "--is-bare-repository"], cwd=path, capture_output=True)
+            is_git = out.returncode == 0 and "true" in out.stdout.decode("utf-8")
+        except FileNotFoundError:
+            is_git = False
+        return is_git
+
     def _run_command(self, command, cwd=None, capture_output=False):
         """Starts a sub process and runs an cmd command
 

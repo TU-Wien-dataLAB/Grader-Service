@@ -1,5 +1,6 @@
 import json
 import shutil
+import subprocess
 import sys
 import tornado
 import os
@@ -88,6 +89,24 @@ class AssignmentBaseHandler(GraderBaseHandler):
             self.log.error(e)
             self.session.rollback()
             raise HTTPError(400, reason="Cannot add object to database.")
+
+        try:
+            # source
+            path = self.construct_git_dir("source", assignment.lecture, assignment)
+            if not self.is_base_git_dir(path):
+                os.makedirs(path, exist_ok=True)
+                self.log.info("Running: git init --bare (source repo)")
+                subprocess.run(["git", "init", "--bare", path], check=True)
+
+            # release
+            path = self.construct_git_dir("release", assignment.lecture, assignment)
+            if not self.is_base_git_dir(path):
+                os.makedirs(path, exist_ok=True)
+                self.log.info("Running: git init --bare (release repo)")
+                subprocess.run(["git", "init", "--bare", path], check=True)
+        except subprocess.CalledProcessError:
+            raise HTTPError(400)
+
         self.write_json(assignment)
 
 

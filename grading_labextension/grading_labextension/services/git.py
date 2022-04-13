@@ -167,7 +167,9 @@ class GitService(Configurable):
         self._run_command(f'sh -c \'git add -A && git commit --allow-empty -m "{m}"\'', cwd=self.path)
 
     def set_author(self, author=getpass.getuser()):
+        # TODO: maybe ask user to specify their own choices
         self._run_command(f'git config user.name "{author}"', cwd=self.path)
+        self._run_command(f'git config user.email "sample@mail.com"', cwd=self.path)
 
     def clone(self, origin: str, force=False):
         """Clones the repository

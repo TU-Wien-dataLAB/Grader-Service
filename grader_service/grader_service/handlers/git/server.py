@@ -145,12 +145,7 @@ class GitBaseHandler(GraderBaseHandler):
             return None
 
         os.makedirs(os.path.dirname(path), exist_ok=True)
-
-        try:
-            out = subprocess.run(["git", "rev-parse", "--is-bare-repository"], cwd=path, capture_output=True)
-            is_git = out.returncode == 0 and "true" in out.stdout.decode("utf-8")
-        except FileNotFoundError:
-            is_git = False
+        is_git = self.is_base_git_dir(path)
         # return git repo
         if os.path.exists(path) and is_git:
             return path
@@ -160,7 +155,6 @@ class GitBaseHandler(GraderBaseHandler):
             try:
                 self.log.info("Running: git init --bare")
                 subprocess.run(["git", "init", "--bare", path], check=True)
-                # TODO: initialize repo with release repo
             except subprocess.CalledProcessError:
                 return None
             return path
