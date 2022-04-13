@@ -3,17 +3,21 @@ stages:
 - charts
 
 variables:
-  RIMAGE:      "adlsregistrydev.azurecr.io/devops/alldevops:latest"
+  RIMAGE:      "adlsregistrydev.azurecr.io/devops/alldevops:latest" # image that is used in the runner
 
   #Azure
   KV:          "kv-admin-os-k8s"
   KV_SVC:      "kv-service-os-k8s"
-  REGISTRY:    "adlsregistrydev"
-
+  REGISTRY:    "adlsregistrysbx"
+  SERVICE:     "k8s"
 
 build-grader-image:
   stage: build
-  tags: [docker,core]
+  environment:
+    name: $CI_COMMIT_BRANCH
+    action: prepare
+    url: https://grader.k8s.$CI_COMMIT_BRANCH.austrianopensciencecloud.org
+  tags: [demo,dind]
   only:
     changes:
       - ./Dockerfile_service
@@ -23,14 +27,16 @@ build-grader-image:
   script:
   # build image
   - docker build -t ${targetname} -f Dockerfile_service .
-  # push image
-  - az login -u ${service_az_tuw_client_id} -p ${service_az_tuw_client_secret} --service-principal -t ${azure_tenant_id}
-  - az acr login --name $REGISTRY
-  - docker push ${targetname}
-  after_script:
-  # logout
-  - docker logout
-  - az logout
+  # # push image
+  # - az login -u ${service_az_tuw_client_id} -p ${service_az_tuw_client_secret} --service-principal -t ${AZURERM_tenant_id}
+  # - az acr login --name $REGISTRY
+
+  # # - docker login -u ${REGISTRY_USER} -p ${REGISTRY_KEY} ${REGISTRY_URL}
+  # - docker push ${targetname}
+
+  # # logout
+  # - docker logout
+  # - az logout
 
 
 trigger_charts_package:
