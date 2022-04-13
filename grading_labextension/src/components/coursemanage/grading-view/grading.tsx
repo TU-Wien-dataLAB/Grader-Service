@@ -4,9 +4,9 @@ import {
   GridSelectionModel
 } from '@mui/x-data-grid';
 import * as React from 'react';
-import { Assignment } from '../../../model/assignment';
-import { Lecture } from '../../../model/lecture';
-import { utcToLocalFormat } from '../../../services/datetime.service';
+import {Assignment} from '../../../model/assignment';
+import {Lecture} from '../../../model/lecture';
+import {utcToLocalFormat} from '../../../services/datetime.service';
 import {
   Box,
   Button,
@@ -22,21 +22,21 @@ import {
   Tooltip,
   IconButton
 } from '@mui/material';
-import Select, { SelectChangeEvent } from '@mui/material/Select';
-import { getAllSubmissions } from '../../../services/submissions.service';
-import { AgreeDialog } from '../../util/dialog';
+import Select, {SelectChangeEvent} from '@mui/material/Select';
+import {getAllSubmissions} from '../../../services/submissions.service';
+import {AgreeDialog} from '../../util/dialog';
 import NavigateNextIcon from '@mui/icons-material/NavigateNext';
-import { ModalTitle } from '../../util/modal-title';
-import { User } from '../../../model/user';
-import { Submission } from '../../../model/submission';
+import {ModalTitle} from '../../util/modal-title';
+import {User} from '../../../model/user';
+import {Submission} from '../../../model/submission';
 import {
   autogradeSubmission,
   generateFeedback
 } from '../../../services/grading.service';
 import LoadingOverlay from '../../util/overlay';
-import { getAssignment } from '../../../services/assignments.service';
-import { ManualGrading } from '../manual-grading';
-import { PanoramaSharp } from '@mui/icons-material';
+import {getAssignment} from '../../../services/assignments.service';
+import {ManualGrading} from '../manual-grading';
+import {PanoramaSharp} from '@mui/icons-material';
 import ReplayIcon from '@mui/icons-material/Replay';
 
 export interface IGradingProps {
@@ -229,9 +229,9 @@ export const GradingComponent = (props: IGradingProps) => {
   };
 
   const columns = [
-    { field: 'sub_id', headerName: 'No.', width: 110 },
-    { field: 'username', headerName: 'User', width: 130 },
-    { field: 'submitted_at', headerName: 'Date', width: 170 },
+    {field: 'sub_id', headerName: 'No.', width: 110},
+    {field: 'username', headerName: 'User', width: 130},
+    {field: 'submitted_at', headerName: 'Date', width: 170},
     {
       field: 'auto_status',
       headerName: 'Autograde-Status',
@@ -270,7 +270,7 @@ export const GradingComponent = (props: IGradingProps) => {
         />
       )
     },
-    { field: 'score', headerName: 'Score', width: 130 }
+    {field: 'score', headerName: 'Score', width: 130}
   ];
 
   //TODO: Not perfomant
@@ -297,18 +297,18 @@ export const GradingComponent = (props: IGradingProps) => {
   return (
     <div>
       <ModalTitle title="Grading">
-        <Box sx={{ ml: 2 }} display="inline-block">
+        <Box sx={{ml: 2}} display="inline-block">
           <Tooltip title="Reload">
             <IconButton aria-label="reload" onClick={updateSubmissions}>
-              <ReplayIcon />
+              <ReplayIcon/>
             </IconButton>
           </Tooltip>
         </Box>
       </ModalTitle>
-      <div style={{ display: 'flex', height: '65vh', marginTop: '30px' }}>
-        <div style={{ flexGrow: 1 }}>
+      <div style={{display: 'flex', height: '50vh', marginTop: '30px'}}>
+        <div style={{flexGrow: 1}}>
           <DataGrid
-            sx={{ mb: 3, ml: 3, mr: 3 }}
+            sx={{mb: 3, ml: 3, mr: 3}}
             columns={columns}
             rows={rows}
             checkboxSelection
@@ -325,8 +325,8 @@ export const GradingComponent = (props: IGradingProps) => {
           />
         </div>
       </div>
-      <span>
-        <FormControl sx={{ m: 3 }}>
+      <span style={{height: '15vh'}}>
+        <FormControl sx={{m: 3}}>
           <InputLabel id="submission-select-label">View</InputLabel>
           <Select
             labelId="submission-select-label"
@@ -341,11 +341,11 @@ export const GradingComponent = (props: IGradingProps) => {
         </FormControl>
         <Button
           disabled={selectedRows.length === 0}
-          sx={{ m: 3 }}
+          sx={{m: 3}}
           variant="outlined"
           onClick={handleAutogradeSubmissions}
         >
-          {`Autograde ${selectedRows.length} selected`}
+          {`Autograde (${selectedRows.length})`}
         </Button>
         <NavigateNextIcon
           color={
@@ -353,45 +353,45 @@ export const GradingComponent = (props: IGradingProps) => {
             selectedRowsData[0]?.auto_status !== 'automatically_graded'
               ? 'error'
               : selectedRowsData.length !== 1 ||
-                selectedRowsData[0]?.auto_status !== 'automatically_graded'
-              ? 'disabled'
-              : 'primary'
+              selectedRowsData[0]?.auto_status !== 'automatically_graded'
+                ? 'disabled'
+                : 'primary'
           }
-          sx={{ mb: -1 }}
+          sx={{mb: -1}}
         />
         <Button
           disabled={
             selectedRowsData.length !== 1 ||
             selectedRowsData[0]?.auto_status !== 'automatically_graded'
           }
-          sx={{ m: 3 }}
+          sx={{m: 3}}
           onClick={() => {
             cleanSelectedRows();
             setDisplayManualGrading(true);
           }}
           variant="outlined"
         >
-          {'Manualgrade selected'}
+          {'Manualgrade'}
         </Button>
         <NavigateNextIcon
           color={
             selectedRows.length === 0
               ? 'disabled'
-              : allManualGraded(selectedRowsData)
-              ? 'primary'
-              : 'error'
+              : allManualGraded(selectedRowsData) || props.assignment.automatic_grading === "full_auto"
+                ? 'primary'
+                : 'error'
           }
-          sx={{ mb: -1 }}
+          sx={{mb: -1}}
         />
         <Button
           disabled={
-            selectedRows.length === 0 || !allManualGraded(selectedRowsData)
+            selectedRows.length === 0 || (props.assignment.automatic_grading !== "full_auto" && !allManualGraded(selectedRowsData))
           }
-          sx={{ m: 3 }}
+          sx={{m: 3}}
           onClick={handleGenerateFeedback}
           variant="outlined"
         >
-          {`Generate Feedback for ${selectedRows.length} selected`}
+          {`Generate Feedback (${selectedRows.length})`}
         </Button>
       </span>
 
@@ -423,7 +423,7 @@ export const GradingComponent = (props: IGradingProps) => {
         <DialogContent>
           <Typography
             id="alert-dialog-description"
-            sx={{ fontSize: 10, fontFamily: "'Roboto Mono', monospace" }}
+            sx={{fontSize: 10, fontFamily: "'Roboto Mono', monospace"}}
           >
             {logs}
           </Typography>
