@@ -221,46 +221,11 @@ class AssignmentResetHandler(GraderBaseHandler):
         lecture_id, assignment_id = parse_ids(lecture_id, assignment_id)
         assignment = self.get_assignment(lecture_id, assignment_id)
 
-        git_path_base = os.path.join(self.application.grader_service_dir, "tmp", assignment.lecture.code,
-                                     assignment.name, self.user.name)
-        # Deleting dir
-        if os.path.exists(git_path_base):
-            shutil.rmtree(git_path_base)
-
-        self.log.info(f"DIR {git_path_base}")
-        os.makedirs(git_path_base, exist_ok=True)
-        git_path_release = os.path.join(git_path_base, "release")
-        git_path_user = os.path.join(git_path_base, self.user.name)
-        self.log.info(f"GIT BASE {git_path_base}")
-        self.log.info(f"GIT RELEASE {git_path_release}")
-        self.log.info(f"GIT USER {git_path_release}")
-
         repo_path_release = self.construct_git_dir('release', assignment.lecture, assignment)
         repo_path_user = self.construct_git_dir(assignment.type, assignment.lecture, assignment)
 
-        try:
-            self._run_command(f"git clone -b main '{repo_path_release}'", cwd=git_path_base)
-            self._run_command(f"git clone -b main '{repo_path_user}'", cwd=git_path_base)
-            # self._run_command("git pull", cwd=git_path_release)
-            # self._run_command(f"git pull", cwd=git_path_user)
-
-            self.log.info(f"Copying repository contents from {git_path_release} to {git_path_user}")
-            ignore = shutil.ignore_patterns(".git", "__pycache__")
-            if sys.version_info.major == 3 and sys.version_info.minor >= 8:
-                shutil.copytree(git_path_release, git_path_user, ignore=ignore, dirs_exist_ok=True)
-            else:
-                for item in os.listdir(git_path_release):
-                    s = os.path.join(git_path_release, item)
-                    d = os.path.join(git_path_user, item)
-                    if os.path.isdir(s):
-                        shutil.copytree(s, d, ignore=ignore)
-                    else:
-                        shutil.copy2(s, d)
-
-            self._run_command(f'sh -c \'git add -A && git commit --allow-empty -m "Reset"\'', git_path_user)
-            self._run_command("git push origin main", git_path_user)
-        finally:
-            shutil.rmtree(git_path_base)
+        self.duplicate_release_repo(repo_path_release=repo_path_release, repo_path_user=repo_path_user,
+                                    assignment=assignment, message="Reset")
         self.write_json(assignment)
 
 

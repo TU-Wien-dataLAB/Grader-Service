@@ -26,9 +26,6 @@ from grader_service.server import GraderServer
 
 class GitBaseHandler(GraderBaseHandler):
 
-    def create_assignment_repo(self):
-        pass
-
     async def data_received(self, chunk: bytes):
         return self.process.stdin.write(chunk)
 
@@ -157,6 +154,13 @@ class GitBaseHandler(GraderBaseHandler):
                 subprocess.run(["git", "init", "--bare", path], check=True)
             except subprocess.CalledProcessError:
                 return None
+
+            if repo_type in ["user", "group"]:
+                repo_path_release = self.construct_git_dir('release', assignment.lecture, assignment)
+                self.duplicate_release_repo(repo_path_release=repo_path_release, repo_path_user=path,
+                                            assignment=assignment, message="Initialize with Release",
+                                            checkout_main=True)
+
             return path
 
     @staticmethod
@@ -180,6 +184,7 @@ class RPCHandler(GitBaseHandler):
     """Request handler for RPC calls
 
     Use this handler to handle example.git/git-upload-pack and example.git/git-receive-pack URLs"""
+
     async def prepare(self):
         await super().prepare()
         self.rpc = self.path_args[0]

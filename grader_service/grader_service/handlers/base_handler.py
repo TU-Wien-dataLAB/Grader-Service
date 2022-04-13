@@ -5,7 +5,9 @@ import json
 import logging
 import os
 import shlex
+import shutil
 import subprocess
+import sys
 import time
 from typing import Any, Awaitable, Callable, List, Optional
 from urllib.parse import ParseResult, urlparse
@@ -191,6 +193,47 @@ class GraderBaseHandler(SessionMixin, web.RequestHandler):
             is_git = False
         return is_git
 
+    def duplicate_release_repo(self, repo_path_release: str, repo_path_user: str, assignment: Assignment, message: str,
+                               checkout_main: bool = False):
+        tmp_path_base = os.path.join(self.application.grader_service_dir, "tmp", assignment.lecture.code,
+                                     assignment.name, self.user.name)
+        # Deleting dir
+        if os.path.exists(tmp_path_base):
+            shutil.rmtree(tmp_path_base)
+
+        os.makedirs(tmp_path_base, exist_ok=True)
+        tmp_path_release = os.path.join(tmp_path_base, "release")
+        tmp_path_user = os.path.join(tmp_path_base, self.user.name)
+
+        self.log.info(f"Duplicating release repository {repo_path_release}")
+        self.log.info(f"Temporary path used for copying: {tmp_path_base}")
+
+        try:
+            self._run_command(f"git clone -b main '{repo_path_release}'", cwd=tmp_path_base)
+            if checkout_main:
+                self._run_command(f"git clone '{repo_path_user}'", cwd=tmp_path_base)
+                self._run_command(f"git checkout -b main", cwd=tmp_path_user)
+            else:
+                self._run_command(f"git clone -b main '{repo_path_user}'", cwd=tmp_path_base)
+
+            self.log.info(f"Copying repository contents from {tmp_path_release} to {tmp_path_user}")
+            ignore = shutil.ignore_patterns(".git", "__pycache__")
+            if sys.version_info.major == 3 and sys.version_info.minor >= 8:
+                shutil.copytree(tmp_path_release, tmp_path_user, ignore=ignore, dirs_exist_ok=True)
+            else:
+                for item in os.listdir(tmp_path_release):
+                    s = os.path.join(tmp_path_release, item)
+                    d = os.path.join(tmp_path_user, item)
+                    if os.path.isdir(s):
+                        shutil.copytree(s, d, ignore=ignore)
+                    else:
+                        shutil.copy2(s, d)
+
+            self._run_command(f'sh -c \'git add -A && git commit --allow-empty -m "{message}"\'', tmp_path_user)
+            self._run_command("git push -u origin main", tmp_path_user)
+        finally:
+            shutil.rmtree(tmp_path_base)
+
     def _run_command(self, command, cwd=None, capture_output=False):
         """Starts a sub process and runs an cmd command
 
@@ -211,7 +254,7 @@ class GraderBaseHandler(SessionMixin, web.RequestHandler):
             if capture_output:
                 return str(ret.stdout, 'utf-8')
         except subprocess.CalledProcessError as e:
-            self.log.error(e)
+            self.log.error(e.stderr)
             raise HTTPError(500)
         except FileNotFoundError as e:
             self.log.error(e)

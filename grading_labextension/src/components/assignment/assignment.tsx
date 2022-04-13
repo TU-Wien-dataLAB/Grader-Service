@@ -20,7 +20,7 @@ import { Assignment } from '../../model/assignment';
 import LoadingOverlay from '../util/overlay';
 import { Lecture } from '../../model/lecture';
 import { getAllSubmissions } from '../../services/submissions.service';
-import { getAssignment } from '../../services/assignments.service';
+import {getAssignment, pullAssignment} from '../../services/assignments.service';
 import { DeadlineComponent } from '../util/deadline';
 import { AssignmentModalComponent } from './assignment-modal';
 import { Submission } from '../../model/submission';
@@ -72,7 +72,12 @@ export const AssignmentComponent = (props: IAssignmentComponentProps) => {
     <Box>
       <Card
         sx={{ maxWidth: 200, minWidth: 200, m: 1.5 }}
-        onClick={e => setDisplayAssignment(true)}
+        onClick={async () => {
+          if (files.length === 0) {
+            await pullAssignment(props.lecture.id, assignment.id, "assignment");
+          }
+          setDisplayAssignment(true);
+        }}
       >
         <CardActionArea>
           <CardContent>
