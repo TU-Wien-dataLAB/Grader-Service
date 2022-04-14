@@ -224,6 +224,9 @@ class AssignmentResetHandler(GraderBaseHandler):
         repo_path_release = self.construct_git_dir('release', assignment.lecture, assignment)
         repo_path_user = self.construct_git_dir(assignment.type, assignment.lecture, assignment)
 
+        if not os.path.exists(repo_path_release) or not os.path.exists(repo_path_user):
+            raise HTTPError(404, reason="Some repositories do not exist!")
+
         self.duplicate_release_repo(repo_path_release=repo_path_release, repo_path_user=repo_path_user,
                                     assignment=assignment, message="Reset")
         self.write_json(assignment)

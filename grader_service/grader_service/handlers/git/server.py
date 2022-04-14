@@ -157,6 +157,8 @@ class GitBaseHandler(GraderBaseHandler):
 
             if repo_type in ["user", "group"]:
                 repo_path_release = self.construct_git_dir('release', assignment.lecture, assignment)
+                if not os.path.exists(repo_path_release):
+                    return None
                 self.duplicate_release_repo(repo_path_release=repo_path_release, repo_path_user=path,
                                             assignment=assignment, message="Initialize with Release",
                                             checkout_main=True)
