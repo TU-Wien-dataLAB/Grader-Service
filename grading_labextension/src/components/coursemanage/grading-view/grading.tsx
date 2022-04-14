@@ -273,19 +273,8 @@ export const GradingComponent = (props: IGradingProps) => {
     {field: 'score', headerName: 'Score', width: 130}
   ];
 
-  //TODO: Not perfomant
   const getSubmissionFromRow = (row: IRowValues): Submission => {
-    if (row === undefined) {
-      return null;
-    }
-    const id = row.id;
-    console.log(id);
-    for (const submission of submissions) {
-      if (submission.id === id) {
-        return submission;
-      }
-    }
-    return null;
+    return row as Submission;
   };
 
   const allManualGraded = (selection: IRowValues[]) => {
