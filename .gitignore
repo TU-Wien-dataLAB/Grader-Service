@@ -7,6 +7,8 @@ grading_labextension/grader/grading_labextension/labextension/*
 grading_labextension/grader/grading_labextension/labextension
 grading_labextension/grader/grading_labextension/labextension/build_log.json
 jupyterhub_cookie_secret
+grading_labextension/package-lock.json
+grading_labextension/yarn.lock
 
 ### Linux ###
 *~
