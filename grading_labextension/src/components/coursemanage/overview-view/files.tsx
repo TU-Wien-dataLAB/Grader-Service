@@ -32,6 +32,7 @@ import moment from 'moment';
 import {useEffect} from 'react';
 import {openBrowser, openTerminal} from "./util";
 import {PageConfig} from "@jupyterlab/coreutils";
+import PublishRoundedIcon from "@mui/icons-material/PublishRounded";
 
 export interface IFilesProps {
   lecture: Lecture;
@@ -190,7 +191,12 @@ export const Files = (props: IFilesProps) => {
         </Box>
       </CardContent>
       <CardActions>
-        <CommitDialog handleCommit={msg => handlePushAssignment(msg)}/>
+        <CommitDialog handleCommit={msg => handlePushAssignment(msg)}>
+          <Button sx={{mt: -1}} variant="outlined" size="small">
+            <PublishRoundedIcon fontSize="small" sx={{mr: 1}}/>
+            Commit
+          </Button>
+        </CommitDialog>
         <Button
           sx={{mt: -1, ml: 2}}
           onClick={() => handlePullAssignment()}

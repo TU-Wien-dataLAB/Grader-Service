@@ -96,7 +96,16 @@ export const AssignmentStatus = (props: IAssignmentStatusProps) => {
               pushed. After you are done working on the files you can release the assignment.
             </Typography>
             <ReleaseDialog assignment={assignment} handleCommit={handlePushAssignment}
-                           handleRelease={handleReleaseAssignment}/>
+                           handleRelease={handleReleaseAssignment}>
+              <Button
+                sx={{mt: 1}}
+                variant="outlined"
+                size="small"
+              >
+                <NewReleasesRoundedIcon fontSize="small" sx={{mr: 1}}/>
+                Release
+              </Button>
+            </ReleaseDialog>
           </Box>
         )
       },

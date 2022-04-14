@@ -26,7 +26,7 @@ import {
   Tooltip,
   Typography,
   Card,
-  CardActionArea
+  CardActionArea, Box
 } from '@mui/material';
 import {Assignment} from '../../model/assignment';
 import {LoadingButton} from '@mui/lab';
@@ -546,23 +546,19 @@ export const CreateDialog = (props: ICreateDialogProps) => {
 
 export interface ICommitDialogProps {
   handleCommit: (msg: string) => void;
+  children: React.ReactNode;
 }
 
 export const CommitDialog = (props: ICommitDialogProps) => {
   const [open, setOpen] = React.useState(false);
   const [message, setMessage] = React.useState('');
 
+
   return (
     <div>
-      <Button
-        sx={{mt: -1}}
-        onClick={() => setOpen(true)}
-        variant="outlined"
-        size="small"
-      >
-        <PublishRoundedIcon fontSize="small" sx={{mr: 1}}/>
-        Commit
-      </Button>
+      <Box onClick={() => setOpen(true)}>
+        {props.children}
+      </Box>
       <Dialog
         open={open}
         onBackdropClick={() => setOpen(false)}
@@ -671,15 +667,9 @@ export const ReleaseDialog = (props: IReleaseDialogProps) => {
 
   return (
     <div>
-      <Button
-        sx={{mt: 1}}
-        onClick={() => setAgreeOpen(true)}
-        variant="outlined"
-        size="small"
-      >
-        <NewReleasesRoundedIcon fontSize="small" sx={{mr: 1}}/>
-        Release
-      </Button>
+      <Box onClick={() => setAgreeOpen(true)}>
+        {props.children}
+      </Box>
       <AgreeDialog open={agreeOpen} title={'Release Assignment'} message={agreeMessage} handleAgree={() => {
         setAgreeOpen(false);
         setCommitOpen(true);
