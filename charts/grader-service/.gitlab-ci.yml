@@ -4,7 +4,8 @@ stages:
 package-job-1:
   stage: package
   # image: ${REGISTRY_URL}/devops/helm-kubectl-rootles:latest
-  image: mbwali/helm-cmpush:latest
+  # TODO regitry url
+  image: adlsregistrysbx.azurecr.io/helm-kubectl-cmpush:latest 
   tags:
   - bootstrap
   before_script:
