@@ -1,6 +1,6 @@
 import * as React from 'react';
-import { Assignment } from '../../../model/assignment';
-import { Lecture } from '../../../model/lecture';
+import {Assignment} from '../../../model/assignment';
+import {Lecture} from '../../../model/lecture';
 import {
   generateAssignment,
   pullAssignment,
@@ -8,7 +8,7 @@ import {
   updateAssignment
 } from '../../../services/assignments.service';
 import GetAppRoundedIcon from '@mui/icons-material/GetAppRounded';
-import { AgreeDialog, CommitDialog } from '../../util/dialog';
+import {AgreeDialog, CommitDialog} from '../../util/dialog';
 import {
   Button,
   Card,
@@ -23,12 +23,15 @@ import {
   Tooltip
 } from '@mui/material';
 import ReplayIcon from '@mui/icons-material/Replay';
-import { FilesList } from '../../util/file-list';
-import { Settings } from './settings-menu';
-import { GlobalObjects } from '../../../index';
-import { Contents } from '@jupyterlab/services';
+import OpenInBrowserIcon from '@mui/icons-material/OpenInBrowser';
+import TerminalIcon from '@mui/icons-material/Terminal';
+import {FilesList} from '../../util/file-list';
+import {GlobalObjects} from '../../../index';
+import {Contents} from '@jupyterlab/services';
 import moment from 'moment';
-import { useEffect } from 'react';
+import {useEffect} from 'react';
+import {openBrowser, openTerminal} from "./util";
+import {PageConfig} from "@jupyterlab/coreutils";
 
 export interface IFilesProps {
   lecture: Lecture;
@@ -50,16 +53,16 @@ export const Files = (props: IFilesProps) => {
   });
   const [reloadFilesToggle, reloadFiles] = React.useState(false);
 
-  const [srcChangedTimestamp, setSrcChangeTimestamp] = React.useState(
-    moment().valueOf()
-  ); // now
+  const [srcChangedTimestamp, setSrcChangeTimestamp] = React.useState(moment().valueOf()); // now
   const [generateTimestamp, setGenerateTimestamp] = React.useState(null);
+
+  const serverRoot = PageConfig.getOption('serverRoot');
 
   useEffect(() => {
     const srcPath = `source/${lecture.code}/${assignment.name}`;
     GlobalObjects.docManager.services.contents.fileChanged.connect(
       (sender: Contents.IManager, change: Contents.IChangedArgs) => {
-        const { oldValue, newValue } = change;
+        const {oldValue, newValue} = change;
         if (!newValue.path.includes(srcPath)) {
           return;
         }
@@ -161,31 +164,24 @@ export const Files = (props: IFilesProps) => {
                   aria-label="reload"
                   onClick={() => reloadFiles(!reloadFilesToggle)}
                 >
-                  <ReplayIcon />
+                  <ReplayIcon/>
                 </IconButton>
               </Tooltip>
-            </Grid>
-            <Grid item>
-              <Settings
-                lecture={lecture}
-                assignment={assignment}
-                selectedDir={selectedDir}
-              />
             </Grid>
           </Grid>
         }
       />
 
-      <CardContent sx={{ height: '270px', overflowY: 'auto' }}>
+      <CardContent sx={{height: '270px', overflowY: 'auto'}}>
         <Tabs
           variant="fullWidth"
           value={selectedDir}
           onChange={(e, dir) => handleSwitchDir(dir)}
         >
-          <Tab label="Source" value="source" />
-          <Tab label="Release" value="release" />
+          <Tab label="Source" value="source"/>
+          <Tab label="Release" value="release"/>
         </Tabs>
-        <Box height={214} sx={{ overflowY: 'auto' }}>
+        <Box height={214} sx={{overflowY: 'auto'}}>
           <FilesList
             path={`${selectedDir}/${props.lecture.code}/${props.assignment.name}`}
             reloadFiles={reloadFilesToggle}
@@ -194,16 +190,32 @@ export const Files = (props: IFilesProps) => {
         </Box>
       </CardContent>
       <CardActions>
-        <CommitDialog handleCommit={msg => handlePushAssignment(msg)} />
+        <CommitDialog handleCommit={msg => handlePushAssignment(msg)}/>
         <Button
-          sx={{ mt: -1, ml: 2 }}
+          sx={{mt: -1, ml: 2}}
           onClick={() => handlePullAssignment()}
           variant="outlined"
           size="small"
         >
-          <GetAppRoundedIcon fontSize="small" sx={{ mr: 1 }} />
+          <GetAppRoundedIcon fontSize="small" sx={{mr: 1}}/>
           Pull
         </Button>
+        <Tooltip title={"Show in File-Browser"}>
+          <IconButton
+            sx={{mt: -1, pt: 0, pb: 0}}
+            color={"primary"}
+            onClick={() => openBrowser(`${selectedDir}/${lecture.code}/${assignment.name}`, props.showAlert)}>
+            <OpenInBrowserIcon/>
+          </IconButton>
+        </Tooltip>
+        <Tooltip title={"Open in Terminal"}>
+          <IconButton
+            sx={{mt: -1, pt: 0, pb: 0}}
+            color={"primary"}
+            onClick={() => openTerminal(`${serverRoot}/${selectedDir}/${lecture.code}/${assignment.name}`, props.showAlert)}>
+            <TerminalIcon/>
+          </IconButton>
+        </Tooltip>
       </CardActions>
       <AgreeDialog open={showDialog} {...dialogContent} />
     </Card>
