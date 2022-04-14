@@ -74,7 +74,7 @@ def default_user():
         "kind": "user",
         "name": "ubuntu",
         "admin": False,
-        "groups": ["20wle2__instructor", "21wle1__student", "22wle1__instructor"],
+        "groups": ["20wle2:instructor", "21wle1:student", "22wle1:instructor"],
     }
     yield user
 

@@ -62,7 +62,7 @@ async def test_post_lectures(
     default_user,
     default_token,
 ):
-    default_user["groups"] = ["pt__instructor"]  # user has to already be in group (we only activate on post)
+    default_user["groups"] = ["pt:instructor"]  # user has to already be in group (we only activate on post)
     http_server = jupyter_hub_mock_server(default_user, default_token)
     app.hub_api_url = http_server.url_for("")[0:-1]
 
@@ -73,7 +73,7 @@ async def test_post_lectures(
     assert get_response.code == 200
     lectures = json.loads(get_response.body.decode())
     assert isinstance(lectures, list)
-    assert len(lectures) == 0
+    assert len(lectures) == 1
     orig_len = len(lectures)
 
     # same code as in group of user
@@ -98,7 +98,7 @@ async def test_post_lectures(
     )
     assert get_response.code == 200
     lectures = json.loads(get_response.body.decode())
-    assert len(lectures) == orig_len + 1
+    assert len(lectures) == orig_len
 
 
 async def test_post_not_found(
@@ -135,7 +135,7 @@ async def test_post_unknown_parameter(
     default_user,
     default_token,
 ):
-    default_user["groups"] = ["pt__instructor"]  # user has to already be in group (we only activate on post)
+    default_user["groups"] = ["pt:instructor"]  # user has to already be in group (we only activate on post)
     http_server = jupyter_hub_mock_server(default_user, default_token)
     app.hub_api_url = http_server.url_for("")[0:-1]
 

@@ -99,7 +99,7 @@ async def test_get_submissions_instructor_version(
     app.hub_api_url = http_server.url_for("")[0:-1]
 
     l_id = 3
-    a_id = 3
+    a_id = 4
     engine = sql_alchemy_db.engine
     insert_assignments(engine, l_id)
 
@@ -184,7 +184,7 @@ async def test_get_submissions_latest_instructor_version(
     app.hub_api_url = http_server.url_for("")[0:-1]
 
     l_id = 3
-    a_id = 3
+    a_id = 4
     engine = sql_alchemy_db.engine
     insert_assignments(engine, l_id)
 
@@ -289,7 +289,7 @@ async def test_get_submission(
     app.hub_api_url = http_server.url_for("")[0:-1]
 
     l_id = 3 # user has to be instructor
-    a_id = 3
+    a_id = 4
     engine = sql_alchemy_db.engine
     insert_assignments(engine, l_id)
 
@@ -352,7 +352,7 @@ async def test_get_submission_assignment_submission_missmatch(
     app.hub_api_url = http_server.url_for("")[0:-1]
 
     l_id = 3  # user has to be instructor
-    a_id = 3
+    a_id = 4
     engine = sql_alchemy_db.engine
     insert_assignments(engine, l_id)
     insert_submission(engine, a_id, default_user["name"])
@@ -434,7 +434,7 @@ async def test_put_submission(
     app.hub_api_url = http_server.url_for("")[0:-1]
 
     l_id = 3 # default user is student
-    a_id = 3
+    a_id = 4
 
     url = service_base_url + f"/lectures/{l_id}/assignments/{a_id}/submissions/1/"
 
@@ -570,7 +570,7 @@ async def test_submission_properties(
     app.hub_api_url = http_server.url_for("")[0:-1]
 
     l_id = 3 # default user is student
-    a_id = 3
+    a_id = 4
 
     url = service_base_url + f"/lectures/{l_id}/assignments/{a_id}/submissions/1/properties"
 

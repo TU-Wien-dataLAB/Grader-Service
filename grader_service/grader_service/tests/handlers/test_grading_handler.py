@@ -31,7 +31,7 @@ async def test_auto_grading(
     app.hub_api_url = http_server.url_for("")[0:-1]
 
     l_id = 3 # default user is student
-    a_id = 3
+    a_id = 4
 
     url = service_base_url + f"/lectures/{l_id}/assignments/{a_id}/grading/1/auto"
 
@@ -89,7 +89,7 @@ async def test_auto_grading_wrong_lecture(
     default_token,
     sql_alchemy_db,
 ):
-    default_user["groups"] = ["20wle2__instructor", "21wle1__instructor", "22wle1__instructor"]
+    default_user["groups"] = ["20wle2:instructor", "21wle1:instructor", "22wle1:instructor"]
     http_server = jupyter_hub_mock_server(default_user, default_token)
     app.hub_api_url = http_server.url_for("")[0:-1]
 
@@ -100,7 +100,7 @@ async def test_auto_grading_wrong_lecture(
     insert_assignments(engine, l_id)
     insert_submission(engine, a_id, default_user["name"])
 
-    l_id = 1  # default user now instructor -> passes authorization for handler
+    # default user now instructor -> passes authorization for handler
     url = service_base_url + f"/lectures/{l_id}/assignments/{a_id}/grading/1/auto"
 
     with pytest.raises(HTTPClientError) as exc_info:
@@ -124,7 +124,7 @@ async def test_feedback(
     app.hub_api_url = http_server.url_for("")[0:-1]
 
     l_id = 3 # default user is student
-    a_id = 3
+    a_id = 4
 
     url = service_base_url + f"/lectures/{l_id}/assignments/{a_id}/grading/1/feedback"
 
@@ -183,7 +183,7 @@ async def test_feedback_wrong_lecture(
     default_token,
     sql_alchemy_db,
 ):
-    default_user["groups"] = ["20wle2__instructor", "21wle1__instructor", "22wle1__instructor"]
+    default_user["groups"] = ["20wle2:instructor", "21wle1:instructor", "22wle1:instructor"]
     http_server = jupyter_hub_mock_server(default_user, default_token)
     app.hub_api_url = http_server.url_for("")[0:-1]
 
@@ -194,7 +194,7 @@ async def test_feedback_wrong_lecture(
     insert_assignments(engine, l_id)
     insert_submission(engine, a_id, default_user["name"])
 
-    l_id = 1  # default user now instructor -> passes authorization for handler
+    # default user now instructor -> passes authorization for handler
     url = service_base_url + f"/lectures/{l_id}/assignments/{a_id}/grading/1/feedback"
 
     with pytest.raises(HTTPClientError) as exc_info:

@@ -13,7 +13,7 @@ from unittest.mock import AsyncMock, MagicMock, Mock
 import asyncio
 
 
-async def test_authenticate_token_user_None():
+async def test_authenticate_user_None():
     token = "test_token"
     user = {"name": "user99", "groups": ["lecture1__WS21__student", "lecture1__SS21__tutor", "lecture99__SS22__student"]}
     user_mock = AsyncMock(return_value=user)
@@ -23,8 +23,9 @@ async def test_authenticate_token_user_None():
     m.get_current_user_async = user_mock
     # m.session = session
     m.get_secure_cookie = Mock(return_value=None)
-    m.authenticate_token_user = GraderBaseHandler.authenticate_token_user
-    await GraderBaseHandler.authenticate_token_user(m, token)
+    m.get_request_token = Mock(return_value=token)
+    m.authenticate_token_user = user_mock
+    await GraderBaseHandler.authenticate_user(m)
     m.set_secure_cookie.assert_called_with(token, json.dumps(user), expires_days=0.05)
 
 
@@ -73,25 +74,6 @@ def test_authenticate_cookie_user_New():
     m.authenticate_cookie_user = GraderBaseHandler.authenticate_cookie_user
     assert not GraderBaseHandler.authenticate_cookie_user(m, user)
     m.set_secure_cookie.assert_called_with(user["name"], json.dumps(user), expires_days=1)
-
- 
-async def test_authenticate_user_no_cookies(sql_alchemy_db):
-    token = "test_token"
-    user = {"name": "user99", "groups": ["lecture1__WS21__student", "lecture1__SS21__tutor", "lecture99__SS22__student"]} 
-    async_mock = AsyncMock(return_value=user)
-    m = MagicMock()
-    m.get_current_user_async = async_mock
-    session = sessionmaker(bind=sql_alchemy_db.engine)()
-    m.session = session
-    m.authenticate_user = GraderBaseHandler.authenticate_user
-    m.get_request_token = Mock(return_value=token)
-    m.authenticate_token_user = async_mock
-    m.authenticate_cookie_user = Mock(return_value=False)
-
-    await GraderBaseHandler.authenticate_user(m)
-
-    lecture99 = session.query(Lecture).filter(Lecture.code == "lecture99").one_or_none()
-    assert lecture99 is not None
 
 
 def test_string_serialization():
