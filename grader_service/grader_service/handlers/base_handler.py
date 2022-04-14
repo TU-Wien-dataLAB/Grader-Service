@@ -158,7 +158,7 @@ class GraderBaseHandler(SessionMixin, web.RequestHandler):
         the path of the repository based on the inputs or None if the repo_type is not recognized.
         """
         assignment_path = os.path.abspath(
-            os.path.join(self.gitbase, lecture.code, assignment.name)
+            os.path.join(self.gitbase, lecture.code, str(assignment.id))
         )
         if repo_type == "source" or repo_type == "release":
             path = os.path.join(assignment_path, repo_type)
@@ -199,7 +199,7 @@ class GraderBaseHandler(SessionMixin, web.RequestHandler):
     def duplicate_release_repo(self, repo_path_release: str, repo_path_user: str, assignment: Assignment, message: str,
                                checkout_main: bool = False):
         tmp_path_base = os.path.join(self.application.grader_service_dir, "tmp", assignment.lecture.code,
-                                     assignment.name, self.user.name)
+                                     str(assignment.id), self.user.name)
         # Deleting dir
         if os.path.exists(tmp_path_base):
             shutil.rmtree(tmp_path_base)

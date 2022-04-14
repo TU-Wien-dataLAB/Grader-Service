@@ -1,7 +1,12 @@
+import io
 import json
+import logging
 import os
 import shutil
 from subprocess import CalledProcessError
+
+from traitlets import Unicode
+
 from grader_service.autograding.local_grader import LocalAutogradeExecutor, rm_error
 from grader_convert.gradebook.models import GradeBookModel
 from grader_service.orm.assignment import Assignment
@@ -44,7 +49,7 @@ class GenerateFeedbackExecutor(LocalAutogradeExecutor):
             self.grader_service_dir,
             "git",
             lecture.code,
-            assignment.name,
+            str(assignment.id),
             "autograde",
             assignment.type,
             repo_name,
@@ -87,18 +92,17 @@ class GenerateFeedbackExecutor(LocalAutogradeExecutor):
         os.mkdir(self.output_path)
         self._write_gradebook()
 
-        command = f'{self.convert_executable} generate_feedback -i "{self.input_path}" -o "{self.output_path}" -p "*.ipynb"'
-        self.log.info(f"Running {command}")
-        process = await self._run_subprocess(command, None)
-        self.grading_logs = process.stderr.read().decode("utf-8")
-        self.log.info(self.grading_logs)
-        if process.returncode == 0:
-            self.log.info("Process has successfully completed execution!")
-        else:
-            raise RuntimeError("Process has failed execution!")
-        # autograder = GenerateFeedback(self.input_path, self.output_path, "*.ipynb")
-        # autograder.force = True
-        # autograder.start()
+        autograder = GenerateFeedback(self.input_path, self.output_path, "*.ipynb")
+        autograder.force = True
+
+        log_stream = io.StringIO()
+        log_handler = logging.StreamHandler(log_stream)
+        autograder.log.addHandler(log_handler)
+
+        autograder.start()
+
+        self.grading_logs = log_stream.getvalue()
+        autograder.log.removeHandler(log_handler)
 
     async def _push_results(self):
         os.unlink(os.path.join(self.output_path, "gradebook.json"))
@@ -120,7 +124,7 @@ class GenerateFeedbackExecutor(LocalAutogradeExecutor):
             self.grader_service_dir,
             "git",
             lecture.code,
-            assignment.name,
+            str(assignment.id),
             "feedback",
             assignment.type,
             repo_name,
@@ -181,3 +185,24 @@ class GenerateFeedbackExecutor(LocalAutogradeExecutor):
     def _set_db_state(self, success=True):
         self.submission.feedback_available = True
         self.session.commit()
+
+
+class GenerateFeedbackProcessExecutor(GenerateFeedbackExecutor):
+    convert_executable = Unicode("grader-convert", allow_none=False).tag(config=True)
+
+    async def _run(self):
+        if os.path.exists(self.output_path):
+            shutil.rmtree(self.output_path, onerror=rm_error)
+
+        os.mkdir(self.output_path)
+        self._write_gradebook()
+
+        command = f'{self.convert_executable} generate_feedback -i "{self.input_path}" -o "{self.output_path}" -p "*.ipynb"'
+        self.log.info(f"Running {command}")
+        process = await self._run_subprocess(command, None)
+        self.grading_logs = process.stderr.read().decode("utf-8")
+        self.log.info(self.grading_logs)
+        if process.returncode == 0:
+            self.log.info("Process has successfully completed execution!")
+        else:
+            raise RuntimeError("Process has failed execution!")

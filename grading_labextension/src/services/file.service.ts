@@ -14,6 +14,9 @@ export const getFiles = async (path: string): Promise<IModel[]> => {
     manager: GlobalObjects.docManager
   });
   await model.cd(path);
+  if (model.path !== path) {
+    return [];
+  }
   const items = model.items();
   const files = [];
   let f: IModel = items.next();

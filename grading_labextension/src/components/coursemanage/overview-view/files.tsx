@@ -60,7 +60,7 @@ export const Files = (props: IFilesProps) => {
   const serverRoot = PageConfig.getOption('serverRoot');
 
   useEffect(() => {
-    const srcPath = `source/${lecture.code}/${assignment.name}`;
+    const srcPath = `source/${lecture.code}/${assignment.id}`;
     GlobalObjects.docManager.services.contents.fileChanged.connect(
       (sender: Contents.IManager, change: Contents.IChangedArgs) => {
         const {oldValue, newValue} = change;
@@ -184,7 +184,7 @@ export const Files = (props: IFilesProps) => {
         </Tabs>
         <Box height={214} sx={{overflowY: 'auto'}}>
           <FilesList
-            path={`${selectedDir}/${props.lecture.code}/${props.assignment.name}`}
+            path={`${selectedDir}/${props.lecture.code}/${props.assignment.id}`}
             reloadFiles={reloadFilesToggle}
             showAlert={props.showAlert}
           />
@@ -210,7 +210,7 @@ export const Files = (props: IFilesProps) => {
           <IconButton
             sx={{mt: -1, pt: 0, pb: 0}}
             color={"primary"}
-            onClick={() => openBrowser(`${selectedDir}/${lecture.code}/${assignment.name}`, props.showAlert)}>
+            onClick={() => openBrowser(`${selectedDir}/${lecture.code}/${assignment.id}`, props.showAlert)}>
             <OpenInBrowserIcon/>
           </IconButton>
         </Tooltip>
@@ -218,7 +218,7 @@ export const Files = (props: IFilesProps) => {
           <IconButton
             sx={{mt: -1, pt: 0, pb: 0}}
             color={"primary"}
-            onClick={() => openTerminal(`${serverRoot}/${selectedDir}/${lecture.code}/${assignment.name}`, props.showAlert)}>
+            onClick={() => openTerminal(`${serverRoot}/${selectedDir}/${lecture.code}/${assignment.id}`, props.showAlert)}>
             <TerminalIcon/>
           </IconButton>
         </Tooltip>

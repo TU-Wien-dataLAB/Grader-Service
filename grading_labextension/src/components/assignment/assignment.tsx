@@ -51,7 +51,7 @@ export const AssignmentComponent = (props: IAssignmentComponentProps) => {
         setHasFeedback(feedback);
       }
     );
-    getFiles(`${props.lecture.code}/${assignment.name}`).then(files => {
+    getFiles(`${props.lecture.code}/${assignment.id}`).then(files => {
       setFiles(files);
     });
   }, [props]);

@@ -97,7 +97,7 @@ class GitLogHandler(ExtensionBaseHandler):
         git_service = GitService(
             server_root_dir=self.root_dir,
             lecture_code=lecture["code"],
-            assignment_name=assignment["name"],
+            assignment_id=assignment["id"],
             repo_type=repo,
             config=self.config,
             force_user_repo=True if repo == "release" else False,
@@ -143,7 +143,7 @@ class PullHandler(ExtensionBaseHandler):
         git_service = GitService(
             server_root_dir=self.root_dir,
             lecture_code=lecture["code"],
-            assignment_name=assignment["name"],
+            assignment_id=assignment["id"],
             repo_type=repo,
             config=self.config,
             force_user_repo=repo == "release",
@@ -201,7 +201,7 @@ class PushHandler(ExtensionBaseHandler):
         git_service = GitService(
             server_root_dir=self.root_dir,
             lecture_code=lecture["code"],
-            assignment_name=assignment["name"],
+            assignment_id=assignment["id"],
             repo_type=repo,
             config=self.config,
         )
@@ -211,7 +211,7 @@ class PushHandler(ExtensionBaseHandler):
             src_path = GitService(
                 self.root_dir,
                 lecture["code"],
-                assignment["name"],
+                assignment["id"],
                 repo_type="source",
                 config=self.config,
             ).path
@@ -360,7 +360,7 @@ class NotebookAccessHandler(ExtensionBaseHandler):
         git_service = GitService(
             server_root_dir=self.root_dir,
             lecture_code=lecture["code"],
-            assignment_name=assignment["name"],
+            assignment_id=assignment["id"],
             repo_type="release",
             config=self.config,
             force_user_repo=True,
@@ -384,6 +384,6 @@ class NotebookAccessHandler(ExtensionBaseHandler):
             self.log.error(e)
             self.write_error(403)
             return
-        url = f'/user/{username}/lab/tree/{lecture["code"]}/{quote(assignment["name"])}/{quote(notebook_name)}'
+        url = f'/user/{username}/lab/tree/{lecture["code"]}/{assignment["id"]}/{quote(notebook_name)}'
         self.log.info(f"Redirecting to {url}")
         self.redirect(url)

@@ -35,7 +35,7 @@ export const AssignmentStatus = (props: IAssignmentStatusProps) => {
       return 2;
     }
     const files = await getFiles(
-      `${props.lecture.code}/${props.assignment.name}`
+      `${props.lecture.code}/${props.assignment.id}`
     );
     if (files.length > 0) {
       return 1;

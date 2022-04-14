@@ -1,4 +1,6 @@
+import io
 import json
+import logging
 import os
 import shlex
 import shutil
@@ -45,7 +47,6 @@ class LocalAutogradeExecutor(LoggingConfigurable):
     base_input_path = Unicode(os.getenv("GRADER_AUTOGRADE_IN_PATH"), allow_none=False).tag(config=True)
     base_output_path = Unicode(os.getenv("GRADER_AUTOGRADE_OUT_PATH"), allow_none=False).tag(config=True)
 
-    convert_executable = Unicode("grader-convert", allow_none=False).tag(config=True)
     git_executable = Unicode("git", allow_none=False).tag(config=True)
 
     def __init__(self, grader_service_dir: str, submission: Submission, close_session=True, **kwargs):
@@ -128,6 +129,7 @@ class LocalAutogradeExecutor(LoggingConfigurable):
         if assignment.type == "user":
             repo_name = self.submission.username
         else:
+            # TODO: fix query to work with group.name
             group = self.session.query(Group).get(
                 (self.submission.username, lecture.id)
             )
@@ -139,7 +141,7 @@ class LocalAutogradeExecutor(LoggingConfigurable):
             self.grader_service_dir,
             "git",
             lecture.code,
-            assignment.name,
+            str(assignment.id),
             assignment.type,
             repo_name,
         )
@@ -174,18 +176,17 @@ class LocalAutogradeExecutor(LoggingConfigurable):
         os.mkdir(self.output_path)
         self._write_gradebook()
 
-        command = f'{self.convert_executable} autograde -i "{self.input_path}" -o "{self.output_path}" -p "*.ipynb"'
-        self.log.info(f"Running {command}")
-        process = await self._run_subprocess(command, None)
-        self.grading_logs = process.stderr.read().decode("utf-8")
-        self.log.info(self.grading_logs)
-        if process.returncode == 0:
-            self.log.info("Process has successfully completed execution!")
-        else:
-            raise RuntimeError("Process has failed execution!")
-        # autograder = Autograde(self.input_path, self.output_path, "*.ipynb")
-        # autograder.force = True
-        # autograder.start()
+        autograder = Autograde(self.input_path, self.output_path, "*.ipynb")
+        autograder.force = True
+
+        log_stream = io.StringIO()
+        log_handler = logging.StreamHandler(log_stream)
+        autograder.log.addHandler(log_handler)
+
+        autograder.start()
+
+        self.grading_logs = log_stream.getvalue()
+        autograder.log.removeHandler(log_handler)
 
     async def _push_results(self):
         os.unlink(os.path.join(self.output_path, "gradebook.json"))
@@ -207,7 +208,7 @@ class LocalAutogradeExecutor(LoggingConfigurable):
             self.grader_service_dir,
             "git",
             lecture.code,
-            assignment.name,
+            str(assignment.id),
             "autograde",
             assignment.type,
             repo_name,
@@ -317,3 +318,24 @@ class LocalAutogradeExecutor(LoggingConfigurable):
         if shutil.which(exec) is None:
             raise TraitError(f"The executable is not valid: {exec}")
         return exec
+
+
+class LocalProcessAutogradeExecutor(LocalAutogradeExecutor):
+    convert_executable = Unicode("grader-convert", allow_none=False).tag(config=True)
+
+    async def _run(self):
+        if os.path.exists(self.output_path):
+            shutil.rmtree(self.output_path, onerror=rm_error)
+
+        os.mkdir(self.output_path)
+        self._write_gradebook()
+
+        command = f'{self.convert_executable} autograde -i "{self.input_path}" -o "{self.output_path}" -p "*.ipynb"'
+        self.log.info(f"Running {command}")
+        process = await self._run_subprocess(command, None)
+        self.grading_logs = process.stderr.read().decode("utf-8")
+        self.log.info(self.grading_logs)
+        if process.returncode == 0:
+            self.log.info("Process has successfully completed execution!")
+        else:
+            raise RuntimeError("Process has failed execution!")

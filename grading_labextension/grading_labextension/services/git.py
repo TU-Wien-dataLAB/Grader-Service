@@ -11,8 +11,6 @@ from datetime import datetime
 import getpass
 import shutil
 import sys
-from urllib.parse import quote
-
 
 class GitError(Exception):
     def __init__(self, error: str):
@@ -32,19 +30,19 @@ class GitService(Configurable):
         f'{os.environ.get("GRADER_HOST_URL", "127.0.0.1")}:{os.environ.get("GRADER_HOST_PORT", "4010")}{os.environ.get("GRADER_GIT_BASE_URL", "/services/grader/git")}',
         allow_none=False).tag(config=True)
 
-    def __init__(self, server_root_dir: str, lecture_code: str, assignment_name: str, repo_type: str,
+    def __init__(self, server_root_dir: str, lecture_code: str, assignment_id: int, repo_type: str,
                  force_user_repo=False, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.log = logging.getLogger(str(self.__class__))
         self._git_version = None
         self.git_root_dir = server_root_dir
         self.lecture_code = lecture_code
-        self.assignment_name = assignment_name
+        self.assignment_id = assignment_id
         self.repo_type = repo_type
         if self.repo_type == "assignment" or force_user_repo:
-            self.path = os.path.join(self.git_root_dir, self.lecture_code, self.assignment_name)
+            self.path = os.path.join(self.git_root_dir, self.lecture_code, str(self.assignment_id))
         else:
-            self.path = os.path.join(self.git_root_dir, self.repo_type, self.lecture_code, self.assignment_name)
+            self.path = os.path.join(self.git_root_dir, self.repo_type, self.lecture_code, str(self.assignment_id))
         self.log.info(f"New git service working in {self.path}")
         os.makedirs(self.path, exist_ok=True)
 
@@ -70,7 +68,7 @@ class GitService(Configurable):
             sub_id ([type], optional): a query param for the feedback pull. Defaults to None.
         """
         self.log.info(f"Setting remote {origin} for {self.path}")
-        url = posixpath.join(self.git_remote_url, self.lecture_code, quote(self.assignment_name), self.repo_type)
+        url = posixpath.join(self.git_remote_url, self.lecture_code, str(self.assignment_id), self.repo_type)
         try:
             if sub_id is None:
                 self._run_command(

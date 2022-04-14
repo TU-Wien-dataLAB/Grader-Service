@@ -46,10 +46,11 @@ export const ManualGrading = (props: IManualGradingProps) => {
       props.assignment.id,
       props.submission.id
     ).then(() => {
-      const manualPath = `manualgrade/${props.lecture.code}/${props.assignment.name}/${props.submission.id}`;
+      const manualPath = `manualgrade/${props.lecture.code}/${props.assignment.id}/${props.submission.id}`;
+      console.log("Successfully pulled autograde repo into " + manualPath);
       setPath(manualPath);
     });
-  }, [props]);
+  }, [props.lecture, props.assignment, props.submission]);
 
   const openFinishDialog = () => {
     setDialogContent({
@@ -82,7 +83,7 @@ export const ManualGrading = (props: IManualGradingProps) => {
 
   return (
     <Box>
-      <ModalTitle title={'Manual Grading ' + props.assignment.name} />
+      <ModalTitle title={'Manual Grading ' + props.assignment.id} />
       <Box sx={{ m: 2, mt: 12 }}>
         <Stack direction="row" spacing={2} sx={{ ml: 2 }}>
           <Stack sx={{ mt: 0.5 }}>
@@ -175,7 +176,7 @@ export const ManualGrading = (props: IManualGradingProps) => {
       </Box>
       <Typography sx={{ m: 2, mb: 0 }}>Submission Files</Typography>
       <FilesList path={path} showAlert={props.showAlert} sx={{ m: 2 }} />
-      <Button variant="outlined" color="success" onClick={openFinishDialog}>
+      <Button variant="outlined" color="success" onClick={openFinishDialog} sx={{ml: 2}}>
         Confirm Manualgrade
       </Button>
       <AgreeDialog open={showDialog} {...dialogContent} />

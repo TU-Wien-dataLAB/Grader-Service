@@ -61,7 +61,7 @@ export const AssignmentComponent = (props: IAssignmentComponentProps) => {
       setLatestSubmissions(response);
     });
 
-    getFiles(`source/${props.lecture.code}/${assignment.name}`).then(files => {
+    getFiles(`source/${props.lecture.code}/${assignment.id}`).then(files => {
       setFiles(files);
     });
   }, [props]);
@@ -71,7 +71,7 @@ export const AssignmentComponent = (props: IAssignmentComponentProps) => {
       <Card
         sx={{maxWidth: 225, minWidth: 225, m: 1.5}}
         onClick={async () => {
-          await openBrowser(`source/${props.lecture.code}/${assignment.name}`, props.showAlert)
+          await openBrowser(`source/${props.lecture.code}/${assignment.id}`, props.showAlert)
           setDisplaySubmissions(true)
         }}
       >

@@ -31,7 +31,7 @@ export const AssignmentFilesComponent = (
   props: IAssignmentFilesComponentProps
 ) => {
   const [dialog, setDialog] = React.useState(false);
-  const path = `${props.lecture.code}/${props.assignment.name}`;
+  const path = `${props.lecture.code}/${props.assignment.id}`;
 
   const fetchAssignmentHandler = async (repo: 'assignment' | 'release') => {
     try {

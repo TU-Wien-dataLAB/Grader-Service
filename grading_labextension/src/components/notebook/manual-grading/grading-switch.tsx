@@ -12,7 +12,7 @@ import { Notebook, NotebookPanel } from '@jupyterlab/notebook';
 import { Lecture } from '../../../model/lecture';
 import { Assignment } from '../../../model/assignment';
 import { IconNames } from '@blueprintjs/icons';
-import { getAllAssignments } from '../../../services/assignments.service';
+import {getAllAssignments, getAssignment} from '../../../services/assignments.service';
 import { getAllLectures } from '../../../services/lectures.service';
 import { DataWidget } from './data-widget/data-widget';
 import { GradeWidget } from './grade-widget/grade-widget';
@@ -49,8 +49,9 @@ export class GradingModeSwitch extends React.Component<ImodeSwitchProps> {
       public async componentDidMount() {
         const lectures = await getAllLectures();
         this.lecture = lectures.find(l => l.code === this.notebookPaths[1]);
-        const assignments = await getAllAssignments(this.lecture.id);
-        this.assignment = assignments.find(a => a.name === this.notebookPaths[2]);
+        // const assignments = await getAllAssignments(this.lecture.id);
+        // this.assignment = assignments.find(a => a.id.toString() === this.notebookPaths[2]);
+        this.assignment = await getAssignment(this.lecture.id, {id: +this.notebookPaths[2]} as Assignment)
     
         const properties = await getProperties(this.lecture.id, this.assignment.id, this.subID);
         this.gradeBook = new GradeBook(properties);

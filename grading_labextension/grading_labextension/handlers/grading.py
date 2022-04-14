@@ -72,7 +72,7 @@ class GradingManualHandler(ExtensionBaseHandler):
         git_service = GitService(
             server_root_dir=self.root_dir,
             lecture_code=lecture["code"],
-            assignment_name=assignment["name"],
+            assignment_id=assignment["id"],
             repo_type="autograde",
             config=self.config,
         )
@@ -80,8 +80,8 @@ class GradingManualHandler(ExtensionBaseHandler):
             git_service.git_root_dir,
             "manualgrade",
             git_service.lecture_code,
-            git_service.assignment_name,
-            sub_id,
+            str(git_service.assignment_id),
+            str(sub_id),
         )
         self.log.info(f"Path: {git_service.path}")
         if not os.path.exists(git_service.path):
@@ -162,7 +162,7 @@ class PullFeedbackHandler(ExtensionBaseHandler):
         git_service = GitService(
             server_root_dir=self.root_dir,
             lecture_code=lecture["code"],
-            assignment_name=assignment["name"],
+            assignment_id=assignment["id"],
             repo_type="feedback",
             config=self.config,
         )
@@ -170,8 +170,8 @@ class PullFeedbackHandler(ExtensionBaseHandler):
             git_service.git_root_dir,
             "feedback",
             git_service.lecture_code,
-            git_service.assignment_name,
-            sub_id,
+            str(git_service.assignment_id),
+            str(sub_id),
         )
         self.log.info(f"Path: {git_service.path}")
         if not os.path.exists(git_service.path):
