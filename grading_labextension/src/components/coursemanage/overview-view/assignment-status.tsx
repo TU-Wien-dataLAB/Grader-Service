@@ -78,7 +78,6 @@ export const AssignmentStatus = (props: IAssignmentStatusProps) => {
       );
     } catch (err) {
       props.showAlert('error', 'Error Pushing Assignment');
-      closeDialog();
       return;
     }
     await updateAssignmentStatus("pushed", 'Successfully Pushed Assignment', 'Error Updating Assignment')
@@ -93,7 +92,8 @@ export const AssignmentStatus = (props: IAssignmentStatusProps) => {
           <Box>
             <Typography sx={{fontSize: 12}}>
               The assignment has been created and files can now be added to be
-              pushed. After you are done working on the files you can release the assignment.
+              pushed. After you are done working on the files you can release the assignment,
+              which makes a final commit with the current state of the assignment.
             </Typography>
             <ReleaseDialog assignment={assignment} handleCommit={handlePushAssignment}
                            handleRelease={handleReleaseAssignment}>
@@ -126,7 +126,7 @@ export const AssignmentStatus = (props: IAssignmentStatusProps) => {
               size="small"
             >
               <UndoIcon fontSize="small" sx={{mr: 1}}/>
-              Revoke
+              Undo Release
             </Button>
             <Button
               sx={{mt: 1}}
