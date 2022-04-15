@@ -19,7 +19,6 @@ import { red } from '@mui/material/colors';
 
 interface ILectureComponentProps {
   lecture: Lecture;
-  active: boolean;
   root: HTMLElement;
   showAlert: (severity: string, msg: string) => void;
   expanded?: boolean;
@@ -27,7 +26,6 @@ interface ILectureComponentProps {
 
 export const LectureComponent = (props: ILectureComponentProps) => {
   const [lecture, setLecture] = React.useState(props.lecture);
-  const [active, setActive] = React.useState(props.active);
   const [assignments, setAssignments] = React.useState(null);
   const [expanded, setExpanded] = React.useState(
     props.expanded === undefined ? false : props.expanded
@@ -76,7 +74,7 @@ export const LectureComponent = (props: ILectureComponentProps) => {
               Lecture:
             </Typography>
             {lecture.name}
-            {!active ? (
+            {lecture.complete ? (
               <Typography
                 sx={{
                   display: 'inline-block',
@@ -85,7 +83,7 @@ export const LectureComponent = (props: ILectureComponentProps) => {
                   color: red[400]
                 }}
               >
-                inactive
+                complete
               </Typography>
             ) : null}
           </Typography>
@@ -93,7 +91,6 @@ export const LectureComponent = (props: ILectureComponentProps) => {
             lecture={lecture}
             handleSubmit={async () => {
               setLecture(await getLecture(lecture.id));
-              setActive(true); // once we PUT lecture we know it is active
             }}
           />
         </CardContent>

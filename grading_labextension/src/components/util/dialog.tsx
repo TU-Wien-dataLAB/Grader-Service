@@ -280,6 +280,8 @@ export const EditLectureDialog = (props: IEditLectureProps) => {
     }
   });
 
+  console.log(props.lecture);
+
   const [openDialog, setOpen] = React.useState(false);
 
   return (
@@ -314,7 +316,8 @@ export const EditLectureDialog = (props: IEditLectureProps) => {
               <FormControlLabel
                 control={
                   <Checkbox
-                    value={props.lecture.complete}
+                    value={formik.values.complete}
+                    checked={formik.values.complete}
                     onChange={e => {
                       formik.setFieldValue('complete', e.target.checked);
                     }}
@@ -322,16 +325,6 @@ export const EditLectureDialog = (props: IEditLectureProps) => {
                 }
                 label="Complete"
               />
-              <Button
-                fullWidth
-                color="error"
-                variant="contained"
-                onClick={() => {
-                  setOpen(false);
-                }}
-              >
-                Delete Lecture
-              </Button>
             </Stack>
           </DialogContent>
           <DialogActions>

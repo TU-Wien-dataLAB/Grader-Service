@@ -17,7 +17,7 @@ class LectureBaseHandler(GraderBaseHandler):
     async def get(self):
         """Returns all lectures the user can access
         """
-        self.validate_parameters()
+        self.validate_parameters("complete")
         complete = self.get_argument("complete", "false") == "true"
 
         state = LectureState.complete if complete else LectureState.active

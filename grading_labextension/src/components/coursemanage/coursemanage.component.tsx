@@ -1,9 +1,9 @@
 import * as React from 'react';
-import { Lecture } from '../../model/lecture';
-import { getAllLectures } from '../../services/lectures.service';
-import { Scope, UserPermissions } from '../../services/permission.service';
-import { LectureComponent } from './lecture';
-import { Alert, AlertProps, AlertTitle, Portal } from '@mui/material';
+import {Lecture} from '../../model/lecture';
+import {getAllLectures} from '../../services/lectures.service';
+import {Scope, UserPermissions} from '../../services/permission.service';
+import {LectureComponent} from './lecture';
+import {Alert, AlertProps, AlertTitle, Portal} from '@mui/material';
 
 export interface ICourseManageProps {
   // lectures: Array<Lecture>;
@@ -32,10 +32,12 @@ export const CourseManageComponent = (props: ICourseManageProps) => {
   };
 
   const [lectures, setLectures] = React.useState([] as Lecture[]);
+  const [completedLectures, setCompletedLectures] = React.useState([] as Lecture[])
   React.useEffect(() => {
     UserPermissions.loadPermissions()
       .then(() => {
         getAllLectures().then(l => setLectures(l));
+        getAllLectures(true).then(l => setCompletedLectures(l));
       })
       .catch(() => showAlert('error', 'Error Loading Permissions'));
   }, [props]);
@@ -50,10 +52,19 @@ export const CourseManageComponent = (props: ICourseManageProps) => {
         .map((el, index) => (
           <LectureComponent
             lecture={el}
-            active={true}
             root={props.root}
             showAlert={showAlert}
             expanded={true}
+          />
+        ))}
+      {completedLectures
+        .filter(el => UserPermissions.getScope(el) > Scope.student)
+        .map((el, index) => (
+          <LectureComponent
+            lecture={el}
+            root={props.root}
+            showAlert={showAlert}
+            expanded={false}
           />
         ))}
       <Portal container={document.body}>
@@ -61,7 +72,7 @@ export const CourseManageComponent = (props: ICourseManageProps) => {
           <Alert
             onClose={handleAlertClose}
             severity={severity as AlertProps['severity']}
-            sx={{ position: 'fixed', left: '50%', ml: '-50px', mt: 10 }}
+            sx={{position: 'fixed', left: '50%', ml: '-50px', mt: 10}}
           >
             <AlertTitle>{alertMessage}</AlertTitle>
           </Alert>

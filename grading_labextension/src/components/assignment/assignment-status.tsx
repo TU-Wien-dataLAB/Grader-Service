@@ -29,15 +29,9 @@ export const AssignmentStatus = (props: IAssignmentStatusProps) => {
       false
     );
     if (hasFeedback) {
-      return 4;
+      return 3;
     }
     if (props.submissions.length > 0) {
-      return 2;
-    }
-    const files = await getFiles(
-      `${props.lecture.code}/${props.assignment.id}`
-    );
-    if (files.length > 0) {
       return 1;
     }
     return 0;
@@ -45,16 +39,6 @@ export const AssignmentStatus = (props: IAssignmentStatusProps) => {
 
   const fontSize = 14;
   const steps = [
-    {
-      label: 'Not Pulled',
-      description: (
-        <Typography sx={{ fontSize }}>
-          There are no files present in the working directory. You need to pull
-          from the release repository in order to work on the assignment, which
-          downloads all the necessary files.
-        </Typography>
-      )
-    },
     {
       label: 'Pulled',
       description: (
@@ -102,7 +86,7 @@ export const AssignmentStatus = (props: IAssignmentStatusProps) => {
           ))}
         </Stepper>
         <Typography sx={{ mt: 2, ml: 2, maxWidth: '50%' }}>
-          {steps[activeStep < 3 ? activeStep : 3].description}
+          {steps[activeStep < 2 ? activeStep : 2].description}
         </Typography>
       </CardContent>
     </Card>

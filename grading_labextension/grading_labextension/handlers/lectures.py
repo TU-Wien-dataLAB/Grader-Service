@@ -14,7 +14,7 @@ class LectureBaseHandler(ExtensionBaseHandler):
         """Sends a GET-request to the grader service and returns the autorized lectures
         """
         query_params = RequestService.get_query_string({
-            "active": self.get_argument("active", None)
+            "complete": self.get_argument("complete", None)
         })
         try:
             response = await self.request_service.request(

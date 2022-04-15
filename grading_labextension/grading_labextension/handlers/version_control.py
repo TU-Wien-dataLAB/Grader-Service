@@ -285,7 +285,7 @@ class PushHandler(ExtensionBaseHandler):
             git_service.commit(m=commit_message)
         except GitError as e:
             self.log.error("GitError:\n" + e.error)
-        # committing might fail because there is nothing to commit -> try to push regardless
+
         try:
             git_service.push(f"grader_{repo}", force=True)
         except GitError as e:
