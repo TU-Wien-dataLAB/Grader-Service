@@ -94,7 +94,7 @@ gitEmail: "grader-service@mail.com"
 
 # pvc
 storageClassName: "csi-cinder-sc-delete"
-accessMode: "ReadWriteOnce"
+accessMode: "ReadWriteOnce" # TODO: change to ReadWriteMany
 capacity: "10G"
 
 ingress:
