@@ -27,16 +27,18 @@ build-grader-image:
   script:
   # build image
   - docker build -t ${targetname} -f Dockerfile_service .
-  # # push image
-  # - az login -u ${service_az_tuw_client_id} -p ${service_az_tuw_client_secret} --service-principal -t ${AZURERM_tenant_id}
-  # - az acr login --name $REGISTRY
 
-  # # - docker login -u ${REGISTRY_USER} -p ${REGISTRY_KEY} ${REGISTRY_URL}
-  # - docker push ${targetname}
+  # login to az & docker
+  - tok=$(docker run mcr.microsoft.com/azure-cli /bin/bash -c "az login --federated-token "$(cat $AZURE_FEDERATED_TOKEN_FILE)"  --service-principal -u $AZURE_CLIENT_ID -t $AZURE_TENANT_ID > /dev/null; az acr login -n adlsregistrysbx --expose-token --output tsv --query accessToken")
+  - docker login adlsregistrysbx.azurecr.io --username 00000000-0000-0000-0000-000000000000 --password $tok 
 
-  # # logout
-  # - docker logout
-  # - az logout
+  # push image
+  - docker push ${targetname}
+  
+  after_script:
+  # logout
+  - docker logout
+  - az logout
 
 
 trigger_charts_package:
