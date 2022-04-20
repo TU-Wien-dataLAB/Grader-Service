@@ -49,7 +49,7 @@ build-cmpush-image:
   tags: [demo,dind]
   only:
     changes:
-      - ./cm-push/**
+      - cm-push/**/*
   before_script:
   - export targetname="${REGISTRY}.azurecr.io/helm-kubectl-cmpush:latest"
   - echo $targetname
