@@ -55,7 +55,7 @@ build-cmpush-image:
   - echo $targetname
   script:
   # build image
-  - docker build -t ${targetname} -f Dockerfile_service .
+  - docker build -t ${targetname} -f ./cm-push/Dockerfile .
 
   # login to az & docker
   - tok=$(docker run mcr.microsoft.com/azure-cli /bin/bash -c "az login --federated-token "$(cat $AZURE_FEDERATED_TOKEN_FILE)"  --service-principal -u $AZURE_CLIENT_ID -t $AZURE_TENANT_ID > /dev/null; az acr login -n adlsregistrysbx --expose-token --output tsv --query accessToken")
