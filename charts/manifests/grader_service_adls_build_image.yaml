@@ -40,7 +40,7 @@ data:
     c.KubeAutogradeExecutor.kube_context = None
     c.KubeAutogradeExecutor.base_input_path = "/var/lib/grader-service/convert_in"
     c.KubeAutogradeExecutor.base_output_path = "/var/lib/grader-service/convert_out"
-    c.KubeAutogradeExecutor.default_image_name = lambda l, a: "mbwali/grader-service:latest"
+    c.KubeAutogradeExecutor.default_image_name = lambda l, a: "adlsregistrysbx.azurecr.io/grader-service:latest"
     c.KubeAutogradeExecutor.volume_mounts = [{"name": "data", "mountPath": "/var/lib/grader-service"}]
     c.KubeAutogradeExecutor.volumes = [{"name": "data", "persistentVolumeClaim": {"claimName": "grader-service"}}]
 
@@ -78,7 +78,7 @@ spec:
       serviceAccountName: grader-service
       containers:
       - name: grader-service
-        image: mbwali/grader-service:latest
+        image: adlsregistrysbx.azurecr.io/grader-service:latest
         imagePullPolicy: Always
         # command: [ "sh", "-c", "sleep 140s" ] # for debug
         ports:
