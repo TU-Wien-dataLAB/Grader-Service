@@ -51,7 +51,7 @@ def upgrade():
 
     # ## Assignments
     # op.execute('INSERT INTO "assignment" ("name","lectid","duedate","points","status", "type") VALUES ("assignment_1",1,"2021-09-21 23:59:00.000",20,"released","user")')
-    op.execute('INSERT INTO "assignment" ("name","lectid","duedate","points","status", "type") VALUES ("Intro to Python",1,"2023-10-10 23:59:00.000",10,"created","user")')
+    # op.execute('INSERT INTO "assignment" ("name","lectid","duedate","points","status", "type") VALUES ("Intro to Python",1,"2023-10-10 23:59:00.000",10,"created","user")')
 
     # ## Submissions
     # op.execute('INSERT INTO "submission" ("date","status","assignid","username","commit_hash") VALUES ("2021-05-05 14:43:35.863","not_graded",1,"user1", "e93ae2b2369cb0ddb647f1c608148ccda59e22a1")')

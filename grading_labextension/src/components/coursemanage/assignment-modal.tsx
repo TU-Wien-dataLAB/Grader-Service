@@ -22,6 +22,8 @@ export interface IAssignmentModalProps {
   root: HTMLElement;
   users: any;
   showAlert: (severity: string, msg: string) => void;
+  onClose: () => void;
+
 }
 
 export const AssignmentModalComponent = (props: IAssignmentModalProps) => {
@@ -50,6 +52,7 @@ export const AssignmentModalComponent = (props: IAssignmentModalProps) => {
             latest_submissions={latestSubmissions}
             showAlert={props.showAlert}
             users={props.users}
+            onClose={props.onClose}
           />
         )}
 

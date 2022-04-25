@@ -38,13 +38,13 @@ class AssignmentBaseHandler(ExtensionBaseHandler):
         try:
             dirs = set(filter(lambda e: e[0] != ".", os.listdir(os.path.expanduser(f'{self.root_dir}/{lecture["code"]}'))))
             for assignment in response:
-                if assignment["name"] not in dirs:
-                    self.log.info(f'Creating directory {self.root_dir}/{lecture["code"]}/{assignment["name"]}')
+                if assignment["id"] not in dirs:
+                    self.log.info(f'Creating directory {self.root_dir}/{lecture["code"]}/{assignment["id"]}')
                     os.makedirs(
-                        os.path.expanduser(f'{self.root_dir}/{lecture["code"]}/{assignment["name"]}'), exist_ok=True
+                        os.path.expanduser(f'{self.root_dir}/{lecture["code"]}/{assignment["id"]}'), exist_ok=True
                     )
                 try:
-                    dirs.remove(assignment["name"])
+                    dirs.remove(assignment["id"])
                 except KeyError:
                     pass
         except FileNotFoundError:

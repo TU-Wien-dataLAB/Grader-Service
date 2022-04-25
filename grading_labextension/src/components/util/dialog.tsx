@@ -1,5 +1,5 @@
 import * as React from 'react';
-import {useFormik} from 'formik';
+import { useFormik } from 'formik';
 import * as yup from 'yup';
 
 import AdapterDateFns from '@mui/lab/AdapterDateFns';
@@ -12,9 +12,7 @@ import {
   DialogActions,
   DialogContent,
   DialogTitle,
-  Paper,
   Stack,
-  styled,
   TextFieldProps,
   DialogContentText,
   IconButton,
@@ -24,26 +22,26 @@ import {
   Select,
   MenuItem,
   Tooltip,
-  Typography,
   Card,
-  CardActionArea, Box
+  CardActionArea,
+  Box
 } from '@mui/material';
-import {Assignment} from '../../model/assignment';
-import {LoadingButton} from '@mui/lab';
+import { Assignment } from '../../model/assignment';
+import { LoadingButton } from '@mui/lab';
 import EditIcon from '@mui/icons-material/Edit';
-import AddRoundedIcon from '@mui/icons-material/AddRounded';
 import {
   createAssignment,
+  deleteAssignment,
   updateAssignment
 } from '../../services/assignments.service';
-import {Lecture} from '../../model/lecture';
+import { Lecture } from '../../model/lecture';
 import TypeEnum = Assignment.TypeEnum;
 import AutomaticGradingEnum = Assignment.AutomaticGradingEnum;
-import {updateLecture} from '../../services/lectures.service';
+import { updateLecture } from '../../services/lectures.service';
 import HelpOutlineOutlinedIcon from '@mui/icons-material/HelpOutlineOutlined';
 import AddIcon from '@mui/icons-material/Add';
-import PublishRoundedIcon from '@mui/icons-material/PublishRounded';
-import NewReleasesRoundedIcon from "@mui/icons-material/NewReleasesRounded";
+import { Simulate } from 'react-dom/test-utils';
+import error = Simulate.error;
 
 const gradingBehaviourHelp = `Specifies the behaviour when a students submits an assignment.\n
 No Automatic Grading: No action is taken on submit.\n
@@ -69,6 +67,8 @@ export interface IEditDialogProps {
   lecture: Lecture;
   assignment: Assignment;
   onSubmit?: () => void;
+  showAlert: (severity: string, msg: string) => void;
+  onClose: () => void;
 }
 
 export const EditDialog = (props: IEditDialogProps) => {
@@ -103,7 +103,7 @@ export const EditDialog = (props: IEditDialogProps) => {
   return (
     <div>
       <IconButton
-        sx={{mt: -1}}
+        sx={{ mt: -1 }}
         onClick={e => {
           e.stopPropagation();
           setOpen(true);
@@ -111,7 +111,7 @@ export const EditDialog = (props: IEditDialogProps) => {
         onMouseDown={event => event.stopPropagation()}
         aria-label="edit"
       >
-        <EditIcon/>
+        <EditIcon />
       </IconButton>
       <Dialog open={openDialog} onBackdropClick={() => setOpen(false)}>
         <DialogTitle>Edit Assignment</DialogTitle>
@@ -153,7 +153,6 @@ export const EditDialog = (props: IEditDialogProps) => {
                   ampm={false}
                   disabled={formik.values.due_date === null}
                   renderInput={(props: TextFieldProps) => {
-                    //@ts-ignore
                     return (
                       <TextField
                         {...props}
@@ -180,7 +179,7 @@ export const EditDialog = (props: IEditDialogProps) => {
                 <Tooltip title={gradingBehaviourHelp}>
                   <HelpOutlineOutlinedIcon
                     fontSize={'small'}
-                    sx={{ml: 1.5, mt: 1.0}}
+                    sx={{ ml: 1.5, mt: 1.0 }}
                   />
                 </Tooltip>
               </InputLabel>
@@ -220,8 +219,19 @@ export const EditDialog = (props: IEditDialogProps) => {
                 fullWidth
                 color="error"
                 variant="contained"
-                onClick={() => {
-                  setOpen(false);
+                onClick={async () => {
+                  await deleteAssignment(
+                    props.lecture.id,
+                    props.assignment.id
+                  ).then(
+                    response => {
+                      setOpen(false);
+                      props.onClose();
+                    },
+                    error => {
+                      props.showAlert('danger', 'Can not delete assignment');
+                    }
+                  );
                 }}
               >
                 Delete Assignment
@@ -287,7 +297,7 @@ export const EditLectureDialog = (props: IEditLectureProps) => {
   return (
     <div>
       <IconButton
-        sx={{mt: -1}}
+        sx={{ mt: -1 }}
         onClick={e => {
           e.stopPropagation();
           setOpen(true);
@@ -295,7 +305,7 @@ export const EditLectureDialog = (props: IEditLectureProps) => {
         onMouseDown={event => event.stopPropagation()}
         aria-label="edit"
       >
-        <EditIcon/>
+        <EditIcon />
       </IconButton>
       <Dialog open={openDialog} onBackdropClick={() => setOpen(false)}>
         <DialogTitle>Edit Lecture</DialogTitle>
@@ -354,7 +364,7 @@ interface INewAssignmentCardProps {
 
 export default function NewAssignmentCard(props: INewAssignmentCardProps) {
   return (
-    <Card sx={{width: 225, height: 225, m: 1.5, backgroundColor: '#fcfcfc'}}>
+    <Card sx={{ width: 225, height: 225, m: 1.5, backgroundColor: '#fcfcfc' }}>
       <Tooltip title={'New Assignment'}>
         <CardActionArea
           onClick={props.onClick}
@@ -366,7 +376,7 @@ export default function NewAssignmentCard(props: INewAssignmentCardProps) {
             alignItems: 'center'
           }}
         >
-          <AddIcon sx={{fontSize: 50}} color="disabled"/>
+          <AddIcon sx={{ fontSize: 50 }} color="disabled" />
         </CardActionArea>
       </Tooltip>
     </Card>
@@ -456,7 +466,6 @@ export const CreateDialog = (props: ICreateDialogProps) => {
                   ampm={false}
                   disabled={formik.values.due_date === null}
                   renderInput={(props: TextFieldProps) => {
-                    //@ts-ignore
                     return (
                       <TextField
                         {...props}
@@ -483,7 +492,7 @@ export const CreateDialog = (props: ICreateDialogProps) => {
                 <Tooltip title={gradingBehaviourHelp}>
                   <HelpOutlineOutlinedIcon
                     fontSize={'small'}
-                    sx={{ml: 1.5, mt: 1.0}}
+                    sx={{ ml: 1.5, mt: 1.0 }}
                   />
                 </Tooltip>
               </InputLabel>
@@ -546,12 +555,9 @@ export const CommitDialog = (props: ICommitDialogProps) => {
   const [open, setOpen] = React.useState(false);
   const [message, setMessage] = React.useState('');
 
-
   return (
     <div>
-      <Box onClick={() => setOpen(true)}>
-        {props.children}
-      </Box>
+      <Box onClick={() => setOpen(true)}>{props.children}</Box>
       <Dialog
         open={open}
         onBackdropClick={() => setOpen(false)}
@@ -562,7 +568,7 @@ export const CommitDialog = (props: ICommitDialogProps) => {
         <DialogTitle>Commit Files</DialogTitle>
         <DialogContent>
           <TextField
-            sx={{mt: 2, width: '100%'}}
+            sx={{ mt: 2, width: '100%' }}
             id="outlined-textarea"
             label="Commit Message"
             placeholder="Commit Message"
@@ -646,7 +652,7 @@ export const AgreeDialog = (props: IAgreeDialogProps) => {
 };
 
 export interface IReleaseDialogProps extends ICommitDialogProps {
-  assignment: Assignment,
+  assignment: Assignment;
   handleRelease: () => void;
 }
 
@@ -660,13 +666,17 @@ export const ReleaseDialog = (props: IReleaseDialogProps) => {
 
   return (
     <div>
-      <Box onClick={() => setAgreeOpen(true)}>
-        {props.children}
-      </Box>
-      <AgreeDialog open={agreeOpen} title={'Release Assignment'} message={agreeMessage} handleAgree={() => {
-        setAgreeOpen(false);
-        setCommitOpen(true);
-      }} handleDisagree={() => setAgreeOpen(false)}/>
+      <Box onClick={() => setAgreeOpen(true)}>{props.children}</Box>
+      <AgreeDialog
+        open={agreeOpen}
+        title={'Release Assignment'}
+        message={agreeMessage}
+        handleAgree={() => {
+          setAgreeOpen(false);
+          setCommitOpen(true);
+        }}
+        handleDisagree={() => setAgreeOpen(false)}
+      />
       <Dialog
         open={commitOpen}
         onBackdropClick={() => setCommitOpen(false)}
@@ -677,7 +687,7 @@ export const ReleaseDialog = (props: IReleaseDialogProps) => {
         <DialogTitle>Commit Files</DialogTitle>
         <DialogContent>
           <TextField
-            sx={{mt: 2, width: '100%'}}
+            sx={{ mt: 2, width: '100%' }}
             id="outlined-textarea"
             label="Commit Message"
             placeholder="Commit Message"
@@ -716,5 +726,5 @@ export const ReleaseDialog = (props: IReleaseDialogProps) => {
         </DialogActions>
       </Dialog>
     </div>
-  )
-}
+  );
+};

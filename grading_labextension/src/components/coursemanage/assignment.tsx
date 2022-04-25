@@ -8,16 +8,16 @@ import {
   Typography
 } from '@mui/material';
 
-import {Assignment} from '../../model/assignment';
+import { Assignment } from '../../model/assignment';
 import LoadingOverlay from '../util/overlay';
-import {Lecture} from '../../model/lecture';
-import {getAllSubmissions} from '../../services/submissions.service';
-import {getAssignment} from '../../services/assignments.service';
-import {AssignmentModalComponent} from './assignment-modal';
-import {DeadlineComponent} from '../util/deadline';
-import {blue} from '@mui/material/colors';
-import {getFiles} from '../../services/file.service';
-import {openBrowser} from "./overview-view/util";
+import { Lecture } from '../../model/lecture';
+import { getAllSubmissions } from '../../services/submissions.service';
+import { getAssignment } from '../../services/assignments.service';
+import { AssignmentModalComponent } from './assignment-modal';
+import { DeadlineComponent } from '../util/deadline';
+import { blue } from '@mui/material/colors';
+import { getFiles } from '../../services/file.service';
+import { openBrowser } from './overview-view/util';
 
 interface IAssignmentComponentProps {
   lecture: Lecture;
@@ -25,6 +25,7 @@ interface IAssignmentComponentProps {
   root: HTMLElement;
   users: any;
   showAlert: (severity: string, msg: string) => void;
+  onDeleted: () => void;
 }
 
 export const AssignmentComponent = (props: IAssignmentComponentProps) => {
@@ -34,6 +35,7 @@ export const AssignmentComponent = (props: IAssignmentComponentProps) => {
   const onSubmissionClose = async () => {
     setDisplaySubmissions(false);
     setAssignment(await getAssignment(props.lecture.id, assignment));
+    props.onDeleted();
   };
 
   const [allSubmissions, setAllSubmissions] = React.useState([]);
@@ -69,10 +71,13 @@ export const AssignmentComponent = (props: IAssignmentComponentProps) => {
   return (
     <Box>
       <Card
-        sx={{maxWidth: 225, minWidth: 225, m: 1.5}}
+        sx={{ maxWidth: 225, minWidth: 225, m: 1.5 }}
         onClick={async () => {
-          await openBrowser(`source/${props.lecture.code}/${assignment.id}`, props.showAlert)
-          setDisplaySubmissions(true)
+          await openBrowser(
+            `source/${props.lecture.code}/${assignment.id}`,
+            props.showAlert
+          );
+          setDisplaySubmissions(true);
         }}
       >
         <CardActionArea>
@@ -81,7 +86,7 @@ export const AssignmentComponent = (props: IAssignmentComponentProps) => {
               {assignment.name}
             </Typography>
             <Typography
-              sx={{fontSize: 14}}
+              sx={{ fontSize: 14 }}
               color="text.secondary"
               gutterBottom
             >
@@ -97,9 +102,9 @@ export const AssignmentComponent = (props: IAssignmentComponentProps) => {
                 {assignment.status}
               </Typography>
             </Typography>
-            <Divider sx={{mt: 1, mb: 1}}/>
+            <Divider sx={{ mt: 1, mb: 1 }} />
 
-            <Typography sx={{fontSize: 15, mt: 0.5, ml: 0.5}}>
+            <Typography sx={{ fontSize: 15, mt: 0.5, ml: 0.5 }}>
               {allSubmissions.length}
               <Typography
                 color="text.secondary"
@@ -112,9 +117,9 @@ export const AssignmentComponent = (props: IAssignmentComponentProps) => {
                 {'Submission' + (allSubmissions.length === 1 ? '' : 's')}
               </Typography>
             </Typography>
-            <Typography sx={{fontSize: 15, mt: 0.5, ml: 0.5}}>
+            <Typography sx={{ fontSize: 15, mt: 0.5, ml: 0.5 }}>
               {numAutoGraded}
-              <Typography sx={{fontSize: 10, ml: 0, display: 'inline-block'}}>
+              <Typography sx={{ fontSize: 10, ml: 0, display: 'inline-block' }}>
                 {'/' + allSubmissions.length}
               </Typography>
               <Typography
@@ -128,9 +133,9 @@ export const AssignmentComponent = (props: IAssignmentComponentProps) => {
                 {'Autograded Submission' + (numAutoGraded === 1 ? '' : 's')}
               </Typography>
             </Typography>
-            <Typography sx={{fontSize: 15, mt: 0.5, ml: 0.5}}>
+            <Typography sx={{ fontSize: 15, mt: 0.5, ml: 0.5 }}>
               {numManualGraded}
-              <Typography sx={{fontSize: 10, ml: 0, display: 'inline-block'}}>
+              <Typography sx={{ fontSize: 10, ml: 0, display: 'inline-block' }}>
                 {'/' + allSubmissions.length}
               </Typography>
               <Typography
@@ -166,6 +171,7 @@ export const AssignmentComponent = (props: IAssignmentComponentProps) => {
           root={props.root}
           users={props.users}
           showAlert={props.showAlert}
+          onClose={onSubmissionClose}
         />
       </LoadingOverlay>
     </Box>

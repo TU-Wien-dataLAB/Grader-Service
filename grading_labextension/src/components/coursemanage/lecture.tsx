@@ -30,6 +30,7 @@ export const LectureComponent = (props: ILectureComponentProps) => {
   const [expanded, setExpanded] = React.useState(
     props.expanded === undefined ? false : props.expanded
   );
+  const [reloadToogle, setReload] = React.useState(false);
   const [users, setUsers] = React.useState(null);
 
   React.useEffect(() => {
@@ -40,8 +41,11 @@ export const LectureComponent = (props: ILectureComponentProps) => {
     getUsers(lecture).then(response => {
       setUsers(response);
     });
-  }, []);
+  }, [reloadToogle]);
 
+  const onAssignmentDelete = () => {
+    setReload(!reloadToogle);
+  }
   const handleExpandClick = () => {
     setExpanded(!expanded);
   };
@@ -105,6 +109,7 @@ export const LectureComponent = (props: ILectureComponentProps) => {
                   root={props.root}
                   users={users}
                   showAlert={props.showAlert}
+                  onDeleted={onAssignmentDelete}
                 />
               ))}
               <CreateDialog

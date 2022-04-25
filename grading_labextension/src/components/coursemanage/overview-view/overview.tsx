@@ -4,7 +4,6 @@ import { Assignment } from '../../../model/assignment';
 import { Lecture } from '../../../model/lecture';
 import { EditDialog } from '../../util/dialog';
 import { ModalTitle } from '../../util/modal-title';
-import { GradingChart, SubmittedChart } from './charts';
 import { OverviewCard } from './overview-card';
 import { Box, Grid } from '@mui/material';
 import { Files } from './files';
@@ -20,6 +19,7 @@ export interface IOverviewProps {
   latest_submissions: any;
   users: any;
   showAlert: (severity: string, msg: string) => void;
+  onClose: () => void;
 }
 
 export const OverviewComponent = (props: IOverviewProps) => {
@@ -36,11 +36,13 @@ export const OverviewComponent = (props: IOverviewProps) => {
           <EditDialog
             lecture={props.lecture}
             assignment={assignment}
+            showAlert={props.showAlert}
             onSubmit={() =>
               getAssignment(props.lecture.id, assignment).then(assignment =>
                 setAssignment(assignment)
               )
             }
+            onClose={props.onClose}
           />
         </Box>
       </ModalTitle>
