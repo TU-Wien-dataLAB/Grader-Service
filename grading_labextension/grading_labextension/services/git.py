@@ -1,3 +1,4 @@
+import enum
 import logging
 import subprocess
 from typing import List, Dict
@@ -12,6 +13,7 @@ import getpass
 import shutil
 import sys
 
+
 class GitError(Exception):
     def __init__(self, error: str):
         self.error = error
@@ -21,6 +23,13 @@ class GitError(Exception):
 
     def __repr__(self) -> str:
         return self.__str__()
+
+
+class RemoteStatus(enum.Enum):
+    up_to_date = 1
+    pull_needed = 2
+    push_needed = 3
+    divergent = 4
 
 
 class GitService(Configurable):
@@ -214,6 +223,21 @@ class GitService(Configurable):
                     shutil.copytree(s, d, ignore=ignore)
                 else:
                     shutil.copy2(s, d)
+
+    def check_remote_status(self, origin: str, branch: str) -> RemoteStatus:
+        local = self._run_command(f"git rev-parse {branch}", cwd=self.path, capture_output=True).strip()
+        remote = self._run_command(f"git rev-parse {origin}/{branch}", cwd=self.path, capture_output=True).strip()
+        if local == remote:
+            return RemoteStatus.up_to_date
+
+        base = self._run_command(f"git merge-base {branch} {origin}/{branch}", cwd=self.path, capture_output=True).strip()
+
+        if local == base:
+            return RemoteStatus.pull_needed
+        elif remote == base:
+            return RemoteStatus.push_needed
+        else:
+            return RemoteStatus.divergent
 
     def get_log(self, history_count=10) -> List[Dict[str, str]]:
         """
