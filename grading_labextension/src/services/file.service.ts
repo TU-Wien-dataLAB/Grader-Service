@@ -13,7 +13,12 @@ export const getFiles = async (path: string): Promise<IModel[]> => {
     auto: true,
     manager: GlobalObjects.docManager
   });
-  await model.cd(path);
+  try {
+    await model.cd(path);
+  } catch (_) {
+    return [];
+  }
+
   if (model.path !== path) {
     return [];
   }

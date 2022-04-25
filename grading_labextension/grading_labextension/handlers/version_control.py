@@ -43,11 +43,11 @@ class GenerateHandler(ExtensionBaseHandler):
             self.write_error(e.code)
             return
         code = lecture["code"]
-        name = assignment["name"]
+        a_id = assignment["id"]
 
         generator = GenerateAssignment(
-            input_dir=f"{self.root_dir}/source/{code}/{name}",
-            output_dir=f"{self.root_dir}/release/{code}/{name}",
+            input_dir=f"{self.root_dir}/source/{code}/{a_id}",
+            output_dir=f"{self.root_dir}/release/{code}/{a_id}",
             file_pattern="*.ipynb",
         )
         generator.force = True
@@ -102,6 +102,9 @@ class GitLogHandler(ExtensionBaseHandler):
             config=self.config,
             force_user_repo=True if repo == "release" else False,
         )
+        if not git_service.is_git():
+            git_service.init()
+            git_service.set_author()
         git_service.set_remote(f"grader_{repo}")
         git_service.fetch_all()
         logs = git_service.get_log(n_history)

@@ -79,15 +79,15 @@ class AssignmentBaseHandler(ExtensionBaseHandler):
             return
         # if we did not get an error when creating the assignment (i.e. the user is authorized etc.) then we can create the directory structure if it does not exist yet
         os.makedirs(
-            os.path.expanduser(f'{self.root_dir}/{lecture["code"]}/{response["name"]}'),
+            os.path.expanduser(f'{self.root_dir}/{lecture["code"]}/{response["id"]}'),
             exist_ok=True
         )
         os.makedirs(
-            os.path.expanduser(f"{self.root_dir}/source/{lecture['code']}/{response['name']}"),
+            os.path.expanduser(f"{self.root_dir}/source/{lecture['code']}/{response['id']}"),
             exist_ok=True,
         )
         os.makedirs(
-            os.path.expanduser(f"{self.root_dir}/release/{lecture['code']}/{response['name']}"),
+            os.path.expanduser(f"{self.root_dir}/release/{lecture['code']}/{response['id']}"),
             exist_ok=True,
         )
         self.write(json.dumps(response))
@@ -153,7 +153,7 @@ class AssignmentObjectHandler(ExtensionBaseHandler):
             return
         
         os.makedirs(
-            os.path.expanduser(f'{self.root_dir}/{lecture["code"]}/{response["name"]}'),
+            os.path.expanduser(f'{self.root_dir}/{lecture["code"]}/{response["id"]}'),
             exist_ok=True
         )
         self.write(json.dumps(response))
@@ -188,8 +188,8 @@ class AssignmentObjectHandler(ExtensionBaseHandler):
             self.set_status(e.code)
             self.write_error(e.code)
             return
-        self.log.warn(f'Deleting directory {self.root_dir}/{lecture["code"]}/{assignment["name"]}')
-        shutil.rmtree(os.path.expanduser(f'{self.root_dir}/{lecture["code"]}/{assignment["name"]}'), ignore_errors=True)
+        self.log.warn(f'Deleting directory {self.root_dir}/{lecture["code"]}/{assignment["id"]}')
+        shutil.rmtree(os.path.expanduser(f'{self.root_dir}/{lecture["code"]}/{assignment["id"]}'), ignore_errors=True)
         self.write("OK")
 
 
