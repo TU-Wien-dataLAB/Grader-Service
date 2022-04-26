@@ -1,7 +1,7 @@
 from grading_labextension.services.request import RequestService
 from jupyter_server.base.handlers import APIHandler
 import os
-from tornado.httpclient import HTTPClient
+from tornado.httpclient import HTTPClient, HTTPClientError
 from traitlets.config.configurable import SingletonConfigurable
 from traitlets.traitlets import Unicode
 
@@ -34,3 +34,29 @@ class ExtensionBaseHandler(APIHandler):
         """
 
         return dict(Authorization="Token " + HandlerConfig.instance().hub_api_token)
+
+    async def get_lecture(self, lecture_id):
+        try:
+            lecture = await self.request_service.request(
+                "GET",
+                f"{self.base_url}/lectures/{lecture_id}",
+                header=self.grader_authentication_header,
+            )
+            return lecture
+        except HTTPClientError as e:
+            self.set_status(e.code)
+            self.write_error(e.code)
+            return
+
+    async def get_assignment(self, lecture_id, assignment_id):
+        try:
+            assignment = await self.request_service.request(
+                "GET",
+                f"{self.base_url}/lectures/{lecture_id}/assignments/{assignment_id}",
+                header=self.grader_authentication_header,
+            )
+            return assignment
+        except HTTPClientError as e:
+            self.set_status(e.code)
+            self.write_error(e.code)
+            return
