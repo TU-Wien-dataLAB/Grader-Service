@@ -1,7 +1,7 @@
 import enum
 import logging
 import subprocess
-from typing import List, Dict
+from typing import List, Dict, Union
 from traitlets.config.configurable import Configurable
 from traitlets.config.loader import Config
 from traitlets.traitlets import Int, TraitError, Unicode, validate
@@ -226,7 +226,10 @@ class GitService(Configurable):
 
     def check_remote_status(self, origin: str, branch: str) -> RemoteStatus:
         local = self._run_command(f"git rev-parse {branch}", cwd=self.path, capture_output=True).strip()
-        remote = self._run_command(f"git rev-parse {origin}/{branch}", cwd=self.path, capture_output=True).strip()
+        if self.remote_branch_exists(origin, branch):
+            remote = self._run_command(f"git rev-parse {origin}/{branch}", cwd=self.path, capture_output=True).strip()
+        else:
+            return RemoteStatus.push_needed
         if local == remote:
             return RemoteStatus.up_to_date
 
@@ -238,6 +241,14 @@ class GitService(Configurable):
             return RemoteStatus.push_needed
         else:
             return RemoteStatus.divergent
+
+    def remote_branch_exists(self, origin: str, branch: str) -> bool:
+        ret_code = self._run_command(f"git ls-remote --exit-code {origin}  {branch}", cwd=self.path,
+                                     check=False).returncode
+        if ret_code == 2:
+            return False
+        else:
+            return True
 
     def get_log(self, history_count=10) -> List[Dict[str, str]]:
         """
@@ -285,14 +296,14 @@ class GitService(Configurable):
             self._git_version = tuple([int(v) for v in version.split(".")])
         return self._git_version
 
-    def _run_command(self, command, cwd=None, capture_output=False):
-        """Starts a sub process and runs an cmd command
+    def _run_command(self, command, cwd=None, capture_output=False, check=True) -> Union[str, subprocess.CompletedProcess]:
+        """Starts a sub process and runs a cmd command
 
         Args:
             command str: command that is getting run.
             cwd (str, optional): states where the command is getting run. Defaults to None.
             capture_output (bool, optional): states if output is getting saved. Defaults to False.
-
+            check (bool, optional): whether to raise a GitError if process fails.
         Raises:
             GitError: returns appropriate git error 
 
@@ -301,9 +312,11 @@ class GitService(Configurable):
         """
         try:
             self.log.info(f"Running: {command}")
-            ret = subprocess.run(shlex.split(command), check=True, cwd=cwd, capture_output=True)
+            ret = subprocess.run(shlex.split(command), check=check, cwd=cwd, capture_output=True)
             if capture_output:
                 return str(ret.stdout, 'utf-8')
+            else:
+                return ret
         except subprocess.CalledProcessError as e:
             raise GitError(str(e.stdout, 'utf-8') + str(e.stderr, 'utf-8'))
         except FileNotFoundError as e:

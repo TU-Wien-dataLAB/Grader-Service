@@ -71,6 +71,37 @@ class GenerateHandler(ExtensionBaseHandler):
 
 
 @register_handler(
+    path=r"\/lectures\/(?P<lecture_id>\d*)\/assignments\/(?P<assignment_id>\d*)\/remote-status\/(?P<repo>\w*)\/?"
+)
+class GitRemoteStatusHandler(ExtensionBaseHandler):
+    async def get(self, lecture_id: int, assignment_id: int, repo: str):
+        if repo not in {"assignment", "source", "release"}:
+            self.write_error(404)
+        lecture = await self.get_lecture(lecture_id)
+        assignment = await self.get_assignment(lecture_id, assignment_id)
+        git_service = GitService(
+            server_root_dir=self.root_dir,
+            lecture_code=lecture["code"],
+            assignment_id=assignment["id"],
+            repo_type=repo,
+            config=self.config,
+            force_user_repo=True if repo == "release" else False,
+        )
+        try:
+            if not git_service.is_git():
+                git_service.init()
+                git_service.set_author()
+            git_service.set_remote(f"grader_{repo}")
+            git_service.fetch_all()
+            status = git_service.check_remote_status(f"grader_{repo}", "main")
+        except GitError:
+            self.set_status(400)
+            self.write_error(400)
+            return
+        self.write(status.name)
+
+
+@register_handler(
     path=r"\/lectures\/(?P<lecture_id>\d*)\/assignments\/(?P<assignment_id>\d*)\/log\/(?P<repo>\w*)\/?"
 )
 class GitLogHandler(ExtensionBaseHandler):
@@ -102,12 +133,17 @@ class GitLogHandler(ExtensionBaseHandler):
             config=self.config,
             force_user_repo=True if repo == "release" else False,
         )
-        if not git_service.is_git():
-            git_service.init()
-            git_service.set_author()
-        git_service.set_remote(f"grader_{repo}")
-        git_service.fetch_all()
-        logs = git_service.get_log(n_history)
+        try:
+            if not git_service.is_git():
+                git_service.init()
+                git_service.set_author()
+            git_service.set_remote(f"grader_{repo}")
+            git_service.fetch_all()
+            logs = git_service.get_log(n_history)
+        except GitError:
+            self.set_status(400)
+            self.write_error(400)
+            return
         self.write(json.dumps(logs))
 
 
