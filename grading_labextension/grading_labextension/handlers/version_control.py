@@ -30,12 +30,12 @@ class GenerateHandler(ExtensionBaseHandler):
         try:
             lecture = await self.request_service.request(
                 "GET",
-                f"{self.base_url}/lectures/{lecture_id}",
+                f"{self.service_base_url}/lectures/{lecture_id}",
                 header=self.grader_authentication_header,
             )
             assignment = await self.request_service.request(
                 "GET",
-                f"{self.base_url}/lectures/{lecture_id}/assignments/{assignment_id}",
+                f"{self.service_base_url}/lectures/{lecture_id}/assignments/{assignment_id}",
                 header=self.grader_authentication_header,
             )
         except HTTPClientError as e:
@@ -112,12 +112,12 @@ class GitLogHandler(ExtensionBaseHandler):
         try:
             lecture = await self.request_service.request(
                 "GET",
-                f"{self.base_url}/lectures/{lecture_id}",
+                f"{self.service_base_url}/lectures/{lecture_id}",
                 header=self.grader_authentication_header,
             )
             assignment = await self.request_service.request(
                 "GET",
-                f"{self.base_url}/lectures/{lecture_id}/assignments/{assignment_id}",
+                f"{self.service_base_url}/lectures/{lecture_id}/assignments/{assignment_id}",
                 header=self.grader_authentication_header,
             )
         except HTTPClientError as e:
@@ -166,12 +166,12 @@ class PullHandler(ExtensionBaseHandler):
         try:
             lecture = await self.request_service.request(
                 "GET",
-                f"{self.base_url}/lectures/{lecture_id}",
+                f"{self.service_base_url}/lectures/{lecture_id}",
                 header=self.grader_authentication_header,
             )
             assignment = await self.request_service.request(
                 "GET",
-                f"{self.base_url}/lectures/{lecture_id}/assignments/{assignment_id}",
+                f"{self.service_base_url}/lectures/{lecture_id}/assignments/{assignment_id}",
                 header=self.grader_authentication_header,
             )
         except HTTPClientError as e:
@@ -224,12 +224,12 @@ class PushHandler(ExtensionBaseHandler):
         try:
             lecture = await self.request_service.request(
                 "GET",
-                f"{self.base_url}/lectures/{lecture_id}",
+                f"{self.service_base_url}/lectures/{lecture_id}",
                 header=self.grader_authentication_header,
             )
             assignment = await self.request_service.request(
                 "GET",
-                f"{self.base_url}/lectures/{lecture_id}/assignments/{assignment_id}",
+                f"{self.service_base_url}/lectures/{lecture_id}/assignments/{assignment_id}",
                 header=self.grader_authentication_header,
             )
         except HTTPClientError as e:
@@ -285,7 +285,7 @@ class PushHandler(ExtensionBaseHandler):
             self.log.info(f"Setting properties of assignment from {gradebook_path}")
             response: HTTPResponse = await self.request_service.request(
                 "PUT",
-                f"{self.base_url}/lectures/{lecture_id}/assignments/{assignment_id}/properties",
+                f"{self.service_base_url}/lectures/{lecture_id}/assignments/{assignment_id}/properties",
                 header=self.grader_authentication_header,
                 body=gradebook_json,
                 decode_response=False,
@@ -339,7 +339,7 @@ class PushHandler(ExtensionBaseHandler):
                 submission = Submission(commit_hash=latest_commit_hash)
                 await self.request_service.request(
                     "POST",
-                    f"{self.base_url}/lectures/{lecture_id}/assignments/{assignment_id}/submissions",
+                    f"{self.service_base_url}/lectures/{lecture_id}/assignments/{assignment_id}/submissions",
                     body=submission.to_dict(),
                     header=self.grader_authentication_header,
                 )
@@ -363,7 +363,7 @@ class ResetHandler(ExtensionBaseHandler):
         try:
             await self.request_service.request(
                 "GET",
-                f"{self.base_url}/lectures/{lecture_id}/assignments/{assignment_id}/reset",
+                f"{self.service_base_url}/lectures/{lecture_id}/assignments/{assignment_id}/reset",
                 header=self.grader_authentication_header,
             )
         except HTTPClientError as e:
@@ -383,12 +383,12 @@ class NotebookAccessHandler(ExtensionBaseHandler):
         try:
             lecture = await self.request_service.request(
                 "GET",
-                f"{self.base_url}/lectures/{lecture_id}",
+                f"{self.service_base_url}/lectures/{lecture_id}",
                 header=self.grader_authentication_header,
             )
             assignment = await self.request_service.request(
                 "GET",
-                f"{self.base_url}/lectures/{lecture_id}/assignments/{assignment_id}",
+                f"{self.service_base_url}/lectures/{lecture_id}/assignments/{assignment_id}",
                 header=self.grader_authentication_header,
             )
         except HTTPClientError as e:

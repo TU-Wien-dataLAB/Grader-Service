@@ -30,7 +30,7 @@ class ExtensionBaseHandler(APIHandler):
         self.root_dir = os.path.expanduser(self.settings["server_root_dir"])
 
     @property
-    def base_url(self):
+    def service_base_url(self):
         return HandlerConfig.instance().service_base_url
 
     @property
@@ -47,7 +47,7 @@ class ExtensionBaseHandler(APIHandler):
         try:
             lecture = await self.request_service.request(
                 "GET",
-                f"{self.base_url}/lectures/{lecture_id}",
+                f"{self.service_base_url}/lectures/{lecture_id}",
                 header=self.grader_authentication_header,
             )
             return lecture
@@ -60,7 +60,7 @@ class ExtensionBaseHandler(APIHandler):
         try:
             assignment = await self.request_service.request(
                 "GET",
-                f"{self.base_url}/lectures/{lecture_id}/assignments/{assignment_id}",
+                f"{self.service_base_url}/lectures/{lecture_id}/assignments/{assignment_id}",
                 header=self.grader_authentication_header,
             )
             return assignment

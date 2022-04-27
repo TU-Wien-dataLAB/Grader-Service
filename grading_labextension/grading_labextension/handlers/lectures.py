@@ -19,7 +19,7 @@ class LectureBaseHandler(ExtensionBaseHandler):
         try:
             response = await self.request_service.request(
                 "GET",
-                f"{self.base_url}/lectures{query_params}",
+                f"{self.service_base_url}/lectures{query_params}",
                 header=self.grader_authentication_header,
             )
         except HTTPError as e:
@@ -36,7 +36,7 @@ class LectureBaseHandler(ExtensionBaseHandler):
         try:
             response = await self.request_service.request(
                 "POST",
-                f"{self.base_url}/lectures",
+                f"{self.service_base_url}/lectures",
                 body=data,
                 header=self.grader_authentication_header,
             )
@@ -61,7 +61,7 @@ class LectureObjectHandler(ExtensionBaseHandler):
         try:
             response_data: dict = await self.request_service.request(
                 "PUT",
-                f"{self.base_url}/lectures/{lecture_id}",
+                f"{self.service_base_url}/lectures/{lecture_id}",
                 body=data,
                 header=self.grader_authentication_header,
             )
@@ -81,7 +81,7 @@ class LectureObjectHandler(ExtensionBaseHandler):
         try:
             response_data: dict = await self.request_service.request(
                 "GET",
-                f"{self.base_url}/lectures/{lecture_id}",
+                f"{self.service_base_url}/lectures/{lecture_id}",
                 header=self.grader_authentication_header,
             )
         except HTTPError as e:
@@ -101,7 +101,7 @@ class LectureObjectHandler(ExtensionBaseHandler):
         try:
             await self.request_service.request(
                 "DELETE",
-                f"{self.base_url}/lectures/{lecture_id}",
+                f"{self.service_base_url}/lectures/{lecture_id}",
                 header=self.grader_authentication_header,
             )
         except HTTPError as e:
@@ -119,7 +119,7 @@ class LectureStudentsHandler(ExtensionBaseHandler):
         try:
             response = await self.request_service.request(
                 method="GET",
-                endpoint=f"{self.base_url}/lectures/{lecture_id}/users/",
+                endpoint=f"{self.service_base_url}/lectures/{lecture_id}/users/",
                 header=self.grader_authentication_header,
             )
         except HTTPError as e:

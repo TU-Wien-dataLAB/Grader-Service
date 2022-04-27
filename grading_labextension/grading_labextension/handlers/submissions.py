@@ -26,7 +26,7 @@ class SubmissionHandler(ExtensionBaseHandler):
         try:
             response = await self.request_service.request(
                 method="GET",
-                endpoint=f"{self.base_url}/lectures/{lecture_id}/assignments/{assignment_id}/submissions{query_params}",
+                endpoint=f"{self.service_base_url}/lectures/{lecture_id}/assignments/{assignment_id}/submissions{query_params}",
                 header=self.grader_authentication_header,
             )
         except HTTPError as e:
@@ -54,7 +54,7 @@ class SubmissionPropertiesHandler(ExtensionBaseHandler):
         try:
             response = await self.request_service.request(
                 method="GET",
-                endpoint=f"{self.base_url}/lectures/{lecture_id}/assignments/{assignment_id}/submissions/{submission_id}/properties",
+                endpoint=f"{self.service_base_url}/lectures/{lecture_id}/assignments/{assignment_id}/submissions/{submission_id}/properties",
                 header=self.grader_authentication_header,
             )
         except HTTPError as e:
@@ -76,7 +76,7 @@ class SubmissionPropertiesHandler(ExtensionBaseHandler):
         try:
             await self.request_service.request(
                 method="PUT",
-                endpoint=f"{self.base_url}/lectures/{lecture_id}/assignments/{assignment_id}/submissions/{submission_id}/properties",
+                endpoint=f"{self.service_base_url}/lectures/{lecture_id}/assignments/{assignment_id}/submissions/{submission_id}/properties",
                 header=self.grader_authentication_header,
                 body=self.request.body.decode("utf-8"),
                 decode_response=False
@@ -105,7 +105,7 @@ class SubmissionObjectHandler(ExtensionBaseHandler):
         try:
             response = await self.request_service.request(
                 method="GET",
-                endpoint=f"{self.base_url}/lectures/{lecture_id}/assignments/{assignment_id}/submissions/{submission_id}",
+                endpoint=f"{self.service_base_url}/lectures/{lecture_id}/assignments/{assignment_id}/submissions/{submission_id}",
                 header=self.grader_authentication_header,
             )
         except HTTPError as e:
@@ -127,7 +127,7 @@ class SubmissionObjectHandler(ExtensionBaseHandler):
         try:
             await self.request_service.request(
                 method="PUT",
-                endpoint=f"{self.base_url}/lectures/{lecture_id}/assignments/{assignment_id}/submissions/{submission_id}",
+                endpoint=f"{self.service_base_url}/lectures/{lecture_id}/assignments/{assignment_id}/submissions/{submission_id}",
                 header=self.grader_authentication_header,
                 body=self.request.body.decode("utf-8"),
                 decode_response=False

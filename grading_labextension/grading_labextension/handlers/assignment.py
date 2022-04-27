@@ -20,13 +20,13 @@ class AssignmentBaseHandler(ExtensionBaseHandler):
         try:
             response = await self.request_service.request(
                 method="GET",
-                endpoint=f"{self.base_url}/lectures/{lecture_id}/assignments",
+                endpoint=f"{self.service_base_url}/lectures/{lecture_id}/assignments",
                 header=self.grader_authentication_header,
             )
 
             lecture = await self.request_service.request(
                 "GET",
-                f"{self.base_url}/lectures/{lecture_id}",
+                f"{self.service_base_url}/lectures/{lecture_id}",
                 header=self.grader_authentication_header,
             )
         except HTTPError as e:
@@ -63,14 +63,14 @@ class AssignmentBaseHandler(ExtensionBaseHandler):
         try:
             response = await self.request_service.request(
                 method="POST",
-                endpoint=f"{self.base_url}/lectures/{lecture_id}/assignments",
+                endpoint=f"{self.service_base_url}/lectures/{lecture_id}/assignments",
                 body=data,
                 header=self.grader_authentication_header,
             )
 
             lecture = await self.request_service.request(
                 "GET",
-                f"{self.base_url}/lectures/{lecture_id}",
+                f"{self.service_base_url}/lectures/{lecture_id}",
                 header=self.grader_authentication_header,
             )
         except HTTPError as e:
@@ -110,7 +110,7 @@ class AssignmentObjectHandler(ExtensionBaseHandler):
         try:
             response = await self.request_service.request(
                 method="PUT",
-                endpoint=f"{self.base_url}/lectures/{lecture_id}/assignments/{assignment_id}",
+                endpoint=f"{self.service_base_url}/lectures/{lecture_id}/assignments/{assignment_id}",
                 body=data,
                 header=self.grader_authentication_header,
             )
@@ -139,12 +139,12 @@ class AssignmentObjectHandler(ExtensionBaseHandler):
         try:
             response = await self.request_service.request(
                 method="GET",
-                endpoint=f"{self.base_url}/lectures/{lecture_id}/assignments/{assignment_id}{query_params}",
+                endpoint=f"{self.service_base_url}/lectures/{lecture_id}/assignments/{assignment_id}{query_params}",
                 header=self.grader_authentication_header,
             )
             lecture = await self.request_service.request(
                 "GET",
-                f"{self.base_url}/lectures/{lecture_id}",
+                f"{self.service_base_url}/lectures/{lecture_id}",
                 header=self.grader_authentication_header,
             )
         except HTTPError as e:
@@ -170,17 +170,17 @@ class AssignmentObjectHandler(ExtensionBaseHandler):
         try:
             assignment = await self.request_service.request(
                 method="GET",
-                endpoint=f"{self.base_url}/lectures/{lecture_id}/assignments/{assignment_id}",
+                endpoint=f"{self.service_base_url}/lectures/{lecture_id}/assignments/{assignment_id}",
                 header=self.grader_authentication_header,
             )
             lecture = await self.request_service.request(
                 "GET",
-                f"{self.base_url}/lectures/{lecture_id}",
+                f"{self.service_base_url}/lectures/{lecture_id}",
                 header=self.grader_authentication_header,
             )
             response = await self.request_service.request(
                 method="DELETE",
-                endpoint=f"{self.base_url}/lectures/{lecture_id}/assignments/{assignment_id}",
+                endpoint=f"{self.service_base_url}/lectures/{lecture_id}/assignments/{assignment_id}",
                 header=self.grader_authentication_header,
                 decode_response=False
             )

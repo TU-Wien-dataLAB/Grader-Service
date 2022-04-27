@@ -21,7 +21,7 @@ class GradingAutoHandler(ExtensionBaseHandler):
         try:
             response = await self.request_service.request(
                 method="GET",
-                endpoint=f"{self.base_url}/lectures/{lecture_id}/assignments/{assignment_id}/grading/{sub_id}/auto",
+                endpoint=f"{self.service_base_url}/lectures/{lecture_id}/assignments/{assignment_id}/grading/{sub_id}/auto",
                 header=self.grader_authentication_header,
             )
         except HTTPError as e:
@@ -49,19 +49,19 @@ class GradingManualHandler(ExtensionBaseHandler):
         try:
             lecture = await self.request_service.request(
                 "GET",
-                f"{self.base_url}/lectures/{lecture_id}",
+                f"{self.service_base_url}/lectures/{lecture_id}",
                 header=self.grader_authentication_header,
             )
 
             assignment = await self.request_service.request(
                 "GET",
-                f"{self.base_url}/lectures/{lecture_id}/assignments/{assignment_id}",
+                f"{self.service_base_url}/lectures/{lecture_id}/assignments/{assignment_id}",
                 header=self.grader_authentication_header,
             )
 
             submission = await self.request_service.request(
                 "GET",
-                f"{self.base_url}/lectures/{lecture_id}/assignments/{assignment_id}/submissions/{sub_id}",
+                f"{self.service_base_url}/lectures/{lecture_id}/assignments/{assignment_id}/submissions/{sub_id}",
                 header=self.grader_authentication_header,
             )
         except HTTPError as e:
@@ -112,7 +112,7 @@ class GenerateFeedbackHandler(ExtensionBaseHandler):
         try:
             response = await self.request_service.request(
                 method="GET",
-                endpoint=f"{self.base_url}/lectures/{lecture_id}/assignments/{assignment_id}/grading/{sub_id}/feedback",
+                endpoint=f"{self.service_base_url}/lectures/{lecture_id}/assignments/{assignment_id}/grading/{sub_id}/feedback",
                 header=self.grader_authentication_header,
             )
         except HTTPError as e:
@@ -139,19 +139,19 @@ class PullFeedbackHandler(ExtensionBaseHandler):
         try:
             lecture = await self.request_service.request(
                 "GET",
-                f"{self.base_url}/lectures/{lecture_id}",
+                f"{self.service_base_url}/lectures/{lecture_id}",
                 header=self.grader_authentication_header,
             )
 
             assignment = await self.request_service.request(
                 "GET",
-                f"{self.base_url}/lectures/{lecture_id}/assignments/{assignment_id}",
+                f"{self.service_base_url}/lectures/{lecture_id}/assignments/{assignment_id}",
                 header=self.grader_authentication_header,
             )
 
             submission = await self.request_service.request(
                 "GET",
-                f"{self.base_url}/lectures/{lecture_id}/assignments/{assignment_id}/submissions/{sub_id}",
+                f"{self.service_base_url}/lectures/{lecture_id}/assignments/{assignment_id}/submissions/{sub_id}",
                 header=self.grader_authentication_header,
             )
         except HTTPError as e:

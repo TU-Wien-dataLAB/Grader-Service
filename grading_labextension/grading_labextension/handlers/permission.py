@@ -14,7 +14,7 @@ class PermissionBaseHandler(ExtensionBaseHandler):
         try:
             response = await self.request_service.request(
                 "GET",
-                f"{self.base_url}/permissions",
+                f"{self.service_base_url}/permissions",
                 header=self.grader_authentication_header,
             )
         except HTTPError as e:
