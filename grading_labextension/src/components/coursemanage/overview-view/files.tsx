@@ -1,4 +1,5 @@
 import * as React from 'react';
+import {useEffect} from 'react';
 import {Assignment} from '../../../model/assignment';
 import {Lecture} from '../../../model/lecture';
 import {
@@ -10,17 +11,18 @@ import {
 import GetAppRoundedIcon from '@mui/icons-material/GetAppRounded';
 import {AgreeDialog, CommitDialog} from '../../util/dialog';
 import {
+  Box,
   Button,
   Card,
-  Grid,
-  CardHeader,
-  CardContent,
   CardActions,
-  Tabs,
-  Tab,
-  Box,
+  CardContent,
+  CardHeader,
+  Grid,
   IconButton,
-  Tooltip
+  Tab,
+  Tabs,
+  Tooltip,
+  Typography
 } from '@mui/material';
 import ReplayIcon from '@mui/icons-material/Replay';
 import OpenInBrowserIcon from '@mui/icons-material/OpenInBrowser';
@@ -29,10 +31,11 @@ import {FilesList} from '../../util/file-list';
 import {GlobalObjects} from '../../../index';
 import {Contents} from '@jupyterlab/services';
 import moment from 'moment';
-import {useEffect} from 'react';
 import {openBrowser, openTerminal} from "./util";
 import {PageConfig} from "@jupyterlab/coreutils";
 import PublishRoundedIcon from "@mui/icons-material/PublishRounded";
+import {getRemoteStatus} from "../../../services/file.service";
+import {RepoType} from "../../util/repo-type";
 
 export interface IFilesProps {
   lecture: Lecture;
@@ -52,7 +55,9 @@ export const Files = (props: IFilesProps) => {
     handleAgree: null,
     handleDisagree: null
   });
-  const [reloadFilesToggle, reloadFiles] = React.useState(false);
+  const [reloadFilesToggle, setReloadFiles] = React.useState(false);
+
+  const [repoStatus, setRepoStatus] = React.useState(null as "up_to_date" | "pull_needed" | "push_needed" | "divergent");
 
   const [srcChangedTimestamp, setSrcChangeTimestamp] = React.useState(moment().valueOf()); // now
   const [generateTimestamp, setGenerateTimestamp] = React.useState(null);
@@ -76,7 +81,18 @@ export const Files = (props: IFilesProps) => {
       },
       this
     );
+
+    getRemoteStatus(lecture, assignment, RepoType.SOURCE).then(status => {
+      setRepoStatus(status as "up_to_date" | "pull_needed" | "push_needed" | "divergent");
+    });
   }, [props]);
+
+  const reloadFiles = () => {
+    setReloadFiles(!reloadFilesToggle);
+    getRemoteStatus(lecture, assignment, RepoType.SOURCE).then(status => {
+      setRepoStatus(status as "up_to_date" | "pull_needed" | "push_needed" | "divergent");
+    });
+  }
 
   const handleSwitchDir = async (dir: 'source' | 'release') => {
     if (dir === 'release') {
@@ -134,6 +150,18 @@ export const Files = (props: IFilesProps) => {
     setShowDialog(true);
   };
 
+  const getRemoteStatusText = (status: "up_to_date" | "pull_needed" | "push_needed" | "divergent") => {
+    if (status == "up_to_date") {
+      return "The local files are up to date with the remote repository."
+    } else if (status == "pull_needed") {
+      return "The remote repository has new changes. Pull now to load them."
+    } else if (status == "push_needed") {
+      return "You have made changes to your local repository which you can push."
+    } else {
+      return "The local and remote files are divergent."
+    }
+  }
+
   const handlePullAssignment = async () => {
     setDialogContent({
       title: 'Pull Assignment',
@@ -145,7 +173,7 @@ export const Files = (props: IFilesProps) => {
         } catch (err) {
           props.showAlert('error', 'Error Pulling Assignment');
         }
-        reloadFiles(!reloadFilesToggle);
+        reloadFiles();
         closeDialog();
       },
       handleDisagree: () => closeDialog()
@@ -163,7 +191,7 @@ export const Files = (props: IFilesProps) => {
               <Tooltip title="Reload">
                 <IconButton
                   aria-label="reload"
-                  onClick={() => reloadFiles(!reloadFilesToggle)}
+                  onClick={() => reloadFiles()}
                 >
                   <ReplayIcon/>
                 </IconButton>
@@ -174,6 +202,7 @@ export const Files = (props: IFilesProps) => {
       />
 
       <CardContent sx={{height: '270px', overflowY: 'auto'}}>
+        <Typography>{getRemoteStatusText(repoStatus)}</Typography>
         <Tabs
           variant="fullWidth"
           value={selectedDir}

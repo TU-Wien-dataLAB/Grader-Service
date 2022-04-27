@@ -1,11 +1,11 @@
 import {FilterFileBrowserModel} from "@jupyterlab/filebrowser/lib/model";
 import {GlobalObjects} from "../index";
 import {Contents} from '@jupyterlab/services';
-import IModel = Contents.IModel;
 import {Assignment} from "../model/assignment";
 import {HTTPMethod, request} from "./request.service";
 import {Lecture} from "../model/lecture";
-import { RepoType } from "../components/util/repo-type";
+import {RepoType} from "../components/util/repo-type";
+import IModel = Contents.IModel;
 
 export const getFiles = async (path: string): Promise<IModel[]> => {
   if (path === null) return [];
@@ -49,4 +49,9 @@ export function getGitLog(lecture: Lecture, assignment: Assignment, repo: RepoTy
   })
   url += '?' + searchParams;
   return request<IGitLogObject[]>(HTTPMethod.GET, url);
+}
+
+export function getRemoteStatus(lecture: Lecture, assignment: Assignment, repo: RepoType): Promise<string> {
+  let url = `/lectures/${lecture.id}/assignments/${assignment.id}/remote-status/${repo}/`
+  return request<string>(HTTPMethod.GET, url);
 }

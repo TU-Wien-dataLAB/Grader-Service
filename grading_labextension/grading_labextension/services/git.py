@@ -1,7 +1,7 @@
 import enum
 import logging
 import subprocess
-from typing import List, Dict, Union
+from typing import List, Dict, Union, Tuple
 from traitlets.config.configurable import Configurable
 from traitlets.config.loader import Config
 from traitlets.traitlets import Int, TraitError, Unicode, validate
@@ -225,12 +225,25 @@ class GitService(Configurable):
                     shutil.copy2(s, d)
 
     def check_remote_status(self, origin: str, branch: str) -> RemoteStatus:
-        local = self._run_command(f"git rev-parse {branch}", cwd=self.path, capture_output=True).strip()
+        untracked, added = self.git_status()
+        local_changes = len(untracked) > 0 or len(added) > 0
+        if self.local_branch_exists(branch):
+            local = self._run_command(f"git rev-parse {branch}", cwd=self.path, capture_output=True).strip()
+        else:
+            local = None
         if self.remote_branch_exists(origin, branch):
             remote = self._run_command(f"git rev-parse {origin}/{branch}", cwd=self.path, capture_output=True).strip()
         else:
             return RemoteStatus.push_needed
+
+        if local is None and remote:
+            if local_changes:
+                return RemoteStatus.divergent
+            return RemoteStatus.pull_needed
+
         if local == remote:
+            if local_changes:
+                return RemoteStatus.push_needed
             return RemoteStatus.up_to_date
 
         base = self._run_command(f"git merge-base {branch} {origin}/{branch}", cwd=self.path, capture_output=True).strip()
@@ -242,13 +255,31 @@ class GitService(Configurable):
         else:
             return RemoteStatus.divergent
 
+    def git_status(self) -> Tuple[List[str], List[str]]:
+        files = self._run_command("git status --porcelain", cwd=self.path, capture_output=True)
+        untracked, added = [], []
+        for line in files.splitlines():
+            k, v = line.split(maxsplit=1)
+            if k == "??":
+                untracked.append(v)
+            elif k == "A":
+                added.append(v)
+        return untracked, added
+
+    def local_branch_exists(self, branch: str) -> bool:
+        ret_code = self._run_command(f"git rev-parse --quiet --verify {branch}", cwd=self.path, check=False).returncode
+        if ret_code == 0:
+            return True
+        else:
+            return False
+
     def remote_branch_exists(self, origin: str, branch: str) -> bool:
         ret_code = self._run_command(f"git ls-remote --exit-code {origin}  {branch}", cwd=self.path,
                                      check=False).returncode
-        if ret_code == 2:
-            return False
-        else:
+        if ret_code == 0:
             return True
+        else:
+            return False
 
     def get_log(self, history_count=10) -> List[Dict[str, str]]:
         """
