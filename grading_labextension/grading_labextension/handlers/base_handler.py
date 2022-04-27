@@ -19,7 +19,11 @@ class ExtensionBaseHandler(APIHandler):
     """
     request_service = RequestService()
     http_client = HTTPClient()
-    base_url = "/services/grader"
+    # base_url = "/services/grader"
+    base_url = Unicode(
+        os.environ.get("GRADER_BASE_URL", "/services/grader"),
+        help="Base URL to use for each request to the grader service",
+    ).tag(config=True)
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, *kwargs)
