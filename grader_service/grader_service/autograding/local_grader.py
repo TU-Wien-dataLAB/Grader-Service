@@ -183,9 +183,10 @@ class LocalAutogradeExecutor(LoggingConfigurable):
         log_handler = logging.StreamHandler(log_stream)
         autograder.log.addHandler(log_handler)
 
-        autograder.start()
-
-        self.grading_logs = log_stream.getvalue()
+        try:
+            autograder.start()
+        finally:
+            self.grading_logs = log_stream.getvalue()
         autograder.log.removeHandler(log_handler)
 
     async def _push_results(self):
