@@ -49,7 +49,7 @@ class SubmissionHandler(GraderBaseHandler):
     def on_finish(self):
         # we do not close the session we just commit because we might run
         # LocalAutogradeExecutor or GenerateFeedbackExecutor in POST which still need it
-        super().on_finish()
+        pass
 
     @authorize([Scope.student, Scope.tutor, Scope.instructor])
     async def get(self, lecture_id: int, assignment_id: int):
