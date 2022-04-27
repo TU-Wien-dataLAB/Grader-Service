@@ -11,6 +11,10 @@ class HandlerConfig(SingletonConfigurable):
     hub_api_url = Unicode(os.environ.get("JUPYTERHUB_API_URL"), help="The url of the hubs api.").tag(config=True)
     hub_api_token = Unicode(os.environ.get("JUPYTERHUB_API_TOKEN"), help="The authorization token to access the hub api").tag(config=True)
     hub_user = Unicode(os.environ.get("JUPYTERHUB_USER"), help="The user name in jupyter hub.").tag(config=True)
+    service_base_url = Unicode(
+        os.environ.get("GRADER_BASE_URL", "/services/grader"),
+        help="Base URL to use for each request to the grader service",
+    ).tag(config=True)
 
 
 class ExtensionBaseHandler(APIHandler):
@@ -20,14 +24,14 @@ class ExtensionBaseHandler(APIHandler):
     request_service = RequestService()
     http_client = HTTPClient()
     # base_url = "/services/grader"
-    base_url = Unicode(
-        os.environ.get("GRADER_BASE_URL", "/services/grader"),
-        help="Base URL to use for each request to the grader service",
-    ).tag(config=True)
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, *kwargs)
         self.root_dir = os.path.expanduser(self.settings["server_root_dir"])
+
+    @property
+    def base_url(self):
+        return HandlerConfig.instance().service_base_url
 
     @property
     def grader_authentication_header(self):

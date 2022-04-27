@@ -2,6 +2,8 @@ import enum
 import logging
 import subprocess
 from typing import List, Dict, Union, Tuple
+from urllib.parse import urlparse, ParseResultBytes
+
 from traitlets.config.configurable import Configurable
 from traitlets.config.loader import Config
 from traitlets.traitlets import Int, TraitError, Unicode, validate
@@ -34,9 +36,8 @@ class RemoteStatus(enum.Enum):
 
 class GitService(Configurable):
     git_access_token = Unicode(os.environ.get("JUPYTERHUB_API_TOKEN"), allow_none=False).tag(config=True)
-    git_http_scheme = Unicode(os.environ.get("GRADER_HTTP_SCHEME", 'http'), allow_none=False).tag(config=True)
-    git_remote_url = Unicode(
-        f'{os.environ.get("GRADER_HOST_URL", "127.0.0.1")}:{os.environ.get("GRADER_HOST_PORT", "4010")}{os.environ.get("GRADER_GIT_BASE_URL", "/services/grader/git")}',
+    git_service_url = Unicode(
+        f'{os.environ.get("GRADER_HOST_URL", "http://127.0.0.1:4010")}{os.environ.get("GRADER_GIT_BASE_URL", "/services/grader/git")}',
         allow_none=False).tag(config=True)
 
     def __init__(self, server_root_dir: str, lecture_code: str, assignment_id: int, repo_type: str,
@@ -56,6 +57,10 @@ class GitService(Configurable):
         os.makedirs(self.path, exist_ok=True)
 
         self.log.info("git_access_token: " + self.git_access_token)
+        url_parsed = urlparse(self.git_service_url)
+        self.log.info(f"git_service_url: " + self.git_service_url)
+        self.git_http_scheme: str = url_parsed.scheme
+        self.git_remote_url: str = url_parsed.netloc + url_parsed.path
         self.log.info("git_http_scheme: " + self.git_http_scheme)
         self.log.info("git_remote_url: " + self.git_remote_url)
 
