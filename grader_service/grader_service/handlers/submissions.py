@@ -39,7 +39,6 @@ def tuple_to_submission(t):
     ) = t
     return s
 
-
 @register_handler(
     path=r"\/lectures\/(?P<lecture_id>\d*)\/assignments\/(?P<assignment_id>\d*)\/submissions\/?",
     version_specifier=VersionSpecifier.ALL,
@@ -155,10 +154,13 @@ class SubmissionHandler(GraderBaseHandler):
             raise HTTPError(400)
 
         assignment = self.get_assignment(lecture_id, assignment_id)
+        submission_ts = datetime.datetime.utcnow()
+        if submission_ts > assignment.duedate:
+            raise HTTPError(400, reason="Submission after due date of assignment!")
 
         submission = Submission()
         submission.assignid = assignment.id
-        submission.date = datetime.datetime.utcnow()
+        submission.date = submission_ts
         submission.username = self.user.name
         submission.feedback_available = False
 
@@ -245,7 +247,7 @@ class SubmissionObjectHandler(GraderBaseHandler):
         body = tornado.escape.json_decode(self.request.body)
         sub_model = SubmissionModel.from_dict(body)
         sub = self.get_submission(lecture_id, assignment_id, submission_id)
-        sub.date = sub_model.submitted_at
+        # sub.date = sub_model.submitted_at
         sub.assignid = assignment_id
         sub.username = self.user.name
         sub.auto_status = sub_model.auto_status
