@@ -230,8 +230,8 @@ class GitService(Configurable):
                     shutil.copy2(s, d)
 
     def check_remote_status(self, origin: str, branch: str) -> RemoteStatus:
-        untracked, added = self.git_status()
-        local_changes = len(untracked) > 0 or len(added) > 0
+        untracked, added, modified = self.git_status(hidden_files=False)
+        local_changes = len(untracked) > 0 or len(added) > 0 or len(modified) > 0
         if self.local_branch_exists(branch):
             local = self._run_command(f"git rev-parse {branch}", cwd=self.path, capture_output=True).strip()
         else:
@@ -260,16 +260,20 @@ class GitService(Configurable):
         else:
             return RemoteStatus.divergent
 
-    def git_status(self) -> Tuple[List[str], List[str]]:
+    def git_status(self, hidden_files: bool = False) -> Tuple[List[str], List[str], List[str]]:
         files = self._run_command("git status --porcelain", cwd=self.path, capture_output=True)
-        untracked, added = [], []
+        untracked, added, modified = [], [], []
         for line in files.splitlines():
             k, v = line.split(maxsplit=1)
+            if v[0] == "." and not hidden_files:  # TODO: implement nested check for hidden files
+                continue
             if k == "??":
                 untracked.append(v)
             elif k == "A":
                 added.append(v)
-        return untracked, added
+            elif k == "M":
+                modified.append(v)
+        return untracked, added, modified
 
     def local_branch_exists(self, branch: str) -> bool:
         ret_code = self._run_command(f"git rev-parse --quiet --verify {branch}", cwd=self.path, check=False).returncode

@@ -221,12 +221,14 @@ export const Files = (props: IFilesProps) => {
       </CardContent>
       <CardActions>
         <CommitDialog handleCommit={msg => handlePushAssignment(msg)}>
-          <Button sx={{mt: -1}} variant="outlined" size="small">
+          <Button sx={{mt: -1}} variant="outlined" size="small"
+                  color={repoStatus === "pull_needed" || repoStatus === "divergent" ? "error" : "primary"}>
             <PublishRoundedIcon fontSize="small" sx={{mr: 1}}/>
             Commit
           </Button>
         </CommitDialog>
         <Button
+          color={repoStatus === "push_needed" || repoStatus === "divergent" ? "error" : "primary"}
           sx={{mt: -1, ml: 2}}
           onClick={() => handlePullAssignment()}
           variant="outlined"
