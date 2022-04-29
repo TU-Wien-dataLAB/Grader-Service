@@ -10,7 +10,8 @@ export function utcToLocal(time: string): string {
 }
 
 export function utcToLocalFormat(time: string): string {
-    const localeData = moment.localeData("de");
+    const locale = window.navigator.language;
+    const localeData = moment.localeData(locale);
     const format = localeData.longDateFormat('L') + ' HH:mm:ss';
     return moment.utc(time).local().format(format)
 }

@@ -274,7 +274,14 @@ export const GradingComponent = (props: IGradingProps) => {
   ];
 
   const getSubmissionFromRow = (row: IRowValues): Submission => {
-    return row as Submission;
+    // Leave linear search for now (there were problems with casting and the local display date when casting)
+    if (row === undefined) {
+      return null;
+    }
+    const id = row.id;
+    const submission = submissions.find(s => s.id === id);
+    console.log(submission);
+    return (submission === undefined) ? null : submission;
   };
 
   const allManualGraded = (selection: IRowValues[]) => {
@@ -393,7 +400,7 @@ export const GradingComponent = (props: IGradingProps) => {
         <ManualGrading
           lecture={props.lecture}
           assignment={props.assignment}
-          submission={selectedRowsData[0]}
+          submission={getSubmissionFromRow(selectedRowsData[0])}
           username={selectedRowsData[0]?.username}
           onClose={onManualGradingClose}
           showAlert={props.showAlert}
