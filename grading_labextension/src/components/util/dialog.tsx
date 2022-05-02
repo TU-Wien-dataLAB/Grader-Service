@@ -219,6 +219,10 @@ export const EditDialog = (props: IEditDialogProps) => {
                 fullWidth
                 color="error"
                 variant="contained"
+                disabled={
+                  props.assignment.status === 'released' ||
+                  props.assignment.status === 'complete'
+                }
                 onClick={async () => {
                   await deleteAssignment(
                     props.lecture.id,
