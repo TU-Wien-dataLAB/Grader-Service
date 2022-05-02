@@ -24,7 +24,8 @@ import {
   Tooltip,
   Card,
   CardActionArea,
-  Box
+  Box,
+  Typography
 } from '@mui/material';
 import { Assignment } from '../../model/assignment';
 import { LoadingButton } from '@mui/lab';
@@ -117,7 +118,7 @@ export const EditDialog = (props: IEditDialogProps) => {
         <DialogTitle>Edit Assignment</DialogTitle>
         <form onSubmit={formik.handleSubmit}>
           <DialogContent>
-            <Stack spacing={2}>
+            <Stack spacing={2} sx={{ ml: 2, mr: 2 }}>
               <TextField
                 variant="outlined"
                 fullWidth
@@ -197,6 +198,7 @@ export const EditDialog = (props: IEditDialogProps) => {
                 <MenuItem value={'full_auto'}>Fully Automatic Grading</MenuItem>
               </Select>
 
+              {/* Not included in release 1.0
               <InputLabel id="demo-simple-select-label">Type</InputLabel>
               <Select
                 labelId="assignment-type-select-label"
@@ -213,7 +215,7 @@ export const EditDialog = (props: IEditDialogProps) => {
               >
                 <MenuItem value={'user'}>User</MenuItem>
                 <MenuItem value={'group'}>Group</MenuItem>
-              </Select>
+              </Select>*/}
 
               <Button
                 fullWidth
@@ -240,6 +242,14 @@ export const EditDialog = (props: IEditDialogProps) => {
               >
                 Delete Assignment
               </Button>
+              <small
+                hidden={
+                  props.assignment.status !== 'released' &&
+                  props.assignment.status !== 'complete'
+                }
+              >
+                Can not delete assignment while it is released!
+              </small>
             </Stack>
           </DialogContent>
           <DialogActions>
