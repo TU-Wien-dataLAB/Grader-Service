@@ -390,7 +390,7 @@ class GraderBaseHandler(SessionMixin, web.RequestHandler):
         try:
             user: dict = await self.hub_request_service.request(
                 "GET",
-                self.hub_api_base_path + f"/user",
+                self.hub_api_base_path + f"/authorizations/token/{token}",
                 header={"Authorization": f"token {self.application.hub_api_token}"},
             )
             if user["kind"] != "user":

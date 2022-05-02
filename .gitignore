@@ -3,12 +3,12 @@
 # Edit at https://www.toptal.com/developers/gitignore?templates=python,node,vscode,pycharm,macos,windows,linux
 
 jupyter_hub_config.py
-grading_labextension/grader/grading_labextension/labextension/*
-grading_labextension/grader/grading_labextension/labextension
-grading_labextension/grader/grading_labextension/labextension/build_log.json
+grader_labextension/grader/grader_labextension/labextension/*
+grader_labextension/grader/grader_labextension/labextension
+grader_labextension/grader/grader_labextension/labextension/build_log.json
 jupyterhub_cookie_secret
-grading_labextension/package-lock.json
-grading_labextension/yarn.lock
+grader_labextension/package-lock.json
+grader_labextension/yarn.lock
 
 ### Linux ###
 *~
@@ -316,8 +316,8 @@ share/python-wheels/
 MANIFEST
 
 #grading npm/yarn
-grading_labextension/yarn.lock
-grading_labextension/package-lock.json
+grader_labextension/yarn.lock
+grader_labextension/package-lock.json
 
 # PyInstaller
 #  Usually these files are written by a python script from a template
@@ -472,18 +472,18 @@ $RECYCLE.BIN/
 *.lnk
 
 # End of https://www.toptal.com/developers/gitignore/api/python,node,vscode,pycharm,macos,windows,linux
-grading_labextension/grader/grading_labextension/labextension/build_log.json
-grading_labextension/grader/grading_labextension/labextension/package.json
-grading_labextension/grading_labextension/labextension/*
-grading_labextension/grading_labextension/labextension
+grader_labextension/grader/grader_labextension/labextension/build_log.json
+grader_labextension/grader/grader_labextension/labextension/package.json
+grader_labextension/grader_labextension/labextension/*
+grader_labextension/grader_labextension/labextension
 *.sqlite
 
 #Sqlite database
 *.db
-grading_labextension/grader/grading_labextension/labextension/build_log.json
+grader_labextension/grader/grader_labextension/labextension/build_log.json
 grader_service_config.py
 
 
 #OpenAPI
-grading_labextension/.openapi-generator
+grader_labextension/.openapi-generator
 grader_service/.openapi-generator

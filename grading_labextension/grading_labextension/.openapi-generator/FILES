@@ -1,8 +1,0 @@
-api/models/assignment.py
-api/models/base_model_.py
-api/models/error_message.py
-api/models/lecture.py
-api/models/submission.py
-api/models/user.py
-api/typing_utils.py
-api/util.py
