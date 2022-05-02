@@ -10,6 +10,8 @@ jupyterhub_cookie_secret
 grader_labextension/package-lock.json
 grader_labextension/yarn.lock
 
+jupyterhub.sqlite*
+
 ### Linux ###
 *~
 
