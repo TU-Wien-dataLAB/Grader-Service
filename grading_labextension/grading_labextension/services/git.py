@@ -239,6 +239,8 @@ class GitService(Configurable):
         if self.remote_branch_exists(origin, branch):
             remote = self._run_command(f"git rev-parse {origin}/{branch}", cwd=self.path, capture_output=True).strip()
         else:
+            if len(untracked) + len(added) + len(modified) == 0:
+                return RemoteStatus.up_to_date  # if we don't have remote and no files we are up-to-date
             return RemoteStatus.push_needed
 
         if local is None and remote:
