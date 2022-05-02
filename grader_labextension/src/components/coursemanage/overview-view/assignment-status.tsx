@@ -12,6 +12,7 @@ import * as React from 'react';
 import NewReleasesRoundedIcon from '@mui/icons-material/NewReleasesRounded';
 import TaskIcon from '@mui/icons-material/Task';
 import UndoIcon from '@mui/icons-material/Undo';
+import TerminalIcon from '@mui/icons-material/Terminal';
 
 import { AgreeDialog, ReleaseDialog } from '../../util/dialog';
 import {
@@ -99,15 +100,18 @@ export const AssignmentStatus = (props: IAssignmentStatusProps) => {
   };
 
   const closeDialog = () => setShowDialog(false);
-
+  const fontSize = 16;
   const steps = [
     {
       label: 'Edit',
       description: (
         <Box>
-          <Typography sx={{ fontSize: 12 }}>
+          <Typography sx={{ fontSize }}>
             The assignment has been created and files can now be added to be
-            pushed. After you are done working on the files you can release the
+            pushed. You can commit and pull changes from the remote file repository through the file view or can
+            work directly with the underlying git repositories by opening the assignment
+            in the terminal (<TerminalIcon color={"primary"} fontSize={"inherit"}/>).
+            After you are done working on the files you can release the
             assignment, which makes a final commit with the current state of the
             assignment.
           </Typography>
@@ -128,11 +132,15 @@ export const AssignmentStatus = (props: IAssignmentStatusProps) => {
       label: 'Released',
       description: (
         <Box>
-          <Typography sx={{ fontSize: 12 }}>
+          <Typography sx={{ fontSize }}>
             The assignment has been released to students and it is not advised
-            to push further changes since this would probably reset most of the
-            students progress. If the assignment is over you can mark it as
+            to push further changes to the repository. If the assignment is over you can mark it as
             complete in the edit menu or right here.
+            Undoing the release of the assignment will hide the assignment from students again
+            but their local files are unaffected by this action. When re-releasing the
+            assignment after significant changes a new commit will be made and you will have to
+            instruct users to reset their progress thus far
+            or work with separate versions later on.
           </Typography>
           <Button
             sx={{ mt: 1, mr: 1 }}
@@ -165,9 +173,10 @@ export const AssignmentStatus = (props: IAssignmentStatusProps) => {
       label: 'Assignment Completed',
       description: (
         <Box>
-          <Typography sx={{ fontSize: 12 }}>
+          <Typography sx={{ fontSize }}>
             The assignment has been completed and is not visible to students
-            anymore. You can change the status in the edit menu.
+            anymore but all their progress will be saved. When re-activating the assignment it will again show up in the assignment view
+            and new submissions can be made given the deadline is set accordingly.
           </Typography>
           <Button
             sx={{ mt: 1 }}

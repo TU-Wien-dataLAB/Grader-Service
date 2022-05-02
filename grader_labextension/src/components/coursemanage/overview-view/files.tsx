@@ -64,6 +64,9 @@ export const Files = (props: IFilesProps) => {
 
   const serverRoot = PageConfig.getOption('serverRoot');
 
+  const isCommitOverwrite = () => repoStatus === "pull_needed" || repoStatus === "divergent";
+  const isPullOverwrite = () => repoStatus === "push_needed" || repoStatus === "divergent"
+
   useEffect(() => {
     const srcPath = `source/${lecture.code}/${assignment.id}`;
     GlobalObjects.docManager.services.contents.fileChanged.connect(
@@ -221,22 +224,26 @@ export const Files = (props: IFilesProps) => {
       </CardContent>
       <CardActions>
         <CommitDialog handleCommit={msg => handlePushAssignment(msg)}>
-          <Button sx={{mt: -1}} variant="outlined" size="small"
-                  color={repoStatus === "pull_needed" || repoStatus === "divergent" ? "error" : "primary"}>
-            <PublishRoundedIcon fontSize="small" sx={{mr: 1}}/>
-            Commit
-          </Button>
+          <Tooltip title={`Commit Changes${isCommitOverwrite() ? " (Overwrites remote files!)" : ""}`}>
+            <Button sx={{mt: -1}} variant="outlined" size="small"
+                    color={isCommitOverwrite() ? "error" : "primary"}>
+              <PublishRoundedIcon fontSize="small" sx={{mr: 1}}/>
+              Commit
+            </Button>
+          </Tooltip>
         </CommitDialog>
-        <Button
-          color={repoStatus === "push_needed" || repoStatus === "divergent" ? "error" : "primary"}
-          sx={{mt: -1, ml: 2}}
-          onClick={() => handlePullAssignment()}
-          variant="outlined"
-          size="small"
-        >
-          <GetAppRoundedIcon fontSize="small" sx={{mr: 1}}/>
-          Pull
-        </Button>
+        <Tooltip title={`Pull from Remote${isPullOverwrite() ? " (Overwrites local changes!)" : ""}`}>
+          <Button
+            color={isPullOverwrite() ? "error" : "primary"}
+            sx={{mt: -1, ml: 2}}
+            onClick={() => handlePullAssignment()}
+            variant="outlined"
+            size="small"
+          >
+            <GetAppRoundedIcon fontSize="small" sx={{mr: 1}}/>
+            Pull
+          </Button>
+        </Tooltip>
         <Tooltip title={"Show in File-Browser"}>
           <IconButton
             sx={{mt: -1, pt: 0, pb: 0}}
