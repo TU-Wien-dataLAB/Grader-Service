@@ -139,7 +139,10 @@ class GitLogHandler(ExtensionBaseHandler):
                 git_service.set_author()
             git_service.set_remote(f"grader_{repo}")
             git_service.fetch_all()
-            logs = git_service.get_log(n_history)
+            if git_service.local_branch_exists("main"):  # at least main should exist
+                logs = git_service.get_log(n_history)
+            else:
+                logs = []
         except GitError:
             self.set_status(400)
             self.write_error(400)
