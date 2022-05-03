@@ -390,8 +390,8 @@ class GraderBaseHandler(SessionMixin, web.RequestHandler):
         try:
             user: dict = await self.hub_request_service.request(
                 "GET",
-                self.hub_api_base_path + f"/authorizations/token/{token}",
-                header={"Authorization": f"token {self.application.hub_api_token}"},
+                self.hub_api_base_path + f"/user",
+                header={"Authorization": f"token {token}"},
             )
             if user["kind"] != "user":
                 return None
@@ -400,6 +400,8 @@ class GraderBaseHandler(SessionMixin, web.RequestHandler):
             return None
         except HTTPClientError as e:
             logging.getLogger(str(self.__class__)).error(e.response.error)
+            return None
+        except KeyError:
             return None
         return user
 
