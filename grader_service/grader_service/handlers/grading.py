@@ -48,6 +48,7 @@ class GradingAutoHandler(GraderBaseHandler):
             lambda: self.log.info(f"Autograding task of submission {submission.id} exited!")
         )
         submission = self.session.query(Submission).get(sub_id)
+        self.set_status(202)
         self.write_json(submission)
 
 
@@ -83,4 +84,5 @@ class GenerateFeedbackHandler(GraderBaseHandler):
             lambda: self.log.info(f"Successfully generated feedback for submission {submission.id}!")
         )
         submission = self.session.query(Submission).get(sub_id)
+        self.set_status(202)
         self.write_json(submission)

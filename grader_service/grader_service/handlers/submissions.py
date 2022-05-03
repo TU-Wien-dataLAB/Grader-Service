@@ -184,10 +184,12 @@ class SubmissionHandler(GraderBaseHandler):
 
         self.session.add(submission)
         self.session.commit()
+        self.set_status(201)
         self.write_json(submission)
 
         # If the assignment has automatic grading or fully automatic grading perform necessary operations
         if assignment.automatic_grading in [AutoGradingBehaviour.auto, AutoGradingBehaviour.full_auto]:
+            self.set_status(202)
             executor = RequestHandlerConfig.instance().autograde_executor_class(
                 self.application.grader_service_dir, submission, close_session=False, config=self.application.config
             )

@@ -109,7 +109,6 @@ class GraderBaseHandler(SessionMixin, web.RequestHandler):
         ) = httputil.split_host_and_port(hub_api_parsed.netloc)
         self.hub_api_base_path: str = hub_api_parsed.path
 
-        self.has_auth = False
         self.log = self.application.log
 
     def data_received(self, chunk: bytes) -> Optional[Awaitable[None]]:
@@ -270,10 +269,9 @@ class GraderBaseHandler(SessionMixin, web.RequestHandler):
         """
         token = self.get_request_token()
         if token is None:
-            self.write_error(403)
+            self.write_error(401)
             await self.finish()
             return
-            # raise HTTPError(403)
 
         start_time = time.monotonic()
 
@@ -283,7 +281,6 @@ class GraderBaseHandler(SessionMixin, web.RequestHandler):
             self.write_error(403)
             await self.finish()
             return
-            # raise HTTPError(403)
         self.set_secure_cookie(token, json.dumps(user), expires_days=self.application.max_token_cookie_age_days)
         self.log.info(
             f'User {user["name"]} has been authenticated (took {(time.monotonic() - start_time) * 1e3:.2f}ms)')
@@ -367,13 +364,11 @@ class GraderBaseHandler(SessionMixin, web.RequestHandler):
             return equal
 
     def get_request_token(self) -> Optional[str]:
-        token = None
         for (k, v) in sorted(self.request.headers.get_all()):
             if k == "Authorization":
                 name, value = v.split(" ")
                 if name == "Token":
                     token = value
-                    self.has_auth = True
                 elif name == "Basic":
                     auth_decoded = base64.decodebytes(value.encode("ascii")).decode(
                         "ascii"
@@ -381,7 +376,6 @@ class GraderBaseHandler(SessionMixin, web.RequestHandler):
                     _, token = auth_decoded.split(
                         ":", 2
                     )  # we interpret the password as the token and ignore the username
-                    self.has_auth = True
                 else:
                     token = None
                 return token
@@ -412,8 +406,6 @@ class GraderBaseHandler(SessionMixin, web.RequestHandler):
 
     def write_error(self, status_code: int, **kwargs) -> None:
         self.clear()
-        if status_code == 403 and not self.has_auth:
-            status_code = 401
         self.set_status(status_code)
         _, e, _ = kwargs.get("exc_info", (None, None, None))
         if e and isinstance(e, HTTPError) and e.reason:

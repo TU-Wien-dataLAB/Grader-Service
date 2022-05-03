@@ -68,6 +68,7 @@ class LectureBaseHandler(GraderBaseHandler):
             raise HTTPError(404)
         except MultipleResultsFound:
             raise HTTPError(400)
+        self.set_status(201)
         self.write_json(lecture)
 
 

@@ -28,10 +28,9 @@ export function request<T>(method: HTTPMethod, endPoint: string, body: object = 
 
   return from(ServerConnection.makeRequest(requestUrl, options, settings)).pipe(
     switchMap(async response => {
-      if(response.status != 200) {
+      if(!response.ok) {
         throw throwError(await response.text())
       }
-      console.log(response)
       let data: any = await response.text();
       if (data.length > 0) {
         try {
