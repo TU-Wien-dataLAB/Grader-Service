@@ -52,6 +52,7 @@ spec:
           volumeMounts:
             {{- toYaml .Values.volumeMounts | default "" | nindent 12 }} 
   
+    {{ if .Values.volumePermissions.enabled }}
       initContainers:
       - name: volume-permissions
         image: busybox
@@ -60,6 +61,8 @@ spec:
         volumeMounts:
           - name: data
             mountPath: /var/lib/grader-service
+    {{ end }}
+
       volumes:
         {{- toYaml .Values.volumes | default "" | nindent 8 }}
       {{- with .Values.nodeSelector }}

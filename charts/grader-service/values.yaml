@@ -92,9 +92,12 @@ apiToken: "7e272a9df62444de9d2d111b5ff6e70f"
 gitUser: "grader-service"
 gitEmail: "grader-service@mail.com"
 
+volumePermissions:
+  enabled: false
+
 # pvc
 storageClassName: "csi-cinder-sc-delete"
-accessMode: "ReadWriteOnce" # TODO: change to ReadWriteMany
+accessMode: "ReadWriteOnce"
 capacity: "10G"
 
 ingress:
