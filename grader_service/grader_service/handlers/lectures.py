@@ -1,3 +1,9 @@
+# Copyright (c) 2022, TU Wien
+# All rights reserved.
+#
+# This source code is licensed under the BSD-style license found in the
+# LICENSE file in the root directory of this source tree.
+
 import tornado
 from grader_service.api.models.lecture import Lecture as LectureModel
 from grader_service.orm.base import DeleteState

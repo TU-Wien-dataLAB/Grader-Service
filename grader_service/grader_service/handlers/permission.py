@@ -1,3 +1,9 @@
+# Copyright (c) 2022, TU Wien
+# All rights reserved.
+#
+# This source code is licensed under the BSD-style license found in the
+# LICENSE file in the root directory of this source tree.
+
 from grader_service.orm.takepart import Role, Scope
 from grader_service.registry import VersionSpecifier, register_handler
 

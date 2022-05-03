@@ -1,3 +1,9 @@
+// Copyright (c) 2022, TU Wien
+// All rights reserved.
+//
+// This source code is licensed under the BSD-style license found in the
+// LICENSE file in the root directory of this source tree.
+
 // token: 0b79bab50daca910b000d4f1a2b675d604257e42
 
 import { Lecture } from "../model/lecture";

@@ -1,3 +1,9 @@
+// Copyright (c) 2022, TU Wien
+// All rights reserved.
+//
+// This source code is licensed under the BSD-style license found in the
+// LICENSE file in the root directory of this source tree.
+
 import {FilterFileBrowserModel} from "@jupyterlab/filebrowser/lib/model";
 import {GlobalObjects} from "../index";
 import {Contents} from '@jupyterlab/services';
