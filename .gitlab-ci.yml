@@ -12,7 +12,7 @@ default:
 
 variables:
   IMAGE: ${CI_REGISTRY}/grader/grader-service
-  TAG: ${CI_COMMIT_REF}
+  TAG: ${CI_COMMIT_SHORT_SHA}
 
 build-grader-service-image:
   stage: build
