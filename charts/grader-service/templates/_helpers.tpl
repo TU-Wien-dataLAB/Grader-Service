@@ -54,9 +54,5 @@ app.kubernetes.io/instance: {{ .Release.Name }}
 Create the name of the service account to use
 */}}
 {{- define "grader-service.serviceAccountName" -}}
-{{- if .Values.serviceAccount.create }}
-{{- default (include "grader-service.fullname" .) .Values.serviceAccount.name }}
-{{- else }}
-{{- default "default" .Values.serviceAccount.name }}
-{{- end }}
+{{- include "grader-service.fullname" . }}
 {{- end }}
