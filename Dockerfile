@@ -37,22 +37,14 @@ RUN groupadd -g 1000 grader-service && \
 
 USER grader-service
 
-RUN git config --global user.name "graderservice"
-RUN git config --global user.email "graderservice@mail.com"
-
 WORKDIR /var/lib/grader-service
 
 ENV GRADER_SERVICE_HOST="0.0.0.0"
-
 ENV GRADER_HOST_URL="0.0.0.0"
-
 ENV GRADER_SERVICE_DIRECTORY="/var/lib/grader-service"
-
 ENV GRADER_HOST_URL="0.0.0.0"
-
 ENV GRADER_DB_DIALECT="sqlite"
 ENV GRADER_DB_HOST="/var/lib/grader-service/grader.db"
-
 ENV GRADER_AUTOGRADE_IN_PATH="/var/lib/grader-service/convert_in"
 ENV GRADER_AUTOGRADE_OUT_PATH="/var/lib/grader-service/convert_out"
 

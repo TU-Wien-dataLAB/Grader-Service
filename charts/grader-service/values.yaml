@@ -2,10 +2,8 @@
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
 
-replicaCount: 1
-
 image:
-  repository: adlsregistrysbx.azurecr.io/grader-service
+  repository: s210.dl.hpc.tuwien.ac.at/grader/grader-service
   pullPolicy: IfNotPresent
   # Overrides the image tag whose default is the chart appVersion.
   tag: "latest"
@@ -19,9 +17,6 @@ serviceAccount:
   create: true
   # Annotations to add to the service account
   annotations: {}
-  # The name of the service account to use.
-  # If not set and create is true, a name is generated using the fullname template
-  name: "grader-service"
 
 podAnnotations: {}
 
@@ -39,58 +34,20 @@ securityContext: {}
 service:
   type: ClusterIP
   port: 4010
+port: 4010
+jupyterhub:
+  apiUrl: http://hub:8081/hub/api
+  apiToken: "7e272a9df62444de9d2d111b5ff6e70f"
+  baseUrl: /
+  serviceName: grader
 
-env:
-  - name: JUPYTERHUB_API_TOKEN
-    valueFrom:
-      secretKeyRef:
-        name: hub
-        key: hub.services.grader.apiToken
-  - name: JUPYTERHUB_API_URL
-    value: 'http://hub:8081/hub/api'
-  - name: GRADER_SERVICE_PORT
-    value: "4010"
-  - name: JUPYTERHUB_BASE_URL
-    value: '/'
-  - name: JUPYTERHUB_SERVICE_NAME
-    value: 'grader'
-  - name: GRADER_SERVICE_DIRECTORY
-    value: '/var/lib/grader-service'
-  - name: GRADER_DB_DIALECT
-    value: 'sqlite'
-  - name: GRADER_DB_HOST
-    value: '/var/lib/grader-service/grader.db'
+db:
+  dialect: sqlite
+  host: /var/lib/grader-service/grader.db
 
-volumeMounts:
-  - name: data
-    mountPath: /var/lib/grader-service
-  - name: config
-    mountPath: /var/lib/grader-service/grader_service_config.py
-    subPath: grader_service_config.py
-  - name: config
-    mountPath: /var/lib/grader-service/.gitconfig
-    subPath: .gitconfig
-
-volumes:
-  - name: data
-    persistentVolumeClaim:
-      claimName: grader-service
-      readOnly: false
-  - name: config
-    configMap:
-      defaultMode: 444
-      name: grader-service
-
-# namespace
-namespace: "grader"
-
-# secret
-initSecretName: "hub"
-apiToken: "7e272a9df62444de9d2d111b5ff6e70f"
-
-# configmap
-gitUser: "grader-service"
-gitEmail: "grader-service@mail.com"
+gitConfig:
+  gitUser: "grader-service"
+  gitEmail: "grader-service@mail.com"
 
 volumePermissions:
   enabled: false
@@ -127,13 +84,6 @@ resources: {}
   # requests:
   #   cpu: 100m
   #   memory: 128Mi
-
-autoscaling:
-  enabled: false
-  minReplicas: 1
-  maxReplicas: 100
-  targetCPUUtilizationPercentage: 80
-  # targetMemoryUtilizationPercentage: 80
 
 nodeSelector: {}
 

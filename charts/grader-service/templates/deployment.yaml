@@ -4,10 +4,8 @@ metadata:
   name: {{ include "grader-service.fullname" . }}
   labels:
     {{- include "grader-service.labels" . | nindent 4 }}
+  namespace: {{ .Release.Namespace }}
 spec:
-  {{- if not .Values.autoscaling.enabled }}
-  replicas: {{ .Values.replicaCount }}
-  {{- end }}
   selector:
     matchLabels:
       {{- include "grader-service.selectorLabels" . | nindent 6 }}
@@ -35,7 +33,7 @@ spec:
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           ports:
             - name: http
-              containerPort: 4010
+              containerPort: {{ .Values.port }}
               protocol: TCP
           # livenessProbe:
           #   httpGet:
@@ -48,23 +46,57 @@ spec:
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
           env:
-            {{- toYaml .Values.env | nindent 12 }}
+            - name: JUPYTERHUB_API_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: grader-service
+                  key: hub.services.grader.apiToken
+            - name: JUPYTERHUB_API_URL
+              value: {{ .Values.jupyterhub.api_url }}
+            - name: GRADER_SERVICE_PORT
+              value: {{ .Values.port | quote }}
+            - name: JUPYTERHUB_BASE_URL
+              value: {{ .Values.jupyterhub.base_url }}
+            - name: JUPYTERHUB_SERVICE_NAME
+              value: {{ .Values.jupyterhub.service_name}}
+            - name: GRADER_SERVICE_DIRECTORY
+              value: /var/lib/grader-service
+            - name: GRADER_DB_DIALECT
+              value: {{ .Values.db.dialect }}
+            - name: GRADER_DB_HOST
+              value: {{ .Values.db.host }}
           volumeMounts:
-            {{- toYaml .Values.volumeMounts | default "" | nindent 12 }} 
+            - name: data
+              mountPath: /var/lib/grader-service
+            - name: config
+              mountPath: /etc/grader-service/grader_service_config.py
+              subPath: grader_service_config.py
+            - name: config
+              mountPath: /var/lib/grader-service/.gitconfig
+              subPath: .gitconfig
   
     {{ if .Values.volumePermissions.enabled }}
       initContainers:
-      - name: volume-permissions
-        image: busybox
-        command: ["/bin/sh","-c"]
-        args: ["chown -R 1000:1000 /var/lib/grader-service;"]
-        volumeMounts:
-          - name: data
-            mountPath: /var/lib/grader-service
+        - name: volume-permissions
+          image: busybox
+          command: ["/bin/sh","-c"]
+          args: ["chown -R 1000:1000 /var/lib/grader-service;"]
+          volumeMounts:
+            - name: data
+              mountPath: /var/lib/grader-service
     {{ end }}
 
       volumes:
-        {{- toYaml .Values.volumes | default "" | nindent 8 }}
+        - name: data
+          persistentVolumeClaim:
+            claimName: grader-service
+            readOnly: false
+        - name: config
+          configMap:
+            defaultMode: 444
+            name: grader-service
+
+
       {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}
