@@ -85,17 +85,15 @@ export const GradingComponent = (props: IGradingProps) => {
       handleAgree: async () => {
         try {
           const numSubs = selectedRowsData.length;
-          await Promise.all(
-            selectedRowsData.map(async row => {
-              row.auto_status = 'pending';
-              await autogradeSubmission(
-                props.lecture,
-                props.assignment,
-                getSubmissionFromRow(row)
-              );
-              console.log('Autograded submission');
-            })
-          );
+          selectedRowsData.map(async row => {
+            row.auto_status = 'pending';
+            await autogradeSubmission(
+              props.lecture,
+              props.assignment,
+              getSubmissionFromRow(row)
+            );
+            console.log('Autograded submission');
+          });
         } catch (err) {
           console.error(err);
           props.showAlert('error', 'Error Autograding Submissions');
