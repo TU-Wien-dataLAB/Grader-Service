@@ -20,12 +20,12 @@ RUN apt-get update \
 
 # INSTALL grader-service
 COPY ./grader_service /grader_service
-COPY ./convert /convert
+COPY ./grader_convert /grader_convert
 COPY ./grader_service.sh /usr/local/bin/grader_service.sh
 # install dependencies
-RUN python3 -m pip install -r /convert/requirements.txt && \
+RUN python3 -m pip install -r /grader_convert/requirements.txt && \
     python3 -m pip install -r /grader_service/requirements.txt && \
-    python3 -m pip install  /convert/ && \
+    python3 -m pip install  /grader_convert/ && \
     python3 -m pip install  /grader_service/ 
     # && \
     # rm -rf /convert/ && \
