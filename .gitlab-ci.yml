@@ -6,80 +6,27 @@
 
 stages:
 - build
-- charts
+
+default:
+  image: ${CI_REGISTRY}/ci/ci-docker-image:latest
 
 variables:
-  RIMAGE:      "adlsregistrydev.azurecr.io/devops/alldevops:latest" # image that is used in the runner
+  IMAGE: ${CI_REGISTRY}/grader/grader-service
+  TAG: ${CI_COMMIT_SHORT_SHA}
 
-  #Azure
-  KV:          "kv-admin-os-k8s"
-  KV_SVC:      "kv-service-os-k8s"
-  REGISTRY:    "adlsregistrysbx"
-  SERVICE:     "k8s"
-
-build-grader-image:
+build-grader-service-image:
   stage: build
-  environment:
-    name: $CI_COMMIT_BRANCH
-    action: prepare
-    url: https://grader.k8s.$CI_COMMIT_BRANCH.austrianopensciencecloud.org
-  tags: [demo,dind]
+
   only:
     changes:
-      - ./Dockerfile_service
-  before_script:
-  - export targetname="${REGISTRY}.azurecr.io/grader-service:latest"
-  - echo $targetname
-  script:
-  # build image
-  - docker build -t ${targetname} -f Dockerfile_service .
-
-  # login to az & docker
-  - tok=$(docker run mcr.microsoft.com/azure-cli /bin/bash -c "az login --federated-token "$(cat $AZURE_FEDERATED_TOKEN_FILE)"  --service-principal -u $AZURE_CLIENT_ID -t $AZURE_TENANT_ID > /dev/null; az acr login -n adlsregistrysbx --expose-token --output tsv --query accessToken")
-  - docker login adlsregistrysbx.azurecr.io --username 00000000-0000-0000-0000-000000000000 --password $tok 
-
-  # push image
-  - docker push ${targetname}
-
-  after_script:
-  # logout
-  - docker logout
-  - az logout
-
-build-cmpush-image:
-  stage: build
-  environment:
-    name: $CI_COMMIT_BRANCH
-    action: prepare
-    url: https://grader.k8s.$CI_COMMIT_BRANCH.austrianopensciencecloud.org
-  tags: [demo,dind]
-  only:
-    changes:
-      - cm-push/**/*
-  before_script:
-  - export targetname="${REGISTRY}.azurecr.io/helm-kubectl-cmpush:latest"
-  - echo $targetname
-  script:
-  # build image
-  - docker build -t ${targetname} -f ./cm-push/Dockerfile .
-
-  # login to az & docker
-  - tok=$(docker run mcr.microsoft.com/azure-cli /bin/bash -c "az login --federated-token "$(cat $AZURE_FEDERATED_TOKEN_FILE)"  --service-principal -u $AZURE_CLIENT_ID -t $AZURE_TENANT_ID > /dev/null; az acr login -n adlsregistrysbx --expose-token --output tsv --query accessToken")
-  - docker login adlsregistrysbx.azurecr.io --username 00000000-0000-0000-0000-000000000000 --password $tok 
-
-  # push image
-  - docker push ${targetname}
+      - ./Dockerfile
+      - ./grader_service/*/**
   
-  after_script:
-  # logout
-  - docker logout
-  - az logout
+  before_script:
+    - docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" $CI_REGISTRY
 
-trigger_charts_package:
-  stage: charts
-  trigger:
-    include: charts/grader-service/.gitlab-ci.yml
-    strategy: depend
-  only:
-    changes:
-      - charts/grader-service/**/*
+  script:
+    - docker build -t ${IMAGE}:${TAG} .
+
+  after_script:
+    - docker logout
