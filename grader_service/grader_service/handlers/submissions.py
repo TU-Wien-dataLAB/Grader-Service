@@ -161,7 +161,7 @@ class SubmissionHandler(GraderBaseHandler):
 
         assignment = self.get_assignment(lecture_id, assignment_id)
         submission_ts = datetime.datetime.utcnow()
-        if submission_ts > assignment.duedate:
+        if assignment.duedate is not None and submission_ts > assignment.duedate:
             raise HTTPError(400, reason="Submission after due date of assignment!")
 
         submission = Submission()

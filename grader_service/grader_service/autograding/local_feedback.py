@@ -82,21 +82,12 @@ class GenerateFeedbackExecutor(LocalAutogradeExecutor):
             pass
         self.log.info("Successfully cloned repo")
 
-    def _write_gradebook(self):
-        gradebook_str = self.submission.properties
-        if not os.path.exists(self.output_path):
-            os.mkdir(self.output_path)
-        path = os.path.join(self.output_path, "gradebook.json")
-        self.log.info(f"Writing gradebook to {path}")
-        with open(path, "w") as f:
-            f.write(gradebook_str)
-
     async def _run(self):
         if os.path.exists(self.output_path):
             shutil.rmtree(self.output_path, onerror=rm_error)
 
         os.mkdir(self.output_path)
-        self._write_gradebook()
+        self._write_gradebook(self.submission.properties)
 
         autograder = GenerateFeedback(self.input_path, self.output_path, "*.ipynb")
         autograder.force = True
@@ -201,7 +192,7 @@ class GenerateFeedbackProcessExecutor(GenerateFeedbackExecutor):
             shutil.rmtree(self.output_path, onerror=rm_error)
 
         os.mkdir(self.output_path)
-        self._write_gradebook()
+        self._write_gradebook(self.submission.properties)
 
         command = f'{self.convert_executable} generate_feedback -i "{self.input_path}" -o "{self.output_path}" -p "*.ipynb"'
         self.log.info(f"Running {command}")

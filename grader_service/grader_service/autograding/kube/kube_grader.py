@@ -27,6 +27,9 @@ from grader_service.orm import Assignment
 
 
 class GraderPod(LoggingConfigurable):
+    """
+    Wrapper for a kubernetes pod that supports polling of the pod's status.
+    """
     poll_interval = Integer(default_value=1000, allow_none=False,
                             help="Time in ms to wait before status is polled again.").tag(config=True)
 
@@ -65,10 +68,24 @@ class GraderPod(LoggingConfigurable):
 
 
 def _get_image_name(lecture: Lecture, assignment: Assignment = None) -> str:
+    """
+    Default implementation of the default_image_name method which return the lecture code followed by '_image'.
+    All the functions have the lecture and assignment available as parameters.
+    :param lecture: Lecture to build the image name.
+    :param assignment: Assignment to build the image name.
+    :return: The image name as a string.
+    """
     return f"{lecture.code}_image"
 
 
 class KubeAutogradeExecutor(LocalAutogradeExecutor):
+    """
+    Runs an autograde job in a kubernetes cluster as a pod. The cluster has to have a shared persistent
+    volume claim that is mounted in the input and output directories so that both the service and
+    the executor pods have access to the files. The service account of the grader service has to have
+    permission to get, update, create and delete pods, pod status and pod logs.
+    """
+
     image_config_path = Unicode(default_value=None, allow_none=True).tag(config=True)
     default_image_name = Callable(default_value=_get_image_name, allow_none=False).tag(config=True)
     kube_context = Unicode(default_value=None, allow_none=True,
@@ -92,6 +109,14 @@ class KubeAutogradeExecutor(LocalAutogradeExecutor):
         self.client = CoreV1Api()
 
     def get_image(self) -> str:
+        """
+        Returns the image name based on the lecture and assignment. If an image config file exists and has
+        been specified it will first be queried for an image name. If the image name cannot be found in the
+        config file or none has been specified the image name will be determined by the default_image_name function
+        which takes the lecture and assignment as parameters and is specified in the config.
+        The default implementation of this function is to return the lecture code followed by '_image'.
+        :return: The image name as determined by this method.
+        """
         cfg = {}
         if self.image_config_path is not None:
             with open(self.image_config_path, "r") as f:
@@ -106,6 +131,11 @@ class KubeAutogradeExecutor(LocalAutogradeExecutor):
             return self.default_image_name(self.lecture, self.assignment)
 
     def start_pod(self) -> GraderPod:
+        """
+        Starts a pod in the default namespace with the commit hash as the name of the pod. The image is
+        determined by the get_image method.
+        :return:
+        """
         # The output path will not exist in the pod
         command = f'{self.convert_executable} autograde ' \
                   f'-i "{self.input_path}" ' \
@@ -129,11 +159,16 @@ class KubeAutogradeExecutor(LocalAutogradeExecutor):
         return GraderPod(pod, self.client, config=self.config)
 
     async def _run(self):
+        """
+        Runs the autograding process in a kubernetes pod which has to have access to the files in the
+        input and output directory through a persistent volume claim.
+        :return: Coroutine
+        """
         if os.path.exists(self.output_path):
             shutil.rmtree(self.output_path, onerror=rm_error)
 
         os.mkdir(self.output_path)
-        self._write_gradebook()
+        self._write_gradebook(self.submission.assignment.properties)
 
         grader_pod = None
         try:
@@ -164,10 +199,20 @@ class KubeAutogradeExecutor(LocalAutogradeExecutor):
             raise RuntimeError("Pod has failed execution!")
 
     def _delete_pod(self, pod: GraderPod):
+        """
+        Deletes the pod from the cluster after successful or failed execution.
+        :param pod: The pod to delete.
+        :return: None
+        """
         self.log.info(
             f"Deleting pod '{pod.name}' in namespace '{pod.namespace}' after execution status {pod.polling.result()}")
         self.client.delete_namespaced_pod(name=pod.name, namespace=pod.namespace)
 
     def _get_pod_logs(self, pod: GraderPod) -> str:
+        """
+        Returns the logs of the pod that were output during execution.
+        :param pod: The pod to retrieve the logs from.
+        :return: The logs as a string.
+        """
         api_response: str = self.client.read_namespaced_pod_log(name=pod.name, namespace=pod.namespace)
         return api_response.strip()
