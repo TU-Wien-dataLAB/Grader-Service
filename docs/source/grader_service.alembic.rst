@@ -1,4 +1,4 @@
-grader\_service.alembic package
+Alembic
 ===============================
 
 Subpackages

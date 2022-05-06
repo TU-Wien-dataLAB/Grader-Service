@@ -1,10 +1,10 @@
-grader\_service.orm package
+ORM
 ===========================
 
 Submodules
 ----------
 
-grader\_service.orm.assignment module
+Assignment
 -------------------------------------
 
 .. automodule:: grader_service.orm.assignment
@@ -12,7 +12,7 @@ grader\_service.orm.assignment module
    :undoc-members:
    :show-inheritance:
 
-grader\_service.orm.base module
+Base
 -------------------------------
 
 .. automodule:: grader_service.orm.base
@@ -20,7 +20,7 @@ grader\_service.orm.base module
    :undoc-members:
    :show-inheritance:
 
-grader\_service.orm.group module
+Group
 --------------------------------
 
 .. automodule:: grader_service.orm.group
@@ -28,7 +28,7 @@ grader\_service.orm.group module
    :undoc-members:
    :show-inheritance:
 
-grader\_service.orm.lecture module
+Lecture
 ----------------------------------
 
 .. automodule:: grader_service.orm.lecture
@@ -36,7 +36,7 @@ grader\_service.orm.lecture module
    :undoc-members:
    :show-inheritance:
 
-grader\_service.orm.submission module
+Submission
 -------------------------------------
 
 .. automodule:: grader_service.orm.submission
@@ -44,7 +44,7 @@ grader\_service.orm.submission module
    :undoc-members:
    :show-inheritance:
 
-grader\_service.orm.takepart module
+Takepart
 -----------------------------------
 
 .. automodule:: grader_service.orm.takepart
@@ -52,7 +52,7 @@ grader\_service.orm.takepart module
    :undoc-members:
    :show-inheritance:
 
-grader\_service.orm.user module
+User
 -------------------------------
 
 .. automodule:: grader_service.orm.user
@@ -60,10 +60,11 @@ grader\_service.orm.user module
    :undoc-members:
    :show-inheritance:
 
-Module contents
----------------
+..
+    Module contents
+    ---------------
 
-.. automodule:: grader_service.orm
-   :members:
-   :undoc-members:
-   :show-inheritance:
+    .. automodule:: grader_service.orm
+       :members:
+       :undoc-members:
+       :show-inheritance:

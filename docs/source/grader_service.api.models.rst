@@ -1,4 +1,4 @@
-grader\_service.api.models package
+Models
 ==================================
 
 Submodules

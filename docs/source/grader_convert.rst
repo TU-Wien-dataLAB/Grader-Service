@@ -1,4 +1,4 @@
-grader\_convert package
+Grader Convert
 =======================
 
 Subpackages
@@ -16,7 +16,7 @@ Subpackages
 Submodules
 ----------
 
-grader\_convert.main module
+Main
 ---------------------------
 
 .. automodule:: grader_convert.main
@@ -24,7 +24,7 @@ grader\_convert.main module
    :undoc-members:
    :show-inheritance:
 
-grader\_convert.utils module
+Utils
 ----------------------------
 
 .. automodule:: grader_convert.utils
@@ -32,7 +32,7 @@ grader\_convert.utils module
    :undoc-members:
    :show-inheritance:
 
-grader\_convert.validator module
+Validator
 --------------------------------
 
 .. automodule:: grader_convert.validator
@@ -40,10 +40,11 @@ grader\_convert.validator module
    :undoc-members:
    :show-inheritance:
 
-Module contents
----------------
+..
+    Module contents
+    ---------------
 
-.. automodule:: grader_convert
-   :members:
-   :undoc-members:
-   :show-inheritance:
+    .. automodule:: grader_convert
+       :members:
+       :undoc-members:
+       :show-inheritance:

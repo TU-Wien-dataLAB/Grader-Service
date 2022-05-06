@@ -1,4 +1,4 @@
-grader\_labextension package
+Grader Labextension
 ============================
 
 Subpackages

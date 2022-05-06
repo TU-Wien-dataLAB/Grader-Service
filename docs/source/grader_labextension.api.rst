@@ -1,4 +1,4 @@
-grader\_labextension.api package
+API
 ================================
 
 Submodules

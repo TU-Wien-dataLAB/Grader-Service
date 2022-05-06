@@ -1,4 +1,4 @@
-grader\_service.autograding.kube package
+Kube
 ========================================
 
 Submodules

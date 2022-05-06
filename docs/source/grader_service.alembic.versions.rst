@@ -1,4 +1,4 @@
-grader\_service.alembic.versions package
+Alembic Versions
 ========================================
 
 Submodules

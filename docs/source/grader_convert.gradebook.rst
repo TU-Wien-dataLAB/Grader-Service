@@ -1,10 +1,10 @@
-grader\_convert.gradebook package
+Gradebook
 =================================
 
 Submodules
 ----------
 
-grader\_convert.gradebook.gradebook module
+Gradebook
 ------------------------------------------
 
 .. automodule:: grader_convert.gradebook.gradebook
@@ -12,7 +12,7 @@ grader\_convert.gradebook.gradebook module
    :undoc-members:
    :show-inheritance:
 
-grader\_convert.gradebook.models module
+Models
 ---------------------------------------
 
 .. automodule:: grader_convert.gradebook.models
@@ -20,10 +20,11 @@ grader\_convert.gradebook.models module
    :undoc-members:
    :show-inheritance:
 
-Module contents
----------------
+..
+    Module contents
+    ---------------
 
-.. automodule:: grader_convert.gradebook
-   :members:
-   :undoc-members:
-   :show-inheritance:
+    .. automodule:: grader_convert.gradebook
+       :members:
+       :undoc-members:
+       :show-inheritance:

@@ -1,4 +1,4 @@
-grader\_service.autograding package
+Autograding
 ===================================
 
 Subpackages

@@ -1,10 +1,10 @@
-grader\_convert.converters package
+Converters
 ==================================
 
 Submodules
 ----------
 
-grader\_convert.converters.autograde module
+Autograde
 -------------------------------------------
 
 .. automodule:: grader_convert.converters.autograde
@@ -12,7 +12,7 @@ grader\_convert.converters.autograde module
    :undoc-members:
    :show-inheritance:
 
-grader\_convert.converters.base module
+Base
 --------------------------------------
 
 .. automodule:: grader_convert.converters.base
@@ -20,7 +20,7 @@ grader\_convert.converters.base module
    :undoc-members:
    :show-inheritance:
 
-grader\_convert.converters.baseapp module
+BaseApp
 -----------------------------------------
 
 .. automodule:: grader_convert.converters.baseapp
@@ -28,7 +28,7 @@ grader\_convert.converters.baseapp module
    :undoc-members:
    :show-inheritance:
 
-grader\_convert.converters.generate\_assignment module
+Generate Assignment
 ------------------------------------------------------
 
 .. automodule:: grader_convert.converters.generate_assignment
@@ -36,7 +36,7 @@ grader\_convert.converters.generate\_assignment module
    :undoc-members:
    :show-inheritance:
 
-grader\_convert.converters.generate\_feedback module
+Generate Feedback
 ----------------------------------------------------
 
 .. automodule:: grader_convert.converters.generate_feedback
@@ -44,7 +44,7 @@ grader\_convert.converters.generate\_feedback module
    :undoc-members:
    :show-inheritance:
 
-grader\_convert.converters.generate\_solution module
+Generate Solution
 ----------------------------------------------------
 
 .. automodule:: grader_convert.converters.generate_solution
@@ -52,7 +52,7 @@ grader\_convert.converters.generate\_solution module
    :undoc-members:
    :show-inheritance:
 
-grader\_convert.converters.updateapp module
+Update App
 -------------------------------------------
 
 .. automodule:: grader_convert.converters.updateapp
@@ -60,7 +60,7 @@ grader\_convert.converters.updateapp module
    :undoc-members:
    :show-inheritance:
 
-grader\_convert.converters.validateapp module
+Validate App
 ---------------------------------------------
 
 .. automodule:: grader_convert.converters.validateapp
@@ -68,10 +68,11 @@ grader\_convert.converters.validateapp module
    :undoc-members:
    :show-inheritance:
 
-Module contents
----------------
+..
+    Module contents
+    ---------------
 
-.. automodule:: grader_convert.converters
-   :members:
-   :undoc-members:
-   :show-inheritance:
+    .. automodule:: grader_convert.converters
+       :members:
+       :undoc-members:
+       :show-inheritance:

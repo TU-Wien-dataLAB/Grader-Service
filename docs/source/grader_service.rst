@@ -1,4 +1,4 @@
-grader\_service package
+Grader Service
 =======================
 
 Subpackages
@@ -17,7 +17,7 @@ Subpackages
 Submodules
 ----------
 
-grader\_service.grader\_service\_config module
+Config
 ----------------------------------------------
 
 .. automodule:: grader_service.grader_service_config
@@ -25,7 +25,7 @@ grader\_service.grader\_service\_config module
    :undoc-members:
    :show-inheritance:
 
-grader\_service.main module
+Main
 ---------------------------
 
 .. automodule:: grader_service.main
@@ -33,7 +33,7 @@ grader\_service.main module
    :undoc-members:
    :show-inheritance:
 
-grader\_service.registry module
+Registery
 -------------------------------
 
 .. automodule:: grader_service.registry
@@ -41,7 +41,7 @@ grader\_service.registry module
    :undoc-members:
    :show-inheritance:
 
-grader\_service.request module
+Request
 ------------------------------
 
 .. automodule:: grader_service.request
@@ -49,7 +49,7 @@ grader\_service.request module
    :undoc-members:
    :show-inheritance:
 
-grader\_service.server module
+Server
 -----------------------------
 
 .. automodule:: grader_service.server

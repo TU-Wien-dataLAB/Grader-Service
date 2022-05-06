@@ -1,4 +1,4 @@
-grader\_labextension.services package
+Services
 =====================================
 
 Submodules

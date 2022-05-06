@@ -1,10 +1,10 @@
-grader\_convert.preprocessors package
+Preprocessors
 =====================================
 
 Submodules
 ----------
 
-grader\_convert.preprocessors.base module
+Base
 -----------------------------------------
 
 .. automodule:: grader_convert.preprocessors.base
@@ -12,7 +12,7 @@ grader\_convert.preprocessors.base module
    :undoc-members:
    :show-inheritance:
 
-grader\_convert.preprocessors.checkcellmetadata module
+Check cell metadata
 ------------------------------------------------------
 
 .. automodule:: grader_convert.preprocessors.checkcellmetadata
@@ -20,7 +20,7 @@ grader\_convert.preprocessors.checkcellmetadata module
    :undoc-members:
    :show-inheritance:
 
-grader\_convert.preprocessors.clearhiddentests module
+Clear hidden tests
 -----------------------------------------------------
 
 .. automodule:: grader_convert.preprocessors.clearhiddentests
@@ -28,7 +28,7 @@ grader\_convert.preprocessors.clearhiddentests module
    :undoc-members:
    :show-inheritance:
 
-grader\_convert.preprocessors.clearmarkingscheme module
+Clear marking scheme
 -------------------------------------------------------
 
 .. automodule:: grader_convert.preprocessors.clearmarkingscheme
@@ -36,7 +36,7 @@ grader\_convert.preprocessors.clearmarkingscheme module
    :undoc-members:
    :show-inheritance:
 
-grader\_convert.preprocessors.clearoutput module
+Clear output
 ------------------------------------------------
 
 .. automodule:: grader_convert.preprocessors.clearoutput
@@ -44,7 +44,7 @@ grader\_convert.preprocessors.clearoutput module
    :undoc-members:
    :show-inheritance:
 
-grader\_convert.preprocessors.clearsolutions module
+Clear solutions
 ---------------------------------------------------
 
 .. automodule:: grader_convert.preprocessors.clearsolutions
@@ -52,7 +52,7 @@ grader\_convert.preprocessors.clearsolutions module
    :undoc-members:
    :show-inheritance:
 
-grader\_convert.preprocessors.computechecksums module
+Compute checksums
 -----------------------------------------------------
 
 .. automodule:: grader_convert.preprocessors.computechecksums
@@ -68,7 +68,7 @@ grader\_convert.preprocessors.deduplicateids module
    :undoc-members:
    :show-inheritance:
 
-grader\_convert.preprocessors.execute module
+Execute
 --------------------------------------------
 
 .. automodule:: grader_convert.preprocessors.execute
@@ -76,7 +76,7 @@ grader\_convert.preprocessors.execute module
    :undoc-members:
    :show-inheritance:
 
-grader\_convert.preprocessors.getgrades module
+Get grades
 ----------------------------------------------
 
 .. automodule:: grader_convert.preprocessors.getgrades
@@ -84,7 +84,7 @@ grader\_convert.preprocessors.getgrades module
    :undoc-members:
    :show-inheritance:
 
-grader\_convert.preprocessors.headerfooter module
+Header footer
 -------------------------------------------------
 
 .. automodule:: grader_convert.preprocessors.headerfooter
@@ -92,7 +92,7 @@ grader\_convert.preprocessors.headerfooter module
    :undoc-members:
    :show-inheritance:
 
-grader\_convert.preprocessors.limitoutput module
+Limit output
 ------------------------------------------------
 
 .. automodule:: grader_convert.preprocessors.limitoutput
@@ -100,7 +100,7 @@ grader\_convert.preprocessors.limitoutput module
    :undoc-members:
    :show-inheritance:
 
-grader\_convert.preprocessors.lockcells module
+Lock cells
 ----------------------------------------------
 
 .. automodule:: grader_convert.preprocessors.lockcells
@@ -108,7 +108,7 @@ grader\_convert.preprocessors.lockcells module
    :undoc-members:
    :show-inheritance:
 
-grader\_convert.preprocessors.overwritecells module
+Overwrite cells
 ---------------------------------------------------
 
 .. automodule:: grader_convert.preprocessors.overwritecells
@@ -116,7 +116,7 @@ grader\_convert.preprocessors.overwritecells module
    :undoc-members:
    :show-inheritance:
 
-grader\_convert.preprocessors.overwritekernelspec module
+Overwrite kernel spec
 --------------------------------------------------------
 
 .. automodule:: grader_convert.preprocessors.overwritekernelspec
@@ -124,7 +124,7 @@ grader\_convert.preprocessors.overwritekernelspec module
    :undoc-members:
    :show-inheritance:
 
-grader\_convert.preprocessors.saveautogrades module
+Save autogrades
 ---------------------------------------------------
 
 .. automodule:: grader_convert.preprocessors.saveautogrades
@@ -132,7 +132,7 @@ grader\_convert.preprocessors.saveautogrades module
    :undoc-members:
    :show-inheritance:
 
-grader\_convert.preprocessors.savecells module
+Save cells
 ----------------------------------------------
 
 .. automodule:: grader_convert.preprocessors.savecells
@@ -140,10 +140,11 @@ grader\_convert.preprocessors.savecells module
    :undoc-members:
    :show-inheritance:
 
-Module contents
----------------
+..
+    Module contents
+    ---------------
 
-.. automodule:: grader_convert.preprocessors
-   :members:
-   :undoc-members:
-   :show-inheritance:
+    .. automodule:: grader_convert.preprocessors
+       :members:
+       :undoc-members:
+       :show-inheritance:

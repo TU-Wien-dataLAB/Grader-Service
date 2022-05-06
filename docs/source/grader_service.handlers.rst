@@ -1,4 +1,4 @@
-grader\_service.handlers package
+Handlers
 ================================
 
 Subpackages

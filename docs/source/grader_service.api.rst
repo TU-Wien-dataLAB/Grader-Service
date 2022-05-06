@@ -1,4 +1,4 @@
-grader\_service.api package
+API
 ===========================
 
 Subpackages

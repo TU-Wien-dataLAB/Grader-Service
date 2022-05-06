@@ -1,4 +1,4 @@
-grader\_labextension.handlers package
+Handlers
 =====================================
 
 Submodules

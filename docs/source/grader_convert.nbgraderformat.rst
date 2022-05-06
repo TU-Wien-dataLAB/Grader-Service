@@ -1,10 +1,10 @@
-grader\_convert.nbgraderformat package
+NbgraderFormat
 ======================================
 
 Submodules
 ----------
 
-grader\_convert.nbgraderformat.common module
+Common
 --------------------------------------------
 
 .. automodule:: grader_convert.nbgraderformat.common
@@ -12,7 +12,7 @@ grader\_convert.nbgraderformat.common module
    :undoc-members:
    :show-inheritance:
 
-grader\_convert.nbgraderformat.v1 module
+V1
 ----------------------------------------
 
 .. automodule:: grader_convert.nbgraderformat.v1
@@ -20,7 +20,7 @@ grader\_convert.nbgraderformat.v1 module
    :undoc-members:
    :show-inheritance:
 
-grader\_convert.nbgraderformat.v2 module
+V2
 ----------------------------------------
 
 .. automodule:: grader_convert.nbgraderformat.v2
@@ -28,7 +28,7 @@ grader\_convert.nbgraderformat.v2 module
    :undoc-members:
    :show-inheritance:
 
-grader\_convert.nbgraderformat.v3 module
+V3
 ----------------------------------------
 
 .. automodule:: grader_convert.nbgraderformat.v3
@@ -36,10 +36,11 @@ grader\_convert.nbgraderformat.v3 module
    :undoc-members:
    :show-inheritance:
 
-Module contents
----------------
+..
+    Module contents
+    ---------------
 
-.. automodule:: grader_convert.nbgraderformat
-   :members:
-   :undoc-members:
-   :show-inheritance:
+    .. automodule:: grader_convert.nbgraderformat
+       :members:
+       :undoc-members:
+       :show-inheritance:
