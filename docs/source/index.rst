@@ -3,16 +3,19 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-Welcome to grader's documentation!
+Grader Service Documentation
 ==================================
 
 .. toctree::
    :maxdepth: 2
    :caption: Contents:
 
-   grader_service
-   grader_labextension
-   grader_convert
+   installation
+   get_started
+   grader_service/index
+   grader_labextension/index
+   grader_convert/index
+   about
 
 Indices and tables
 ==================

@@ -16,7 +16,7 @@ Below is an interactive view of the grader service OpenAPI specification.
 
     <script>
     const ui = SwaggerUIBundle({
-      url: './_static/openapi/grader_api.yml',
+      url: '../_static/openapi/extension_api.yml',
       dom_id: '#openapi-ui',
       presets: [
         SwaggerUIBundle.presets.apis,
