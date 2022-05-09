@@ -14,7 +14,10 @@ import { OverviewCard } from './overview-card';
 import { Box, Grid } from '@mui/material';
 import { Files } from './files';
 import { GitLog } from './git-log';
-import { getAssignment } from '../../../services/assignments.service';
+import {
+  getAssignment,
+  updateAssignment
+} from '../../../services/assignments.service';
 import { AssignmentStatus } from './assignment-status';
 import { RepoType } from '../../util/repo-type';
 
@@ -35,6 +38,10 @@ export const OverviewComponent = (props: IOverviewProps) => {
     setAssignment(assignment);
   };
 
+  React.useEffect(() => {
+    console.log('Updating');
+  }, [assignment]);
+
   return (
     <Box>
       <ModalTitle title={assignment.name}>
@@ -43,9 +50,11 @@ export const OverviewComponent = (props: IOverviewProps) => {
             lecture={props.lecture}
             assignment={assignment}
             showAlert={props.showAlert}
-            onSubmit={() =>
-              getAssignment(props.lecture.id, assignment).then(assignment =>
-                setAssignment(assignment)
+            onSubmit={updatedAssignment =>
+              updateAssignment(props.lecture.id, updatedAssignment).then(
+                response => {
+                  setAssignment(response);
+                }
               )
             }
             onClose={props.onClose}
