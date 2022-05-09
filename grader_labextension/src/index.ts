@@ -165,9 +165,8 @@ const extension: JupyterFrontEndPlugin<void> = {
       tracker.activeCellChanged.connect(() => {
         const notebookPanel: NotebookPanel = tracker.currentWidget;
         const notebook: Notebook = tracker.currentWidget.content;
-        const notebookPaths: string[] = notebookPanel.context.contentsModel.path.split(
-          '/'
-        );
+        const notebookPaths: string[] =
+          notebookPanel.context.contentsModel.path.split('/');
         if (notebookPaths[0] === 'manualgrade') {
           return;
         }

@@ -365,6 +365,9 @@ instance/
 docs/_build/
 doc/_build/
 
+#Typedoc documentation
+docs/typedoc
+
 # PyBuilder
 target/
 
