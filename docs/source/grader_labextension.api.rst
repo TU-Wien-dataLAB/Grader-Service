@@ -4,7 +4,7 @@ API
 Submodules
 ----------
 
-grader\_labextension.api.typing\_utils module
+Typing Utils
 ---------------------------------------------
 
 .. automodule:: grader_labextension.api.typing_utils
@@ -12,7 +12,7 @@ grader\_labextension.api.typing\_utils module
    :undoc-members:
    :show-inheritance:
 
-grader\_labextension.api.util module
+Util
 ------------------------------------
 
 .. automodule:: grader_labextension.api.util
@@ -20,10 +20,11 @@ grader\_labextension.api.util module
    :undoc-members:
    :show-inheritance:
 
-Module contents
----------------
+..
+    Module contents
+    ---------------
 
-.. automodule:: grader_labextension.api
-   :members:
-   :undoc-members:
-   :show-inheritance:
+    .. automodule:: grader_labextension.api
+       :members:
+       :undoc-members:
+       :show-inheritance:

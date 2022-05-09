@@ -4,7 +4,7 @@ Handlers
 Submodules
 ----------
 
-grader\_labextension.handlers.assignment module
+Assignment
 -----------------------------------------------
 
 .. automodule:: grader_labextension.handlers.assignment
@@ -12,7 +12,7 @@ grader\_labextension.handlers.assignment module
    :undoc-members:
    :show-inheritance:
 
-grader\_labextension.handlers.base\_handler module
+Base Handler
 --------------------------------------------------
 
 .. automodule:: grader_labextension.handlers.base_handler
@@ -20,7 +20,7 @@ grader\_labextension.handlers.base\_handler module
    :undoc-members:
    :show-inheritance:
 
-grader\_labextension.handlers.grading module
+Grading
 --------------------------------------------
 
 .. automodule:: grader_labextension.handlers.grading
@@ -28,7 +28,7 @@ grader\_labextension.handlers.grading module
    :undoc-members:
    :show-inheritance:
 
-grader\_labextension.handlers.lectures module
+Lecture
 ---------------------------------------------
 
 .. automodule:: grader_labextension.handlers.lectures
@@ -36,7 +36,7 @@ grader\_labextension.handlers.lectures module
    :undoc-members:
    :show-inheritance:
 
-grader\_labextension.handlers.permission module
+Permission
 -----------------------------------------------
 
 .. automodule:: grader_labextension.handlers.permission
@@ -44,7 +44,7 @@ grader\_labextension.handlers.permission module
    :undoc-members:
    :show-inheritance:
 
-grader\_labextension.handlers.submissions module
+Submission
 ------------------------------------------------
 
 .. automodule:: grader_labextension.handlers.submissions
@@ -52,7 +52,7 @@ grader\_labextension.handlers.submissions module
    :undoc-members:
    :show-inheritance:
 
-grader\_labextension.handlers.version\_control module
+Version Control
 -----------------------------------------------------
 
 .. automodule:: grader_labextension.handlers.version_control
@@ -60,10 +60,12 @@ grader\_labextension.handlers.version\_control module
    :undoc-members:
    :show-inheritance:
 
-Module contents
----------------
 
-.. automodule:: grader_labextension.handlers
-   :members:
-   :undoc-members:
-   :show-inheritance:
+..
+    Module contents
+    ---------------
+
+    .. automodule:: grader_labextension.handlers
+       :members:
+       :undoc-members:
+       :show-inheritance:

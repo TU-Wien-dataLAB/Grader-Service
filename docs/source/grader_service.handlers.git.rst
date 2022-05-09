@@ -4,7 +4,7 @@ Git
 Submodules
 ----------
 
-grader\_service.handlers.git.server module
+Server
 ------------------------------------------
 
 .. automodule:: grader_service.handlers.git.server
@@ -12,10 +12,11 @@ grader\_service.handlers.git.server module
    :undoc-members:
    :show-inheritance:
 
-Module contents
----------------
+..
+    Module contents
+    ---------------
 
-.. automodule:: grader_service.handlers.git
-   :members:
-   :undoc-members:
-   :show-inheritance:
+    .. automodule:: grader_service.handlers.git
+       :members:
+       :undoc-members:
+       :show-inheritance:

@@ -4,7 +4,7 @@ Services
 Submodules
 ----------
 
-grader\_labextension.services.git module
+Git
 ----------------------------------------
 
 .. automodule:: grader_labextension.services.git
@@ -12,7 +12,7 @@ grader\_labextension.services.git module
    :undoc-members:
    :show-inheritance:
 
-grader\_labextension.services.request module
+Request
 --------------------------------------------
 
 .. automodule:: grader_labextension.services.request
@@ -20,10 +20,11 @@ grader\_labextension.services.request module
    :undoc-members:
    :show-inheritance:
 
-Module contents
----------------
+..
+    Module contents
+    ---------------
 
-.. automodule:: grader_labextension.services
-   :members:
-   :undoc-members:
-   :show-inheritance:
+    .. automodule:: grader_labextension.services
+       :members:
+       :undoc-members:
+       :show-inheritance:

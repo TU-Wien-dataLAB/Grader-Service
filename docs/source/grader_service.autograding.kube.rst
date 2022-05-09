@@ -1,10 +1,10 @@
-Kube
+Kube Grading
 ========================================
 
 Submodules
 ----------
 
-grader\_service.autograding.kube.kube\_grader module
+Kube Grader
 ----------------------------------------------------
 
 .. automodule:: grader_service.autograding.kube.kube_grader
@@ -12,7 +12,7 @@ grader\_service.autograding.kube.kube\_grader module
    :undoc-members:
    :show-inheritance:
 
-grader\_service.autograding.kube.util module
+Util
 --------------------------------------------
 
 .. automodule:: grader_service.autograding.kube.util
@@ -20,10 +20,12 @@ grader\_service.autograding.kube.util module
    :undoc-members:
    :show-inheritance:
 
-Module contents
----------------
 
-.. automodule:: grader_service.autograding.kube
-   :members:
-   :undoc-members:
-   :show-inheritance:
+..
+    Module contents
+    ---------------
+
+    .. automodule:: grader_service.autograding.kube
+       :members:
+       :undoc-members:
+       :show-inheritance:

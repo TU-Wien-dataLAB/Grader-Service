@@ -14,7 +14,7 @@ Subpackages
 Submodules
 ----------
 
-grader\_labextension.handlers module
+Handlers
 ------------------------------------
 
 .. automodule:: grader_labextension.handlers
@@ -22,7 +22,7 @@ grader\_labextension.handlers module
    :undoc-members:
    :show-inheritance:
 
-grader\_labextension.registry module
+Registry
 ------------------------------------
 
 .. automodule:: grader_labextension.registry
@@ -30,18 +30,11 @@ grader\_labextension.registry module
    :undoc-members:
    :show-inheritance:
 
-grader\_labextension.test module
---------------------------------
+..
+    Module contents
+    ---------------
 
-.. automodule:: grader_labextension.test
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-Module contents
----------------
-
-.. automodule:: grader_labextension
-   :members:
-   :undoc-members:
-   :show-inheritance:
+    .. automodule:: grader_labextension
+       :members:
+       :undoc-members:
+       :show-inheritance:

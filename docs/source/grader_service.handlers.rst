@@ -12,7 +12,7 @@ Subpackages
 Submodules
 ----------
 
-grader\_service.handlers.assignment module
+Assignment
 ------------------------------------------
 
 .. automodule:: grader_service.handlers.assignment
@@ -20,7 +20,7 @@ grader\_service.handlers.assignment module
    :undoc-members:
    :show-inheritance:
 
-grader\_service.handlers.base\_handler module
+Base handler
 ---------------------------------------------
 
 .. automodule:: grader_service.handlers.base_handler
@@ -28,7 +28,7 @@ grader\_service.handlers.base\_handler module
    :undoc-members:
    :show-inheritance:
 
-grader\_service.handlers.grading module
+Grading
 ---------------------------------------
 
 .. automodule:: grader_service.handlers.grading
@@ -36,7 +36,7 @@ grader\_service.handlers.grading module
    :undoc-members:
    :show-inheritance:
 
-grader\_service.handlers.handler\_utils module
+Handler utils
 ----------------------------------------------
 
 .. automodule:: grader_service.handlers.handler_utils
@@ -44,7 +44,7 @@ grader\_service.handlers.handler\_utils module
    :undoc-members:
    :show-inheritance:
 
-grader\_service.handlers.lectures module
+Lecture
 ----------------------------------------
 
 .. automodule:: grader_service.handlers.lectures
@@ -52,7 +52,7 @@ grader\_service.handlers.lectures module
    :undoc-members:
    :show-inheritance:
 
-grader\_service.handlers.permission module
+Permission
 ------------------------------------------
 
 .. automodule:: grader_service.handlers.permission
@@ -60,7 +60,7 @@ grader\_service.handlers.permission module
    :undoc-members:
    :show-inheritance:
 
-grader\_service.handlers.submissions module
+Submission
 -------------------------------------------
 
 .. automodule:: grader_service.handlers.submissions
@@ -68,10 +68,11 @@ grader\_service.handlers.submissions module
    :undoc-members:
    :show-inheritance:
 
-Module contents
----------------
+..
+    Module contents
+    ---------------
 
-.. automodule:: grader_service.handlers
-   :members:
-   :undoc-members:
-   :show-inheritance:
+    .. automodule:: grader_service.handlers
+       :members:
+       :undoc-members:
+       :show-inheritance:

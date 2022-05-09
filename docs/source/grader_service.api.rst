@@ -12,7 +12,7 @@ Subpackages
 Submodules
 ----------
 
-grader\_service.api.typing\_utils module
+Typing utils
 ----------------------------------------
 
 .. automodule:: grader_service.api.typing_utils
@@ -20,7 +20,7 @@ grader\_service.api.typing\_utils module
    :undoc-members:
    :show-inheritance:
 
-grader\_service.api.util module
+Util
 -------------------------------
 
 .. automodule:: grader_service.api.util
@@ -28,10 +28,11 @@ grader\_service.api.util module
    :undoc-members:
    :show-inheritance:
 
+..
 Module contents
----------------
+    ---------------
 
-.. automodule:: grader_service.api
-   :members:
-   :undoc-members:
-   :show-inheritance:
+    .. automodule:: grader_service.api
+       :members:
+       :undoc-members:
+       :show-inheritance:

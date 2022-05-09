@@ -12,7 +12,7 @@ Subpackages
 Submodules
 ----------
 
-grader\_service.autograding.grader\_executor module
+Executor
 ---------------------------------------------------
 
 .. automodule:: grader_service.autograding.grader_executor
@@ -20,7 +20,7 @@ grader\_service.autograding.grader\_executor module
    :undoc-members:
    :show-inheritance:
 
-grader\_service.autograding.local\_feedback module
+Local feedback
 --------------------------------------------------
 
 .. automodule:: grader_service.autograding.local_feedback
@@ -28,7 +28,7 @@ grader\_service.autograding.local\_feedback module
    :undoc-members:
    :show-inheritance:
 
-grader\_service.autograding.local\_grader module
+Local grader
 ------------------------------------------------
 
 .. automodule:: grader_service.autograding.local_grader
@@ -36,10 +36,12 @@ grader\_service.autograding.local\_grader module
    :undoc-members:
    :show-inheritance:
 
-Module contents
----------------
 
-.. automodule:: grader_service.autograding
-   :members:
-   :undoc-members:
-   :show-inheritance:
+..
+    Module contents
+    ---------------
+
+    .. automodule:: grader_service.autograding
+       :members:
+       :undoc-members:
+       :show-inheritance:
