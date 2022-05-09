@@ -20,41 +20,41 @@ tags:
 
 paths:
   /lectures:
-    $ref: './openapi/paths_shared.yml#/lectures'
+    $ref: './paths_shared.yml#/lectures'
 
   /lectures/{lect_id}:
-    $ref: './openapi/paths_shared.yml#/lecturesById'
+    $ref: './paths_shared.yml#/lecturesById'
 
   /lectures/{lect_id}/users:
-    $ref: './openapi/paths_shared.yml#/lectureUsers'
+    $ref: './paths_shared.yml#/lectureUsers'
 
   /lectures/{lect_id}/assignments:
-    $ref: './openapi/paths_shared.yml#/assignments'
+    $ref: './paths_shared.yml#/assignments'
 
   # get id has no query params for grader 
   /lectures/{lect_id}/assignments/{a_id}:
-    $ref: './openapi/paths_grader.yml#/assignmentsById'
+    $ref: './paths_grader.yml#/assignmentsById'
   
   /lectures/{lect_id}/assignments/{a_id}/properties:
-    $ref: './openapi/paths_grader.yml#/propertiesAssignment'
+    $ref: './paths_grader.yml#/propertiesAssignment'
 
   /lectures/{lect_id}/assignments/{a_id}/submissions:
-    $ref: './openapi/paths_grader.yml#/submissions'
+    $ref: './paths_grader.yml#/submissions'
   
   /lectures/{lect_id}/assignments/{a_id}/submissions/{s_id}:
-    $ref: './openapi/paths_shared.yml#/submissionsById'
+    $ref: './paths_shared.yml#/submissionsById'
 
   /lectures/{lect_id}/assignments/{a_id}/submissions/{s_id}/properties:
-    $ref: './openapi/paths_grader.yml#/propertiesSubmission'
+    $ref: './paths_grader.yml#/propertiesSubmission'
 
   /lectures/{lect_id}/assignments/{a_id}/grading/{s_id}/auto:
-    $ref: './openapi/paths_shared.yml#/auto'
+    $ref: './paths_shared.yml#/auto'
 
   /lectures/{lect_id}/assignments/{a_id}/grading/{s_id}/feedback:
-    $ref: './openapi/paths_shared.yml#/feedback'
+    $ref: './paths_shared.yml#/feedback'
   
   /permissions:
-    $ref: './openapi/paths_shared.yml#/permissions'
+    $ref: './paths_shared.yml#/permissions'
 
 
 
