@@ -63,8 +63,7 @@ class SubmissionHandler(GraderBaseHandler):
         Two query parameter: latest, instructor-version
 
         latest: only get the latest submissions of users
-        instructor-version: if true, get the submissions of all users in lecture
-                            if false, get own submissions
+        instructor-version: if true, get the submissions of all users in lecture if false, get own submissions.
 
         :param lecture_id: id of the lecture
         :type lecture_id: int

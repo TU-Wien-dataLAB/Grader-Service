@@ -1,29 +1,25 @@
 Grader Service
 =======================
 
+REST API Documentation
+------------------------
+
+.. toctree::
+   :maxdepth: 4
+
+   grader_service_rest_api
+
 Subpackages
 -----------
 
 .. toctree::
    :maxdepth: 4
 
-   grader_service.alembic
    grader_service.api
    grader_service.autograding
    grader_service.handlers
    grader_service.orm
-   grader_service.tests
 
-Submodules
-----------
-
-Config
-----------------------------------------------
-
-.. automodule:: grader_service.grader_service_config
-   :members:
-   :undoc-members:
-   :show-inheritance:
 
 Main
 ---------------------------

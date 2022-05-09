@@ -11,7 +11,6 @@ Subpackages
    grader_convert.gradebook
    grader_convert.nbgraderformat
    grader_convert.preprocessors
-   grader_convert.tests
 
 Submodules
 ----------
