@@ -29,7 +29,6 @@ export interface IAssignmentModalProps {
   users: any;
   showAlert: (severity: string, msg: string) => void;
   onClose: () => void;
-
 }
 
 export const AssignmentModalComponent = (props: IAssignmentModalProps) => {
