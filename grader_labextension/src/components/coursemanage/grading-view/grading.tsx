@@ -58,7 +58,7 @@ interface IRowValues extends Submission {
 }
 
 export const GradingComponent = (props: IGradingProps) => {
-  const [option, setOption] = React.useState('latest');
+  const [option, setOption] = React.useState('latest' as "none" | "latest" | "best");
   const [showDialog, setShowDialog] = React.useState(false);
   const [showLogs, setShowLogs] = React.useState(false);
   const [logs, setLogs] = React.useState(undefined);
@@ -123,8 +123,7 @@ export const GradingComponent = (props: IGradingProps) => {
               console.log('Autograded submission');
             })
           );
-          const latest = option === 'latest' ? option : "none";
-          getAllSubmissions(props.lecture, props.assignment, latest, true).then(
+          getAllSubmissions(props.lecture, props.assignment, option, true).then(
             response => {
               setRows(generateRows(response));
               props.showAlert(
@@ -184,12 +183,11 @@ export const GradingComponent = (props: IGradingProps) => {
   );
 
   const handleChange = (event: SelectChangeEvent) => {
-    setOption(event.target.value as string);
+    setOption(event.target.value as "none" | "latest" | "best");
   };
 
   const updateSubmissions = () => {
-    const latest = option === 'latest' ? option : "none";
-    getAllSubmissions(props.lecture, props.assignment, latest, true).then(
+    getAllSubmissions(props.lecture, props.assignment, option, true).then(
       response => {
         setRows(generateRows(response));
         setSubmissions(response);
@@ -331,8 +329,9 @@ export const GradingComponent = (props: IGradingProps) => {
             label="Age"
             onChange={handleChange}
           >
-            <MenuItem value={'all'}>All Submissions</MenuItem>
+            <MenuItem value={'none'}>All Submissions</MenuItem>
             <MenuItem value={'latest'}>Latest Submissions of Users</MenuItem>
+            <MenuItem value={'best'}>Best Submissions of Users</MenuItem>
           </Select>
         </FormControl>
         <Button
