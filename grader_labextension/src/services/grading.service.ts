@@ -14,6 +14,18 @@ export function createManualFeedback(lectid: number, assignid: number, subid: nu
   return request<any>(HTTPMethod.GET, `/lectures/${lectid}/assignments/${assignid}/grading/${subid}/manual`)
 }
 
+
+export function saveSubmissions(lecture: Lecture, assignment: Assignment, filter: "none" | "latest" | "best" = "none"): Promise<any> {
+  let url = `/lectures/${lecture.id}/assignments/${assignment.id}/submissions/save`;
+  if (filter) {
+    const searchParams = new URLSearchParams({
+      filter: filter
+    });
+    url += '?' + searchParams;
+  }
+  return request<any>(HTTPMethod.PUT, url)
+}
+
 export function autogradeSubmission(lecture: Lecture, assignment: Assignment, submission: Submission): Promise<any> {
   return request<Assignment>(HTTPMethod.GET, `/lectures/${lecture.id}/assignments/${assignment.id}/grading/${submission.id}/auto`)
 }

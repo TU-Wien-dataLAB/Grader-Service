@@ -72,11 +72,14 @@ class SubmissionHandler(GraderBaseHandler):
         :raises HTTPError: throws err if user is not authorized or the assignment was not found
         """
         lecture_id, assignment_id = parse_ids(lecture_id, assignment_id)
-        self.validate_parameters("filter", "instructor-version")
+        self.validate_parameters("filter", "instructor-version", "format")
         submission_filter = self.get_argument("filter", "none")
         if submission_filter not in ["none", "latest", "best"]:
             raise HTTPError(400, reason="Filter parameter has to be either 'none', 'latest' or 'best'")
         instructor_version = self.get_argument("instructor-version", None) == "true"
+        response_format = self.get_argument("format", "json")
+        if response_format not in ["json", "csv"]:
+            raise HTTPError(400, reason="Response format can either be 'json' or 'csv'")
 
         role: Role = self.get_role(lecture_id)
         if instructor_version and role.role < Scope.tutor:
@@ -180,8 +183,16 @@ class SubmissionHandler(GraderBaseHandler):
                     )
                         .all()
                 )
-
-        self.write_json(submissions)
+        if response_format == "csv":
+            # csv format does not include logs
+            self.set_header("Content-Type", "text/csv")
+            for i, s in enumerate(submissions):
+                d = s.model.to_dict()
+                if i == 0:
+                    self.write(",".join((k for k in d.keys() if k != "logs"))+"\n")
+                self.write(",".join((str(v) for k, v in d.items() if k != "logs"))+"\n")
+        else:
+            self.write_json(submissions)
         self.session.close()  # manually close here because on_finish overwrite
 
     async def post(self, lecture_id: int, assignment_id: int):
