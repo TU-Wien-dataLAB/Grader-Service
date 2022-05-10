@@ -18,11 +18,12 @@ import { DeadlineComponent } from '../../util/deadline';
 import { GradingChart, SubmittedChart } from './charts';
 import { Lecture } from '../../../model/lecture';
 import { utcToLocal } from '../../../services/datetime.service';
+import { Submission } from '../../../model/submission';
 
 export interface IOverviewCardProps {
   lecture: Lecture;
   assignment: Assignment;
-  allSubmissions: any[];
+  allSubmissions: Submission[];
   users: { students: string[]; tutors: string[]; instructors: string[] };
 }
 

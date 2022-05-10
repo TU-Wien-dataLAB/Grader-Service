@@ -49,21 +49,26 @@ export const AssignmentComponent = (props: IAssignmentComponentProps) => {
   const [numAutoGraded, setNumAutoGraded] = React.useState(0);
   const [numManualGraded, setNumManualGraded] = React.useState(0);
   React.useEffect(() => {
-    getAllSubmissions(props.lecture, assignment, "none", true).then(response => {
-      setAllSubmissions(response);
-      let auto = 0;
-      let manual = 0;
-      for (const submission of response) {
-        if (submission.auto_status === 'automatically_graded') {
-          auto++;
+    getAllSubmissions(props.lecture, assignment, "none", true).then(
+      response => {
+        setAllSubmissions(response);
+        let auto = 0;
+        let manual = 0;
+        for (const submission of response) {
+          if (submission.auto_status === 'automatically_graded') {
+            auto++;
+          }
+          if (submission.manual_status === 'manually_graded') {
+            manual++;
+          }
         }
-        if (submission.manual_status === 'manually_graded') {
-          manual++;
-        }
+        setNumAutoGraded(auto);
+        setNumManualGraded(manual);
+      },
+      error => {
+        props.showAlert('danger', error);
       }
-      setNumAutoGraded(auto);
-      setNumManualGraded(manual);
-    });
+    );
 
     getAllSubmissions(props.lecture, assignment, "latest", true).then(response => {
       setLatestSubmissions(response);
@@ -72,7 +77,7 @@ export const AssignmentComponent = (props: IAssignmentComponentProps) => {
     getFiles(`source/${props.lecture.code}/${assignment.id}`).then(files => {
       setFiles(files);
     });
-  }, [props]);
+  }, [assignment]);
 
   return (
     <Box>
