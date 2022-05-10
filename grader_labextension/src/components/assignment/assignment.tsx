@@ -46,7 +46,7 @@ export const AssignmentComponent = (props: IAssignmentComponentProps) => {
   const [hasFeedback, setHasFeedback] = React.useState(false);
   const [files, setFiles] = React.useState([]);
   React.useEffect(() => {
-    getAllSubmissions(props.lecture, assignment, false, false).then(
+    getAllSubmissions(props.lecture, assignment, "none", false).then(
       response => {
         setSubmissions(response);
         const feedback = response.reduce(
@@ -65,12 +65,7 @@ export const AssignmentComponent = (props: IAssignmentComponentProps) => {
   const onAssignmentClose = async () => {
     setDisplayAssignment(false);
     setAssignment(await getAssignment(props.lecture.id, assignment));
-    const submissions = await getAllSubmissions(
-      props.lecture,
-      assignment,
-      false,
-      false
-    );
+    const submissions = await getAllSubmissions(props.lecture, assignment, "none", false);
     setSubmissions(submissions);
   };
 

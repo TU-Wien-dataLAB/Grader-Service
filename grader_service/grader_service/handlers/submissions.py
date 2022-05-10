@@ -72,8 +72,10 @@ class SubmissionHandler(GraderBaseHandler):
         :raises HTTPError: throws err if user is not authorized or the assignment was not found
         """
         lecture_id, assignment_id = parse_ids(lecture_id, assignment_id)
-        self.validate_parameters("latest", "instructor-version")
-        latest = self.get_argument("latest", None) == "true"
+        self.validate_parameters("filter", "instructor-version")
+        submission_filter = self.get_argument("filter", "none")
+        if submission_filter not in ["none", "latest", "best"]:
+            raise HTTPError(400, reason="Filter parameter has to be either 'none', 'latest' or 'best'")
         instructor_version = self.get_argument("instructor-version", None) == "true"
 
         role: Role = self.get_role(lecture_id)
@@ -82,7 +84,7 @@ class SubmissionHandler(GraderBaseHandler):
         assignment = self.get_assignment(lecture_id, assignment_id)
 
         if instructor_version:
-            if latest:
+            if submission_filter == 'latest':
                 submissions = (
                     self.session.query(
                         Submission.id,
@@ -101,10 +103,29 @@ class SubmissionHandler(GraderBaseHandler):
                         .all()
                 )
                 submissions = [tuple_to_submission(t) for t in submissions]
+            elif submission_filter == 'best':
+                submissions = (
+                    self.session.query(
+                        Submission.id,
+                        Submission.auto_status,
+                        Submission.manual_status,
+                        func.max(Submission.score),
+                        Submission.username,
+                        Submission.assignid,
+                        Submission.commit_hash,
+                        Submission.feedback_available,
+                        Submission.logs,
+                        Submission.date,
+                    )
+                        .filter(Submission.assignid == assignment_id)
+                        .group_by(Submission.username)
+                        .all()
+                )
+                submissions = [tuple_to_submission(t) for t in submissions]
             else:
                 submissions = assignment.submissions
         else:
-            if latest:
+            if submission_filter == 'latest':
                 submissions = (
                     self.session.query(
                         Submission.id,
@@ -117,6 +138,28 @@ class SubmissionHandler(GraderBaseHandler):
                         Submission.feedback_available,
                         Submission.logs,
                         func.max(Submission.date),
+                    )
+                        .filter(
+                        Submission.assignid == assignment_id,
+                        Submission.username == role.username,
+                    )
+                        .group_by(Submission.username)
+                        .all()
+                )
+                submissions = [tuple_to_submission(t) for t in submissions]
+            elif submission_filter == 'best':
+                submissions = (
+                    self.session.query(
+                        Submission.id,
+                        Submission.auto_status,
+                        Submission.manual_status,
+                        func.max(Submission.score),
+                        Submission.username,
+                        Submission.assignid,
+                        Submission.commit_hash,
+                        Submission.feedback_available,
+                        Submission.logs,
+                        Submission.date,
                     )
                         .filter(
                         Submission.assignid == assignment_id,

@@ -123,7 +123,7 @@ export const GradingComponent = (props: IGradingProps) => {
               console.log('Autograded submission');
             })
           );
-          const latest = option === 'latest' ? true : false;
+          const latest = option === 'latest' ? option : "none";
           getAllSubmissions(props.lecture, props.assignment, latest, true).then(
             response => {
               setRows(generateRows(response));
@@ -188,7 +188,7 @@ export const GradingComponent = (props: IGradingProps) => {
   };
 
   const updateSubmissions = () => {
-    const latest = option === 'latest' ? true : false;
+    const latest = option === 'latest' ? option : "none";
     getAllSubmissions(props.lecture, props.assignment, latest, true).then(
       response => {
         setRows(generateRows(response));

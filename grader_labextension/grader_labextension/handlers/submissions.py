@@ -26,7 +26,7 @@ class SubmissionHandler(ExtensionBaseHandler):
         query_params = RequestService.get_query_string(
             {
                 "instructor-version": self.get_argument("instructor-version", None),
-                "latest": self.get_argument("latest", None),
+                "filter": self.get_argument("filter", "none"),
             }
         )
         try:

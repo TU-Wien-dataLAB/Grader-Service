@@ -73,12 +73,7 @@ export const AssignmentFilesComponent = (
       props.showAlert('error', 'Error Submitting Assignment');
     }
     try {
-      const submissions = await getAllSubmissions(
-        props.lecture,
-        props.assignment,
-        false,
-        false
-      );
+      const submissions = await getAllSubmissions(props.lecture, props.assignment, "none", false);
       props.setSubmissions(submissions);
     } catch (e) {
       props.showAlert('error', 'Error Updating Submissions');
