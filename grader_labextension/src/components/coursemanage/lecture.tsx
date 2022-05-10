@@ -20,7 +20,11 @@ import { Lecture } from '../../model/lecture';
 import { getAllAssignments } from '../../services/assignments.service';
 import { AssignmentComponent } from './assignment';
 import { CreateDialog, EditLectureDialog } from '../util/dialog';
-import { getLecture, getUsers } from '../../services/lectures.service';
+import {
+  getLecture,
+  getUsers,
+  updateLecture
+} from '../../services/lectures.service';
 import { red } from '@mui/material/colors';
 
 interface ILectureComponentProps {
@@ -46,7 +50,7 @@ export const LectureComponent = (props: ILectureComponentProps) => {
     getUsers(lecture).then(response => {
       setUsers(response);
     });
-  }, []);
+  }, [lecture]);
 
   const onAssignmentDelete = () => {
     getAllAssignments(lecture.id).then(response => {
@@ -101,8 +105,15 @@ export const LectureComponent = (props: ILectureComponentProps) => {
           </Typography>
           <EditLectureDialog
             lecture={lecture}
-            handleSubmit={async () => {
-              setLecture(await getLecture(lecture.id));
+            handleSubmit={updatedLecture => {
+              updateLecture(updatedLecture).then(
+                response => {
+                  setLecture(response);
+                },
+                error => {
+                  props.showAlert('danger', error);
+                }
+              );
             }}
           />
         </CardContent>

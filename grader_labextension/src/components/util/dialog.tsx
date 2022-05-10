@@ -287,7 +287,7 @@ const validationSchemaLecture = yup.object({
 
 export interface IEditLectureProps {
   lecture: Lecture;
-  handleSubmit: () => void;
+  handleSubmit: (updatedLecture: Lecture) => void;
 }
 
 export const EditLectureDialog = (props: IEditLectureProps) => {
@@ -300,9 +300,7 @@ export const EditLectureDialog = (props: IEditLectureProps) => {
     onSubmit: values => {
       const updatedLecture: Lecture = Object.assign(props.lecture, values);
       console.log(updatedLecture);
-      updateLecture(updatedLecture)
-        .then(props.handleSubmit)
-        .catch(error => console.log(error));
+      props.handleSubmit(updatedLecture);
       setOpen(false);
     }
   });
