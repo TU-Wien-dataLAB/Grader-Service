@@ -22,16 +22,6 @@ class Singleton(type):
 class HandlerPathRegistry(object, metaclass=Singleton):
     registry = {}
 
-    @property
-    @staticmethod
-    def path_set() -> Set[str]:
-        return set(HandlerPathRegistry.registry.values())
-
-    @property
-    @staticmethod
-    def path_list() -> List[str]:
-        return list(HandlerPathRegistry.registry.values())
-
     @staticmethod
     def handler_list(
             base_url: str = "/services/grader"
