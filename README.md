@@ -58,9 +58,9 @@ Until then, the service relies on the group configuration of JupyterHub version 
 The config could look like this:
 
     c.JupyterHub.load_groups = {
-        "lect1__instructor": ["user1"],
-        "lect1__tutor": ["user2"],
-        "lect1__student": ["user3", "user4"]
+        "lect1:instructor": ["user1"],
+        "lect1:tutor": ["user2"],
+        "lect1:student": ["user3", "user4"]
     }
 
 Here, `user1` is an instructor of the lecture with the code `lect1` and so on.
@@ -100,9 +100,6 @@ The last thing we have to configure is the server-side of the JupyterLab plugin 
 
     import os
     c.GitService.git_access_token = os.environ.get("JUPYTERHUB_API_TOKEN")
-    c.GitService.git_remote_url = "127.0.0.1:4010/services/grader/git"
-    c.GitService.git_http_scheme = "http"
-    
-    c.RequestService.port = 4010
-    c.RequestService.host = "127.0.0.1"
-    c.RequestService.scheme = "http"
+    c.GitService.git_remote_url = "http://127.0.0.1:4010/services/grader/git"
+
+    c.RequestService.url = "http://127.0.0.1:4010"
