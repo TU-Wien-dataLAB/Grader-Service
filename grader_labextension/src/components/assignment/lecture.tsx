@@ -10,7 +10,7 @@ import {
   Card,
   CardActions,
   CardContent,
-  Collapse,
+  Collapse, Grid,
   LinearProgress,
   Typography
 } from '@mui/material';
@@ -67,16 +67,18 @@ export const LectureComponent = (props: ILectureComponentProps) => {
 
         <Collapse in={expanded} timeout="auto" unmountOnExit>
           <CardContent>
-            <Box sx={{ display: 'flex', flexWrap: 'wrap' }}>
+            <Grid container spacing={2} alignItems="stretch">
               {assignments.map((el: Assignment) => (
-                <AssignmentComponent
-                  lecture={props.lecture}
-                  assignment={el}
-                  root={props.root}
-                  showAlert={props.showAlert}
-                />
+                <Grid item gridAutoColumns={"1fr"} sx={{maxWidth: 225, minWidth: 225, minHeight: "100%", m: 1.5}}>
+                  <AssignmentComponent
+                    lecture={props.lecture}
+                    assignment={el}
+                    root={props.root}
+                    showAlert={props.showAlert}
+                  />
+                </Grid>
               ))}
-            </Box>
+            </Grid>
           </CardContent>
         </Collapse>
         <CardActions>
