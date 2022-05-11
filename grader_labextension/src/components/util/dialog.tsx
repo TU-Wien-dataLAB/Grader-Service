@@ -379,7 +379,9 @@ interface INewAssignmentCardProps {
 
 export default function NewAssignmentCard(props: INewAssignmentCardProps) {
   return (
-    <Card sx={{ width: 225, height: 225, m: 1.5, backgroundColor: '#fcfcfc' }}>
+    <Card
+      sx={{ width: 225, height: "100%", m: 1.5, backgroundColor: '#fcfcfc' }}
+    >
       <Tooltip title={'New Assignment'}>
         <CardActionArea
           onClick={props.onClick}
@@ -430,7 +432,7 @@ export const CreateDialog = (props: ICreateDialogProps) => {
   const [openDialog, setOpen] = React.useState(false);
 
   return (
-    <div>
+    <Box sx={{minHeight: 225, height: "100%"}}>
       <NewAssignmentCard
         onClick={e => {
           e.stopPropagation();
@@ -557,7 +559,7 @@ export const CreateDialog = (props: ICreateDialogProps) => {
           </DialogActions>
         </form>
       </Dialog>
-    </div>
+    </Box>
   );
 };
 

@@ -315,7 +315,7 @@ export const GradingComponent = (props: IGradingProps) => {
     try {
       await saveSubmissions(props.lecture, props.assignment, option);
       await openFile(`${props.lecture.code}/submissions.csv`)
-      props.showAlert("success", "Successfully exported submission!")
+      props.showAlert("success", "Successfully exported submissions!")
     } catch (err) {
       console.log(err)
       props.showAlert("error", "Error exporting submissions!")

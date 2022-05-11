@@ -169,8 +169,8 @@ export const DeadlineComponent = (props: IDeadlineProps) => {
       color={color}
     />
   ) : (
-    <CardContent sx={{backgroundColor: getCardColor(color), p: 1}}>
-      <Typography variant="overline" align="left" sx={{fontSize: 9}}>Deadline</Typography>
+    <CardContent sx={{backgroundColor: getCardColor(color), p: 1, width: "100%"}}>
+      <Typography variant="overline" align="left" sx={{fontSize: 9, ml: 1}}>Deadline</Typography>
       <Typography align="center" sx={{fontSize: 12, m: 0, mt: -1}}>
         {displayDate}
       </Typography>

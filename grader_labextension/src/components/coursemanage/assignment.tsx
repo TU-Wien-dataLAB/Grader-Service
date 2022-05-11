@@ -80,9 +80,9 @@ export const AssignmentComponent = (props: IAssignmentComponentProps) => {
   }, [assignment]);
 
   return (
-    <Box>
+    <Box sx={{height: "100%"}}>
       <Card
-        sx={{ maxWidth: 225, minWidth: 225, m: 1.5 }}
+        sx={{ maxWidth: 225, minWidth: 225, height: "100%", m: 1.5 }}
         onClick={async () => {
           await openBrowser(
             `source/${props.lecture.code}/${assignment.id}`,
@@ -91,8 +91,8 @@ export const AssignmentComponent = (props: IAssignmentComponentProps) => {
           setDisplaySubmissions(true);
         }}
       >
-        <CardActionArea>
-          <CardContent>
+        <CardActionArea sx={{height: "100%", display: "flex", flexDirection: "column"}}>
+          <CardContent sx={{flexGrow: 1}}>
             <Typography variant="h5" component="div">
               {assignment.name}
             </Typography>
