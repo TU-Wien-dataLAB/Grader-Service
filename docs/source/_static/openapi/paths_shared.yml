@@ -15,14 +15,30 @@ lectures:
           schema:
             $ref: './schemas.yml#/components/schemas/Lecture'
     responses:
-      200:
+      201:
         description: OK
         content:
           application/json:
             schema:
               $ref: "./schemas.yml#/components/schemas/Lecture"
+      400:
+        description: Error
+        content:
+          application/json:
+            schema:
+              $ref: "./schemas.yml#/components/schemas/ErrorMessage"
       403:
-        description: Unautorized
+        description: Forbidden
+        content:
+          application/json:
+            schema:
+              $ref: "./schemas.yml#/components/schemas/ErrorMessage"
+      404:
+        description: Lecture Code not found
+        content:
+          application/json:
+            schema:
+              $ref: "./schemas.yml#/components/schemas/ErrorMessage"
       500:
         description: Internal server error
         content:
@@ -39,13 +55,6 @@ lectures:
     tags:
       - "Lectures"
     parameters:
-      - name: semester
-        in: query
-        description: The semester for which to fetch lectures
-        required: false
-        example: "SS21"
-        schema:
-          type: string
       - name: complete
         in: query
         description: The state of the lectures to query (active or complete)
@@ -62,8 +71,18 @@ lectures:
               type: "array"
               items:
                 $ref: "./schemas.yml#/components/schemas/Lecture"
-      403:
+      401:
         description: Unautorized
+        content:
+          application/json:
+            schema:
+              $ref: "./schemas.yml#/components/schemas/ErrorMessage"
+      403:
+        description: Forbidden
+        content:
+          application/json:
+            schema:
+              $ref: "./schemas.yml#/components/schemas/ErrorMessage"
       500:
         description: Internal server error
         content:
@@ -76,7 +95,6 @@ lecturesById:
     security:
       - hub_auth:
           - instructor
-          - tutor
     summary: Update an existing lecture
     tags:
       - "Lectures"
@@ -103,10 +121,20 @@ lecturesById:
           application/json:
             schema:
               $ref: "./schemas.yml#/components/schemas/Lecture"
-      403:
+      401:
         description: Unautorized
+        content:
+          application/json:
+            schema:
+              $ref: "./schemas.yml#/components/schemas/ErrorMessage"
+      403:
+        description: Forbidden
+        content:
+          application/json:
+            schema:
+              $ref: "./schemas.yml#/components/schemas/ErrorMessage"
       404:
-        description: Lecture id not found
+        description: Lecture not found
         content:
           application/json:
             schema:
@@ -142,8 +170,24 @@ lecturesById:
           application/json:
             schema:
               $ref: "./schemas.yml#/components/schemas/Lecture"
-      403:
+      401:
         description: Unautorized
+        content:
+          application/json:
+            schema:
+              $ref: "./schemas.yml#/components/schemas/ErrorMessage"
+      403:
+        description: Forbidden
+        content:
+          application/json:
+            schema:
+              $ref: "./schemas.yml#/components/schemas/ErrorMessage"
+      404:
+        description: Lecture not found
+        content:
+          application/json:
+            schema:
+              $ref: "./schemas.yml#/components/schemas/ErrorMessage"
       500:
         description: Internal server error
         content:
@@ -154,7 +198,6 @@ lecturesById:
     security:
       - hub_auth:
           - instructor
-          - tutor
     summary: Delete an existing lecture
     tags:
       - "Lectures"
@@ -174,8 +217,24 @@ lecturesById:
           application/json:
             schema:
               $ref: "./schemas.yml#/components/schemas/Lecture"
-      403:
+      400:
+        description: Error
+        content:
+          application/json:
+            schema:
+              $ref: "./schemas.yml#/components/schemas/ErrorMessage"
+      401:
         description: Unautorized
+        content:
+          application/json:
+            schema:
+              $ref: "./schemas.yml#/components/schemas/ErrorMessage"
+      403:
+        description: Forbidden
+        content:
+          application/json:
+            schema:
+              $ref: "./schemas.yml#/components/schemas/ErrorMessage"
       404:
         description: Not found
         content:
@@ -227,10 +286,14 @@ lectureUsers:
                   type: array
                   items:
                     $ref: './schemas.yml#/components/schemas/User'
-      403:
+      401:
         description: Unautorized
-      404:
-        description: Lecture id or assignment id not found
+        content:
+          application/json:
+            schema:
+              $ref: "./schemas.yml#/components/schemas/ErrorMessage"
+      403:
+        description: Forbidden
         content:
           application/json:
             schema:
@@ -247,7 +310,6 @@ assignments:
     security:
       - hub_auth:
           - instructor
-          - tutor
     summary: Request creation of an assignment
     tags:
       - Assignments
@@ -261,21 +323,37 @@ assignments:
           type: integer
           format: int64
     requestBody:
-      description: The initial state of an assignment. Every field will be empty except `due_date` and `name`.
+      description: The initial state of an assignment. Every field can be empty except `due_date` and `name`.
       required: true
       content:
         application/json:
           schema:
             $ref: './schemas.yml#/components/schemas/Assignment'
     responses:
-      200:
+      201:
         description: OK
         content:
           application/json:
             schema:
               $ref: "./schemas.yml#/components/schemas/Assignment"
-      403:
+      400:
+        description: Error
+        content:
+          application/json:
+            schema:
+              $ref: "./schemas.yml#/components/schemas/ErrorMessage"
+      401:
         description: Unautorized
+        content:
+          application/json:
+            schema:
+              $ref: "./schemas.yml#/components/schemas/ErrorMessage"
+      403:
+        description: Forbidden
+        content:
+          application/json:
+            schema:
+              $ref: "./schemas.yml#/components/schemas/ErrorMessage"
       404:
         description: Lecture id not found.
         content:
@@ -315,8 +393,18 @@ assignments:
               type: "array"
               items:
                 $ref: "./schemas.yml#/components/schemas/Assignment"
-      403:
+      401:
         description: Unautorized
+        content:
+          application/json:
+            schema:
+              $ref: "./schemas.yml#/components/schemas/ErrorMessage"
+      403:
+        description: Forbidden
+        content:
+          application/json:
+            schema:
+              $ref: "./schemas.yml#/components/schemas/ErrorMessage"
       404:
         description: Lecture id not found.
         content:
@@ -337,7 +425,6 @@ assignmentsById:
     security:
       - hub_auth:
           - instructor
-          - tutor
     summary: Update an existing assignment (also handles release)
     tags:
       - Assignments
@@ -359,7 +446,7 @@ assignmentsById:
           type: integer
           format: int64
     requestBody:
-      description: The parameters of the assignment that should be updated.
+      description: The new assignment data.
       required: true
       content:
         application/json:
@@ -372,8 +459,18 @@ assignmentsById:
           application/json:
             schema:
               $ref: "./schemas.yml#/components/schemas/Assignment"
-      403:
+      401:
         description: Unautorized
+        content:
+          application/json:
+            schema:
+              $ref: "./schemas.yml#/components/schemas/ErrorMessage"
+      403:
+        description: Forbidden
+        content:
+          application/json:
+            schema:
+              $ref: "./schemas.yml#/components/schemas/ErrorMessage"
       404:
         description: Lecture id or assignment id not found.
         content:
@@ -412,17 +509,9 @@ assignmentsById:
         schema:
           type: integer
           format: int64
-      - name: instuctor-version # TODO: Take care of auth!!! Maybe different path?
+      - name: instuctor-version
         in: query
         description: Fetch the instructor version of the assignment
-        required: false
-        example: false
-        schema:
-          type: boolean
-          default: false
-      - name: metadata-only
-        in: query
-        description: Only return the assignment information and don't fetch it
         required: false
         example: false
         schema:
@@ -435,8 +524,18 @@ assignmentsById:
           application/json:
             schema:
               $ref: "./schemas.yml#/components/schemas/Assignment"
-      403:
+      401:
         description: Unautorized
+        content:
+          application/json:
+            schema:
+              $ref: "./schemas.yml#/components/schemas/ErrorMessage"
+      403:
+        description: Forbidden
+        content:
+          application/json:
+            schema:
+              $ref: "./schemas.yml#/components/schemas/ErrorMessage"
       404:
         description: Lecture id or assignment id not found
         content:
@@ -477,74 +576,20 @@ assignmentsById:
     responses:
       200:
         description: OK
-      403:
+      401:
         description: Unautorized
+        content:
+          application/json:
+            schema:
+              $ref: "./schemas.yml#/components/schemas/ErrorMessage"
+      403:
+        description: Forbidden
+        content:
+          application/json:
+            schema:
+              $ref: "./schemas.yml#/components/schemas/ErrorMessage"
       404:
         description: Lecture id or assignment id not found.
-        content:
-          application/json:
-            schema:
-              $ref: "./schemas.yml#/components/schemas/ErrorMessage"
-      500:
-        description: Internal server error
-        content:
-          application/json:
-            schema:
-              $ref: "./schemas.yml#/components/schemas/ErrorMessage"
-
-
-submissions:
-  get:
-    security:
-      - hub_auth:
-          - instructor
-          - tutor
-          - student
-    summary: Return the submissions of an assignment
-    tags:
-      - "Submissions"
-    parameters:
-      - name: lect_id
-        in: path
-        description: ID of the lecture
-        required: true
-        example: 1
-        schema:
-          type: integer
-          format: int64
-      - name: a_id
-        in: path
-        description: ID of the assignment in the lecture
-        required: true
-        example: 2
-        schema:
-          type: integer
-          format: int64
-      - name: latest
-        in: query
-        description: Only return the latest submission
-        required: false
-        schema:
-          type: boolean
-          default: false
-      - name: instructor-version
-        in: query
-        description: Whether to fetch the all submissions of students
-        required: false
-        schema:
-          type: boolean
-          default: false
-    responses:
-      200:
-        description: OK
-        content:
-          application/json:
-            schema:
-              $ref: "./schemas.yml#/components/schemas/UserSubmissions"
-      403:
-        description: Unautorized
-      404:
-        description: Lecture id or assignment id not found
         content:
           application/json:
             schema:
@@ -598,8 +643,18 @@ submissionsById:
           application/json:
             schema:
               $ref: "./schemas.yml#/components/schemas/Submission"
-      403:
+      401:
         description: Unautorized
+        content:
+          application/json:
+            schema:
+              $ref: "./schemas.yml#/components/schemas/ErrorMessage"
+      403:
+        description: Forbidden
+        content:
+          application/json:
+            schema:
+              $ref: "./schemas.yml#/components/schemas/ErrorMessage"
       404:
         description: Lecture id or assignment id or submission id not found
         content:
@@ -617,8 +672,7 @@ submissionsById:
       - hub_auth:
           - instructor
           - tutor
-          - student
-    summary: Update the submission with specified id
+    summary: Update the submission with specified id (only auto and manual grading status and feedback available flag)
     tags:
       - "Submissions"
     parameters:
@@ -653,102 +707,20 @@ submissionsById:
           application/json:
             schema:
               $ref: "./schemas.yml#/components/schemas/Submission"
-      403:
+      401:
         description: Unautorized
+        content:
+          application/json:
+            schema:
+              $ref: "./schemas.yml#/components/schemas/ErrorMessage"
+      403:
+        description: Forbidden
+        content:
+          application/json:
+            schema:
+              $ref: "./schemas.yml#/components/schemas/ErrorMessage"
       404:
         description: Lecture id or assignment id or submission id not found
-        content:
-          application/json:
-            schema:
-              $ref: "./schemas.yml#/components/schemas/ErrorMessage"
-      500:
-        description: Internal server error
-        content:
-          application/json:
-            schema:
-              $ref: "./schemas.yml#/components/schemas/ErrorMessage"
-
-grading:
-  get:
-    security:
-      - hub_auth:
-          - instructor
-          - tutor
-    summary: List student submissions of a lecture
-    tags:
-      - Grading
-    parameters:
-      - name: lect_id
-        in: path
-        description: ID of the lecture
-        required: true
-        example: 1
-        schema:
-          type: integer
-          format: int64
-      - name: a_id
-        in: path
-        description: ID of the assignment in the lecture
-        required: true
-        example: 2
-        schema:
-          type: integer
-          format: int64
-      - name: metadata_only
-        in: query
-        description: Only return the metadata information of the submissions
-        required: false
-        example: false
-        schema:
-          type: boolean
-          default: false
-      - name: latest
-        in: query
-        description: Only return the latest submission of each student
-        required: false
-        schema:
-          type: boolean
-          default: false
-      - name: user_id
-        in: query
-        description: Specify the user id
-        required: false
-        example: 2
-        schema:
-          type: integer
-          format: int64
-    responses:
-      200:
-        description: OK
-        content:
-          application/json:
-            schema:
-              type: "object"
-              properties:
-                n_submissions:
-                  type: integer
-                  format: int64
-                  example: 42
-                data:
-                  type: array
-                  items:
-                    type: object
-                    properties:
-                      student:
-                        $ref: "./schemas.yml#/components/schemas/User"
-                      submissions:
-                        type: "array"
-                        items:
-                          type: object
-                          properties:
-                            submission:
-                              $ref: "./schemas.yml#/components/schemas/Submission"
-                            grading_result:
-                              $ref: "./schemas.yml#/components/schemas/GradingResult"
-      403:
-        description: Unautorized
-      404:
-        description: Lecture id or assignment id not found
         content:
           application/json:
             schema:
@@ -795,7 +767,7 @@ auto:
           type: integer
           format: int64
     responses:
-      200:
+      202:
         description: OK
         content:
           application/json:
@@ -803,8 +775,18 @@ auto:
               type: "array"
               items:
                 $ref: "./schemas.yml#/components/schemas/Submission"
-      403:
+      401:
         description: Unautorized
+        content:
+          application/json:
+            schema:
+              $ref: "./schemas.yml#/components/schemas/ErrorMessage"
+      403:
+        description: Forbidden
+        content:
+          application/json:
+            schema:
+              $ref: "./schemas.yml#/components/schemas/ErrorMessage"
       404:
         description: Lecture id, assignment id or submission id not found
         content:
@@ -853,7 +835,7 @@ feedback:
           type: integer
           format: int64
     responses:
-      200:
+      202:
         description: OK
         content:
           application/json:
@@ -861,8 +843,18 @@ feedback:
               type: "array"
               items:
                 $ref: "./schemas.yml#/components/schemas/Submission"
-      403:
+      401:
         description: Unautorized
+        content:
+          application/json:
+            schema:
+              $ref: "./schemas.yml#/components/schemas/ErrorMessage"
+      403:
+        description: Forbidden
+        content:
+          application/json:
+            schema:
+              $ref: "./schemas.yml#/components/schemas/ErrorMessage"
       404:
         description: Lecture id, assignment id or submission id not found
         content:
@@ -904,119 +896,7 @@ permissions:
             example:
               [ { "lecture_code": "iv21s", "scope": 1 }, { "lecture_code": "ab21s", "scope": 0 } ]
       403:
-        description: Unautorized
-        content:
-          application/json:
-            schema:
-              $ref: "./schemas.yml#/components/schemas/ErrorMessage"
-      500:
-        description: Internal server error
-        content:
-          application/json:
-            schema:
-              $ref: "./schemas.yml#/components/schemas/ErrorMessage"
-
-versionControlPull:
-  get:
-    security:
-      - hub_auth:
-          - instructor
-          - tutor
-          - student
-    summary: Pulls an assignment to the specified repo
-    tags:
-      - Version Control
-    parameters:
-      - name: lect_id
-        in: path
-        description: ID of the lecture
-        required: true
-        example: 1
-        schema:
-          type: integer
-          format: int64
-      - name: a_id
-        in: path
-        description: ID of the assignment in the lecture
-        required: true
-        example: 2
-        schema:
-          type: integer
-          format: int64
-      - name: repo
-        in: path
-        description: The identifier of the repo
-        required: true
-        schema:
-          type: string
-          enum:
-            - "user"
-            - "group"
-            - "release"
-            - "source"
-    responses:
-      200:
-        description: OK
-      403:
-        description: Unautorized
-      404:
-        description: Lecture id, assignment id or repo not found.
-        content:
-          application/json:
-            schema:
-              $ref: "./schemas.yml#/components/schemas/ErrorMessage"
-      500:
-        description: Internal server error
-        content:
-          application/json:
-            schema:
-              $ref: "./schemas.yml#/components/schemas/ErrorMessage"
-
-versionControlPush:
-  put:
-    security:
-      - hub_auth:
-          - instructor
-          - tutor
-          - student
-    summary: Pushes an assignment to the specified repo
-    tags:
-      - Version Control
-    parameters:
-      - name: lect_id
-        in: path
-        description: ID of the lecture
-        required: true
-        example: 1
-        schema:
-          type: integer
-          format: int64
-      - name: a_id
-        in: path
-        description: ID of the assignment in the lecture
-        required: true
-        example: 2
-        schema:
-          type: integer
-          format: int64
-      - name: repo
-        in: path
-        description: The identifier of the repo
-        required: true
-        schema:
-          type: string
-          enum:
-            - "user"
-            - "group"
-            - "release"
-            - "source"
-    responses:
-      200:
-        description: OK
-      403:
-        description: Unautorized
-      404:
-        description: Lecture id, assignment id or repo not found.
+        description: Forbidden
         content:
           application/json:
             schema:

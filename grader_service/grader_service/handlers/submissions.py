@@ -195,6 +195,7 @@ class SubmissionHandler(GraderBaseHandler):
             self.write_json(submissions)
         self.session.close()  # manually close here because on_finish overwrite
 
+    @authorize([Scope.student, Scope.tutor, Scope.instructor])
     async def post(self, lecture_id: int, assignment_id: int):
         """Create submission based on commit hash.
 
@@ -309,8 +310,8 @@ class SubmissionObjectHandler(GraderBaseHandler):
         sub_model = SubmissionModel.from_dict(body)
         sub = self.get_submission(lecture_id, assignment_id, submission_id)
         # sub.date = sub_model.submitted_at
-        sub.assignid = assignment_id
-        sub.username = self.user.name
+        # sub.assignid = assignment_id
+        # sub.username = self.user.name
         sub.auto_status = sub_model.auto_status
         sub.manual_status = sub_model.manual_status
         sub.feedback_available = sub_model.feedback_available or False

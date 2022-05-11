@@ -33,14 +33,6 @@ submissions:
           type: string
           enum: [ "none", "latest", "best" ]
           default: "none"
-      - name: format
-        in: query
-        description: Return format
-        required: false
-        schema:
-          type: string
-          enum: [ "json", "csv" ]
-          default: "json"
       - name: instructor-version
         in: query
         description: Whether to fetch the all submissions of students
@@ -48,18 +40,25 @@ submissions:
         schema:
           type: boolean
           default: false
-    produces:
-      - application/json
-      - text/csv
-    responses: # TODO add csv example
+    responses:
       200:
         description: OK
         content:
           application/json:
             schema:
               $ref: "./schemas.yml#/components/schemas/UserSubmissions"
-      403:
+      401:
         description: Unautorized
+        content:
+          application/json:
+            schema:
+              $ref: "./schemas.yml#/components/schemas/ErrorMessage"
+      403:
+        description: Forbidden
+        content:
+          application/json:
+            schema:
+              $ref: "./schemas.yml#/components/schemas/ErrorMessage"
       404:
         description: Lecture id or assignment id not found
         content:
@@ -72,140 +71,18 @@ submissions:
           application/json:
             schema:
               $ref: "./schemas.yml#/components/schemas/ErrorMessage"
-  post:
-    security:
-      - hub_auth:
-          - instructor
-          - tutor
-          - student
-    summary: Set properties of an assignment
-    tags:
-      - "Submissions"
-    parameters:
-      - name: lect_id
-        in: path
-        description: ID of the lecture
-        required: true
-        example: 1
-        schema:
-          type: integer
-          format: int64
-      - name: a_id
-        in: path
-        description: ID of the assignment in the lecture
-        required: true
-        example: 2
-        schema:
-          type: integer
-          format: int64
-    requestBody:
-      description: The properties of the submission that should be created.
-      required: true
-      content:
-        application/json:
-          schema:
-            $ref: "./schemas.yml#/components/schemas/Submission"
-    responses:
-      201:
-        description: OK
-        content:
-          application/json:
-            schema:
-              $ref: "./schemas.yml#/components/schemas/Submission"
-      401:
-        description: Unautorized
-        content:
-          application/json:
-            schema:
-              $ref: "./schemas.yml#/components/schemas/ErrorMessage"
-      403:
-        description: Forbidden
-        content:
-          application/json:
-            schema:
-              $ref: "./schemas.yml#/components/schemas/ErrorMessage"
-      404:
-        description: Lecture id or assignment id not found.
-        content:
-          application/json:
-            schema:
-              $ref: "./schemas.yml#/components/schemas/ErrorMessage"
-      500:
-        description: Internal server error
-        content:
-          application/json:
-            schema:
-              $ref: "./schemas.yml#/components/schemas/ErrorMessage"
 
-propertiesAssignment:
-  put:
-    security:
-      - hub_auth:
-          - instructor
-          - tutor
-    summary: Set properties of an assignment
-    tags:
-      - Assignments
-    parameters:
-      - name: lect_id
-        in: path
-        description: ID of the lecture
-        required: true
-        example: 1
-        schema:
-          type: integer
-          format: int64
-      - name: a_id
-        in: path
-        description: ID of the assignment in the lecture
-        required: true
-        example: 2
-        schema:
-          type: integer
-          format: int64
-    requestBody:
-      description: The properties of the assignment that should be set.
-      required: true
-      content:
-        application/json:
-          schema:
-            type: string
-    responses:
-      200:
-        description: OK
-      401:
-        description: Unautorized
-        content:
-          application/json:
-            schema:
-              $ref: "./schemas.yml#/components/schemas/ErrorMessage"
-      403:
-        description: Forbidden
-        content:
-          application/json:
-            schema:
-              $ref: "./schemas.yml#/components/schemas/ErrorMessage"
-      404:
-        description: Lecture id or assignment id not found.
-        content:
-          application/json:
-            schema:
-              $ref: "./schemas.yml#/components/schemas/ErrorMessage"
-      500:
-        description: Internal server error
-        content:
-          application/json:
-            schema:
-              $ref: "./schemas.yml#/components/schemas/ErrorMessage"
+
+versionControlPull:
   get:
     security:
       - hub_auth:
           - instructor
           - tutor
           - student
-    summary: "Get properties of an assignment"
+    summary: Pulls an assignment to the specified repo
     tags:
-      - "Assignments"
+      - Version Control
     parameters:
       - name: lect_id
         in: path
@@ -223,27 +100,23 @@ propertiesAssignment:
         schema:
           type: integer
           format: int64
+      - name: repo
+        in: path
+        description: The identifier of the repo
+        required: true
+        schema:
+          type: string
+          enum:
+            - "assignment"
+            - "release"
+            - "source"
     responses:
       200:
         description: OK
-        content:
-          application/json:
-            schema:
-              type: string
-      401:
-        description: Unautorized
-        content:
-          application/json:
-            schema:
-              $ref: "./schemas.yml#/components/schemas/ErrorMessage"
       403:
         description: Forbidden
-        content:
-          application/json:
-            schema:
-              $ref: "./schemas.yml#/components/schemas/ErrorMessage"
       404:
-        description: Lecture id or assignment id not found
+        description: Lecture id, assignment id or repo not found.
         content:
           application/json:
             schema:
@@ -255,16 +128,16 @@ propertiesAssignment:
             schema:
               $ref: "./schemas.yml#/components/schemas/ErrorMessage"
 
-
-propertiesSubmission:
+versionControlPush:
   put:
     security:
       - hub_auth:
           - instructor
           - tutor
-    summary: Set properties of a submission
+          - student
+    summary: Pushes an assignment to the specified repo
     tags:
-      - Submissions
+      - Version Control
     parameters:
       - name: lect_id
         in: path
@@ -282,38 +155,23 @@ propertiesSubmission:
         schema:
           type: integer
           format: int64
-      - name: s_id
+      - name: repo
         in: path
-        description: ID of the assignment in the submission
+        description: The identifier of the repo
         required: true
-        example: 3
         schema:
-          type: integer
-          format: int64
-    requestBody:
-      description: The properties of the submission that should be set.
-      required: true
-      content:
-        application/json:
-          schema:
-            type: string
+          type: string
+          enum:
+            - "assignment"
+            - "release"
+            - "source"
     responses:
       200:
         description: OK
-      401:
-        description: Unautorized
-        content:
-          application/json:
-            schema:
-              $ref: "./schemas.yml#/components/schemas/ErrorMessage"
       403:
         description: Forbidden
-        content:
-          application/json:
-            schema:
-              $ref: "./schemas.yml#/components/schemas/ErrorMessage"
       404:
-        description: Lecture id or assignment id not found.
+        description: Lecture id, assignment id or repo not found.
         content:
           application/json:
             schema:
@@ -324,15 +182,98 @@ propertiesSubmission:
           application/json:
             schema:
               $ref: "./schemas.yml#/components/schemas/ErrorMessage"
-  get:
+
+gitLog:
+  put:
     security:
       - hub_auth:
           - instructor
           - tutor
           - student
-    summary: "Get properties of a submission"
+    summary: Return git logs
     tags:
-      - "Submissions"
+      - Version Control
+    parameters:
+      - name: lect_id
+        in: path
+        description: ID of the lecture
+        required: true
+        example: 1
+        schema:
+          type: integer
+          format: int64
+      - name: a_id
+        in: path
+        description: ID of the assignment in the lecture
+        required: true
+        example: 2
+        schema:
+          type: integer
+          format: number
+      - name: repo
+        in: path
+        description: The identifier of the repo
+        required: true
+        schema:
+          type: string
+          enum:
+            - "assignment"
+            - "release"
+            - "source"
+      - name: n
+        in: query
+        description: Number of commits in log
+        required: false
+        schema:
+          type: integer
+          default: 10
+    responses:
+      200:
+        description: OK
+        content:
+          application/json:
+            schema:
+              type: "array"
+              items:
+                type: "object"
+                properties:
+                  commit:
+                    type: "string"
+                  autor:
+                    type: "string"
+                  date:
+                    type: "string"
+                  ref:
+                    type: "string"
+                  commit_msg:
+                    type: "string"
+                  pre_commit:
+                    type: "string"
+
+      403:
+        description: Forbidden
+      404:
+        description: Lecture id, assignment id or repo not found.
+        content:
+          application/json:
+            schema:
+              $ref: "./schemas.yml#/components/schemas/ErrorMessage"
+      500:
+        description: Internal server error
+        content:
+          application/json:
+            schema:
+              $ref: "./schemas.yml#/components/schemas/ErrorMessage"
+
+generate:
+  put:
+    security:
+      - hub_auth:
+          - instructor
+          - tutor
+    summary: Generates the release versions from the source repository
+    tags:
+      - Version Control
     parameters:
       - name: lect_id
         in: path
@@ -350,35 +291,77 @@ propertiesSubmission:
         schema:
           type: integer
           format: int64
-      - name: s_id
+    responses:
+      200:
+        description: OK
+      403:
+        description: Forbidden
+      404:
+        description: Lecture id, assignment id or repo not found.
+        content:
+          application/json:
+            schema:
+              $ref: "./schemas.yml#/components/schemas/ErrorMessage"
+      500:
+        description: Internal server error
+        content:
+          application/json:
+            schema:
+              $ref: "./schemas.yml#/components/schemas/ErrorMessage"
+
+remoteStatus:
+  put:
+    security:
+      - hub_auth:
+          - instructor
+          - tutor
+          - student
+    summary: Checks the remote status against local files
+    tags:
+      - Version Control
+    parameters:
+      - name: lect_id
         in: path
-        description: ID of the assignment in the submission
+        description: ID of the lecture
         required: true
-        example: 3
+        example: 1
         schema:
           type: integer
           format: int64
+      - name: a_id
+        in: path
+        description: ID of the assignment in the lecture
+        required: true
+        example: 2
+        schema:
+          type: integer
+          format: int64
+      - name: repo
+        in: path
+        description: The identifier of the repo
+        required: true
+        schema:
+          type: string
+          enum:
+            - "assignment"
+            - "release"
+            - "source"
     responses:
       200:
         description: OK
         content:
-          application/json:
+          text/plain:
             schema:
               type: string
-      401:
-        description: Unautorized
-        content:
-          application/json:
-            schema:
-              $ref: "./schemas.yml#/components/schemas/ErrorMessage"
+              enum:
+                - "up_to_date"
+                - "pull_needed"
+                - "push_needed"
+                - "divergent"
       403:
         description: Forbidden
-        content:
-          application/json:
-            schema:
-              $ref: "./schemas.yml#/components/schemas/ErrorMessage"
       404:
-        description: Lecture id or assignment id not found
+        description: Lecture id, assignment id or repo not found.
         content:
           application/json:
             schema:

@@ -3,23 +3,23 @@ info:
   title: Grader Extension API
   version: '0.1'
 servers:
-    - url: /services/mock
-      description: relative path to mock
+  - url: /services/mock
+    description: relative path to mock
 
 ###### Tags of API endpoints
 tags:
-- name: "Lectures"
-  description: "Available lectures"
-- name: "Assignments"
-  description: Assignments of a lecture
-- name: "Submissions"
-  description: View submissions of an assignment
-- name: "Grading"
-  description: Manage the grading and feedback of assignments (Instructor)
-- name: "Permissions"
-  description: Endpoint for security scopes of user
-- name: "Version Control"
-  description: Pulling and pushing assignments
+  - name: "Lectures"
+    description: "Available lectures"
+  - name: "Assignments"
+    description: Assignments of a lecture
+  - name: "Submissions"
+    description: View submissions of an assignment
+  - name: "Grading"
+    description: Manage the grading and feedback of assignments (Instructor)
+  - name: "Permissions"
+    description: Endpoint for security scopes of user
+  - name: "Version Control"
+    description: Working with git repositories
 
 paths:
   /lectures:
@@ -38,7 +38,7 @@ paths:
     $ref: './paths_shared.yml#/assignmentsById'
 
   /lectures/{lect_id}/assignments/{a_id}/submissions:
-    $ref: './paths_shared.yml#/submissions'
+    $ref: './paths_extension.yml#/submissions'
 
   /lectures/{lect_id}/assignments/{a_id}/submissions/{s_id}:
     $ref: './paths_shared.yml#/submissionsById'
@@ -56,11 +56,16 @@ paths:
     $ref: './paths_shared.yml#/permissions'
 
   /lectures/{lect_id}/assignments/{a_id}/pull/{repo}:
-    $ref: './paths_shared.yml#/versionControlPull'
+    $ref: './paths_extension.yml#/versionControlPull'
 
   /lectures/{lect_id}/assignments/{a_id}/push/{repo}:
-    $ref: './paths_shared.yml#/versionControlPush'
+    $ref: './paths_extension.yml#/versionControlPush'
 
+  /lectures/{lect_id}/assignments/{a_id}/log/{repo}:
+    $ref: './paths_extension.yml#/gitLog'
 
+  /lectures/{lect_id}/assignments/{a_id}/generate:
+    $ref: './paths_extension.yml#/generate'
 
-
+  /lectures/{lect_id}/assignments/{a_id}/remote-status/{repo}:
+    $ref: './paths_extension.yml#/remoteStatus'

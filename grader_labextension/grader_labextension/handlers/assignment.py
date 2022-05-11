@@ -138,7 +138,6 @@ class AssignmentObjectHandler(ExtensionBaseHandler):
         query_params = RequestService.get_query_string(
             {
                 "instructor-version": self.get_argument("instructor-version", None),
-                "metadata-only": self.get_argument("metadata-only", None),
             }
         )
 
