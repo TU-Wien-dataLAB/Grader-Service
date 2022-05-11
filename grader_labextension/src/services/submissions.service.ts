@@ -34,12 +34,12 @@ export async function pullFeedback(
 export function getSubmissions(
   lecture: Lecture,
   assignment: Assignment,
-  latest = false
+  filter: string = "none"
 ): Promise<Submission[]> {
   let url = `/lectures/${lecture.id}/assignments/${assignment.id}/submissions`;
-  if (latest) {
+  if (filter) {
     const searchParams = new URLSearchParams({
-      latest: String(latest)
+      filter: filter
     });
     url += '?' + searchParams;
   }
@@ -49,15 +49,15 @@ export function getSubmissions(
 export function getAllSubmissions(
   lecture: Lecture,
   assignment: Assignment,
-  latest = false,
+  filter: "none" | "latest" | "best" = "none",
   instructor = true
 ): Promise<Submission[]> {
   let url = `/lectures/${lecture.id}/assignments/${assignment.id}/submissions`;
 
-  if (latest || instructor) {
+  if (filter || instructor) {
     const searchParams = new URLSearchParams({
       'instructor-version': String(instructor),
-      latest: String(latest)
+      filter: filter
     });
     url += '?' + searchParams;
   }

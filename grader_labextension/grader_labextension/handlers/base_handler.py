@@ -3,6 +3,7 @@
 #
 # This source code is licensed under the BSD-style license found in the
 # LICENSE file in the root directory of this source tree.
+from typing import Optional, Awaitable
 
 from grader_labextension.services.request import RequestService
 from jupyter_server.base.handlers import APIHandler
@@ -27,6 +28,10 @@ class ExtensionBaseHandler(APIHandler):
     """
     BaseHandler for all server-extension handler
     """
+
+    def data_received(self, chunk: bytes) -> Optional[Awaitable[None]]:
+        pass
+
     request_service = RequestService()
     http_client = HTTPClient()
     # base_url = "/services/grader"
@@ -49,7 +54,7 @@ class ExtensionBaseHandler(APIHandler):
 
         return dict(Authorization="Token " + HandlerConfig.instance().hub_api_token)
 
-    async def get_lecture(self, lecture_id):
+    async def get_lecture(self, lecture_id) -> dict:
         try:
             lecture = await self.request_service.request(
                 "GET",

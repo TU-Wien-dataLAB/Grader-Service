@@ -3,12 +3,50 @@
 #
 # This source code is licensed under the BSD-style license found in the
 # LICENSE file in the root directory of this source tree.
-
+from grader_labextension import RequestService
 from grader_labextension.registry import register_handler
 from grader_labextension.handlers.base_handler import ExtensionBaseHandler
-from tornado.httpclient import HTTPError
+from tornado.httpclient import HTTPError, HTTPResponse
 from grader_labextension.services.git import GitService
 import os
+
+
+@register_handler(
+    path=r"\/lectures\/(?P<lecture_id>\d*)\/assignments\/(?P<assignment_id>\d*)\/submissions\/save?"
+)
+class ExportGradesHandler(ExtensionBaseHandler):
+    async def put(self, lecture_id: int, assignment_id: int):
+        query_params = RequestService.get_query_string(
+            {
+                "instructor-version": "true",
+                "filter": self.get_argument("filter", "none"),
+                "format": "csv"
+            }
+        )
+        try:
+            response: HTTPResponse = await self.request_service.request(
+                method="GET",
+                endpoint=f"{self.service_base_url}/lectures/{lecture_id}/assignments/{assignment_id}/submissions{query_params}",
+                header=self.grader_authentication_header,
+                decode_response=False
+            )
+        except HTTPError as e:
+            self.set_status(e.code)
+            self.write_error(e.code)
+            return
+
+        lecture = await self.get_lecture(lecture_id)
+        dir_path = os.path.join(self.root_dir, lecture["code"])
+        os.makedirs(dir_path, exist_ok=True)
+        csv_content = response.body.decode("utf-8")
+        file_path = os.path.join(dir_path, "submissions.csv")
+        with open(file_path, "w") as f:
+            f.write(csv_content)
+
+        self.write("OK")
+
+
+
 
 @register_handler(
     path=r"\/lectures\/(?P<lecture_id>\d*)\/assignments\/(?P<assignment_id>\d*)\/grading\/(?P<sub_id>\d*)\/auto\/?"
@@ -23,7 +61,7 @@ class GradingAutoHandler(ExtensionBaseHandler):
         :type assignment_id: int
         :param sub_id: id of the submission
         :type sub_id: int
-        """        
+        """
         try:
             response = await self.request_service.request(
                 method="GET",
@@ -50,7 +88,7 @@ class GradingManualHandler(ExtensionBaseHandler):
         :type assignment_id: int
         :param sub_id: id of the submission
         :type sub_id: int
-        """        
+        """
 
         try:
             lecture = await self.request_service.request(
@@ -113,7 +151,7 @@ class GenerateFeedbackHandler(ExtensionBaseHandler):
         :type assignment_id: int
         :param sub_id: id of the submission
         :type sub_id: int
-        """        
+        """
 
         try:
             response = await self.request_service.request(
@@ -141,7 +179,7 @@ class PullFeedbackHandler(ExtensionBaseHandler):
         :type assignment_id: int
         :param sub_id: id of the submission
         :type sub_id: int
-        """        
+        """
         try:
             lecture = await self.request_service.request(
                 "GET",

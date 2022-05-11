@@ -49,7 +49,7 @@ export const AssignmentComponent = (props: IAssignmentComponentProps) => {
   const [numAutoGraded, setNumAutoGraded] = React.useState(0);
   const [numManualGraded, setNumManualGraded] = React.useState(0);
   React.useEffect(() => {
-    getAllSubmissions(props.lecture, assignment, false, true).then(
+    getAllSubmissions(props.lecture, assignment, "none", true).then(
       response => {
         setAllSubmissions(response);
         let auto = 0;
@@ -70,7 +70,7 @@ export const AssignmentComponent = (props: IAssignmentComponentProps) => {
       }
     );
 
-    getAllSubmissions(props.lecture, assignment, true, true).then(response => {
+    getAllSubmissions(props.lecture, assignment, "latest", true).then(response => {
       setLatestSubmissions(response);
     });
 
