@@ -19,11 +19,5 @@
     "strictNullChecks": false,
     "target": "es2017",
     "types": []
-  },
-  "include": ["src/**/*.ts","src/**/*.tsx", "src/*", "src/**/*.tsx","src/**/**/*.tsx","src/**/**/**/*.tsx", "src/**/*.jsx", "src/**/*.jsx","src/**/**/*.jsx","src/**/**/**/*.jsx"],
-  "typedocOptions": {
-    "entryPointStrategy": "expand",
-    "entryPoints": ["src/"],
-    "out": "../docs/typedoc"
   }
 }
