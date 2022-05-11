@@ -16,7 +16,7 @@ import subprocess
 import sys
 import time
 from typing import Any, Awaitable, Callable, List, Optional
-from urllib.parse import ParseResult, urlparse
+from urllib.parse import ParseResult, urlparse, quote
 
 from traitlets import Type
 from traitlets.config import SingletonConfigurable
@@ -357,15 +357,15 @@ class GraderBaseHandler(SessionMixin, web.RequestHandler):
 
     def authenticate_cookie_user(self, user: dict) -> bool:
         max_age = self.application.max_user_cookie_age_days
-        cookie_user = self.get_secure_cookie(user["name"], max_age_days=max_age)
+        cookie_user = self.get_secure_cookie(quote(user["name"]), max_age_days=max_age)
         if not cookie_user:
-            self.set_secure_cookie(user["name"], json.dumps(user), expires_days=max_age)
+            self.set_secure_cookie(quote(user["name"]), json.dumps(user), expires_days=max_age)
             return False
         else:
             equal = user == json.loads(cookie_user)
             if not equal:
                 self.set_secure_cookie(
-                    user["name"], json.dumps(user), expires_days=max_age
+                    quote(user["name"]), json.dumps(user), expires_days=max_age
                 )
             return equal
 
