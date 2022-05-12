@@ -1,3 +1,9 @@
+# Copyright (c) 2022, TU Wien
+# All rights reserved.
+#
+# This source code is licensed under the BSD-style license found in the
+# LICENSE file in the root directory of this source tree.
+
 from datetime import datetime
 from re import sub
 import secrets
@@ -31,7 +37,7 @@ async def test_auto_grading(
     app.hub_api_url = http_server.url_for("")[0:-1]
 
     l_id = 3 # default user is student
-    a_id = 3
+    a_id = 4
 
     url = service_base_url + f"/lectures/{l_id}/assignments/{a_id}/grading/1/auto"
 
@@ -43,7 +49,7 @@ async def test_auto_grading(
         response = await http_server_client.fetch(
             url, method="GET", headers={"Authorization": f"Token {default_token}"}
         )
-        assert response.code == 200
+        assert response.code == 202
         submission = Submission.from_dict(json.loads(response.body.decode()))
         assert submission.id == 1
 
@@ -89,7 +95,7 @@ async def test_auto_grading_wrong_lecture(
     default_token,
     sql_alchemy_db,
 ):
-    default_user["groups"] = ["20wle2__instructor", "21wle1__instructor", "22wle1__instructor"]
+    default_user["groups"] = ["20wle2:instructor", "21wle1:instructor", "22wle1:instructor"]
     http_server = jupyter_hub_mock_server(default_user, default_token)
     app.hub_api_url = http_server.url_for("")[0:-1]
 
@@ -100,7 +106,8 @@ async def test_auto_grading_wrong_lecture(
     insert_assignments(engine, l_id)
     insert_submission(engine, a_id, default_user["name"])
 
-    l_id = 1  # default user now instructor -> passes authorization for handler
+    l_id = 99
+    # default user now instructor -> passes authorization for handler
     url = service_base_url + f"/lectures/{l_id}/assignments/{a_id}/grading/1/auto"
 
     with pytest.raises(HTTPClientError) as exc_info:
@@ -108,7 +115,7 @@ async def test_auto_grading_wrong_lecture(
             url, method="GET", headers={"Authorization": f"Token {default_token}"}
         )
     e = exc_info.value
-    assert e.code == 404
+    assert e.code == 403
 
 
 async def test_feedback(
@@ -124,7 +131,7 @@ async def test_feedback(
     app.hub_api_url = http_server.url_for("")[0:-1]
 
     l_id = 3 # default user is student
-    a_id = 3
+    a_id = 4
 
     url = service_base_url + f"/lectures/{l_id}/assignments/{a_id}/grading/1/feedback"
 
@@ -137,7 +144,7 @@ async def test_feedback(
             response = await http_server_client.fetch(
                 url, method="GET", headers={"Authorization": f"Token {default_token}"}
             )
-            assert response.code == 200
+            assert response.code == 202
             submission = Submission.from_dict(json.loads(response.body.decode()))
             assert submission.id == 1
 
@@ -173,33 +180,3 @@ async def test_feedback_wrong_assignment(
     e = exc_info.value
     assert e.code == 404
 
-
-async def test_feedback_wrong_lecture(
-    app: GraderServer,
-    service_base_url,
-    http_server_client,
-    jupyter_hub_mock_server,
-    default_user,
-    default_token,
-    sql_alchemy_db,
-):
-    default_user["groups"] = ["20wle2__instructor", "21wle1__instructor", "22wle1__instructor"]
-    http_server = jupyter_hub_mock_server(default_user, default_token)
-    app.hub_api_url = http_server.url_for("")[0:-1]
-
-    l_id = 3 # default user is student
-    a_id = 3
-
-    engine = sql_alchemy_db.engine
-    insert_assignments(engine, l_id)
-    insert_submission(engine, a_id, default_user["name"])
-
-    l_id = 1  # default user now instructor -> passes authorization for handler
-    url = service_base_url + f"/lectures/{l_id}/assignments/{a_id}/grading/1/feedback"
-
-    with pytest.raises(HTTPClientError) as exc_info:
-        await http_server_client.fetch(
-            url, method="GET", headers={"Authorization": f"Token {default_token}"}
-        )
-    e = exc_info.value
-    assert e.code == 404

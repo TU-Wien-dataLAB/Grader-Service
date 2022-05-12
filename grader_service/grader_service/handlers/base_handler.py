@@ -1,3 +1,9 @@
+# Copyright (c) 2022, TU Wien
+# All rights reserved.
+#
+# This source code is licensed under the BSD-style license found in the
+# LICENSE file in the root directory of this source tree.
+
 import base64
 import datetime
 import functools
@@ -10,7 +16,7 @@ import subprocess
 import sys
 import time
 from typing import Any, Awaitable, Callable, List, Optional
-from urllib.parse import ParseResult, urlparse
+from urllib.parse import ParseResult, urlparse, quote
 
 from traitlets import Type
 from traitlets.config import SingletonConfigurable
@@ -109,7 +115,6 @@ class GraderBaseHandler(SessionMixin, web.RequestHandler):
         ) = httputil.split_host_and_port(hub_api_parsed.netloc)
         self.hub_api_base_path: str = hub_api_parsed.path
 
-        self.has_auth = False
         self.log = self.application.log
 
     def overwrite_user_repository(self, tmp_path_base: str, tmp_path_release: str, tmp_path_user: str,
@@ -142,13 +147,16 @@ class GraderBaseHandler(SessionMixin, web.RequestHandler):
         pass
 
     async def prepare(self) -> Optional[Awaitable[None]]:
-        await self.authenticate_user()
+        if self.request.path.strip("/") != self.application.base_url.strip("/"):
+            await self.authenticate_user()
+        return super().prepare()
 
     def validate_parameters(self, *args):
         if len(self.request.arguments) == 0:
             return
-        if len(set(self.request.arguments.keys()) - set(self.request.body_arguments) - set(args)) != 0:
-            raise HTTPError(400, "Unknown arguments")
+        unknown_arguments = set(self.request.query_arguments.keys()) - set(args)
+        if len(unknown_arguments) != 0:
+            raise HTTPError(400, reason=f"Unknown arguments: {unknown_arguments}")
 
     def get_role(self, lecture_id: int) -> Role:
         role = self.session.query(Role).get((self.user.name, lecture_id))
@@ -177,12 +185,13 @@ class GraderBaseHandler(SessionMixin, web.RequestHandler):
         app: GraderServer = self.application
         return os.path.join(app.grader_service_dir, "git")
 
-    def construct_git_dir(self, repo_type: str, lecture: Lecture, assignment: Assignment) -> Optional[str]:
+    def construct_git_dir(self, repo_type: str, lecture: Lecture, assignment: Assignment,
+                          group_name: Optional[str] = None) -> Optional[str]:
         """Helper method for every handler that needs to access git directories which returns
         the path of the repository based on the inputs or None if the repo_type is not recognized.
         """
         assignment_path = os.path.abspath(
-            os.path.join(self.gitbase, lecture.code, assignment.name)
+            os.path.join(self.gitbase, lecture.code, str(assignment.id))
         )
         if repo_type == "source" or repo_type == "release":
             path = os.path.join(assignment_path, repo_type)
@@ -199,7 +208,9 @@ class GraderBaseHandler(SessionMixin, web.RequestHandler):
             user_path = os.path.join(assignment_path, repo_type)
             path = os.path.join(user_path, self.user.name)
         elif repo_type == "group":
-            group = self.session.query(Group).get((self.user.name, lecture.id))
+            if group_name is None:
+                return None
+            group = self.session.query(Group).get((group_name, lecture.id))
             if group is None:
                 raise HTTPError(404)
             group_path = os.path.join(assignment_path, repo_type)
@@ -208,6 +219,56 @@ class GraderBaseHandler(SessionMixin, web.RequestHandler):
             return None
 
         return path
+
+    @staticmethod
+    def is_base_git_dir(path: str) -> bool:
+        try:
+            out = subprocess.run(["git", "rev-parse", "--is-bare-repository"], cwd=path, capture_output=True)
+            is_git = out.returncode == 0 and "true" in out.stdout.decode("utf-8")
+        except FileNotFoundError:
+            is_git = False
+        return is_git
+
+    def duplicate_release_repo(self, repo_path_release: str, repo_path_user: str, assignment: Assignment, message: str,
+                               checkout_main: bool = False):
+        tmp_path_base = os.path.join(self.application.grader_service_dir, "tmp", assignment.lecture.code,
+                                     str(assignment.id), self.user.name)
+        # Deleting dir
+        if os.path.exists(tmp_path_base):
+            shutil.rmtree(tmp_path_base)
+
+        os.makedirs(tmp_path_base, exist_ok=True)
+        tmp_path_release = os.path.join(tmp_path_base, "release")
+        tmp_path_user = os.path.join(tmp_path_base, self.user.name)
+
+        self.log.info(f"Duplicating release repository {repo_path_release}")
+        self.log.info(f"Temporary path used for copying: {tmp_path_base}")
+
+        try:
+            self._run_command(f"git clone -b main '{repo_path_release}'", cwd=tmp_path_base)
+            if checkout_main:
+                self._run_command(f"git clone '{repo_path_user}'", cwd=tmp_path_base)
+                self._run_command(f"git checkout -b main", cwd=tmp_path_user)
+            else:
+                self._run_command(f"git clone -b main '{repo_path_user}'", cwd=tmp_path_base)
+
+            self.log.info(f"Copying repository contents from {tmp_path_release} to {tmp_path_user}")
+            ignore = shutil.ignore_patterns(".git", "__pycache__")
+            if sys.version_info.major == 3 and sys.version_info.minor >= 8:
+                shutil.copytree(tmp_path_release, tmp_path_user, ignore=ignore, dirs_exist_ok=True)
+            else:
+                for item in os.listdir(tmp_path_release):
+                    s = os.path.join(tmp_path_release, item)
+                    d = os.path.join(tmp_path_user, item)
+                    if os.path.isdir(s):
+                        shutil.copytree(s, d, ignore=ignore)
+                    else:
+                        shutil.copy2(s, d)
+
+            self._run_command(f'sh -c \'git add -A && git commit --allow-empty -m "{message}"\'', tmp_path_user)
+            self._run_command("git push -u origin main", tmp_path_user)
+        finally:
+            shutil.rmtree(tmp_path_base)
 
     def _run_command(self, command, cwd=None, capture_output=False):
         """Starts a sub process and runs an cmd command
@@ -242,10 +303,9 @@ class GraderBaseHandler(SessionMixin, web.RequestHandler):
         """
         token = self.get_request_token()
         if token is None:
-            self.write_error(403)
+            self.write_error(401)
             await self.finish()
             return
-            # raise HTTPError(403)
 
         start_time = time.monotonic()
 
@@ -255,7 +315,6 @@ class GraderBaseHandler(SessionMixin, web.RequestHandler):
             self.write_error(403)
             await self.finish()
             return
-            # raise HTTPError(403)
         self.set_secure_cookie(token, json.dumps(user), expires_days=self.application.max_token_cookie_age_days)
         self.log.info(
             f'User {user["name"]} has been authenticated (took {(time.monotonic() - start_time) * 1e3:.2f}ms)')
@@ -301,10 +360,7 @@ class GraderBaseHandler(SessionMixin, web.RequestHandler):
                     .one_or_none()
             )
             if lecture is None:
-                raise HTTPError(
-                    500,
-                    f"Could not find lecture with code: {lecture_code}. Inconsistent database state!",
-                )
+                raise HTTPError(500, f"Could not find lecture with code: {lecture_code}. Inconsistent database state!")
             role = Role()
             role.username = user["name"]
             role.lectid = lecture.id
@@ -325,26 +381,24 @@ class GraderBaseHandler(SessionMixin, web.RequestHandler):
 
     def authenticate_cookie_user(self, user: dict) -> bool:
         max_age = self.application.max_user_cookie_age_days
-        cookie_user = self.get_secure_cookie(user["name"], max_age_days=max_age)
+        cookie_user = self.get_secure_cookie(quote(user["name"]), max_age_days=max_age)
         if not cookie_user:
-            self.set_secure_cookie(user["name"], json.dumps(user), expires_days=max_age)
+            self.set_secure_cookie(quote(user["name"]), json.dumps(user), expires_days=max_age)
             return False
         else:
             equal = user == json.loads(cookie_user)
             if not equal:
                 self.set_secure_cookie(
-                    user["name"], json.dumps(user), expires_days=max_age
+                    quote(user["name"]), json.dumps(user), expires_days=max_age
                 )
             return equal
 
     def get_request_token(self) -> Optional[str]:
-        token = None
         for (k, v) in sorted(self.request.headers.get_all()):
             if k == "Authorization":
                 name, value = v.split(" ")
                 if name == "Token":
                     token = value
-                    self.has_auth = True
                 elif name == "Basic":
                     auth_decoded = base64.decodebytes(value.encode("ascii")).decode(
                         "ascii"
@@ -352,7 +406,6 @@ class GraderBaseHandler(SessionMixin, web.RequestHandler):
                     _, token = auth_decoded.split(
                         ":", 2
                     )  # we interpret the password as the token and ignore the username
-                    self.has_auth = True
                 else:
                     token = None
                 return token
@@ -361,8 +414,8 @@ class GraderBaseHandler(SessionMixin, web.RequestHandler):
         try:
             user: dict = await self.hub_request_service.request(
                 "GET",
-                self.hub_api_base_path + f"/authorizations/token/{token}",
-                header={"Authorization": f"token {self.application.hub_api_token}"},
+                self.hub_api_base_path + f"/user",
+                header={"Authorization": f"token {token}"},
             )
             if user["kind"] != "user":
                 return None
@@ -371,6 +424,8 @@ class GraderBaseHandler(SessionMixin, web.RequestHandler):
             return None
         except HTTPClientError as e:
             logging.getLogger(str(self.__class__)).error(e.response.error)
+            return None
+        except KeyError:
             return None
         return user
 
@@ -381,8 +436,6 @@ class GraderBaseHandler(SessionMixin, web.RequestHandler):
 
     def write_error(self, status_code: int, **kwargs) -> None:
         self.clear()
-        if status_code == 403 and not self.has_auth:
-            status_code = 401
         self.set_status(status_code)
         _, e, _ = kwargs.get("exc_info", (None, None, None))
         if e and isinstance(e, HTTPError) and e.reason:

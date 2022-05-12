@@ -1,3 +1,9 @@
+# Copyright (c) 2022, TU Wien
+# All rights reserved.
+#
+# This source code is licensed under the BSD-style license found in the
+# LICENSE file in the root directory of this source tree.
+
 """initial
 
 Revision ID: a1791b1371ed
@@ -57,14 +63,21 @@ def upgrade():
                     sa.ForeignKeyConstraint(['username'], ['user.name'], ),
                     sa.PrimaryKeyConstraint('username', 'lectid')
                     )
+
     op.create_table('group',
-                    sa.Column('username', sa.String(length=255), nullable=False),
-                    sa.Column('lectid', sa.Integer(), nullable=False),
                     sa.Column('name', sa.String(length=255), nullable=False),
+                    sa.Column('lectid', sa.Integer(), nullable=False),
                     sa.ForeignKeyConstraint(['lectid'], ['lecture.id'], ),
-                    sa.ForeignKeyConstraint(['username'], ['user.name'], ),
-                    sa.PrimaryKeyConstraint('username', 'lectid')
+                    sa.PrimaryKeyConstraint('name','lectid')
                     )
+    op.create_table('partof',
+                    sa.Column('username', sa.String(length=255), nullable=False),
+                    sa.Column('groupname', sa.String(length=255), nullable=False),
+                    sa.ForeignKeyConstraint(['groupname'], ['group.name'], ),
+                    sa.ForeignKeyConstraint(['username'], ['user.name'], ),
+                    sa.PrimaryKeyConstraint('username', 'groupname')
+                    )
+
     op.create_table('submission',
                     sa.Column('id', sa.Integer(), autoincrement=True, nullable=False),
                     sa.Column('date', sa.DateTime(), nullable=True),
@@ -91,7 +104,8 @@ def downgrade():
     op.drop_table('submission')
     op.drop_table('takepart')
     op.drop_table('assignment')
-    op.drop_table('user')
-    op.drop_table('lecture')
+    op.drop_table('partof')
     op.drop_table('group')
+    op.drop_table('lecture')
+    op.drop_table('user')
     # ### end Alembic commands ###

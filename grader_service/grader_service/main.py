@@ -1,3 +1,9 @@
+# Copyright (c) 2022, TU Wien
+# All rights reserved.
+#
+# This source code is licensed under the BSD-style license found in the
+# LICENSE file in the root directory of this source tree.
+
 import asyncio
 import logging
 import os
@@ -56,6 +62,8 @@ class GraderService(config.Application):
     config_file = Unicode(
         "grader_service_config.py", help="The config file to load"
     ).tag(config=True)
+
+    base_url_path = Unicode("/services/grader", allow_none=False).tag(config=True)
 
     @validate("config_file")
     def _validate_config_file(self, proposal):
@@ -174,11 +182,12 @@ class GraderService(config.Application):
         GraderExecutor.config = self.config
         RequestHandlerConfig.config = self.config
 
-        handlers = HandlerPathRegistry.handler_list()
+        handlers = HandlerPathRegistry.handler_list(self.base_url_path)
         # start the webserver
         self.http_server: HTTPServer = HTTPServer(
             GraderServer(
                 grader_service_dir=self.grader_service_dir,
+                base_url=self.base_url_path,
                 handlers=handlers,
                 cookie_secret=secrets.token_hex(
                     nbytes=32

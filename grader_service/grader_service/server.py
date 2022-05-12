@@ -1,3 +1,9 @@
+# Copyright (c) 2022, TU Wien
+# All rights reserved.
+#
+# This source code is licensed under the BSD-style license found in the
+# LICENSE file in the root directory of this source tree.
+
 import os
 from tornado import web
 from traitlets import config
@@ -28,9 +34,10 @@ class GraderServer(config.LoggingConfigurable, web.Application):
         10, help="Time in minutes until a token cookie expires."
     ).tag(config=True)
 
-    def __init__(self, grader_service_dir: str, **kwargs):
+    def __init__(self, grader_service_dir: str, base_url: str, **kwargs):
         super().__init__(**kwargs)
         self.grader_service_dir = grader_service_dir
+        self.base_url = base_url
 
         self.log.info(f"hub_service_name - { self.hub_service_name }")
         self.log.info(f"hub_api_token - {self.hub_api_token}")

@@ -1,3 +1,9 @@
+# Copyright (c) 2022, TU Wien
+# All rights reserved.
+#
+# This source code is licensed under the BSD-style license found in the
+# LICENSE file in the root directory of this source tree.
+
 import pytest
 from grader_service.server import GraderServer
 import json
@@ -62,7 +68,7 @@ async def test_post_lectures(
     default_user,
     default_token,
 ):
-    default_user["groups"] = ["pt__instructor"]  # user has to already be in group (we only activate on post)
+    default_user["groups"] = ["pt:instructor"]  # user has to already be in group (we only activate on post)
     http_server = jupyter_hub_mock_server(default_user, default_token)
     app.hub_api_url = http_server.url_for("")[0:-1]
 
@@ -73,7 +79,7 @@ async def test_post_lectures(
     assert get_response.code == 200
     lectures = json.loads(get_response.body.decode())
     assert isinstance(lectures, list)
-    assert len(lectures) == 0
+    assert len(lectures) == 1
     orig_len = len(lectures)
 
     # same code as in group of user
@@ -86,7 +92,7 @@ async def test_post_lectures(
         headers={"Authorization": f"Token {default_token}"},
         body=json.dumps(pre_lecture.to_dict()),
     )
-    assert post_response.code == 200
+    assert post_response.code == 201
     post_lecture = Lecture.from_dict(json.loads(post_response.body.decode()))
     assert post_lecture.id != pre_lecture.id
     assert post_lecture.name == pre_lecture.name
@@ -98,7 +104,7 @@ async def test_post_lectures(
     )
     assert get_response.code == 200
     lectures = json.loads(get_response.body.decode())
-    assert len(lectures) == orig_len + 1
+    assert len(lectures) == orig_len
 
 
 async def test_post_not_found(
@@ -135,7 +141,7 @@ async def test_post_unknown_parameter(
     default_user,
     default_token,
 ):
-    default_user["groups"] = ["pt__instructor"]  # user has to already be in group (we only activate on post)
+    default_user["groups"] = ["pt:instructor"]  # user has to already be in group (we only activate on post)
     http_server = jupyter_hub_mock_server(default_user, default_token)
     app.hub_api_url = http_server.url_for("")[0:-1]
 
@@ -400,7 +406,7 @@ async def test_delete_lecture_assignment_complete(
         headers={"Authorization": f"Token {default_token}"},
         body=json.dumps(pre_assignment.to_dict()),
     )
-    assert post_response.code == 200
+    assert post_response.code == 201
 
     url = service_base_url + f"/lectures/{l_id}"
     with pytest.raises(HTTPClientError) as exc_info:

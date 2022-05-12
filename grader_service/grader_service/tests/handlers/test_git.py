@@ -1,3 +1,9 @@
+# Copyright (c) 2022, TU Wien
+# All rights reserved.
+#
+# This source code is licensed under the BSD-style license found in the
+# LICENSE file in the root directory of this source tree.
+
 from grader_service.orm.assignment import Assignment
 from grader_service.orm.group import Group
 from grader_service.orm.submission import Submission
@@ -12,7 +18,7 @@ import os
 
 
 def get_query_side_effect(lid=1, code="ivs21s", a_type="user", scope=Scope.student, group="test_group",
-                          username="test_user", a_name="assign_1"):
+                          username="test_user", a_id=1):
     def query_side_effect(input):
         m = Mock()
         if input is Lecture:
@@ -22,7 +28,7 @@ def get_query_side_effect(lid=1, code="ivs21s", a_type="user", scope=Scope.stude
             m.filter.return_value.one.return_value = lecture
         elif input is Assignment:
             assignment = Assignment()
-            assignment.name = a_name
+            assignment.id = a_id
             assignment.type = a_type
             m.filter.return_value.one.return_value = assignment
         elif input is Role:
@@ -45,7 +51,7 @@ def get_query_side_effect(lid=1, code="ivs21s", a_type="user", scope=Scope.stude
 
 
 def test_git_lookup_student(tmpdir):
-    path = "services/grader/git/iv21s/assign_1/assignment"
+    path = "services/grader/git/iv21s/1/assignment"
     git_dir = str(tmpdir.mkdir("git"))
 
     handler_mock = Mock()
@@ -68,39 +74,11 @@ def test_git_lookup_student(tmpdir):
     assert os.path.exists(os.path.join(lookup_dir, "HEAD"))  # is git dir
     common_path = os.path.commonpath([git_dir, lookup_dir])
     created_paths = os.path.relpath(lookup_dir, common_path)
-    assert created_paths == "iv21s/assign_1/user/test_user"
-
-
-def test_git_lookup_group(tmpdir):
-    path = "services/grader/git/iv21s/assign_1/assignment"
-    git_dir = str(tmpdir.mkdir("git"))
-
-    handler_mock = Mock()
-    handler_mock.request.path = path
-    handler_mock.gitbase = git_dir
-    handler_mock.user.name = "test_user"
-    # handler_mock.session = session
-
-    # orm mocks
-    sf = get_query_side_effect(code="iv21s", a_type="group", scope=Scope.student, group="test_group")
-    handler_mock.session.query = Mock(side_effect=sf)
-
-    constructed_git_dir = GitBaseHandler.construct_git_dir(handler_mock, repo_type="group",
-                                                           lecture=sf(Lecture).filter().one(),
-                                                           assignment=sf(Assignment).filter().one())
-    handler_mock.construct_git_dir = Mock(return_value=constructed_git_dir)
-
-    lookup_dir = GitBaseHandler.gitlookup(handler_mock, "send-pack")
-
-    assert os.path.exists(lookup_dir)
-    assert os.path.exists(os.path.join(lookup_dir, "HEAD"))  # is git dir
-    common_path = os.path.commonpath([git_dir, lookup_dir])
-    created_paths = os.path.relpath(lookup_dir, common_path)
-    assert created_paths == "iv21s/assign_1/group/test_group"
+    assert created_paths == "iv21s/1/user/test_user"
 
 
 def test_git_lookup_instructor(tmpdir):
-    path = "services/grader/git/iv21s/assign_1/source"
+    path = "services/grader/git/iv21s/1/source"
     git_dir = str(tmpdir.mkdir("git"))
 
     handler_mock = Mock()
@@ -123,11 +101,11 @@ def test_git_lookup_instructor(tmpdir):
     assert os.path.exists(os.path.join(lookup_dir, "HEAD"))  # is git dir
     common_path = os.path.commonpath([git_dir, lookup_dir])
     created_paths = os.path.relpath(lookup_dir, common_path)
-    assert created_paths == "iv21s/assign_1/source"
+    assert created_paths == "iv21s/1/source"
 
 
 def test_git_lookup_release_pull_instructor(tmpdir):
-    path = "services/grader/git/iv21s/assign_1/release"
+    path = "services/grader/git/iv21s/1/release"
     git_dir = str(tmpdir.mkdir("git"))
 
     handler_mock = Mock()
@@ -150,7 +128,7 @@ def test_git_lookup_release_pull_instructor(tmpdir):
     assert os.path.exists(os.path.join(lookup_dir, "HEAD"))  # is git dir
     common_path = os.path.commonpath([git_dir, lookup_dir])
     created_paths = os.path.relpath(lookup_dir, common_path)
-    assert created_paths == "iv21s/assign_1/release"
+    assert created_paths == "iv21s/1/release"
 
 
 def test_git_lookup_release_push_student_error(tmpdir):
@@ -290,7 +268,7 @@ def test_git_lookup_push_feedback_student_error():
 
 
 def test_git_lookup_pull_autograde_instructor(tmpdir):
-    path = "services/grader/git/iv21s/assign_1/autograde"
+    path = "services/grader/git/iv21s/1/autograde"
     git_dir = str(tmpdir.mkdir("git"))
 
     handler_mock = Mock()
@@ -312,7 +290,7 @@ def test_git_lookup_pull_autograde_instructor(tmpdir):
     assert os.path.exists(os.path.join(lookup_dir, "HEAD"))  # is git dir
     common_path = os.path.commonpath([git_dir, lookup_dir])
     created_paths = os.path.relpath(lookup_dir, common_path)
-    assert created_paths == "iv21s/assign_1/autograde/user/test_user"
+    assert created_paths == "iv21s/1/autograde/user/test_user"
 
 
 def test_git_lookup_pull_autograde_student_error():
@@ -335,7 +313,7 @@ def test_git_lookup_pull_autograde_student_error():
 
 
 def test_git_lookup_pull_feedback_instructor(tmpdir):
-    path = "services/grader/git/iv21s/assign_1/feedback"
+    path = "services/grader/git/iv21s/1/feedback"
     git_dir = str(tmpdir.mkdir("git"))
 
     handler_mock = Mock()
@@ -357,11 +335,11 @@ def test_git_lookup_pull_feedback_instructor(tmpdir):
     assert os.path.exists(os.path.join(lookup_dir, "HEAD"))  # is git dir
     common_path = os.path.commonpath([git_dir, lookup_dir])
     created_paths = os.path.relpath(lookup_dir, common_path)
-    assert created_paths == "iv21s/assign_1/feedback/user/test_user"
+    assert created_paths == "iv21s/1/feedback/user/test_user"
 
 
 def test_git_lookup_pull_feedback_student_with_valid_id(tmpdir):
-    path = "services/grader/git/iv21s/assign_1/feedback/1"
+    path = "services/grader/git/iv21s/1/feedback/1"
     git_dir = str(tmpdir.mkdir("git"))
 
     handler_mock = Mock()
@@ -383,11 +361,11 @@ def test_git_lookup_pull_feedback_student_with_valid_id(tmpdir):
     assert os.path.exists(os.path.join(lookup_dir, "HEAD"))  # is git dir
     common_path = os.path.commonpath([git_dir, lookup_dir])
     created_paths = os.path.relpath(lookup_dir, common_path)
-    assert created_paths == "iv21s/assign_1/feedback/user/test_user"
+    assert created_paths == "iv21s/1/feedback/user/test_user"
 
 
 def test_git_lookup_pull_feedback_student_with_valid_id_extra(tmpdir):
-    path = "services/grader/git/iv21s/assign_1/feedback/1/info/refs&service=git-upload-pack"
+    path = "services/grader/git/iv21s/1/feedback/1/info/refs&service=git-upload-pack"
     git_dir = str(tmpdir.mkdir("git"))
 
     handler_mock = Mock()
@@ -409,7 +387,7 @@ def test_git_lookup_pull_feedback_student_with_valid_id_extra(tmpdir):
     assert os.path.exists(os.path.join(lookup_dir, "HEAD"))  # is git dir
     common_path = os.path.commonpath([git_dir, lookup_dir])
     created_paths = os.path.relpath(lookup_dir, common_path)
-    assert created_paths == "iv21s/assign_1/feedback/user/test_user"
+    assert created_paths == "iv21s/1/feedback/user/test_user"
 
 
 def test_git_lookup_pull_feedback_student_with_invalid_id_error():

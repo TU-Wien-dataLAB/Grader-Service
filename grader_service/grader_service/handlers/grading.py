@@ -1,6 +1,8 @@
-from typing import Any
-
-from traitlets import Type
+# Copyright (c) 2022, TU Wien
+# All rights reserved.
+#
+# This source code is licensed under the BSD-style license found in the
+# LICENSE file in the root directory of this source tree.
 
 from grader_service.autograding.local_feedback import GenerateFeedbackExecutor
 from grader_service.autograding.grader_executor import GraderExecutor
@@ -48,6 +50,7 @@ class GradingAutoHandler(GraderBaseHandler):
             lambda: self.log.info(f"Autograding task of submission {submission.id} exited!")
         )
         submission = self.session.query(Submission).get(sub_id)
+        self.set_status(202)
         self.write_json(submission)
 
 
@@ -83,4 +86,5 @@ class GenerateFeedbackHandler(GraderBaseHandler):
             lambda: self.log.info(f"Successfully generated feedback for submission {submission.id}!")
         )
         submission = self.session.query(Submission).get(sub_id)
+        self.set_status(202)
         self.write_json(submission)

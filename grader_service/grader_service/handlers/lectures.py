@@ -1,3 +1,9 @@
+# Copyright (c) 2022, TU Wien
+# All rights reserved.
+#
+# This source code is licensed under the BSD-style license found in the
+# LICENSE file in the root directory of this source tree.
+
 import tornado
 from grader_service.api.models.lecture import Lecture as LectureModel
 from grader_service.orm.base import DeleteState
@@ -17,7 +23,7 @@ class LectureBaseHandler(GraderBaseHandler):
     async def get(self):
         """Returns all lectures the user can access
         """
-        self.validate_parameters()
+        self.validate_parameters("complete")
         complete = self.get_argument("complete", "false") == "true"
 
         state = LectureState.complete if complete else LectureState.active
@@ -68,6 +74,7 @@ class LectureBaseHandler(GraderBaseHandler):
             raise HTTPError(404)
         except MultipleResultsFound:
             raise HTTPError(400)
+        self.set_status(201)
         self.write_json(lecture)
 
 

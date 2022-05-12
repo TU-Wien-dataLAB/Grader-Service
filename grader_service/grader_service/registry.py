@@ -1,3 +1,9 @@
+# Copyright (c) 2022, TU Wien
+# All rights reserved.
+#
+# This source code is licensed under the BSD-style license found in the
+# LICENSE file in the root directory of this source tree.
+
 import enum
 from typing import List, Set, Tuple
 
@@ -15,16 +21,6 @@ class Singleton(type):
 
 class HandlerPathRegistry(object, metaclass=Singleton):
     registry = {}
-
-    @property
-    @staticmethod
-    def path_set() -> Set[str]:
-        return set(HandlerPathRegistry.registry.values())
-
-    @property
-    @staticmethod
-    def path_list() -> List[str]:
-        return list(HandlerPathRegistry.registry.values())
 
     @staticmethod
     def handler_list(

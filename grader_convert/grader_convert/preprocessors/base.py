@@ -1,0 +1,27 @@
+# Copyright (c) 2022, TU Wien
+# All rights reserved.
+#
+# This source code is licensed under the BSD-style license found in the
+# LICENSE file in the root directory of this source tree.
+
+from nbconvert.preprocessors import Preprocessor
+from traitlets import Bool, List, Unicode
+
+
+class NbGraderPreprocessor(Preprocessor):
+
+    default_language = Unicode("ipython")
+    display_data_priority = List(
+        [
+            "text/html",
+            "application/pdf",
+            "text/latex",
+            "image/svg+xml",
+            "image/png",
+            "image/jpeg",
+            "text/plain",
+        ]
+    )
+    enabled = Bool(
+        True, help="Whether to use this preprocessor when running nbgrader"
+    ).tag(config=True)

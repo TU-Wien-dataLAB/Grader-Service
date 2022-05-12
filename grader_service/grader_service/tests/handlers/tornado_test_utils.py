@@ -1,3 +1,9 @@
+# Copyright (c) 2022, TU Wien
+# All rights reserved.
+#
+# This source code is licensed under the BSD-style license found in the
+# LICENSE file in the root directory of this source tree.
+
 import os
 from re import S
 import pytest
@@ -61,7 +67,7 @@ def service_base_url():
 @pytest.fixture(scope="function")
 def jupyter_hub_mock_server(httpserver):
     def for_user(login_user: dict, token: str):
-        httpserver.expect_request(f"/authorizations/token/{token}").respond_with_json(
+        httpserver.expect_request(f"/user").respond_with_json(
             login_user
         )
         return httpserver
@@ -74,11 +80,11 @@ def default_user():
         "kind": "user",
         "name": "ubuntu",
         "admin": False,
-        "groups": ["20wle2__instructor", "21wle1__student", "22wle1__instructor"],
+        "groups": ["20wle2:instructor", "21wle1:student", "22wle1:instructor"],
     }
     yield user
 
 @pytest.fixture(scope="function")
 def default_token():
-    token = "some_token"
+    token = "token"
     yield token

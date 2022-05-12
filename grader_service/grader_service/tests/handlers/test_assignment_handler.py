@@ -1,3 +1,9 @@
+# Copyright (c) 2022, TU Wien
+# All rights reserved.
+#
+# This source code is licensed under the BSD-style license found in the
+# LICENSE file in the root directory of this source tree.
+
 import pytest
 from grader_service.server import GraderServer
 import json
@@ -119,7 +125,7 @@ async def test_post_assignment(
         headers={"Authorization": f"Token {default_token}"},
         body=json.dumps(pre_assignment.to_dict()),
     )
-    assert post_response.code == 200
+    assert post_response.code == 201
     post_assignment = Assignment.from_dict(json.loads(post_response.body.decode()))
     assert post_assignment.id != pre_assignment.id
     assert post_assignment.name == pre_assignment.name
@@ -274,7 +280,7 @@ async def test_put_assignment(
         headers={"Authorization": f"Token {default_token}"},
         body=json.dumps(pre_assignment.to_dict()),
     )
-    assert post_response.code == 200
+    assert post_response.code == 201
     post_assignment = Assignment.from_dict(json.loads(post_response.body.decode()))
 
     post_assignment.name = "new name"
@@ -306,7 +312,7 @@ async def test_put_assignment_wrong_lecture_id(
         default_token,
 ):
     # default user becomes instructor in lecture with id 1
-    default_user["groups"] = ["20wle2__instructor", "21wle1__instructor", "22wle1__instructor"]
+    default_user["groups"] = ["20wle2:instructor", "21wle1:instructor", "22wle1:instructor"]
     http_server = jupyter_hub_mock_server(default_user, default_token)
     app.hub_api_url = http_server.url_for("")[0:-1]
     url = service_base_url + "/lectures/3/assignments/"
@@ -318,7 +324,7 @@ async def test_put_assignment_wrong_lecture_id(
         headers={"Authorization": f"Token {default_token}"},
         body=json.dumps(pre_assignment.to_dict()),
     )
-    assert post_response.code == 200
+    assert post_response.code == 201
     post_assignment = Assignment.from_dict(json.loads(post_response.body.decode()))
 
     # now with lecture id 1
@@ -354,7 +360,7 @@ async def test_put_assignment_wrong_assignment_id(
         headers={"Authorization": f"Token {default_token}"},
         body=json.dumps(pre_assignment.to_dict()),
     )
-    assert post_response.code == 200
+    assert post_response.code == 201
     post_assignment = Assignment.from_dict(json.loads(post_response.body.decode()))
 
     url = url + "99"
@@ -388,7 +394,7 @@ async def test_put_assignment_deleted_assignment(
         headers={"Authorization": f"Token {default_token}"},
         body=json.dumps(pre_assignment.to_dict()),
     )
-    assert post_response.code == 200
+    assert post_response.code == 201
     post_assignment = Assignment.from_dict(json.loads(post_response.body.decode()))
 
     url = url + str(post_assignment.id)
@@ -430,7 +436,7 @@ async def test_put_assignment_no_point_changes(
         headers={"Authorization": f"Token {default_token}"},
         body=json.dumps(pre_assignment.to_dict()),
     )
-    assert post_response.code == 200
+    assert post_response.code == 201
     post_assignment = Assignment.from_dict(json.loads(post_response.body.decode()))
 
     post_assignment.name = "new name"
@@ -474,7 +480,7 @@ async def test_get_assignment(
         headers={"Authorization": f"Token {default_token}"},
         body=json.dumps(pre_assignment.to_dict()),
     )
-    assert post_response.code == 200
+    assert post_response.code == 201
     post_assignment = Assignment.from_dict(json.loads(post_response.body.decode()))
 
     url = url + str(post_assignment.id)
@@ -505,7 +511,7 @@ async def test_get_assignment_created_student(
     http_server = jupyter_hub_mock_server(default_user, default_token)
     app.hub_api_url = http_server.url_for("")[0:-1]
     l_id = 1  # default user is student
-    a_id = 2  # assignment is created
+    a_id = 3  # assignment is created
     url = service_base_url + f"/lectures/{l_id}/assignments/{a_id}"
 
     with pytest.raises(HTTPClientError) as exc_info:
@@ -537,7 +543,7 @@ async def test_get_assignment_wrong_lecture_id(
         headers={"Authorization": f"Token {default_token}"},
         body=json.dumps(pre_assignment.to_dict()),
     )
-    assert post_response.code == 200
+    assert post_response.code == 201
     post_assignment = Assignment.from_dict(json.loads(post_response.body.decode()))
 
     l_id = 1
@@ -572,7 +578,7 @@ async def test_get_assignment_wrong_assignment_id(
         headers={"Authorization": f"Token {default_token}"},
         body=json.dumps(pre_assignment.to_dict()),
     )
-    assert post_response.code == 200
+    assert post_response.code == 201
 
     url = service_base_url + f"/lectures/{l_id}/assignments/99"
 
@@ -626,7 +632,7 @@ async def test_get_assignment_instructor_version(
     app.hub_api_url = http_server.url_for("")[0:-1]
 
     l_id = 3
-    url = service_base_url + f"/lectures/{l_id}/assignments/3/?instructor-version=true"
+    url = service_base_url + f"/lectures/{l_id}/assignments/4/?instructor-version=true"
 
     engine = sql_alchemy_db.engine
     insert_assignments(engine, 3)
@@ -683,7 +689,7 @@ async def test_delete_assignment(
         headers={"Authorization": f"Token {default_token}"},
         body=json.dumps(pre_assignment.to_dict()),
     )
-    assert post_response.code == 200
+    assert post_response.code == 201
     post_assignment = Assignment.from_dict(json.loads(post_response.body.decode()))
 
     url = url + str(post_assignment.id)
@@ -725,7 +731,7 @@ async def test_delete_assignment_deleted_assignment(
         headers={"Authorization": f"Token {default_token}"},
         body=json.dumps(pre_assignment.to_dict()),
     )
-    assert post_response.code == 200
+    assert post_response.code == 201
     post_assignment = Assignment.from_dict(json.loads(post_response.body.decode()))
 
     url = url + str(post_assignment.id)
@@ -817,7 +823,7 @@ async def test_delete_assignment_same_name_twice(
         headers={"Authorization": f"Token {default_token}"},
         body=json.dumps(pre_assignment.to_dict()),
     )
-    assert post_response.code == 200
+    assert post_response.code == 201
     post_assignment = Assignment.from_dict(json.loads(post_response.body.decode()))
 
     url = url + str(post_assignment.id)
@@ -837,7 +843,7 @@ async def test_delete_assignment_same_name_twice(
         headers={"Authorization": f"Token {default_token}"},
         body=json.dumps(pre_assignment.to_dict()),
     )
-    assert post_response.code == 200
+    assert post_response.code == 201
     post_assignment = Assignment.from_dict(json.loads(post_response.body.decode()))
 
     url = url + str(post_assignment.id)
@@ -869,7 +875,7 @@ async def test_delete_released_assignment(
         headers={"Authorization": f"Token {default_token}"},
         body=json.dumps(pre_assignment.to_dict()),
     )
-    assert post_response.code == 200
+    assert post_response.code == 201
     post_assignment = Assignment.from_dict(json.loads(post_response.body.decode()))
 
     url = url + str(post_assignment.id)
@@ -903,7 +909,7 @@ async def test_delete_complete_assignment(
         headers={"Authorization": f"Token {default_token}"},
         body=json.dumps(pre_assignment.to_dict()),
     )
-    assert post_response.code == 200
+    assert post_response.code == 201
     post_assignment = Assignment.from_dict(json.loads(post_response.body.decode()))
 
     url = url + str(post_assignment.id)
@@ -937,7 +943,7 @@ async def test_assignment_properties(
         headers={"Authorization": f"Token {default_token}"},
         body=json.dumps(pre_assignment.to_dict()),
     )
-    assert post_response.code == 200
+    assert post_response.code == 201
     post_assignment = Assignment.from_dict(json.loads(post_response.body.decode()))
 
     url = service_base_url + f"/lectures/3/assignments/{post_assignment.id}/properties"
