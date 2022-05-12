@@ -25,7 +25,10 @@ import { blue } from '@mui/material/colors';
 import { getFiles } from '../../services/file.service';
 import { openBrowser } from './overview-view/util';
 
-interface IAssignmentComponentProps {
+/**
+ * Props for AssignmentComponent.
+ */
+export interface IAssignmentComponentProps {
   lecture: Lecture;
   assignment: Assignment;
   root: HTMLElement;
@@ -34,6 +37,11 @@ interface IAssignmentComponentProps {
   onDeleted: () => void;
 }
 
+/**
+ * Renders an assignment card which opens onclick the assignment modal.
+ * @param props Props of assignment functional component
+ * @constructor
+ */
 export const AssignmentComponent = (props: IAssignmentComponentProps) => {
   const [assignment, setAssignment] = React.useState(props.assignment);
   const [displaySubmissions, setDisplaySubmissions] = React.useState(false);
@@ -49,7 +57,7 @@ export const AssignmentComponent = (props: IAssignmentComponentProps) => {
   const [numAutoGraded, setNumAutoGraded] = React.useState(0);
   const [numManualGraded, setNumManualGraded] = React.useState(0);
   React.useEffect(() => {
-    getAllSubmissions(props.lecture, assignment, "none", true).then(
+    getAllSubmissions(props.lecture, assignment, 'none', true).then(
       response => {
         setAllSubmissions(response);
         let auto = 0;
@@ -70,9 +78,11 @@ export const AssignmentComponent = (props: IAssignmentComponentProps) => {
       }
     );
 
-    getAllSubmissions(props.lecture, assignment, "latest", true).then(response => {
-      setLatestSubmissions(response);
-    });
+    getAllSubmissions(props.lecture, assignment, 'latest', true).then(
+      response => {
+        setLatestSubmissions(response);
+      }
+    );
 
     getFiles(`source/${props.lecture.code}/${assignment.id}`).then(files => {
       setFiles(files);
@@ -80,9 +90,9 @@ export const AssignmentComponent = (props: IAssignmentComponentProps) => {
   }, [assignment]);
 
   return (
-    <Box sx={{height: "100%"}}>
+    <Box sx={{ height: '100%' }}>
       <Card
-        sx={{ maxWidth: 225, minWidth: 225, height: "100%", m: 1.5 }}
+        sx={{ maxWidth: 225, minWidth: 225, height: '100%', m: 1.5 }}
         onClick={async () => {
           await openBrowser(
             `source/${props.lecture.code}/${assignment.id}`,
@@ -91,8 +101,10 @@ export const AssignmentComponent = (props: IAssignmentComponentProps) => {
           setDisplaySubmissions(true);
         }}
       >
-        <CardActionArea sx={{height: "100%", display: "flex", flexDirection: "column"}}>
-          <CardContent sx={{flexGrow: 1}}>
+        <CardActionArea
+          sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}
+        >
+          <CardContent sx={{ flexGrow: 1 }}>
             <Typography variant="h5" component="div">
               {assignment.name}
             </Typography>
