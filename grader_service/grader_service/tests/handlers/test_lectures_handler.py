@@ -92,7 +92,7 @@ async def test_post_lectures(
         headers={"Authorization": f"Token {default_token}"},
         body=json.dumps(pre_lecture.to_dict()),
     )
-    assert post_response.code == 200
+    assert post_response.code == 201
     post_lecture = Lecture.from_dict(json.loads(post_response.body.decode()))
     assert post_lecture.id != pre_lecture.id
     assert post_lecture.name == pre_lecture.name
@@ -406,7 +406,7 @@ async def test_delete_lecture_assignment_complete(
         headers={"Authorization": f"Token {default_token}"},
         body=json.dumps(pre_assignment.to_dict()),
     )
-    assert post_response.code == 200
+    assert post_response.code == 201
 
     url = service_base_url + f"/lectures/{l_id}"
     with pytest.raises(HTTPClientError) as exc_info:
