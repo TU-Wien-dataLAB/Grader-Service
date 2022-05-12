@@ -892,7 +892,7 @@ permissions:
                   lecture_code:
                     type: string
                   scope:
-                    type: int64
+                    type: integer
             example:
               [ { "lecture_code": "iv21s", "scope": 1 }, { "lecture_code": "ab21s", "scope": 0 } ]
       403:

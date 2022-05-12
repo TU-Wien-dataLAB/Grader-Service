@@ -55,6 +55,9 @@ paths:
   /permissions:
     $ref: './paths_shared.yml#/permissions'
 
-
-
-
+components:
+  securitySchemes:
+    hub_auth:
+      type: apiKey
+      in: header
+      name: Token

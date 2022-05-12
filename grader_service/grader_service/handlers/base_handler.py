@@ -127,8 +127,9 @@ class GraderBaseHandler(SessionMixin, web.RequestHandler):
     def validate_parameters(self, *args):
         if len(self.request.arguments) == 0:
             return
-        if len(set(self.request.arguments.keys()) - set(self.request.body_arguments) - set(args)) != 0:
-            raise HTTPError(400, "Unknown arguments")
+        unknown_arguments = set(self.request.query_arguments.keys()) - set(args)
+        if len(unknown_arguments) != 0:
+            raise HTTPError(400, reason=f"Unknown arguments: {unknown_arguments}")
 
     def get_role(self, lecture_id: int) -> Role:
         role = self.session.query(Role).get((self.user.name, lecture_id))

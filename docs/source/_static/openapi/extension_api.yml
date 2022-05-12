@@ -46,7 +46,7 @@ paths:
   /lectures/{lect_id}/assignments/{a_id}/submissions/{s_id}/properties:
     $ref: './paths_grader.yml#/propertiesSubmission'
 
-  /lectures/{lect_id}/assignments/{a_id}/grading/{user_id}/auto:
+  /lectures/{lect_id}/assignments/{a_id}/grading/{s_id}/auto:
     $ref: './paths_shared.yml#/auto'
 
   /lectures/{lect_id}/assignments/{a_id}/grading/{s_id}/feedback:
@@ -69,3 +69,10 @@ paths:
 
   /lectures/{lect_id}/assignments/{a_id}/remote-status/{repo}:
     $ref: './paths_extension.yml#/remoteStatus'
+
+components:
+  securitySchemes:
+    hub_auth:
+      type: apiKey
+      in: header
+      name: Token

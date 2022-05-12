@@ -48,10 +48,7 @@ submissions:
         schema:
           type: boolean
           default: false
-    produces:
-      - application/json
-      - text/csv
-    responses: # TODO add csv example
+    responses: # TODO add text/csv
       200:
         description: OK
         content:
