@@ -12,10 +12,14 @@ from grader_service.handlers.base_handler import GraderBaseHandler, authorize
 
 @register_handler(path=r"\/permissions\/?", version_specifier=VersionSpecifier.ALL)
 class PermissionHandler(GraderBaseHandler):
+    """
+    Tornado Handler class for http requests to /permissions.
+    """
     @authorize([Scope.student, Scope.tutor, Scope.instructor])
     async def get(self):
         """
-        Returns the premissions of a user
+        Finds the permissions of a user.
+        :return permissions of the user
         """
         response = []
         role: Role

@@ -30,6 +30,13 @@ from grader_service.handlers.base_handler import GraderBaseHandler, authorize, R
 
 
 def tuple_to_submission(t):
+    """
+    Transforms tuple with values into a submission entity.
+
+    :param t: tuple with values
+    :type t: tuple
+    :return: submission entity
+    """
     s = Submission()
     (
         s.id,
@@ -50,7 +57,9 @@ def tuple_to_submission(t):
     version_specifier=VersionSpecifier.ALL,
 )
 class SubmissionHandler(GraderBaseHandler):
-
+    """
+    Tornado Handler class for http requests to /lectures/{lecture_id}/assignments/{assignment_id}/submissions.
+    """
     def on_finish(self):
         # we do not close the session we just commit because we might run
         # LocalAutogradeExecutor or GenerateFeedbackExecutor in POST which still need it
@@ -58,11 +67,12 @@ class SubmissionHandler(GraderBaseHandler):
 
     @authorize([Scope.student, Scope.tutor, Scope.instructor])
     async def get(self, lecture_id: int, assignment_id: int):
-        """Return the submissions of an assignment
+        """
+        Return the submissions of an assignment.
 
-        Two query parameter: latest, instructor-version
+        Two query parameter: latest, instructor-version.
 
-        latest: only get the latest submissions of users
+        latest: only get the latest submissions of users.
         instructor-version: if true, get the submissions of all users in lecture if false, get own submissions.
 
         :param lecture_id: id of the lecture
@@ -197,7 +207,8 @@ class SubmissionHandler(GraderBaseHandler):
 
     @authorize([Scope.student, Scope.tutor, Scope.instructor])
     async def post(self, lecture_id: int, assignment_id: int):
-        """Create submission based on commit hash.
+        """
+        Create submission based on commit hash.
 
         :param lecture_id: id of the lecture
         :type lecture_id: int
@@ -275,9 +286,14 @@ class SubmissionHandler(GraderBaseHandler):
     version_specifier=VersionSpecifier.ALL,
 )
 class SubmissionObjectHandler(GraderBaseHandler):
+    """
+    Tornado Handler class for http requests to /lectures/{lecture_id}/assignments/{assignment_id}/submissions/{submission_id}.
+    """
     @authorize([Scope.tutor, Scope.instructor])
+
     async def get(self, lecture_id: int, assignment_id: int, submission_id: int):
-        """Returns a specific submission
+        """
+        Returns a specific submission.
 
         :param lecture_id: id of the lecture
         :type lecture_id: int
@@ -294,7 +310,8 @@ class SubmissionObjectHandler(GraderBaseHandler):
 
     @authorize([Scope.tutor, Scope.instructor])
     async def put(self, lecture_id: int, assignment_id: int, submission_id: int):
-        """Updates a specific submission
+        """
+        Updates a specific submission and returns the updated entity.
 
         :param lecture_id: id of the lecture
         :type lecture_id: int
@@ -324,10 +341,14 @@ class SubmissionObjectHandler(GraderBaseHandler):
     version_specifier=VersionSpecifier.ALL,
 )
 class SubmissionPropertiesHandler(GraderBaseHandler):
+    """
+    Tornado Handler class for http requests to /lectures/{lecture_id}/assignments/{assignment_id}/submissions/
+    {submission_id}/properties.
+    """
     @authorize([Scope.tutor, Scope.instructor])
     async def get(self, lecture_id: int, assignment_id: int, submission_id: int):
         """
-        Returns the properties of a submission
+        Returns the properties of a submission,
 
         :param lecture_id: id of the lecture
         :type lecture_id: int
@@ -349,7 +370,7 @@ class SubmissionPropertiesHandler(GraderBaseHandler):
     @authorize([Scope.tutor, Scope.instructor])
     async def put(self, lecture_id: int, assignment_id: int, submission_id: int):
         """
-        Updates the properties of a submission
+        Updates the properties of a submission.
 
         :param lecture_id: id of the lecture
         :type lecture_id: int
