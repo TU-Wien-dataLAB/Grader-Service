@@ -28,25 +28,25 @@
     "url": "https://github.com/github_username/grader-labextension.git"
   },
   "scripts": {
-    "build": "jlpm build:lib && jlpm build:labextension:dev",
-    "build:prod": "jlpm clean && jlpm build:lib && jlpm build:labextension",
+    "build": "npm run build:lib && npm run build:labextension:dev",
+    "build:prod": "npm run clean && npm run build:lib && npm run build:labextension",
     "build:labextension": "jupyter labextension build .",
     "build:labextension:dev": "jupyter labextension build --development True .",
     "build:lib": "tsc",
-    "clean": "jlpm clean:lib",
+    "clean": "npm run clean:lib",
     "clean:lib": "rimraf lib tsconfig.tsbuildinfo",
     "clean:lintcache": "rimraf .eslintcache .stylelintcache",
     "clean:labextension": "rimraf grader_labextension/labextension",
-    "clean:all": "jlpm clean:lib && jlpm clean:labextension && jlpm clean:lintcache",
-    "eslint": "jlpm eslint:check --fix",
+    "clean:all": "npm run clean:lib && npm run clean:labextension && npm run clean:lintcache",
+    "eslint": "npm run eslint:check --fix",
     "eslint:check": "eslint . --cache --ext .ts,.tsx",
-    "install:extension": "jlpm build",
-    "lint": "jlpm stylelint && jlpm prettier && jlpm eslint",
-    "lint:check": "jlpm stylelint:check && jlpm prettier:check && jlpm eslint:check",
-    "prettier": "jlpm prettier:base --write --list-different",
+    "install:extension": "npm run build",
+    "lint": "npm run stylelint && npm run prettier && npm run eslint",
+    "lint:check": "npm run stylelint:check && npm run prettier:check && npm run eslint:check",
+    "prettier": "npm run prettier:base --write --list-different",
     "prettier:base": "prettier \"**/*{.ts,.tsx,.js,.jsx,.css,.json,.md}\"",
-    "prettier:check": "jlpm prettier:base --check",
-    "stylelint": "jlpm stylelint:check --fix",
+    "prettier:check": "npm run prettier:base --check",
+    "stylelint": "npm run stylelint:check --fix",
     "stylelint:check": "stylelint --cache \"style/**/*.css\"",
     "watch": "run-p watch:src watch:labextension",
     "watch:src": "tsc -w",
@@ -95,7 +95,7 @@
     "rimraf": "^3.0.2",
     "typescript": "~4.3.5",
     "typedoc": "^0.22.15",
-    "@types/react-transition-group": "^4.4.4"
+    "yarn-deduplicate": "^3.1.0"
   },
   "sideEffects": [
     "style/*.css",
@@ -126,7 +126,7 @@
         "jlpm"
       ],
       "before-build-python": [
-        "jlpm clean:all"
+        "npm run clean:all"
       ]
     }
   }
