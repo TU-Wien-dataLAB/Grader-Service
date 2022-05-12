@@ -16,9 +16,14 @@ sphinx:
 #mkdocs:
 #  configuration: mkdocs.yml
 
+build:
+  os: ubuntu-20.04
+    tools:
+      nodejs: "16"
+      python: "3.8"
+
 # Optionally set the version of Python and requirements required to build your docs
 python:
-  version: "3.8"
   install:
     - requirements: ./requirements-docs.txt
     - requirements: ./grader_convert/requirements.txt
