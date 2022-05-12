@@ -1,11 +1,8 @@
-# Copyright (c) 2022, TU Wien
-# All rights reserved.
-#
-# This source code is licensed under the BSD-style license found in the
-# LICENSE file in the root directory of this source tree.
-
+import datetime
+import logging
 import os
 import shlex
+import shutil
 import subprocess
 from typing import Optional, List
 from urllib.parse import unquote
@@ -30,12 +27,16 @@ from grader_service.server import GraderServer
 
 class GitBaseHandler(GraderBaseHandler):
 
+    def create_assignment_repo(self):
+        pass
+
     async def data_received(self, chunk: bytes):
         return self.process.stdin.write(chunk)
 
     def write_error(self, status_code: int, **kwargs) -> None:
         self.clear()
-        if status_code == 401:
+        if status_code == 403 and not self.has_auth:
+            status_code = 401
             self.set_header("WWW-Authenticate", 'Basic realm="User Visible Realm"')
         self.set_status(status_code)
 
@@ -63,13 +64,15 @@ class GitBaseHandler(GraderBaseHandler):
         repo_type = pathlets[2]
 
         if role.role == Scope.student:
-            # 1. no source or release interaction with the source repo for students
-            # 2. no pull allowed for autograde for students
-            if (repo_type in ["source", "release"]) or \
+            # 1. no source interaction with the source repo for students
+            # 2. no push to release allowed for students TODO: change to no access for students after git refactor
+            # 3. no pull allowed for autograde for students
+            if (repo_type == "source") or \
+                    (repo_type == "release" and rpc in ["send-pack", "receive-pack"]) or \
                     (repo_type == "autograde" and rpc == "upload-pack"):
                 raise HTTPError(403)
 
-            # 3. students should not be able to pull other submissions -> add query param for sub_id
+            # 4. students should not be able to pull other submissions -> add query param for sub_id
             if repo_type == "feedback" and rpc == "upload-pack":
                 try:
                     sub_id = int(pathlets[3])
@@ -79,19 +82,19 @@ class GitBaseHandler(GraderBaseHandler):
                 if submission is None or submission.username != self.user.name:
                     raise HTTPError(403)
 
-        # 4. no push allowed for autograde and feedback -> the autograder executor can push locally (will bypass this)
+        # 5. no push allowed for autograde and feedback -> the autograder executor can push locally (will bypass this)
         if repo_type in ["autograde", "feedback"] and rpc in ["send-pack", "receive-pack"]:
             raise HTTPError(403)
 
     def gitlookup(self, rpc: str):
         pathlets = self.request.path.strip("/").split("/")
-        # pathlets = ['services', 'grader', 'git', 'lecture_code', 'assignment_id', 'repo_type', ...]
+        # pathlets = ['services', 'grader', 'git', 'lecture_code', 'assignment_name', 'repo_type', ...]
         if len(pathlets) < 6:
             return None
         pathlets = pathlets[3:]
         lecture_path = os.path.abspath(os.path.join(self.gitbase, pathlets[0]))
         assignment_path = os.path.abspath(
-            os.path.join(self.gitbase, pathlets[0], pathlets[1])
+            os.path.join(self.gitbase, pathlets[0], unquote(pathlets[1]))
         )
 
         repo_type = pathlets[2]
@@ -118,9 +121,18 @@ class GitBaseHandler(GraderBaseHandler):
         self._check_git_repo_permissions(rpc, role, pathlets)
 
         try:
-            assignment = self.get_assignment(lecture.id, int(pathlets[1]))
-        except ValueError:
+            assignment = (
+                self.session.query(Assignment)
+                    .filter(
+                    Assignment.lectid == lecture.id,
+                    Assignment.name == unquote(pathlets[1]),
+                )
+                    .one()
+            )
+        except NoResultFound:
             raise HTTPError(404)
+        except MultipleResultsFound:
+            raise HTTPError(400)
 
         if repo_type == "assignment":
             repo_type: str = assignment.type
@@ -136,7 +148,12 @@ class GitBaseHandler(GraderBaseHandler):
             return None
 
         os.makedirs(os.path.dirname(path), exist_ok=True)
-        is_git = self.is_base_git_dir(path)
+
+        try:
+            out = subprocess.run(["git", "rev-parse", "--is-bare-repository"], cwd=path, capture_output=True)
+            is_git = out.returncode == 0 and "true" in out.stdout.decode("utf-8")
+        except FileNotFoundError:
+            is_git = False
         # return git repo
         if os.path.exists(path) and is_git:
             return path
@@ -146,17 +163,30 @@ class GitBaseHandler(GraderBaseHandler):
             try:
                 self.log.info("Running: git init --bare")
                 subprocess.run(["git", "init", "--bare", path], check=True)
+
+                if repo_type == assignment.type:
+                    git_path_base = os.path.join(self.application.grader_service_dir, "tmp", assignment.lecture.code,
+                                                 assignment.name, self.user.name)
+                    # Deleting dir
+                    if os.path.exists(git_path_base):
+                        shutil.rmtree(git_path_base)
+
+                    self.log.info(f"DIR {git_path_base}")
+                    os.makedirs(git_path_base, exist_ok=True)
+                    git_path_release = os.path.join(git_path_base, "release")
+                    git_path_user = os.path.join(git_path_base, self.user.name)
+                    self.log.info(f"GIT BASE {git_path_base}")
+                    self.log.info(f"GIT RELEASE {git_path_release}")
+                    self.log.info(f"GIT USER {git_path_user}")
+
+                    repo_path_release = self.construct_git_dir('release', assignment.lecture, assignment)
+                    repo_path_user = path
+
+                    self.overwrite_user_repository(tmp_path_base=git_path_base, tmp_path_release=git_path_release,
+                                                   tmp_path_user=git_path_user, repo_path_release=repo_path_release,
+                                                   repo_path_user=repo_path_user)
             except subprocess.CalledProcessError:
                 return None
-
-            if repo_type in ["user", "group"]:
-                repo_path_release = self.construct_git_dir('release', assignment.lecture, assignment)
-                if not os.path.exists(repo_path_release):
-                    return None
-                self.duplicate_release_repo(repo_path_release=repo_path_release, repo_path_user=path,
-                                            assignment=assignment, message="Initialize with Release",
-                                            checkout_main=True)
-
             return path
 
     @staticmethod
@@ -181,6 +211,11 @@ class RPCHandler(GitBaseHandler):
 
     Use this handler to handle example.git/git-upload-pack and example.git/git-receive-pack URLs"""
 
+    def on_finish(self):
+        # we do not close the session we just commit because LocalAutogradeExecutor still needs it
+        if self.session:
+            self.session.commit()
+
     async def prepare(self):
         await super().prepare()
         self.rpc = self.path_args[0]
@@ -195,12 +230,94 @@ class RPCHandler(GitBaseHandler):
         )
 
     async def post(self, rpc):
-        self.set_header("Content-Type", "application/x-git-%s-result" % rpc)
-        self.set_header(
-            "Cache-Control", "no-store, no-cache, must-revalidate, max-age=0"
-        )
-        await self.git_response()
-        await self.finish()
+        ## Create submission in database
+        # pathlets = ['services', 'grader', 'git', 'lecture_code', 'assignment_name', 'repo_type', ...]
+        pathlets = self.request.path.strip("/").split("/")
+        pathlets = pathlets[3:]
+        if pathlets[-1] == "git-receive-pack" and pathlets[-2] == "assignment":
+            # get lecture and assignment if they exist
+            try:
+                lecture = (
+                    self.session.query(Lecture)
+                        .filter(Lecture.code == pathlets[0])
+                        .one()
+                )
+                assignment: Assignment = (
+                    self.session.query(Assignment)
+                        .filter(
+                        Assignment.lectid == lecture.id,
+                        Assignment.name == unquote(pathlets[1]),
+                    ).one()
+                )
+            except NoResultFound:
+                raise HTTPError(404)
+            except MultipleResultsFound:
+                raise HTTPError(400)
+
+            submission = Submission()
+            submission.assignid = assignment.id
+            submission.date = datetime.datetime.utcnow()
+            submission.username = self.user.name
+            submission.feedback_available = False
+
+            if assignment.duedate is not None and submission.date > assignment.duedate:
+                self.write({"message": "Cannot submit assignment: Past due date!"})
+                self.write_error(400)
+
+            await self.git_response()
+
+            try:
+                ret = subprocess.run(
+                    shlex.split("git rev-parse main"),
+                    capture_output=True,
+                    cwd=self.gitdir,
+                )
+                submission.commit_hash = str(ret.stdout, "utf-8").strip()
+                submission.auto_status = "not_graded"
+                submission.manual_status = "not_graded"
+            except subprocess.CalledProcessError as e:
+                self.write_error(400)
+                return
+            except FileNotFoundError as e:
+                self.write_error(404)
+                return
+
+            self.session.add(submission)
+            self.session.commit()
+
+            # If the assignment has automatic grading or fully automatic grading perform necessary operations
+            if assignment.automatic_grading in [AutoGradingBehaviour.auto, AutoGradingBehaviour.full_auto]:
+                executor = RequestHandlerConfig.instance().autograde_executor_class(
+                    self.application.grader_service_dir, submission, close_session=False, config=self.application.config
+                )
+                if assignment.automatic_grading == AutoGradingBehaviour.full_auto:
+                    feedback_executor = GenerateFeedbackExecutor(
+                        self.application.grader_service_dir, submission, config=self.application.config
+                    )
+                    GraderExecutor.instance().submit(
+                        executor.start,
+                        on_finish=lambda: GraderExecutor.instance().submit(feedback_executor.start)
+                    )
+                else:
+                    GraderExecutor.instance().submit(
+                        executor.start,
+                        lambda: self.log.info(f"Autograding task of submission {submission.id} exited!")
+                    )
+
+            self.set_header("Content-Type", "application/x-git-%s-result" % rpc)
+            self.set_header(
+                "Cache-Control", "no-store, no-cache, must-revalidate, max-age=0"
+            )
+            if assignment.automatic_grading == AutoGradingBehaviour.unassisted:
+                self.session.close()
+            await self.finish()
+        else:
+            self.set_header("Content-Type", "application/x-git-%s-result" % rpc)
+            self.set_header(
+                "Cache-Control", "no-store, no-cache, must-revalidate, max-age=0"
+            )
+            await self.git_response()
+            await self.finish()
 
 
 @register_handler(path="/.*/info/refs", version_specifier=VersionSpecifier.NONE)
@@ -236,4 +353,4 @@ class InfoRefsHandler(GitBaseHandler):
         await self.flush()
 
         await self.git_response()
-        await self.finish()
+        self.finish()
