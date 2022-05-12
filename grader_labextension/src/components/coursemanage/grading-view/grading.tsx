@@ -10,9 +10,9 @@ import {
   GridSelectionModel
 } from '@mui/x-data-grid';
 import * as React from 'react';
-import {Assignment} from '../../../model/assignment';
-import {Lecture} from '../../../model/lecture';
-import {utcToLocalFormat} from '../../../services/datetime.service';
+import { Assignment } from '../../../model/assignment';
+import { Lecture } from '../../../model/lecture';
+import { utcToLocalFormat } from '../../../services/datetime.service';
 import {
   Box,
   Button,
@@ -28,24 +28,25 @@ import {
   Tooltip,
   IconButton
 } from '@mui/material';
-import Select, {SelectChangeEvent} from '@mui/material/Select';
-import {getAllSubmissions} from '../../../services/submissions.service';
-import {AgreeDialog} from '../../util/dialog';
+import Select, { SelectChangeEvent } from '@mui/material/Select';
+import { getAllSubmissions } from '../../../services/submissions.service';
+import { AgreeDialog } from '../../util/dialog';
 import NavigateNextIcon from '@mui/icons-material/NavigateNext';
 import FileDownloadIcon from '@mui/icons-material/FileDownload';
-import {ModalTitle} from '../../util/modal-title';
-import {User} from '../../../model/user';
-import {Submission} from '../../../model/submission';
+import { ModalTitle } from '../../util/modal-title';
+import { User } from '../../../model/user';
+import { Submission } from '../../../model/submission';
 import {
   autogradeSubmission,
-  generateFeedback, saveSubmissions
+  generateFeedback,
+  saveSubmissions
 } from '../../../services/grading.service';
 import LoadingOverlay from '../../util/overlay';
-import {getAssignment} from '../../../services/assignments.service';
-import {ManualGrading} from '../manual-grading';
-import {PanoramaSharp} from '@mui/icons-material';
+import { getAssignment } from '../../../services/assignments.service';
+import { ManualGrading } from '../manual-grading';
+import { PanoramaSharp } from '@mui/icons-material';
 import ReplayIcon from '@mui/icons-material/Replay';
-import {GlobalObjects} from "../../../index";
+import { GlobalObjects } from '../../../index';
 
 export interface IGradingProps {
   lecture: Lecture;
@@ -60,7 +61,9 @@ interface IRowValues extends Submission {
 }
 
 export const GradingComponent = (props: IGradingProps) => {
-  const [option, setOption] = React.useState('latest' as "none" | "latest" | "best");
+  const [option, setOption] = React.useState(
+    'latest' as 'none' | 'latest' | 'best'
+  );
   const [showDialog, setShowDialog] = React.useState(false);
   const [showLogs, setShowLogs] = React.useState(false);
   const [logs, setLogs] = React.useState(undefined);
@@ -185,7 +188,7 @@ export const GradingComponent = (props: IGradingProps) => {
   );
 
   const handleChange = (event: SelectChangeEvent) => {
-    setOption(event.target.value as "none" | "latest" | "best");
+    setOption(event.target.value as 'none' | 'latest' | 'best');
   };
 
   const updateSubmissions = () => {
@@ -229,9 +232,9 @@ export const GradingComponent = (props: IGradingProps) => {
   };
 
   const columns = [
-    {field: 'sub_id', headerName: 'No.', width: 110},
-    {field: 'username', headerName: 'User', width: 130},
-    {field: 'submitted_at', headerName: 'Date', width: 170},
+    { field: 'sub_id', headerName: 'No.', width: 110 },
+    { field: 'username', headerName: 'User', width: 130 },
+    { field: 'submitted_at', headerName: 'Date', width: 170 },
     {
       field: 'auto_status',
       headerName: 'Autograde-Status',
@@ -270,7 +273,7 @@ export const GradingComponent = (props: IGradingProps) => {
         />
       )
     },
-    {field: 'score', headerName: 'Score', width: 130}
+    { field: 'score', headerName: 'Score', width: 130 }
   ];
 
   const getSubmissionFromRow = (row: IRowValues): Submission => {
@@ -291,10 +294,14 @@ export const GradingComponent = (props: IGradingProps) => {
   };
 
   const optionName = () => {
-    if (option === "latest") return "Latest";
-    else if (option === "best") return "Best";
-    else return "All";
-  }
+    if (option === 'latest') {
+      return 'Latest';
+    } else if (option === 'best') {
+      return 'Best';
+    } else {
+      return 'All';
+    }
+  };
 
   const openFile = async (path: string) => {
     console.log('Opening file: ' + path);
@@ -314,29 +321,29 @@ export const GradingComponent = (props: IGradingProps) => {
   const handleExportSubmissions = async () => {
     try {
       await saveSubmissions(props.lecture, props.assignment, option);
-      await openFile(`${props.lecture.code}/submissions.csv`)
-      props.showAlert("success", "Successfully exported submissions!")
+      await openFile(`${props.lecture.code}/submissions.csv`);
+      props.showAlert('success', 'Successfully exported submissions!');
     } catch (err) {
-      console.log(err)
-      props.showAlert("error", "Error exporting submissions!")
+      console.log(err);
+      props.showAlert('error', 'Error exporting submissions!');
     }
-  }
+  };
 
   return (
     <div>
       <ModalTitle title="Grading">
-        <Box sx={{ml: 2}} display="inline-block">
+        <Box sx={{ ml: 2 }} display="inline-block">
           <Tooltip title="Reload">
             <IconButton aria-label="reload" onClick={updateSubmissions}>
-              <ReplayIcon/>
+              <ReplayIcon />
             </IconButton>
           </Tooltip>
         </Box>
       </ModalTitle>
-      <div style={{display: 'flex', height: '50vh', marginTop: '30px'}}>
-        <div style={{flexGrow: 1}}>
+      <div style={{ display: 'flex', height: '50vh', marginTop: '30px' }}>
+        <div style={{ flexGrow: 1 }}>
           <DataGrid
-            sx={{mb: 3, ml: 3, mr: 3}}
+            sx={{ mb: 3, ml: 3, mr: 3 }}
             columns={columns}
             rows={rows}
             checkboxSelection
@@ -353,8 +360,8 @@ export const GradingComponent = (props: IGradingProps) => {
           />
         </div>
       </div>
-      <span style={{height: '15vh'}}>
-        <FormControl sx={{m: 3}}>
+      <span style={{ height: '15vh' }}>
+        <FormControl sx={{ m: 3 }}>
           <InputLabel id="submission-select-label">View</InputLabel>
           <Select
             labelId="submission-select-label"
@@ -370,7 +377,7 @@ export const GradingComponent = (props: IGradingProps) => {
         </FormControl>
         <Button
           disabled={selectedRows.length === 0}
-          sx={{m: 3}}
+          sx={{ m: 3 }}
           variant="outlined"
           onClick={handleAutogradeSubmissions}
         >
@@ -382,18 +389,18 @@ export const GradingComponent = (props: IGradingProps) => {
             selectedRowsData[0]?.auto_status !== 'automatically_graded'
               ? 'error'
               : selectedRowsData.length !== 1 ||
-              selectedRowsData[0]?.auto_status !== 'automatically_graded'
-                ? 'disabled'
-                : 'primary'
+                selectedRowsData[0]?.auto_status !== 'automatically_graded'
+              ? 'disabled'
+              : 'primary'
           }
-          sx={{mb: -1}}
+          sx={{ mb: -1 }}
         />
         <Button
           disabled={
             selectedRowsData.length !== 1 ||
             selectedRowsData[0]?.auto_status !== 'automatically_graded'
           }
-          sx={{m: 3}}
+          sx={{ m: 3 }}
           onClick={() => {
             cleanSelectedRows();
             setDisplayManualGrading(true);
@@ -407,11 +414,11 @@ export const GradingComponent = (props: IGradingProps) => {
             selectedRows.length === 0
               ? 'disabled'
               : allManualGraded(selectedRowsData) ||
-              props.assignment.automatic_grading === 'full_auto'
-                ? 'primary'
-                : 'error'
+                props.assignment.automatic_grading === 'full_auto'
+              ? 'primary'
+              : 'error'
           }
-          sx={{mb: -1}}
+          sx={{ mb: -1 }}
         />
         <Button
           disabled={
@@ -419,7 +426,7 @@ export const GradingComponent = (props: IGradingProps) => {
             (props.assignment.automatic_grading !== 'full_auto' &&
               !allManualGraded(selectedRowsData))
           }
-          sx={{m: 3}}
+          sx={{ m: 3 }}
           onClick={handleGenerateFeedback}
           variant="outlined"
         >
@@ -427,8 +434,8 @@ export const GradingComponent = (props: IGradingProps) => {
         </Button>
 
         <Button
-          startIcon={<FileDownloadIcon/>}
-          sx={{m: 3}}
+          startIcon={<FileDownloadIcon />}
+          sx={{ m: 3 }}
           onClick={handleExportSubmissions}
           variant="outlined"
         >
@@ -464,7 +471,7 @@ export const GradingComponent = (props: IGradingProps) => {
         <DialogContent>
           <Typography
             id="alert-dialog-description"
-            sx={{fontSize: 10, fontFamily: "'Roboto Mono', monospace"}}
+            sx={{ fontSize: 10, fontFamily: "'Roboto Mono', monospace" }}
           >
             {logs}
           </Typography>

@@ -19,5 +19,12 @@
     "strictNullChecks": false,
     "target": "es2017",
     "types": []
+  },
+  "typedocOptions": {
+    "entryPoints": [
+      "src/components/coursemanage/assignment.tsx",
+      "src/components/coursemanage/assignment-modal.tsx"
+    ],
+    "out": "../docs/typedoc"
   }
 }
