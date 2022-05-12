@@ -24,19 +24,24 @@ from .handler_utils import parse_ids
 from grader_service.handlers.base_handler import GraderBaseHandler, authorize
 
 
+
 @register_handler(
     path=r"\/lectures\/(?P<lecture_id>\d*)\/assignments\/?",
     version_specifier=VersionSpecifier.ALL,
 )
 class AssignmentBaseHandler(GraderBaseHandler):
+    """
+    Tornado Handler class for http requests to /lecture/{lecture_id}/assignments
+    """
+
     @authorize([Scope.student, Scope.tutor, Scope.instructor])
     async def get(self, lecture_id: int):
-        """Returns all assignments of a lecture
+        """Returns all assignments of a lecture.
 
-        :param lecture_id: id of the lecture
-        :type lecture_id: int
-        :raises HTTPError: throws err if lecture is deleted
-        """
+            :param lecture_id: id of the lecture
+            :type lecture_id: int
+            :raises HTTPError: throws err if lecture is deleted
+            """
         lecture_id = parse_ids(lecture_id)
         self.validate_parameters()
         role = self.get_role(lecture_id)
@@ -104,6 +109,10 @@ class AssignmentBaseHandler(GraderBaseHandler):
     version_specifier=VersionSpecifier.ALL,
 )
 class AssignmentObjectHandler(GraderBaseHandler):
+    """
+    Tornado Handler class for http requests to /lecture/{lecture_id}/assignments/{assignment_id}
+    """
+
     @authorize([Scope.instructor])
     async def put(self, lecture_id: int, assignment_id: int):
         """Updates an assignment
@@ -201,6 +210,9 @@ class AssignmentObjectHandler(GraderBaseHandler):
     version_specifier=VersionSpecifier.ALL,
 )
 class AssignmentResetHandler(GraderBaseHandler):
+    """
+    Tornado Handler class for http requests to /lecture/{lecture_id}/assignments/{assignment_id}/reset
+    """
     @authorize([Scope.instructor, Scope.tutor, Scope.student])
     async def get(self, lecture_id: int, assignment_id: int):
         self.validate_parameters()
@@ -223,9 +235,13 @@ class AssignmentResetHandler(GraderBaseHandler):
     version_specifier=VersionSpecifier.ALL,
 )
 class AssignmentPropertiesHandler(GraderBaseHandler):
+    """
+    Tornado Handler class for http requests to /lecture/{lecture_id}/assignments/{assignment_id}/properties
+    """
     @authorize([Scope.tutor, Scope.instructor])
     async def get(self, lecture_id: int, assignment_id: int):
-        """Returns the properties of a specific assignment
+        """
+        Returns the properties of a specific assignment
 
         :param lecture_id: id of the lecture
         :type lecture_id: int
@@ -243,7 +259,8 @@ class AssignmentPropertiesHandler(GraderBaseHandler):
 
     @authorize([Scope.tutor, Scope.instructor])
     async def put(self, lecture_id: int, assignment_id: int):
-        """Updates the properties of a specific assignment
+        """
+        Updates the properties of a specific assignment
 
         :param lecture_id: id of the lecture
         :type lecture_id: int
@@ -264,6 +281,13 @@ class AssignmentPropertiesHandler(GraderBaseHandler):
 
 
 def _check_full_auto_grading(self: GraderBaseHandler, model):
+    """
+    Checks if the assignment notebook contain manual graded cells and throws an error if they do
+
+    :param self: handler class
+    :param model: the notebook which is being tested
+    :return: void
+    """
     for nb in model.notebooks.values():
         if len(nb.task_cells_dict) > 0:
             raise HTTPError(400, reason="Fully autograded notebook cannot contain task cells!")
