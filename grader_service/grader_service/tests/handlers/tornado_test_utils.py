@@ -67,7 +67,7 @@ def service_base_url():
 @pytest.fixture(scope="function")
 def jupyter_hub_mock_server(httpserver):
     def for_user(login_user: dict, token: str):
-        httpserver.expect_request(f"/authorizations/token/{token}").respond_with_json(
+        httpserver.expect_request(f"/user").respond_with_json(
             login_user
         )
         return httpserver
@@ -86,5 +86,5 @@ def default_user():
 
 @pytest.fixture(scope="function")
 def default_token():
-    token = "some_token"
+    token = "token"
     yield token

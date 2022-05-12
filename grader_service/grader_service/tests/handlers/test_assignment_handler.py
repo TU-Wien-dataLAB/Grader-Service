@@ -125,7 +125,7 @@ async def test_post_assignment(
         headers={"Authorization": f"Token {default_token}"},
         body=json.dumps(pre_assignment.to_dict()),
     )
-    assert post_response.code == 200
+    assert post_response.code == 201
     post_assignment = Assignment.from_dict(json.loads(post_response.body.decode()))
     assert post_assignment.id != pre_assignment.id
     assert post_assignment.name == pre_assignment.name
@@ -280,7 +280,7 @@ async def test_put_assignment(
         headers={"Authorization": f"Token {default_token}"},
         body=json.dumps(pre_assignment.to_dict()),
     )
-    assert post_response.code == 200
+    assert post_response.code == 201
     post_assignment = Assignment.from_dict(json.loads(post_response.body.decode()))
 
     post_assignment.name = "new name"
@@ -324,7 +324,7 @@ async def test_put_assignment_wrong_lecture_id(
         headers={"Authorization": f"Token {default_token}"},
         body=json.dumps(pre_assignment.to_dict()),
     )
-    assert post_response.code == 200
+    assert post_response.code == 201
     post_assignment = Assignment.from_dict(json.loads(post_response.body.decode()))
 
     # now with lecture id 1
@@ -360,7 +360,7 @@ async def test_put_assignment_wrong_assignment_id(
         headers={"Authorization": f"Token {default_token}"},
         body=json.dumps(pre_assignment.to_dict()),
     )
-    assert post_response.code == 200
+    assert post_response.code == 201
     post_assignment = Assignment.from_dict(json.loads(post_response.body.decode()))
 
     url = url + "99"
@@ -394,7 +394,7 @@ async def test_put_assignment_deleted_assignment(
         headers={"Authorization": f"Token {default_token}"},
         body=json.dumps(pre_assignment.to_dict()),
     )
-    assert post_response.code == 200
+    assert post_response.code == 201
     post_assignment = Assignment.from_dict(json.loads(post_response.body.decode()))
 
     url = url + str(post_assignment.id)
@@ -436,7 +436,7 @@ async def test_put_assignment_no_point_changes(
         headers={"Authorization": f"Token {default_token}"},
         body=json.dumps(pre_assignment.to_dict()),
     )
-    assert post_response.code == 200
+    assert post_response.code == 201
     post_assignment = Assignment.from_dict(json.loads(post_response.body.decode()))
 
     post_assignment.name = "new name"
@@ -480,7 +480,7 @@ async def test_get_assignment(
         headers={"Authorization": f"Token {default_token}"},
         body=json.dumps(pre_assignment.to_dict()),
     )
-    assert post_response.code == 200
+    assert post_response.code == 201
     post_assignment = Assignment.from_dict(json.loads(post_response.body.decode()))
 
     url = url + str(post_assignment.id)
@@ -543,7 +543,7 @@ async def test_get_assignment_wrong_lecture_id(
         headers={"Authorization": f"Token {default_token}"},
         body=json.dumps(pre_assignment.to_dict()),
     )
-    assert post_response.code == 200
+    assert post_response.code == 201
     post_assignment = Assignment.from_dict(json.loads(post_response.body.decode()))
 
     l_id = 1
@@ -578,7 +578,7 @@ async def test_get_assignment_wrong_assignment_id(
         headers={"Authorization": f"Token {default_token}"},
         body=json.dumps(pre_assignment.to_dict()),
     )
-    assert post_response.code == 200
+    assert post_response.code == 201
 
     url = service_base_url + f"/lectures/{l_id}/assignments/99"
 
@@ -689,7 +689,7 @@ async def test_delete_assignment(
         headers={"Authorization": f"Token {default_token}"},
         body=json.dumps(pre_assignment.to_dict()),
     )
-    assert post_response.code == 200
+    assert post_response.code == 201
     post_assignment = Assignment.from_dict(json.loads(post_response.body.decode()))
 
     url = url + str(post_assignment.id)
@@ -731,7 +731,7 @@ async def test_delete_assignment_deleted_assignment(
         headers={"Authorization": f"Token {default_token}"},
         body=json.dumps(pre_assignment.to_dict()),
     )
-    assert post_response.code == 200
+    assert post_response.code == 201
     post_assignment = Assignment.from_dict(json.loads(post_response.body.decode()))
 
     url = url + str(post_assignment.id)
@@ -823,7 +823,7 @@ async def test_delete_assignment_same_name_twice(
         headers={"Authorization": f"Token {default_token}"},
         body=json.dumps(pre_assignment.to_dict()),
     )
-    assert post_response.code == 200
+    assert post_response.code == 201
     post_assignment = Assignment.from_dict(json.loads(post_response.body.decode()))
 
     url = url + str(post_assignment.id)
@@ -843,7 +843,7 @@ async def test_delete_assignment_same_name_twice(
         headers={"Authorization": f"Token {default_token}"},
         body=json.dumps(pre_assignment.to_dict()),
     )
-    assert post_response.code == 200
+    assert post_response.code == 201
     post_assignment = Assignment.from_dict(json.loads(post_response.body.decode()))
 
     url = url + str(post_assignment.id)
@@ -875,7 +875,7 @@ async def test_delete_released_assignment(
         headers={"Authorization": f"Token {default_token}"},
         body=json.dumps(pre_assignment.to_dict()),
     )
-    assert post_response.code == 200
+    assert post_response.code == 201
     post_assignment = Assignment.from_dict(json.loads(post_response.body.decode()))
 
     url = url + str(post_assignment.id)
@@ -909,7 +909,7 @@ async def test_delete_complete_assignment(
         headers={"Authorization": f"Token {default_token}"},
         body=json.dumps(pre_assignment.to_dict()),
     )
-    assert post_response.code == 200
+    assert post_response.code == 201
     post_assignment = Assignment.from_dict(json.loads(post_response.body.decode()))
 
     url = url + str(post_assignment.id)
@@ -943,7 +943,7 @@ async def test_assignment_properties(
         headers={"Authorization": f"Token {default_token}"},
         body=json.dumps(pre_assignment.to_dict()),
     )
-    assert post_response.code == 200
+    assert post_response.code == 201
     post_assignment = Assignment.from_dict(json.loads(post_response.body.decode()))
 
     url = service_base_url + f"/lectures/3/assignments/{post_assignment.id}/properties"
