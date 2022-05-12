@@ -48,6 +48,8 @@ import { PanoramaSharp } from '@mui/icons-material';
 import ReplayIcon from '@mui/icons-material/Replay';
 import { GlobalObjects } from '../../../index';
 
+
+
 export interface IGradingProps {
   lecture: Lecture;
   assignment: Assignment;

@@ -26,12 +26,18 @@ import { Assignment } from '../../model/assignment';
 import LoadingOverlay from '../util/overlay';
 import { Lecture } from '../../model/lecture';
 import { getAllSubmissions } from '../../services/submissions.service';
-import {getAssignment, pullAssignment} from '../../services/assignments.service';
+import {
+  getAssignment,
+  pullAssignment
+} from '../../services/assignments.service';
 import { DeadlineComponent } from '../util/deadline';
 import { AssignmentModalComponent } from './assignment-modal';
 import { Submission } from '../../model/submission';
 import { getFiles } from '../../services/file.service';
 
+/**
+ * Props for AssignmentComponent.
+ */
 interface IAssignmentComponentProps {
   lecture: Lecture;
   assignment: Assignment;
@@ -39,6 +45,11 @@ interface IAssignmentComponentProps {
   showAlert: (severity: string, msg: string) => void;
 }
 
+/**
+ * Renders an assignment card which opens onclick the assignment modal.
+ * @param props Props of assignment functional component
+ * @constructor
+ */
 export const AssignmentComponent = (props: IAssignmentComponentProps) => {
   const [assignment, setAssignment] = React.useState(props.assignment);
   const [displayAssignment, setDisplayAssignment] = React.useState(false);
@@ -46,7 +57,7 @@ export const AssignmentComponent = (props: IAssignmentComponentProps) => {
   const [hasFeedback, setHasFeedback] = React.useState(false);
   const [files, setFiles] = React.useState([]);
   React.useEffect(() => {
-    getAllSubmissions(props.lecture, assignment, "none", false).then(
+    getAllSubmissions(props.lecture, assignment, 'none', false).then(
       response => {
         setSubmissions(response);
         const feedback = response.reduce(
@@ -65,23 +76,30 @@ export const AssignmentComponent = (props: IAssignmentComponentProps) => {
   const onAssignmentClose = async () => {
     setDisplayAssignment(false);
     setAssignment(await getAssignment(props.lecture.id, assignment));
-    const submissions = await getAllSubmissions(props.lecture, assignment, "none", false);
+    const submissions = await getAllSubmissions(
+      props.lecture,
+      assignment,
+      'none',
+      false
+    );
     setSubmissions(submissions);
   };
 
   return (
-    <Box sx={{height: "100%"}}>
+    <Box sx={{ height: '100%' }}>
       <Card
-        sx={{ maxWidth: 200, minWidth: 200, height: "100%", m: 1.5 }}
+        sx={{ maxWidth: 200, minWidth: 200, height: '100%', m: 1.5 }}
         onClick={async () => {
           if (files.length === 0) {
-            await pullAssignment(props.lecture.id, assignment.id, "assignment");
+            await pullAssignment(props.lecture.id, assignment.id, 'assignment');
           }
           setDisplayAssignment(true);
         }}
       >
-        <CardActionArea sx={{height: "100%", display: "flex", flexDirection: "column"}}>
-          <CardContent sx={{flexGrow: 1}}>
+        <CardActionArea
+          sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}
+        >
+          <CardContent sx={{ flexGrow: 1 }}>
             <Typography variant="h5" component="div">
               {assignment.name}
             </Typography>
