@@ -103,3 +103,4 @@ The last thing we have to configure is the server-side of the JupyterLab plugin 
     c.GitService.git_remote_url = "http://127.0.0.1:4010/services/grader/git"
 
     c.RequestService.url = "http://127.0.0.1:4010"
+

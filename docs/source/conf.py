@@ -18,7 +18,7 @@
 
 # -- Project information -----------------------------------------------------
 
-project = 'grader'
+project = 'Jupyter Grader Service'
 copyright = '2022, Matthias Matt, Florian Jäger, Elias Wimmer'
 author = 'Matthias Matt, Florian Jäger, Elias Wimmer'
 
