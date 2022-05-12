@@ -7,6 +7,12 @@
 from tornado.web import HTTPError
 
 def parse_ids(*args):
+    """
+    Transforms loose ids to an id tuple.
+
+    :param args: certain amount of id (int) values
+    :return: tuple of ids
+    """
     try:
         ids = [int(id) for id in args]
     except ValueError:

@@ -41,6 +41,11 @@ from tornado_sqlalchemy import SessionMixin
 
 
 def authorize(scopes: List[Scope]):
+    """
+    Checks if user is authorized.
+    :param scopes: the user's roles
+    :return: wrapper function
+    """
     if not set(scopes).issubset({Scope.student, Scope.tutor, Scope.instructor}):
         return ValueError("Invalid scopes")
 
@@ -93,6 +98,9 @@ def authorize(scopes: List[Scope]):
 
 
 class GraderBaseHandler(SessionMixin, web.RequestHandler):
+    """
+    Base class of all handler classes that implements validation and request functions
+    """
     request_service = RequestService()
     hub_request_service = RequestService()
 
@@ -121,6 +129,7 @@ class GraderBaseHandler(SessionMixin, web.RequestHandler):
         pass
 
     async def prepare(self) -> Optional[Awaitable[None]]:
+
         if self.request.path.strip("/") != self.application.base_url.strip("/"):
             await self.authenticate_user()
         return super().prepare()

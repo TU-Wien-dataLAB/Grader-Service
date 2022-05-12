@@ -31,7 +31,7 @@ from grader_service.handlers.base_handler import GraderBaseHandler, authorize
 )
 class AssignmentBaseHandler(GraderBaseHandler):
     """
-    Tornado Handler class for http requests to /lecture/{lecture_id}/assignments
+    Tornado Handler class for http requests to /lecture/{lecture_id}/assignments.
     """
 
     @authorize([Scope.student, Scope.tutor, Scope.instructor])
@@ -68,7 +68,7 @@ class AssignmentBaseHandler(GraderBaseHandler):
 
     @authorize([Scope.instructor])
     async def post(self, lecture_id: int):
-        """Creates a new assignment
+        """Creates a new assignment.
 
         :param lecture_id: id of the lecture
         :type lecture_id: int
@@ -110,12 +110,12 @@ class AssignmentBaseHandler(GraderBaseHandler):
 )
 class AssignmentObjectHandler(GraderBaseHandler):
     """
-    Tornado Handler class for http requests to /lecture/{lecture_id}/assignments/{assignment_id}
+    Tornado Handler class for http requests to /lecture/{lecture_id}/assignments/{assignment_id}.
     """
 
     @authorize([Scope.instructor])
     async def put(self, lecture_id: int, assignment_id: int):
-        """Updates an assignment
+        """Updates an assignment.
 
         :param lecture_id: id of the lecture
         :type lecture_id: int
@@ -143,7 +143,7 @@ class AssignmentObjectHandler(GraderBaseHandler):
 
     @authorize([Scope.student, Scope.tutor, Scope.instructor])
     async def get(self, lecture_id: int, assignment_id: int):
-        """Returns a specific assignment of a lecture
+        """Returns a specific assignment of a lecture.
 
         :param lecture_id: id of the lecture
         :type lecture_id: int
@@ -170,7 +170,7 @@ class AssignmentObjectHandler(GraderBaseHandler):
 
     @authorize([Scope.instructor])
     async def delete(self, lecture_id: int, assignment_id: int):
-        """Soft-Deletes a specific assignment
+        """Soft-Deletes a specific assignment.
 
         :param lecture_id: id of the lecture
         :type lecture_id: int
@@ -211,7 +211,7 @@ class AssignmentObjectHandler(GraderBaseHandler):
 )
 class AssignmentResetHandler(GraderBaseHandler):
     """
-    Tornado Handler class for http requests to /lecture/{lecture_id}/assignments/{assignment_id}/reset
+    Tornado Handler class for http requests to /lecture/{lecture_id}/assignments/{assignment_id}/reset.
     """
     @authorize([Scope.instructor, Scope.tutor, Scope.student])
     async def get(self, lecture_id: int, assignment_id: int):
@@ -236,12 +236,12 @@ class AssignmentResetHandler(GraderBaseHandler):
 )
 class AssignmentPropertiesHandler(GraderBaseHandler):
     """
-    Tornado Handler class for http requests to /lecture/{lecture_id}/assignments/{assignment_id}/properties
+    Tornado Handler class for http requests to /lecture/{lecture_id}/assignments/{assignment_id}/properties.
     """
     @authorize([Scope.tutor, Scope.instructor])
     async def get(self, lecture_id: int, assignment_id: int):
         """
-        Returns the properties of a specific assignment
+        Returns the properties of a specific assignment.
 
         :param lecture_id: id of the lecture
         :type lecture_id: int
@@ -260,7 +260,7 @@ class AssignmentPropertiesHandler(GraderBaseHandler):
     @authorize([Scope.tutor, Scope.instructor])
     async def put(self, lecture_id: int, assignment_id: int):
         """
-        Updates the properties of a specific assignment
+        Updates the properties of a specific assignment.
 
         :param lecture_id: id of the lecture
         :type lecture_id: int
@@ -282,7 +282,7 @@ class AssignmentPropertiesHandler(GraderBaseHandler):
 
 def _check_full_auto_grading(self: GraderBaseHandler, model):
     """
-    Checks if the assignment notebook contain manual graded cells and throws an error if they do
+    Checks if the assignment notebook contain manual graded cells and throws an error if they do.
 
     :param self: handler class
     :param model: the notebook which is being tested
