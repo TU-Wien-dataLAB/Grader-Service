@@ -21,6 +21,9 @@ python:
   version: "3.8"
   install:
     - requirements: ./requirements-docs.txt
+    - requirements: ./grader_convert/requirements.txt
+    - requirements: ./grader_service/requirements.txt
+    - requirements: ./grader_labextension/requirements.txt
     - path: grader_convert
       method: pip
     - path: grader_service
