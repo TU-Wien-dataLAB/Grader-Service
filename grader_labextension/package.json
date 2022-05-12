@@ -68,7 +68,6 @@
     "@mui/lab": "^5.0.0-alpha.59",
     "@mui/material": "^5.2.4",
     "@mui/x-data-grid": "^5.1.0",
-    "@types/react": "^17.0.39",
     "chart.js": "^3.7.0",
     "date-fns": "^2.27.0",
     "formik": "^2.2.9",
@@ -76,7 +75,6 @@
     "moment": "^2.29.1",
     "react": "^17.0.2",
     "react-chartjs-2": "^4.0.0",
-    "react-dom": "^17.0.2",
     "rxjs": "^6.6.7",
     "yup": "^0.32.11"
   },
