@@ -7,8 +7,6 @@ grader_labextension/grader/grader_labextension/labextension/*
 grader_labextension/grader/grader_labextension/labextension
 grader_labextension/grader/grader_labextension/labextension/build_log.json
 jupyterhub_cookie_secret
-grader_labextension/package-lock.json
-grader_labextension/yarn.lock
 
 jupyterhub.sqlite*
 
