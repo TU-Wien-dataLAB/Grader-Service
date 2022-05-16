@@ -46,9 +46,8 @@ interface IAssignmentComponentProps {
 }
 
 /**
- * Renders an assignment card which opens onclick the assignment modal.
+ * Renders an assignment card which displays data abount the assignment status opens onclick the assignment modal.
  * @param props Props of assignment functional component
- * @constructor
  */
 export const AssignmentComponent = (props: IAssignmentComponentProps) => {
   const [assignment, setAssignment] = React.useState(props.assignment);
@@ -56,6 +55,7 @@ export const AssignmentComponent = (props: IAssignmentComponentProps) => {
   const [submissions, setSubmissions] = React.useState([] as Submission[]);
   const [hasFeedback, setHasFeedback] = React.useState(false);
   const [files, setFiles] = React.useState([]);
+
   React.useEffect(() => {
     getAllSubmissions(props.lecture, assignment, 'none', false).then(
       response => {
@@ -73,6 +73,9 @@ export const AssignmentComponent = (props: IAssignmentComponentProps) => {
     });
   }, [props]);
 
+  /**
+   * Executed on assignment modal close.
+   */
   const onAssignmentClose = async () => {
     setDisplayAssignment(false);
     setAssignment(await getAssignment(props.lecture.id, assignment));

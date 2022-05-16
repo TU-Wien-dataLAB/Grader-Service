@@ -19,16 +19,25 @@ import { getFiles } from '../../services/file.service';
 import { Lecture } from '../../model/lecture';
 import { Submission } from '../../model/submission';
 import ChatRoundedIcon from '@mui/icons-material/ChatRounded';
-
+/**
+ * Props for AssignmentComponent.
+ */
 export interface IAssignmentStatusProps {
   lecture: Lecture;
   assignment: Assignment;
   submissions: Submission[];
 }
 
+/**
+ * Renders the assignment status stepper.
+ * @param props props of assignment status component
+ */
 export const AssignmentStatus = (props: IAssignmentStatusProps) => {
   const [activeStep, setActiveStep] = React.useState(0);
 
+  /**
+   * Calculates what the current step of the student assignment is.
+   */
   const getActiveStep = async () => {
     const hasFeedback = props.submissions.reduce(
       (accum: boolean, curr: Submission) => accum || curr.feedback_available,
