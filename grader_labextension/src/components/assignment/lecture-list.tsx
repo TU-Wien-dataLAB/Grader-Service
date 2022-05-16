@@ -9,11 +9,17 @@ import { getAllLectures } from '../../services/lectures.service';
 import { Lecture } from '../../model/lecture';
 import { LectureComponent } from './lecture';
 import { AlertProps, Alert, Portal, AlertTitle } from '@mui/material';
-
+/**
+ * Props for LectureListComponent.
+ */
 export interface ILectureListProps {
   root: HTMLElement;
 }
 
+/**
+ * Renders the lectures which the student addends.
+ * @param props Props of the lecture file components
+ */
 export const LectureListComponent = (props: ILectureListProps): JSX.Element => {
   const [lectures, setLectures] = React.useState([] as Lecture[]);
 

@@ -16,7 +16,9 @@ import {
 } from '../../services/submissions.service';
 import { GradeBook } from '../../services/gradebook';
 import { FilesList } from '../util/file-list';
-
+/**
+ * Props for FeedbackComponent.
+ */
 export interface IFeedbackProps {
   lecture: Lecture;
   assignment: Assignment;
@@ -24,6 +26,10 @@ export interface IFeedbackProps {
   showAlert: (severity: string, msg: string) => void;
 }
 
+/**
+ * Renders the feedback of a student submission.
+ * @param props Props of the feedback component
+ */
 export const Feedback = (props: IFeedbackProps) => {
   const [gradeBook, setGradeBook] = React.useState(null);
   const [path, setPath] = React.useState(null);

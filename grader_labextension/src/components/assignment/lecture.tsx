@@ -5,12 +5,12 @@
 // LICENSE file in the root directory of this source tree.
 
 import {
-  Box,
   Button,
   Card,
   CardActions,
   CardContent,
-  Collapse, Grid,
+  Collapse,
+  Grid,
   LinearProgress,
   Typography
 } from '@mui/material';
@@ -20,6 +20,9 @@ import { Lecture } from '../../model/lecture';
 import { getAllAssignments } from '../../services/assignments.service';
 import { AssignmentComponent } from './assignment';
 
+/**
+ * Props for LectureComponent.
+ */
 interface ILectureComponentProps {
   lecture: Lecture;
   root: HTMLElement;
@@ -27,6 +30,10 @@ interface ILectureComponentProps {
   open?: boolean;
 }
 
+/**
+ * Renders the lecture card which contains it's assignments.
+ * @param props Props of the lecture component
+ */
 export const LectureComponent = (props: ILectureComponentProps) => {
   const [assignments, setAssignments] = React.useState(null as Assignment[]);
   const [expanded, setExpanded] = React.useState(props.open);
@@ -36,7 +43,9 @@ export const LectureComponent = (props: ILectureComponentProps) => {
       setAssignments(response);
     });
   }, []);
-
+  /**
+   * Toggles collapsable in the card body.
+   */
   const handleExpandClick = () => {
     setExpanded(!expanded);
   };
