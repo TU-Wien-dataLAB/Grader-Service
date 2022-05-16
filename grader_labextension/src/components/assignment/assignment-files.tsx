@@ -26,6 +26,9 @@ import GradingIcon from '@mui/icons-material/Grading';
 import { Submission } from '../../model/submission';
 import { RepoType } from '../util/repo-type';
 
+/**
+ * Props for AssignmentFilesComponent.
+ */
 export interface IAssignmentFilesComponentProps {
   lecture: Lecture;
   assignment: Assignment;
@@ -33,12 +36,19 @@ export interface IAssignmentFilesComponentProps {
   setSubmissions: React.Dispatch<React.SetStateAction<Submission[]>>;
 }
 
+/**
+ * Renders the file view and additional buttons to submit, push, pull or reset the assignment.
+ * @param props Props of the assignment files component
+ */
 export const AssignmentFilesComponent = (
   props: IAssignmentFilesComponentProps
 ) => {
   const [dialog, setDialog] = React.useState(false);
   const path = `${props.lecture.code}/${props.assignment.id}`;
-
+  /**
+   * Pulls from given repository by sending a request to the grader git service.
+   * @param repo input which repository should be fetched
+   */
   const fetchAssignmentHandler = async (repo: 'assignment' | 'release') => {
     try {
       await pullAssignment(props.lecture.id, props.assignment.id, repo);
@@ -47,7 +57,9 @@ export const AssignmentFilesComponent = (
       props.showAlert('error', 'Error Fetching Assignment');
     }
   };
-
+  /**
+   * Sends request to reset the student changes.
+   */
   const resetAssignmentHandler = async () => {
     try {
       await pushAssignment(
@@ -64,7 +76,9 @@ export const AssignmentFilesComponent = (
     }
     setDialog(false);
   };
-
+  /**
+   * Pushes the student submission and submits the assignment
+   */
   const submitAssignmentHandler = async () => {
     try {
       await submitAssignment(props.lecture, props.assignment, true);
@@ -73,7 +87,12 @@ export const AssignmentFilesComponent = (
       props.showAlert('error', 'Error Submitting Assignment');
     }
     try {
-      const submissions = await getAllSubmissions(props.lecture, props.assignment, "none", false);
+      const submissions = await getAllSubmissions(
+        props.lecture,
+        props.assignment,
+        'none',
+        false
+      );
       props.setSubmissions(submissions);
     } catch (e) {
       props.showAlert('error', 'Error Updating Submissions');

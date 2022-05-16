@@ -19,9 +19,13 @@ from grader_service.handlers.base_handler import GraderBaseHandler, authorize
 
 @register_handler(r"\/lectures\/?", VersionSpecifier.ALL)
 class LectureBaseHandler(GraderBaseHandler):
+    """
+    Tornado Handler class for http requests to /lecture.
+    """
     @authorize([Scope.student, Scope.tutor, Scope.instructor])
     async def get(self):
-        """Returns all lectures the user can access
+        """
+        Returns all lectures the user can access.
         """
         self.validate_parameters("complete")
         complete = self.get_argument("complete", "false") == "true"
@@ -38,7 +42,8 @@ class LectureBaseHandler(GraderBaseHandler):
 
     @authorize([Scope.instructor])
     async def post(self):
-        """Creates a new lecture from a "ghost"-lecture
+        """
+        Creates a new lecture from a "ghost"-lecture.
 
         :raises HTTPError: throws err if "ghost"-lecture was not found
         """
@@ -80,9 +85,13 @@ class LectureBaseHandler(GraderBaseHandler):
 
 @register_handler(r"\/lectures\/(?P<lecture_id>\d*)\/?", VersionSpecifier.ALL)
 class LectureObjectHandler(GraderBaseHandler):
+    """
+    Tornado Handler class for http requests to /lecture/{lecture_id}.
+    """
     @authorize([Scope.instructor])
     async def put(self, lecture_id: int):
-        """Updates a lecture
+        """
+        Updates a lecture.
 
         :param lecture_id: id of the lecture
         :type lecture_id: int
@@ -102,6 +111,11 @@ class LectureObjectHandler(GraderBaseHandler):
 
     @authorize([Scope.student, Scope.tutor, Scope.instructor])
     async def get(self, lecture_id: int):
+        """
+        Finds lecture with the given lecture id.
+        :param lecture_id: id of lecture
+        :return: lecture with given id
+        """
         self.validate_parameters()
         role = self.get_role(lecture_id)
         if role.lecture.deleted == DeleteState.deleted:
@@ -111,7 +125,9 @@ class LectureObjectHandler(GraderBaseHandler):
 
     @authorize([Scope.instructor])
     async def delete(self, lecture_id: int):
-        """ "Soft"-delete a lecture
+        """
+        "Soft"-delete a lecture.
+        Softdeleting: lecture is still saved in the datastore but the users have not access to it.
 
         :param lecture_id: id of the lecture
         :type lecture_id: int
@@ -143,8 +159,16 @@ class LectureObjectHandler(GraderBaseHandler):
     version_specifier=VersionSpecifier.ALL,
 )
 class LectureStudentsHandler(GraderBaseHandler):
+    """
+    Tornado Handler class for http requests to /lecture/{lecture_id}/users.
+    """
     @authorize([Scope.tutor, Scope.instructor])
     async def get(self, lecture_id: int):
+        """
+        Finds all users of a lecture and sorts them by roles.
+        :param lecture_id: id of the lecture
+        :return: user, tutor and instructor list in a json object
+        """
         roles = self.session.query(Role).filter(Role.lectid == lecture_id).all()
         students = [r.username for r in roles if r.role == Scope.student]
         tutors = [r.username for r in roles if r.role == Scope.tutor]

@@ -22,6 +22,10 @@ from grader_service.handlers.base_handler import GraderBaseHandler, authorize, R
     version_specifier=VersionSpecifier.ALL,
 )
 class GradingAutoHandler(GraderBaseHandler):
+    """
+    Tornado Handler class for http requests to /lecture/{lecture_id}/assignments/{assignment_id}/grading/
+    {submission_id}/auto.
+    """
     def on_finish(self):
         # we do not close the session we just commit because LocalAutogradeExecutor still needs it
         if self.session:
@@ -29,7 +33,8 @@ class GradingAutoHandler(GraderBaseHandler):
 
     @authorize([Scope.tutor, Scope.instructor])
     async def get(self, lecture_id: int, assignment_id: int, sub_id: int):
-        """Starts the autograding process of a submission
+        """
+        Starts the autograding process of a submission.
 
         :param lecture_id: id of the lecture
         :type lecture_id: int
@@ -59,13 +64,18 @@ class GradingAutoHandler(GraderBaseHandler):
     version_specifier=VersionSpecifier.ALL,
 )
 class GenerateFeedbackHandler(GraderBaseHandler):
+    """
+    Tornado Handler class for http requests to /lecture/{lecture_id}/assignments/{assignment_id}/grading/
+    {submission_id}/feedback.
+    """
     def on_finish(self):
         # we do not close the session we just commit because GenerateFeedbackHandler still needs it
         if self.session:
             self.session.commit()
 
     async def get(self, lecture_id: int, assignment_id: int, sub_id):
-        """Starts the process of generating feedback for a submission
+        """
+        Starts the process of generating feedback for a submission.
 
         :param lecture_id: id of the lecture
         :type lecture_id: int

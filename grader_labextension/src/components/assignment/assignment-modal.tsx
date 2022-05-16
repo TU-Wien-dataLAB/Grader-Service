@@ -15,7 +15,9 @@ import LoadingOverlay from '../util/overlay';
 import { Feedback } from './feedback';
 import { AssignmentStatus } from './assignment-status';
 import { AssignmentFilesComponent } from './assignment-files';
-
+/**
+ * Props for AssignmentModalComponent.
+ */
 export interface IAssignmentModalProps {
   lecture: Lecture;
   assignment: Assignment;
@@ -24,11 +26,18 @@ export interface IAssignmentModalProps {
   showAlert: (severity: string, msg: string) => void;
 }
 
+/**
+ * Renders the components available in the extended assignment modal view
+ * @param props props of assignment modal component
+ */
 export const AssignmentModalComponent = (props: IAssignmentModalProps) => {
   const [submissions, setSubmissions] = React.useState(props.submissions);
   const [showFeedback, setShowFeedback] = React.useState(false);
   const [feedbackSubmission, setFeedbackSubmission] = React.useState(null);
-
+  /**
+   * Opens the feedback view.
+   * @param submission submission which feedback will be displayed
+   */
   const openFeedback = (submission: Submission) => {
     setFeedbackSubmission(submission);
     setShowFeedback(true);

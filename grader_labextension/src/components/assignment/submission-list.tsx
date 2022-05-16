@@ -25,15 +25,25 @@ import {
   utcToTimestamp
 } from '../../services/datetime.service';
 import CloudDoneRoundedIcon from '@mui/icons-material/CloudDoneRounded';
-
+/**
+ * Props for SubmissionListComponent.
+ */
 interface ISubmissionListProps {
   submissions: Submission[];
   openFeedback: (s: Submission) => void;
   sx?: SxProps<Theme>;
 }
 
+/**
+ * Renders student submissions in a list
+ * @param props Props of submission list component
+ */
 export const SubmissionList = (props: ISubmissionListProps) => {
-  // generateItems will be fed using the IIterator from the FilterFileBrowserModel
+  /**
+   * Generates submission items which will be rendered in the list
+   * and will be fed using the IIterator from the FilterFileBrowserModel
+   * @param submissions student submissions
+   */
   const generateItems = (submissions: Submission[]) => {
     return submissions
       .sort((a, b) =>

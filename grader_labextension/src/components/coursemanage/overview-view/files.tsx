@@ -5,9 +5,9 @@
 // LICENSE file in the root directory of this source tree.
 
 import * as React from 'react';
-import {useEffect} from 'react';
-import {Assignment} from '../../../model/assignment';
-import {Lecture} from '../../../model/lecture';
+import { useEffect } from 'react';
+import { Assignment } from '../../../model/assignment';
+import { Lecture } from '../../../model/lecture';
 import {
   generateAssignment,
   pullAssignment,
@@ -15,7 +15,7 @@ import {
   updateAssignment
 } from '../../../services/assignments.service';
 import GetAppRoundedIcon from '@mui/icons-material/GetAppRounded';
-import {AgreeDialog, CommitDialog} from '../../util/dialog';
+import { AgreeDialog, CommitDialog } from '../../util/dialog';
 import {
   Box,
   Button,
@@ -33,16 +33,18 @@ import {
 import ReplayIcon from '@mui/icons-material/Replay';
 import OpenInBrowserIcon from '@mui/icons-material/OpenInBrowser';
 import TerminalIcon from '@mui/icons-material/Terminal';
-import {FilesList} from '../../util/file-list';
-import {GlobalObjects} from '../../../index';
-import {Contents} from '@jupyterlab/services';
+import { FilesList } from '../../util/file-list';
+import { GlobalObjects } from '../../../index';
+import { Contents } from '@jupyterlab/services';
 import moment from 'moment';
-import {openBrowser, openTerminal} from "./util";
-import {PageConfig} from "@jupyterlab/coreutils";
-import PublishRoundedIcon from "@mui/icons-material/PublishRounded";
-import {getRemoteStatus} from "../../../services/file.service";
-import {RepoType} from "../../util/repo-type";
-
+import { openBrowser, openTerminal } from './util';
+import { PageConfig } from '@jupyterlab/coreutils';
+import PublishRoundedIcon from '@mui/icons-material/PublishRounded';
+import { getRemoteStatus } from '../../../services/file.service';
+import { RepoType } from '../../util/repo-type';
+/**
+ * Props for FilesComponent.
+ */
 export interface IFilesProps {
   lecture: Lecture;
   assignment: Assignment;
@@ -50,6 +52,10 @@ export interface IFilesProps {
   showAlert: (severity: string, msg: string) => void;
 }
 
+/**
+ * Renders in a file list the assignment files
+ * @param props props of the file component
+ */
 export const Files = (props: IFilesProps) => {
   const [assignment, setAssignment] = React.useState(props.assignment);
   const [lecture, setLecture] = React.useState(props.lecture);
@@ -63,21 +69,27 @@ export const Files = (props: IFilesProps) => {
   });
   const [reloadFilesToggle, setReloadFiles] = React.useState(false);
 
-  const [repoStatus, setRepoStatus] = React.useState(null as "up_to_date" | "pull_needed" | "push_needed" | "divergent");
+  const [repoStatus, setRepoStatus] = React.useState(
+    null as 'up_to_date' | 'pull_needed' | 'push_needed' | 'divergent'
+  );
 
-  const [srcChangedTimestamp, setSrcChangeTimestamp] = React.useState(moment().valueOf()); // now
+  const [srcChangedTimestamp, setSrcChangeTimestamp] = React.useState(
+    moment().valueOf()
+  ); // now
   const [generateTimestamp, setGenerateTimestamp] = React.useState(null);
 
   const serverRoot = PageConfig.getOption('serverRoot');
 
-  const isCommitOverwrite = () => repoStatus === "pull_needed" || repoStatus === "divergent";
-  const isPullOverwrite = () => repoStatus === "push_needed" || repoStatus === "divergent"
+  const isCommitOverwrite = () =>
+    repoStatus === 'pull_needed' || repoStatus === 'divergent';
+  const isPullOverwrite = () =>
+    repoStatus === 'push_needed' || repoStatus === 'divergent';
 
   useEffect(() => {
     const srcPath = `source/${lecture.code}/${assignment.id}`;
     GlobalObjects.docManager.services.contents.fileChanged.connect(
       (sender: Contents.IManager, change: Contents.IChangedArgs) => {
-        const {oldValue, newValue} = change;
+        const { oldValue, newValue } = change;
         if (!newValue.path.includes(srcPath)) {
           return;
         }
@@ -92,17 +104,26 @@ export const Files = (props: IFilesProps) => {
     );
 
     getRemoteStatus(lecture, assignment, RepoType.SOURCE).then(status => {
-      setRepoStatus(status as "up_to_date" | "pull_needed" | "push_needed" | "divergent");
+      setRepoStatus(
+        status as 'up_to_date' | 'pull_needed' | 'push_needed' | 'divergent'
+      );
     });
   }, [props]);
-
+  /**
+   * Reload file view.
+   */
   const reloadFiles = () => {
     setReloadFiles(!reloadFilesToggle);
     getRemoteStatus(lecture, assignment, RepoType.SOURCE).then(status => {
-      setRepoStatus(status as "up_to_date" | "pull_needed" | "push_needed" | "divergent");
+      setRepoStatus(
+        status as 'up_to_date' | 'pull_needed' | 'push_needed' | 'divergent'
+      );
     });
-  }
-
+  };
+  /**
+   * Switches between source and release directory.
+   * @param dir dir which should be switched to
+   */
   const handleSwitchDir = async (dir: 'source' | 'release') => {
     if (dir === 'release') {
       if (
@@ -122,7 +143,10 @@ export const Files = (props: IFilesProps) => {
   };
 
   const closeDialog = () => setShowDialog(false);
-
+  /**
+   * Pushes files to the source und release repo.
+   * @param commitMessage the commit message
+   */
   const handlePushAssignment = async (commitMessage: string) => {
     setDialogContent({
       title: 'Push Assignment',
@@ -158,19 +182,26 @@ export const Files = (props: IFilesProps) => {
     });
     setShowDialog(true);
   };
-
-  const getRemoteStatusText = (status: "up_to_date" | "pull_needed" | "push_needed" | "divergent") => {
-    if (status == "up_to_date") {
-      return "The local files are up to date with the remote repository."
-    } else if (status == "pull_needed") {
-      return "The remote repository has new changes. Pull now to load them."
-    } else if (status == "push_needed") {
-      return "You have made changes to your local repository which you can push."
+  /**
+   * Sets the repo status text.
+   * @param status repo status
+   */
+  const getRemoteStatusText = (
+    status: 'up_to_date' | 'pull_needed' | 'push_needed' | 'divergent'
+  ) => {
+    if (status === 'up_to_date') {
+      return 'The local files are up to date with the remote repository.';
+    } else if (status === 'pull_needed') {
+      return 'The remote repository has new changes. Pull now to load them.';
+    } else if (status === 'push_needed') {
+      return 'You have made changes to your local repository which you can push.';
     } else {
-      return "The local and remote files are divergent."
+      return 'The local and remote files are divergent.';
     }
-  }
-
+  };
+  /**
+   * Pulls changes from source repository.
+   */
   const handlePullAssignment = async () => {
     setDialogContent({
       title: 'Pull Assignment',
@@ -198,11 +229,8 @@ export const Files = (props: IFilesProps) => {
           <Grid container>
             <Grid item>
               <Tooltip title="Reload">
-                <IconButton
-                  aria-label="reload"
-                  onClick={() => reloadFiles()}
-                >
-                  <ReplayIcon/>
+                <IconButton aria-label="reload" onClick={() => reloadFiles()}>
+                  <ReplayIcon />
                 </IconButton>
               </Tooltip>
             </Grid>
@@ -210,17 +238,17 @@ export const Files = (props: IFilesProps) => {
         }
       />
 
-      <CardContent sx={{height: '270px', overflowY: 'auto'}}>
+      <CardContent sx={{ height: '270px', overflowY: 'auto' }}>
         <Typography>{getRemoteStatusText(repoStatus)}</Typography>
         <Tabs
           variant="fullWidth"
           value={selectedDir}
           onChange={(e, dir) => handleSwitchDir(dir)}
         >
-          <Tab label="Source" value="source"/>
-          <Tab label="Release" value="release"/>
+          <Tab label="Source" value="source" />
+          <Tab label="Release" value="release" />
         </Tabs>
-        <Box height={214} sx={{overflowY: 'auto'}}>
+        <Box height={214} sx={{ overflowY: 'auto' }}>
           <FilesList
             path={`${selectedDir}/${props.lecture.code}/${props.assignment.id}`}
             reloadFiles={reloadFilesToggle}
@@ -230,40 +258,64 @@ export const Files = (props: IFilesProps) => {
       </CardContent>
       <CardActions>
         <CommitDialog handleCommit={msg => handlePushAssignment(msg)}>
-          <Tooltip title={`Commit Changes${isCommitOverwrite() ? " (Overwrites remote files!)" : ""}`}>
-            <Button sx={{mt: -1}} variant="outlined" size="small"
-                    color={isCommitOverwrite() ? "error" : "primary"}>
-              <PublishRoundedIcon fontSize="small" sx={{mr: 1}}/>
+          <Tooltip
+            title={`Commit Changes${
+              isCommitOverwrite() ? ' (Overwrites remote files!)' : ''
+            }`}
+          >
+            <Button
+              sx={{ mt: -1 }}
+              variant="outlined"
+              size="small"
+              color={isCommitOverwrite() ? 'error' : 'primary'}
+            >
+              <PublishRoundedIcon fontSize="small" sx={{ mr: 1 }} />
               Commit
             </Button>
           </Tooltip>
         </CommitDialog>
-        <Tooltip title={`Pull from Remote${isPullOverwrite() ? " (Overwrites local changes!)" : ""}`}>
+        <Tooltip
+          title={`Pull from Remote${
+            isPullOverwrite() ? ' (Overwrites local changes!)' : ''
+          }`}
+        >
           <Button
-            color={isPullOverwrite() ? "error" : "primary"}
-            sx={{mt: -1, ml: 2}}
+            color={isPullOverwrite() ? 'error' : 'primary'}
+            sx={{ mt: -1, ml: 2 }}
             onClick={() => handlePullAssignment()}
             variant="outlined"
             size="small"
           >
-            <GetAppRoundedIcon fontSize="small" sx={{mr: 1}}/>
+            <GetAppRoundedIcon fontSize="small" sx={{ mr: 1 }} />
             Pull
           </Button>
         </Tooltip>
-        <Tooltip title={"Show in File-Browser"}>
+        <Tooltip title={'Show in File-Browser'}>
           <IconButton
-            sx={{mt: -1, pt: 0, pb: 0}}
-            color={"primary"}
-            onClick={() => openBrowser(`${selectedDir}/${lecture.code}/${assignment.id}`, props.showAlert)}>
-            <OpenInBrowserIcon/>
+            sx={{ mt: -1, pt: 0, pb: 0 }}
+            color={'primary'}
+            onClick={() =>
+              openBrowser(
+                `${selectedDir}/${lecture.code}/${assignment.id}`,
+                props.showAlert
+              )
+            }
+          >
+            <OpenInBrowserIcon />
           </IconButton>
         </Tooltip>
-        <Tooltip title={"Open in Terminal"}>
+        <Tooltip title={'Open in Terminal'}>
           <IconButton
-            sx={{mt: -1, pt: 0, pb: 0}}
-            color={"primary"}
-            onClick={() => openTerminal(`${serverRoot}/${selectedDir}/${lecture.code}/${assignment.id}`, props.showAlert)}>
-            <TerminalIcon/>
+            sx={{ mt: -1, pt: 0, pb: 0 }}
+            color={'primary'}
+            onClick={() =>
+              openTerminal(
+                `${serverRoot}/${selectedDir}/${lecture.code}/${assignment.id}`,
+                props.showAlert
+              )
+            }
+          >
+            <TerminalIcon />
           </IconButton>
         </Tooltip>
       </CardActions>
