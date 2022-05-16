@@ -53,7 +53,7 @@
     "watch:labextension": "jupyter labextension watch ."
   },
   "dependencies": {
-    "@blueprintjs/core": "^4.3.0",
+    "@blueprintjs/core": "^3.54.0",
     "@date-io/date-fns": "^2.11.0",
     "@emotion/react": "^11.7.1",
     "@emotion/styled": "^11.6.0",
