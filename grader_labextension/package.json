@@ -53,12 +53,11 @@
     "watch:labextension": "jupyter labextension watch ."
   },
   "dependencies": {
+    "@blueprintjs/core": "^4.3.0",
     "@date-io/date-fns": "^2.11.0",
     "@emotion/react": "^11.7.1",
     "@emotion/styled": "^11.6.0",
-    "@blueprintjs/core": "^4.3.0",
     "@jupyterlab/application": "^3.4.1",
-    "@jupyterlab/codeeditor": "~3.2.0",
     "@jupyterlab/coreutils": "^5.0.0",
     "@jupyterlab/launcher": "^3.4.1",
     "@jupyterlab/notebook": "^3.4.1",
@@ -75,14 +74,15 @@
     "is-plain-object": "^5.0.0",
     "moment": "^2.29.1",
     "react": "^17.0.2",
-    "react-dom": "^17.0.2",
     "react-chartjs-2": "^4.0.0",
+    "react-dom": "^17.0.2",
     "rxjs": "^7.5.5",
     "yup": "^0.32.11"
   },
   "devDependencies": {
     "@jupyterlab/builder": "^3.0.0",
     "@types/node": "^15.12.5",
+    "@types/react-dom": "^18.0.4",
     "@typescript-eslint/eslint-plugin": "^4.8.1",
     "@typescript-eslint/parser": "^4.8.1",
     "eslint": "^7.14.0",
@@ -92,9 +92,8 @@
     "npm-run-all": "^4.1.5",
     "prettier": "^2.1.1",
     "rimraf": "^3.0.2",
-    "typescript": "~4.3.5",
     "typedoc": "^0.22.15",
-    "yarn-deduplicate": "^3.1.0"
+    "typescript": "~4.3.5"
   },
   "sideEffects": [
     "style/*.css",
