@@ -67,7 +67,7 @@
     "@mui/icons-material": "^5.2.1",
     "@mui/lab": "^5.0.0-alpha.81",
     "@mui/material": "^5.7.0",
-    "@mui/x-data-grid": "^5.1.0",
+    "@mui/x-data-grid": "^5.11.0",
     "chart.js": "^3.7.0",
     "date-fns": "^2.27.0",
     "formik": "^2.2.9",
@@ -81,7 +81,6 @@
   },
   "devDependencies": {
     "@types/react": "^17.0.0",
-    "@types/react-transition-group": "^4.4.4",
     "@jupyterlab/builder": "^3.0.0",
     "@types/node": "^15.12.5",
     "@types/react-dom": "^18.0.4",
