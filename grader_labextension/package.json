@@ -28,25 +28,25 @@
     "url": "https://https://github.com/TU-Wien-dataLAB/Grader-Service.git"
   },
   "scripts": {
-    "build": "npm run build:lib && npm run build:labextension:dev",
-    "build:prod": "npm run clean && npm run build:lib && npm run build:labextension",
+    "build": "jlpm build:lib && jlpm build:labextension:dev",
+    "build:prod": "jlpm clean && jlpm build:lib && jlpm build:labextension",
     "build:labextension": "jupyter labextension build .",
     "build:labextension:dev": "jupyter labextension build --development True .",
     "build:lib": "tsc",
-    "clean": "npm run clean:lib",
+    "clean": "jlpm clean:lib",
     "clean:lib": "rimraf lib tsconfig.tsbuildinfo",
     "clean:lintcache": "rimraf .eslintcache .stylelintcache",
     "clean:labextension": "rimraf grader_labextension/labextension",
-    "clean:all": "npm run clean:lib && npm run clean:labextension && npm run clean:lintcache",
-    "eslint": "npm run eslint:check --fix",
+    "clean:all": "jlpm clean:lib && jlpm clean:labextension && jlpm clean:lintcache",
+    "eslint": "jlpm eslint:check --fix",
     "eslint:check": "eslint . --cache --ext .ts,.tsx",
-    "install:extension": "npm run build",
-    "lint": "npm run stylelint && npm run prettier && npm run eslint",
-    "lint:check": "npm run stylelint:check && npm run prettier:check && npm run eslint:check",
-    "prettier": "npm run prettier:base --write --list-different",
+    "install:extension": "jlpm build",
+    "lint": "jlpm stylelint && jlpm prettier && jlpm eslint",
+    "lint:check": "jlpm stylelint:check && jlpm prettier:check && jlpm eslint:check",
+    "prettier": "jlpm prettier:base --write --list-different",
     "prettier:base": "prettier \"**/*{.ts,.tsx,.js,.jsx,.css,.json,.md}\"",
-    "prettier:check": "npm run prettier:base --check",
-    "stylelint": "npm run stylelint:check --fix",
+    "prettier:check": "jlpm prettier:base --check",
+    "stylelint": "jlpm stylelint:check --fix",
     "stylelint:check": "stylelint --cache \"style/**/*.css\"",
     "watch": "run-p watch:src watch:labextension",
     "watch:src": "tsc -w",
@@ -125,7 +125,7 @@
         "jlpm"
       ],
       "before-build-python": [
-        "npm run clean:all"
+        "jlpm clean:all"
       ]
     }
   }
