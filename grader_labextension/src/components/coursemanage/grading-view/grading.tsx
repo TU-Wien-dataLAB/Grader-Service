@@ -48,8 +48,9 @@ import { PanoramaSharp } from '@mui/icons-material';
 import ReplayIcon from '@mui/icons-material/Replay';
 import { GlobalObjects } from '../../../index';
 
-
-
+/**
+ * Props for GradingComponent.
+ */
 export interface IGradingProps {
   lecture: Lecture;
   assignment: Assignment;
@@ -58,10 +59,17 @@ export interface IGradingProps {
   showAlert: (severity: string, msg: string) => void;
 }
 
+/**
+ * .Rows object for the data grid.
+ */
 interface IRowValues extends Submission {
   sub_id: number;
 }
 
+/**
+ * Renders the grading view in which the course management can grade student submissions and generate feedback.
+ * @param props Props of the grading component
+ */
 export const GradingComponent = (props: IGradingProps) => {
   const [option, setOption] = React.useState(
     'latest' as 'none' | 'latest' | 'best'
@@ -80,11 +88,15 @@ export const GradingComponent = (props: IGradingProps) => {
   const onManualGradingClose = async () => {
     setDisplayManualGrading(false);
   };
-
+  /**
+   * Removes row selection.
+   */
   const cleanSelectedRows = () => {
     setSelectedRows([]);
   };
-
+  /**
+   * Automatically grade selected submissions.
+   */
   const handleAutogradeSubmissions = async () => {
     setDialogContent({
       title: 'Autograde Selected Submissions',
@@ -112,7 +124,9 @@ export const GradingComponent = (props: IGradingProps) => {
     });
     setShowDialog(true);
   };
-
+  /**
+   * Generate feedback for selected submissions.
+   */
   const handleGenerateFeedback = async () => {
     setDialogContent({
       title: 'Generate Feedback',
@@ -150,9 +164,14 @@ export const GradingComponent = (props: IGradingProps) => {
     });
     setShowDialog(true);
   };
-
+  /**
+   * Closes dialog window.
+   */
   const closeDialog = () => setShowDialog(false);
-
+  /**
+   * Generates rows objects out of submission.
+   * @param submissions submissions which are used to generate row objects
+   */
   const generateRows = (submissions: Submission[]) => {
     console.log('Submissions');
     console.log(submissions);
@@ -188,11 +207,16 @@ export const GradingComponent = (props: IGradingProps) => {
   const [selectedRowsData, setSelectedRowsData] = React.useState(
     [] as IRowValues[]
   );
-
+  /**
+   * Updates rows by setting the new value of the submission select.
+   * @param event select change event
+   */
   const handleChange = (event: SelectChangeEvent) => {
     setOption(event.target.value as 'none' | 'latest' | 'best');
   };
-
+  /**
+   * Updates submissions and rows.
+   */
   const updateSubmissions = () => {
     getAllSubmissions(props.lecture, props.assignment, option, true).then(
       response => {
@@ -205,7 +229,11 @@ export const GradingComponent = (props: IGradingProps) => {
   React.useEffect(() => {
     updateSubmissions();
   }, [option, displayManualGrading]);
-
+  /**
+   * Calculates chip color based on submission status.
+   * @param value submission status
+   * @return chip color
+   */
   const getColor = (value: string) => {
     if (value === 'not_graded') {
       return 'warning';
@@ -219,7 +247,10 @@ export const GradingComponent = (props: IGradingProps) => {
     }
     return 'primary';
   };
-
+  /**
+   * Opens log dialog which contain autograded logs from grader service.
+   * @param params row which is needed to find selected submission
+   */
   const openLogs = (params: GridRenderCellParams<string>) => {
     const submission: Submission = getSubmissionFromRow(
       params.row as IRowValues
@@ -277,7 +308,10 @@ export const GradingComponent = (props: IGradingProps) => {
     },
     { field: 'score', headerName: 'Score', width: 130 }
   ];
-
+  /**
+   * Returns submission based on given rows.
+   * @param row row which is needed to determine submission
+   */
   const getSubmissionFromRow = (row: IRowValues): Submission => {
     // Leave linear search for now (there were problems with casting and the local display date when casting)
     if (row === undefined) {
@@ -319,7 +353,9 @@ export const GradingComponent = (props: IGradingProps) => {
         console.log(error);
       });
   };
-
+  /**
+   * Exports submissions.
+   */
   const handleExportSubmissions = async () => {
     try {
       await saveSubmissions(props.lecture, props.assignment, option);
