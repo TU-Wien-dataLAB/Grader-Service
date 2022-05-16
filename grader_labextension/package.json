@@ -100,6 +100,7 @@
   },
   "resolutions": {
     "@types/react-transition-group/@types/react": "^17.0.2",
+    "@types/react-transition-group/node_modules/@types/react": "^17.0.2",
     "@mui/material/@types/react": "^17.0.2"
   },
   "sideEffects": [
