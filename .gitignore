@@ -364,6 +364,7 @@ instance/
 # Sphinx documentation
 docs/_build/
 doc/_build/
+docs/source/_build
 
 #Typedoc documentation
 docs/typedoc
