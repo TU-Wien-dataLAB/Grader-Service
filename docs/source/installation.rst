@@ -1,5 +1,8 @@
 Installation
 **************
+
+.. installation-start
+
 This repository contains the lab/server extensions and the grader service as well as grader-convert.
 
 The grader service has only been tested on Unix/macOS operating systems.
@@ -34,9 +37,11 @@ In the ``grader`` directory run:
 
 .. code-block::
 
-   pip install ./convert
-   pip install ./grading_labextension
+   pip install ./grader_convert
+   pip install ./grader_labextension
    pip install ./grader_service
 
 
 Then, navigate to the ``grading_labextension``\ -directory and follow the instructions in the README file
+
+.. installation-end

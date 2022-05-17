@@ -1,6 +1,8 @@
 Get Started
 **************
 
+.. running-start
+
 Running grader service
 =======================
 
@@ -78,3 +80,4 @@ The last thing we have to configure is the server-side of the JupyterLab plugin 
     c.RequestService.url = "http://127.0.0.1:4010"
 
 
+.. running-end
