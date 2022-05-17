@@ -304,8 +304,8 @@ def ignore_patterns(exclude=None, include=None, max_file_size=None, log=None):
     This is a generalization of :func:`shutils.ignore_patterns` that supports
     include globs, exclude globs, max file size, and logging.
 
-    Arguments
-    ---------
+    Parameters
+    ----------
     exclude: list or None
         A list of filename globs or None (the default)
     include: list or None
@@ -459,15 +459,12 @@ def remove(path: str) -> None:
 def unzip(src, dest, zip_ext=None, create_own_folder=False, tree=False):
     """Extract all content from an archive file to a destination folder.
 
-    Arguments
-    ---------
+    Parameters
+    ----------
     src: str
         Absolute path to the archive file ('/path/to/archive_filename.zip')
     dest: str
         Asolute path to extract all content to ('/path/to/extract/')
-
-    Keyword Arguments
-    -----------------
     zip_ext: list
         Valid zip file extensions. Default: ['.zip', '.gz']
     create_own_folder: bool
@@ -542,8 +539,8 @@ def capture_log(app, fmt="[%(levelname)s] %(message)s"):
     buffer, calls ``app.start()``, and returns the log output. The extra
     handler is removed from the application before returning.
 
-    Arguments
-    ---------
+    Parameters
+    ----------
     app: LoggingConfigurable
         An application, withh the `.start()` method implemented
     fmt: string
