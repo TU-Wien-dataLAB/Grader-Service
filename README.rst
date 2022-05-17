@@ -1,6 +1,9 @@
 
-Grader Service
-=================
+.. image:: ./docs/source/_static/assets/images/logo_name.png
+   :width: 95%
+   :alt: banner
+   :align: center
+
 
 .. image:: https://readthedocs.org/projects/grader-service/badge/?version=latest
     :target: https://grader-service.readthedocs.io/en/latest/?badge=latest
