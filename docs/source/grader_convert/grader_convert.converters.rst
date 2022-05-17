@@ -10,7 +10,6 @@ Autograde
 .. automodule:: grader_convert.converters.autograde
    :members:
    :undoc-members:
-   :show-inheritance:
 
 Base
 --------------------------------------
@@ -18,7 +17,6 @@ Base
 .. automodule:: grader_convert.converters.base
    :members:
    :undoc-members:
-   :show-inheritance:
 
 BaseApp
 -----------------------------------------
@@ -26,7 +24,6 @@ BaseApp
 .. automodule:: grader_convert.converters.baseapp
    :members:
    :undoc-members:
-   :show-inheritance:
 
 Generate Assignment
 ------------------------------------------------------
@@ -34,7 +31,6 @@ Generate Assignment
 .. automodule:: grader_convert.converters.generate_assignment
    :members:
    :undoc-members:
-   :show-inheritance:
 
 Generate Feedback
 ----------------------------------------------------
@@ -42,7 +38,6 @@ Generate Feedback
 .. automodule:: grader_convert.converters.generate_feedback
    :members:
    :undoc-members:
-   :show-inheritance:
 
 Generate Solution
 ----------------------------------------------------
@@ -50,7 +45,6 @@ Generate Solution
 .. automodule:: grader_convert.converters.generate_solution
    :members:
    :undoc-members:
-   :show-inheritance:
 
 Update App
 -------------------------------------------
@@ -58,7 +52,6 @@ Update App
 .. automodule:: grader_convert.converters.updateapp
    :members:
    :undoc-members:
-   :show-inheritance:
 
 Validate App
 ---------------------------------------------
@@ -66,7 +59,6 @@ Validate App
 .. automodule:: grader_convert.converters.validateapp
    :members:
    :undoc-members:
-   :show-inheritance:
 
 ..
     Module contents
@@ -75,4 +67,3 @@ Validate App
     .. automodule:: grader_convert.converters
        :members:
        :undoc-members:
-       :show-inheritance:

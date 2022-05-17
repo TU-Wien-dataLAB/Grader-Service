@@ -21,7 +21,6 @@ Main
 .. automodule:: grader_convert.main
    :members:
    :undoc-members:
-   :show-inheritance:
 
 Utils
 ----------------------------
@@ -29,7 +28,6 @@ Utils
 .. automodule:: grader_convert.utils
    :members:
    :undoc-members:
-   :show-inheritance:
 
 Validator
 --------------------------------
@@ -37,7 +35,6 @@ Validator
 .. automodule:: grader_convert.validator
    :members:
    :undoc-members:
-   :show-inheritance:
 
 ..
     Module contents
@@ -46,4 +43,3 @@ Validator
     .. automodule:: grader_convert
        :members:
        :undoc-members:
-       :show-inheritance:

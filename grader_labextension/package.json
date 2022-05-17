@@ -25,7 +25,7 @@
   "style": "style/index.css",
   "repository": {
     "type": "git",
-    "url": "https://github.com/github_username/grader-labextension.git"
+    "url": "https://https://github.com/TU-Wien-dataLAB/Grader-Service.git"
   },
   "scripts": {
     "build": "jlpm build:lib && jlpm build:labextension:dev",
@@ -53,22 +53,22 @@
     "watch:labextension": "jupyter labextension watch ."
   },
   "dependencies": {
+    "@blueprintjs/core": "^3.54.0",
     "@date-io/date-fns": "^2.11.0",
     "@emotion/react": "^11.7.1",
     "@emotion/styled": "^11.6.0",
-    "@jupyterlab/application": "^3.2.5",
-    "@jupyterlab/codeeditor": "^3.2.0",
+    "@jupyterlab/application": "^3.4.1",
     "@jupyterlab/coreutils": "^5.0.0",
-    "@jupyterlab/launcher": "^3.0.5",
-    "@jupyterlab/notebook": "^3.0.7",
+    "@jupyterlab/launcher": "^3.4.1",
+    "@jupyterlab/notebook": "^3.4.1",
     "@jupyterlab/services": "^6.0.0",
-    "@jupyterlab/terminal": "^3.1.8",
-    "@lumino/widgets": "^1.30.1",
+    "@jupyterlab/terminal": "^3.4.1",
+    "@lumino/widgets": "^1.32.0",
     "@mui/icons-material": "^5.2.1",
-    "@mui/lab": "^5.0.0-alpha.59",
-    "@mui/material": "^5.2.4",
-    "@mui/x-data-grid": "^5.1.0",
-    "@types/react": "^17.0.39",
+    "@mui/lab": "^5.0.0-alpha.81",
+    "@mui/material": "^5.7.0",
+    "@mui/x-data-grid": "^5.11.0",
+    "@mui/system": "^5.7.0",
     "chart.js": "^3.7.0",
     "date-fns": "^2.27.0",
     "formik": "^2.2.9",
@@ -77,14 +77,15 @@
     "react": "^17.0.2",
     "react-chartjs-2": "^4.0.0",
     "react-dom": "^17.0.2",
-    "rxjs": "^6.6.7",
-    "typedoc": "^0.22.15",
+    "react-transition-group": "^4.4.2",
+    "rxjs": "^7.5.5",
     "yup": "^0.32.11"
   },
   "devDependencies": {
+    "@types/react": "^17.0.0",
     "@jupyterlab/builder": "^3.0.0",
     "@types/node": "^15.12.5",
-    "@types/react-dom": "^17.0.11",
+    "@types/react-dom": "^17.0.17",
     "@typescript-eslint/eslint-plugin": "^4.8.1",
     "@typescript-eslint/parser": "^4.8.1",
     "eslint": "^7.14.0",
@@ -94,7 +95,11 @@
     "npm-run-all": "^4.1.5",
     "prettier": "^2.1.1",
     "rimraf": "^3.0.2",
-    "typescript": "4.3.5"
+    "typedoc": "^0.22.15",
+    "typescript": "~4.3.5"
+  },
+  "resolutions": {
+    "@types/react": "^17.0.2"
   },
   "sideEffects": [
     "style/*.css",

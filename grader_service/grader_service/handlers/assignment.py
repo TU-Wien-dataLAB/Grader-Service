@@ -1,12 +1,5 @@
-# Copyright (c) 2022, TU Wien
-# All rights reserved.
-#
-# This source code is licensed under the BSD-style license found in the
-# LICENSE file in the root directory of this source tree.
-
 import json
 import shutil
-import subprocess
 import sys
 import tornado
 import os
@@ -100,7 +93,6 @@ class AssignmentBaseHandler(GraderBaseHandler):
             self.log.error(e)
             self.session.rollback()
             raise HTTPError(400, reason="Cannot add object to database.")
-        self.set_status(201)
         self.write_json(assignment)
 
 
@@ -183,6 +175,9 @@ class AssignmentObjectHandler(GraderBaseHandler):
         try:
             assignment = self.get_assignment(lecture_id, assignment_id)
 
+            if len(assignment.submissions) > 0:
+                raise HTTPError(400, reason="Cannot delete assignment that has submissions")
+
             if assignment.status in ["released", "complete"]:
                 raise HTTPError(400, reason=f'Cannot delete assignment with status "{assignment.status}"')
 
@@ -219,14 +214,27 @@ class AssignmentResetHandler(GraderBaseHandler):
         lecture_id, assignment_id = parse_ids(lecture_id, assignment_id)
         assignment = self.get_assignment(lecture_id, assignment_id)
 
+        git_path_base = os.path.join(self.application.grader_service_dir, "tmp", assignment.lecture.code,
+                                     assignment.name, self.user.name)
+        # Deleting dir
+        if os.path.exists(git_path_base):
+            shutil.rmtree(git_path_base)
+
+        self.log.info(f"DIR {git_path_base}")
+        os.makedirs(git_path_base, exist_ok=True)
+        git_path_release = os.path.join(git_path_base, "release")
+        git_path_user = os.path.join(git_path_base, self.user.name)
+        self.log.info(f"GIT BASE {git_path_base}")
+        self.log.info(f"GIT RELEASE {git_path_release}")
+        self.log.info(f"GIT USER {git_path_user}")
+
         repo_path_release = self.construct_git_dir('release', assignment.lecture, assignment)
         repo_path_user = self.construct_git_dir(assignment.type, assignment.lecture, assignment)
 
-        if not os.path.exists(repo_path_release) or not os.path.exists(repo_path_user):
-            raise HTTPError(404, reason="Some repositories do not exist!")
+        self.overwrite_user_repository(tmp_path_base=git_path_base, tmp_path_release=git_path_release,
+                                       tmp_path_user=git_path_user, repo_path_release=repo_path_release,
+                                       repo_path_user=repo_path_user)
 
-        self.duplicate_release_repo(repo_path_release=repo_path_release, repo_path_user=repo_path_user,
-                                    assignment=assignment, message="Reset")
         self.write_json(assignment)
 
 

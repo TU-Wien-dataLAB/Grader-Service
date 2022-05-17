@@ -115,16 +115,12 @@ class Gradebook:
     # Notebooks
     @write_access
     def add_notebook(self, name: str, **kwargs: dict) -> Notebook:
-        """Add a new notebook to the :class:`~GradeBookModel`.
+        """
+        Add a new notebook to the :class:`~GradeBookModel`.
         Parameters
-        ----------
-        name:
-            the name of the new notebook
-        `**kwargs`
-            additional keyword arguments for the :class:`~Notebook` object
-        Returns
-        -------
-        notebook : :class:`~Notebook`
+        :param name:  the name of the new notebook
+        :param kwargs: additional keyword arguments for the :class:`~Notebook` object
+        :return: notebook : :class:`~Notebook`
         """
         kwargs = {
             k: v for k, v in kwargs.items() if k in set(Notebook.empty_dict().keys())
@@ -133,14 +129,10 @@ class Gradebook:
         self.model.notebooks[name] = Notebook.from_dict(kwargs)
 
     def find_notebook(self, name: str) -> Notebook:
-        """Find a particular notebook.
-        Parameters
-        ----------
-        name:
-            the name of the notebook
-        Returns
-        -------
-        notebook : :class:`~Notebook`
+        """
+        Find a particular notebook.
+        :param name: the name of the notebook
+        :return:  notebook : :class:`~Notebook`
         """
         try:
             return self.model.notebooks[name]
@@ -149,26 +141,20 @@ class Gradebook:
 
     @write_access
     def update_or_create_notebook(self, name: str, **kwargs):
-        """Update an existing notebook, or create it if it doesn't exist.
-        Parameters
-        ----------
-        name : string
-            the name of the notebook
-        `**kwargs`
-            additional keyword arguments for the :class:`~Notebook` object
-        Returns
-        -------
-        notebook : :class:`~nNotebook`
+        """
+        Update an existing notebook, or create it if it doesn't exist.
+        :param name: the name of the notebook
+        :param kwargs: additional keyword arguments for the :class:`~Notebook` object
+        :return: notebook : :class:`~nNotebook`
         """
         raise NotImplementedError()
 
     @write_access
     def remove_notebook(self, name: str):
-        """Deletes an existing notebook from the gradebook.
-        Parameters
-        ----------
-        name : string
-            the name of the notebook to delete
+        """
+        Deletes an existing notebook from the gradebook.
+        :param name: the name of the notebook to delete
+        :return: None
         """
         self.model.notebooks.pop(name, None)
 
@@ -176,18 +162,12 @@ class Gradebook:
 
     @write_access
     def add_grade_cell(self, name: str, notebook: str, **kwargs: dict) -> GradeCell:
-        """Add a new grade cell to an existing notebook.
-        Parameters
-        ----------
-        name:
-            the name of the new grade cell
-        notebook:
-            the name of an existing notebook
-        `**kwargs`
-            additional keyword arguments for :class:`~GradeCell`
-        Returns
-        -------
-        grade_cell
+        """
+        Add a new grade cell to an existing notebook.
+        :param name: the name of the new grade cell
+        :param notebook: the name of an existing notebook
+        :param kwargs: additional keyword arguments for :class:`~GradeCell`
+        :return: grade_cell
         """
         kwargs = {
             k: v for k, v in kwargs.items() if k in set(GradeCell.empty_dict().keys())
@@ -198,16 +178,11 @@ class Gradebook:
         return nb.grade_cells_dict[name]
 
     def find_grade_cell(self, name: str, notebook: str) -> GradeCell:
-        """Find a grade cell in a particular notebook.
-        Parameters
-        ----------
-        name:
-            the name of the grade cell
-        notebook:
-            the name of the notebook
-        Returns
-        -------
-        grade_cell
+        """
+        Find a grade cell in a particular notebook.
+        :param name: the name of the grade cell
+        :param notebook: the name of the notebook
+        :return: grade_cell
         """
         nb = self.find_notebook(notebook)
         try:
@@ -216,16 +191,11 @@ class Gradebook:
             raise MissingEntry()
 
     def find_graded_cell(self, name: str, notebook: str) -> Union[GradeCell, TaskCell]:
-        """Find a graded cell in a particular notebook. This can be either a GradeCell or a TaskCell.
-        Parameters
-        ----------
-        name:
-            the name of the grade cell
-        notebook:
-            the name of the notebook
-        Returns
-        -------
-        grade_cell
+        """
+        Find a graded cell in a particular notebook. This can be either a GradeCell or a TaskCell.
+        :param name: the name of the grade cell
+        :param notebook: the name of the notebook
+        :return: grade_cell
         """
         nb = self.find_notebook(notebook)
         try:
@@ -237,18 +207,12 @@ class Gradebook:
     def update_or_create_grade_cell(
         self, name: str, notebook: str, **kwargs: dict
     ) -> GradeCell:
-        """Update an existing grade cell in a notebook, or create the grade cell if it does not exist.
-        Parameters
-        ----------
-        name:
-            the name of the grade cell
-        notebook:
-            the name of the notebook
-        `**kwargs`
-            additional keyword arguments for :class:`~GradeCell`
-        Returns
-        -------
-        grade_cell
+        """
+        Update an existing grade cell in a notebook, or create the grade cell if it does not exist.
+        :param name: the name of the grade cell
+        :param notebook: the name of the notebook
+        :param kwargs: additional keyword arguments for :class:`~GradeCell`
+        :return: grade_cell
         """
         try:
             grade_cell = self.find_grade_cell(name, notebook)
@@ -265,18 +229,12 @@ class Gradebook:
     def add_solution_cell(
         self, name: str, notebook: str, **kwargs: dict
     ) -> SolutionCell:
-        """Add a new solution cell to an existing notebook.
-        Parameters
-        ----------
-        name:
-            the name of the new solution cell
-        notebook:
-            the name of an existing notebook
-        `**kwargs`
-            additional keyword arguments for :class:`~SolutionCell`
-        Returns
-        -------
-        solution_cell : :class:`~SolutionCell`
+        """
+        Add a new solution cell to an existing notebook.
+        :param name: the name of the new solution cell
+        :param notebook: the name of an existing notebook
+        :param kwargs: additional keyword arguments for :class:`~SolutionCell`
+        :return: solution_cell : :class:`~SolutionCell`
         """
         kwargs = {
             k: v
@@ -289,16 +247,11 @@ class Gradebook:
         return nb.solution_cells_dict[name]
 
     def find_solution_cell(self, name: str, notebook: str) -> SolutionCell:
-        """Find a solution cell in a particular notebook.
-        Parameters
-        ----------
-        name : string
-            the name of the solution cell
-        notebook : string
-            the name of the notebook
-        Returns
-        -------
-        solution_cell : :class:`~SolutionCell`
+        """
+        Find a solution cell in a particular notebook.
+        :param name: the name of the solution cell
+        :param notebook: the name of the notebook
+        :return: solution_cell : :class:`~SolutionCell`
         """
         nb = self.find_notebook(notebook)
         try:
@@ -310,18 +263,12 @@ class Gradebook:
     def update_or_create_solution_cell(
         self, name: str, notebook: str, **kwargs: dict
     ) -> SolutionCell:
-        """Update an existing solution cell in a notebook, or create the solution cell if it does not exist.
-        Parameters
-        ----------
-        name:
-            the name of the solution cell
-        notebook:
-            the name of the notebook
-        `**kwargs`
-            additional keyword arguments for :class:`~SolutionCell`
-        Returns
-        -------
-        solution_cell
+        """
+        Update an existing solution cell in a notebook, or create the solution cell if it does not exist.
+        :param name: the name of the solution cell
+        :param notebook: the name of the notebook
+        :param kwargs: additional keyword arguments for :class:`~SolutionCell`
+        :return: solution_cell
         """
         try:
             solution_cell = self.find_solution_cell(name, notebook)
@@ -336,18 +283,12 @@ class Gradebook:
 
     @write_access
     def add_task_cell(self, name: str, notebook: str, **kwargs: dict) -> TaskCell:
-        """Add a new task cell to an existing notebook.
-        Parameters
-        ----------
-        name:
-            the name of the new task cell
-        notebook:
-            the name of an existing notebook
-        `**kwargs`
-            additional keyword arguments for :class:`~TaskCell`
-        Returns
-        -------
-        task_cell
+        """
+        Add a new task cell to an existing notebook.
+        :param name: the name of the new task cell
+        :param notebook: the name of an existing notebook
+        :param kwargs: additional keyword arguments for :class:`~TaskCell`
+        :return: task_cell
         """
         kwargs = {
             k: v for k, v in kwargs.items() if k in set(TaskCell.empty_dict().keys())
@@ -358,16 +299,11 @@ class Gradebook:
         return nb.task_cells_dict[name]
 
     def find_task_cell(self, name: str, notebook: str) -> TaskCell:
-        """Find a task cell in a particular notebook.
-        Parameters
-        ----------
-        name : string
-            the name of the task cell
-        notebook : string
-            the name of the notebook
-        Returns
-        -------
-        task_cell : :class:`~TaskCell`
+        """
+        Find a task cell in a particular notebook.
+        :param name: the name of the task cell
+        :param notebook: the name of the notebook
+        :return: task_cell : :class:`~TaskCell`
         """
         nb = self.find_notebook(notebook)
         try:
@@ -379,18 +315,12 @@ class Gradebook:
     def update_or_create_task_cell(
         self, name: str, notebook: str, **kwargs
     ) -> TaskCell:
-        """Update an existing task cell in a notebook, or create the task cell if it does not exist.
-        Parameters
-        ----------
-        name : string
-            the name of the task cell
-        notebook : string
-            the name of the notebook
-        `**kwargs`
-            additional keyword arguments for :class:`~TaskCell`
-        Returns
-        -------
-        task_cell : :class:`~TaskCell`
+        """
+        Update an existing task cell in a notebook, or create the task cell if it does not exist.
+        :param name: the name of the task cell
+        :param notebook: the name of the notebook
+        :param kwargs: additional keyword arguments for :class:`~TaskCell`
+        :return: task_cell : :class:`~TaskCell`
         """
         try:
             task_cell = self.find_task_cell(name, notebook)
@@ -405,18 +335,12 @@ class Gradebook:
 
     @write_access
     def add_source_cell(self, name: str, notebook: str, **kwargs: dict) -> SourceCell:
-        """Add a new source cell to an existing notebook.
-        Parameters
-        ----------
-        name : string
-            the name of the new source cell
-        notebook : string
-            the name of an existing notebook
-        `**kwargs`
-            additional keyword arguments for :class:`~SourceCell`
-        Returns
-        -------
-        source_cell : :class:`~SourceCell`
+        """
+        Add a new source cell to an existing notebook.
+        :param name: the name of the new source cell
+        :param notebook: the name of an existing notebook
+        :param kwargs: additional keyword arguments for :class:`~SourceCell`
+        :return: source_cell : :class:`~SourceCell`
         """
         kwargs = {
             k: v for k, v in kwargs.items() if k in set(SourceCell.empty_dict().keys())
@@ -427,16 +351,11 @@ class Gradebook:
         return nb.source_cells_dict[name]
 
     def find_source_cell(self, name: str, notebook: str) -> SourceCell:
-        """Find a source cell in a particular notebook.
-        Parameters
-        ----------
-        name:
-            the name of the source cell
-        notebook:
-            the name of the notebook
-        Returns
-        -------
-        source_cell : :class:`~SourceCell`
+        """
+        Find a source cell in a particular notebook.
+        :param name: the name of the source cell
+        :param notebook: the name of the notebook
+        :return: source_cell : :class:`~SourceCell`
         """
         nb = self.find_notebook(notebook)
         try:
@@ -448,19 +367,13 @@ class Gradebook:
     def update_or_create_source_cell(
         self, name: str, notebook: str, **kwargs: dict
     ) -> SourceCell:
-        """Update an existing source cell in a notebook of an assignment, or
+        """
+        Update an existing source cell in a notebook of an assignment, or
         create the source cell if it does not exist.
-        Parameters
-        ----------
-        name:
-            the name of the source cell
-        notebook:
-            the name of the notebook
-        `**kwargs`
-            additional keyword arguments for :class:`~SourceCell`
-        Returns
-        -------
-        source_cell
+        :param name: the name of the source cell
+        :param notebook: the name of the notebook
+        :param kwargs: additional keyword arguments for :class:`~SourceCell`
+        :return: source_cell
         """
         try:
             source_cell = self.find_source_cell(name, notebook)
@@ -475,18 +388,12 @@ class Gradebook:
 
     @write_access
     def add_grade(self, grade_cell: str, notebook: str, grade: Grade) -> Grade:
-        """Add a grade to a notebook.
-        Parameters
-        ----------
-        grade_cell:
-            the name of a grade or task cell
-        notebook:
-            the name of a notebook
-        grade:
-            the grade to add
-        Returns
-        -------
-        grade
+        """
+        Add a grade to a notebook.
+        :param grade_cell: the name of a grade or task cell
+        :param notebook: the name of a notebook
+        :param grade: the grade to add
+        :return: grade
         """
         nb = self.find_notebook(notebook)
 
@@ -510,17 +417,12 @@ class Gradebook:
         return grade
 
     def find_grade(self, grade_cell: str, notebook: str) -> Grade:
-        """Find a particular grade in a notebook.
+        """
+        Find a particular grade in a notebook.
         If the grade does not exists an empty grade object is returned.
-        Parameters
-        ----------
-        grade_cell:
-            the name of a grade or task cell
-        notebook:
-            the name of a notebook
-        Returns
-        -------
-        grade
+        :param grade_cell: the name of a grade or task cell
+        :param notebook: the name of a notebook
+        :return: grade
         """
         nb = self.find_notebook(notebook)
         try:
@@ -532,18 +434,12 @@ class Gradebook:
     def add_comment(
         self, solution_cell: str, notebook: str, comment: Comment
     ) -> Comment:
-        """Add a comment to a notebook.
-        Parameters
-        ----------
-        solution_cell:
-            the name of a solution or task cell
-        notebook:
-            the name of a notebook
-        comment:
-            the comment to add
-        Returns
-        -------
-        comment
+        """
+        Add a comment to a notebook.
+        :param solution_cell: the name of a solution or task cell
+        :param notebook: the name of a notebook
+        :param comment: the comment to add
+        :return: comment
         """
         nb = self.find_notebook(notebook)
 
@@ -565,16 +461,11 @@ class Gradebook:
         return comment
 
     def find_comment(self, solution_cell: str, notebook: str) -> Comment:
-        """Find a particular comment in a notebook.
-        Parameters
-        ----------
-        solution_cell:
-            the name of a solution or task cell
-        notebook:
-            the name of a notebook
-        Returns
-        -------
-        comment
+        """
+        Find a particular comment in a notebook.
+        :param solution_cell: the name of a solution or task cell
+        :param notebook: the name of a notebook
+        :return: comment
         """
         nb = self.find_notebook(notebook)
         try:
