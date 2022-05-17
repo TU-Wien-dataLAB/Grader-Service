@@ -28,9 +28,9 @@ Util
    :undoc-members:
    :show-inheritance:
 
-..
+
 Module contents
-    ---------------
+---------------
 
     .. automodule:: grader_service.api
        :members:
