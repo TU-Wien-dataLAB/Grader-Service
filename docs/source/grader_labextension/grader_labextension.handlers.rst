@@ -1,16 +1,12 @@
 Handlers
 =====================================
 
-Submodules
-----------
-
 Assignment
 -----------------------------------------------
 
 .. automodule:: grader_labextension.handlers.assignment
    :members:
    :undoc-members:
-   :show-inheritance:
 
 Base Handler
 --------------------------------------------------
@@ -18,7 +14,6 @@ Base Handler
 .. automodule:: grader_labextension.handlers.base_handler
    :members:
    :undoc-members:
-   :show-inheritance:
 
 Grading
 --------------------------------------------
@@ -26,15 +21,14 @@ Grading
 .. automodule:: grader_labextension.handlers.grading
    :members:
    :undoc-members:
-   :show-inheritance:
 
 Lecture
----------------------------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.. autosummary::
+   :toctree: grader_labextension/handlers
 
 .. automodule:: grader_labextension.handlers.lectures
    :members:
-   :undoc-members:
-   :show-inheritance:
 
 Permission
 -----------------------------------------------
@@ -42,7 +36,6 @@ Permission
 .. automodule:: grader_labextension.handlers.permission
    :members:
    :undoc-members:
-   :show-inheritance:
 
 Submission
 ------------------------------------------------
@@ -50,7 +43,6 @@ Submission
 .. automodule:: grader_labextension.handlers.submissions
    :members:
    :undoc-members:
-   :show-inheritance:
 
 Version Control
 -----------------------------------------------------
@@ -58,14 +50,3 @@ Version Control
 .. automodule:: grader_labextension.handlers.version_control
    :members:
    :undoc-members:
-   :show-inheritance:
-
-
-..
-    Module contents
-    ---------------
-
-    .. automodule:: grader_labextension.handlers
-       :members:
-       :undoc-members:
-       :show-inheritance:

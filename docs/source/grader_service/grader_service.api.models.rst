@@ -1,11 +1,6 @@
-Models
+Assignment
 ==================================
 
-Submodules
-----------
-
-Assignment
---------------------------------------------
 
 .. automodule:: grader_service.api.models.assignment
    :members:
@@ -13,7 +8,8 @@ Assignment
    :show-inheritance:
 
 Base model
------------------------------------------------
+==================================
+
 
 .. automodule:: grader_service.api.models.base_model_
    :members:
@@ -21,7 +17,8 @@ Base model
    :show-inheritance:
 
 Error message
-------------------------------------------------
+==================================
+
 
 .. automodule:: grader_service.api.models.error_message
    :members:
@@ -29,7 +26,8 @@ Error message
    :show-inheritance:
 
 Lecture
------------------------------------------
+==================================
+
 
 .. automodule:: grader_service.api.models.lecture
    :members:
@@ -37,7 +35,8 @@ Lecture
    :show-inheritance:
 
 Submission
---------------------------------------------
+==================================
+
 
 .. automodule:: grader_service.api.models.submission
    :members:
@@ -45,19 +44,11 @@ Submission
    :show-inheritance:
 
 User
---------------------------------------
+==================================
+
 
 .. automodule:: grader_service.api.models.user
    :members:
    :undoc-members:
    :show-inheritance:
 
-
-..
-    Module contents
-    ---------------
-
-    .. automodule:: grader_service.api.models
-       :members:
-       :undoc-members:
-       :show-inheritance:
