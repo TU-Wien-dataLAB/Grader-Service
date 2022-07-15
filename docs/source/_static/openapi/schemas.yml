@@ -1,0 +1,166 @@
+## Model generation:
+#  
+# Typescript:
+# java -jar ../openapi-generator-cli.jar generate -i docs/source/_static/openapi/schemas.yml -g typescript-angular -o grader_labextension/src --global-property models
+#
+# Python (service):
+# call in grader_service directory
+# java -Dmodels -DsupportingFiles=util.py,base_model_.py,typing_utils.py -jar ../../openapi-generator-cli.jar generate -i ../docs/source/_static/openapi/schemas.yml -g python-flask -o . --additional-properties=packageName='grader_service.api' ; rm -r grader_service/api/test grader_service/api/controllers grader_service/api/openapi
+# 
+# Python (labextension):
+# call in grader_labextension directory
+# java -Dmodels -DsupportingFiles=util.py,base_model_.py,typing_utils.py -jar ../../openapi-generator-cli.jar generate -i ../docs/source/_static/openapi/schemas.yml -g python-flask -o . --additional-properties=packageName='grader_labextension.api' ; rm -r grader_labextension/api/test grader_labextension/api/controllers grader_labextension/api/openapi
+
+openapi: '3.0.2'
+info:
+  title: Grader Extension API Schemas
+  version: '0.1'
+
+paths:
+  /:
+    get:
+      responses:
+        200:
+          description: OK
+
+###### Data type definitions
+components:
+  schemas:
+    User:
+      type: "object"
+      properties:
+        name:
+          type: "string"
+          example: "Baz Bar"
+      example:
+        name: "Baz Bar"
+    Lecture:
+      type: "object"
+      properties:
+        id:
+          type: "integer"
+          format: "int64"
+          example: 1
+        name:
+          type: "string"
+          example: "Informationsvisualisierung"
+        code:
+          type: "string"
+          example: "ivs21"
+        complete:
+          type: "boolean"
+          default: false
+      example:
+        id: 1
+        name: "Informationsvisualisierung"
+        code: "ivs21"
+        complete: false
+    Assignment:
+      type: "object"
+      properties:
+        id:
+          type: "integer"
+          format: "int64"
+        name:
+          type: "string"
+          example: "assignment_1"
+        type:
+          type: "string"
+          enum:
+            - user
+            - group
+        due_date:
+          type: "string"
+          format: "date-time"
+          example: "2021-07-21T23:55:00Z"
+        status:
+          type: string
+          enum:
+            - created # another state of an assignment (instructor only)
+            - pushed
+            - released
+            - complete # final state -> final grade is calculated
+        points:
+          type: number
+          format: float
+        automatic_grading:
+          type: string
+          enum:
+            - "unassisted"
+            - "auto"
+            - "full_auto"
+        max_submissions:
+          type: integer
+      example:
+        id: 1
+        name: "assignment_1"
+        type: "user"
+        due_date: "2021-07-21T23:55:00Z"
+        status: "released"
+        points: 10.5
+    Submission:
+      type: "object"
+      properties:
+        id:
+          type: "integer"
+          format: "int64"
+        submitted_at:
+          type: "string"
+          format: "date-time"
+          example: "2021-07-21T11:53:07Z"
+        auto_status:
+          type: string
+          enum:
+            - "not_graded"
+            - "pending"
+            - "automatically_graded"
+            - "grading_failed"
+        manual_status:
+          type: string
+          enum:
+            - "not_graded"
+            - "manually_graded"
+            - "being_edited"
+            - "grading_failed"
+        username:
+          type: string
+        score:
+          type: number
+          format: float
+        commit_hash:
+          type: string
+        feedback_available:
+          type: boolean
+        logs:
+          type: string
+      example:
+        id: 2
+        submitted_at: "2021-07-21T11:53:07Z"
+        status: "not_graded"
+        score: 10.0
+        commit_hash: "d2c2372811f226f61f106e5c3d42e5892fd25ee8"
+    ErrorMessage:
+      type: "object"
+      required: [ "code", "error", "path" ]
+      properties:
+        code:
+          type: integer
+        error:
+          type: string
+        path:
+          type: string
+        message:
+          type: string
+        traceback:
+          type: string
+    UserSubmissions:
+      type: "array"
+      items:
+        type: "object"
+        properties:
+          user:
+            $ref: "#/components/schemas/User"
+          submissions:
+            type: "array"
+            items:
+              $ref: "#/components/schemas/Submission"

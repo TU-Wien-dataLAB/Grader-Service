@@ -1,0 +1,15 @@
+---
+apiVersion: "v1"
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ include "grader-service.fullname" . }}
+  namespace: {{ .Release.Namespace }}
+spec:
+#{{- if .Values.storageClassName }}
+# storageClassName: {{ .Values.storageClassName | quote }}
+#{{- end }}
+ accessModes:
+    - {{ .Values.accessMode | quote }}
+ resources:
+   requests:
+     storage: {{ .Values.capacity | quote }}

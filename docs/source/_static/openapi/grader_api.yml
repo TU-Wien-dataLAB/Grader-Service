@@ -1,0 +1,66 @@
+openapi: '3.0.2'
+info:
+  title: Grader API
+  description: The REST API for the grader service
+  license:
+    name: BSD-3-Clause
+  version: '0.1.4'
+servers:
+  - url: /services/mock
+    description: relative path to mock
+
+###### Tags of API endpoints
+tags:
+  - name: "Lectures"
+    description: "Available lectures"
+  - name: "Assignments"
+    description: Assignments of a lecture
+  - name: "Submissions"
+    description: View submissions of an assignment
+  - name: "Grading"
+    description: Manage the grading and feedback of assignments (Instructor)
+
+
+paths:
+  /lectures:
+    $ref: './paths_shared.yml#/lectures'
+
+  /lectures/{lect_id}:
+    $ref: './paths_shared.yml#/lecturesById'
+
+  /lectures/{lect_id}/users:
+    $ref: './paths_shared.yml#/lectureUsers'
+
+  /lectures/{lect_id}/assignments:
+    $ref: './paths_shared.yml#/assignments'
+
+  /lectures/{lect_id}/assignments/{a_id}:
+    $ref: './paths_shared.yml#/assignmentsById'
+  
+  /lectures/{lect_id}/assignments/{a_id}/properties:
+    $ref: './paths_grader.yml#/propertiesAssignment'
+
+  /lectures/{lect_id}/assignments/{a_id}/submissions:
+    $ref: './paths_grader.yml#/submissions'
+  
+  /lectures/{lect_id}/assignments/{a_id}/submissions/{s_id}:
+    $ref: './paths_shared.yml#/submissionsById'
+
+  /lectures/{lect_id}/assignments/{a_id}/submissions/{s_id}/properties:
+    $ref: './paths_grader.yml#/propertiesSubmission'
+
+  /lectures/{lect_id}/assignments/{a_id}/grading/{s_id}/auto:
+    $ref: './paths_shared.yml#/auto'
+
+  /lectures/{lect_id}/assignments/{a_id}/grading/{s_id}/feedback:
+    $ref: './paths_shared.yml#/feedback'
+  
+  /permissions:
+    $ref: './paths_shared.yml#/permissions'
+
+components:
+  securitySchemes:
+    hub_auth:
+      type: apiKey
+      in: header
+      name: Token
