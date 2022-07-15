@@ -17,9 +17,7 @@ Grader Convert
 [![PyPI - Python
 Version](https://img.shields.io/pypi/pyversions/grader-convert)](https://pypi.org/project/grader-convert/)
 
-[![image](https://github.com/TU-Wien-dataLAB/Grader-Service/actions/workflows/convert-build.yml/badge.svg?branch=main)](https://github.com/TU-Wien-dataLAB/Grader-Service/actions/workflows/convert-build.yml)
-
-[![image](https://github.com/TU-Wien-dataLAB/Grader-Service/actions/workflows/convert-tests.yml/badge.svg?branch=main)](https://github.com/TU-Wien-dataLAB/Grader-Service/actions/workflows/convert-tests.yml)
+[![image](https://github.com/TU-Wien-dataLAB/Grader-Service/actions/workflows/build_convert.yml/badge.svg?branch=main)](https://github.com/TU-Wien-dataLAB/Grader-Service/actions/workflows/convert-build.yml)
 
 Grader Service
 
@@ -28,9 +26,7 @@ Grader Service
 [![PyPI - Python
 Version](https://img.shields.io/pypi/pyversions/grader-service)](https://pypi.org/project/grader-service/)
 
-[![image](https://github.com/TU-Wien-dataLAB/Grader-Service/actions/workflows/service-build.yml/badge.svg?branch=main)](https://github.com/TU-Wien-dataLAB/Grader-Service/actions/workflows/service-build.yml)
-
-[![image](https://github.com/TU-Wien-dataLAB/Grader-Service/actions/workflows/service-tests.yml/badge.svg?branch=main)](https://github.com/TU-Wien-dataLAB/Grader-Service/actions/workflows/service-tests.yml)
+[![image](https://github.com/TU-Wien-dataLAB/Grader-Service/actions/workflows/build_service.yml/badge.svg?branch=main)](https://github.com/TU-Wien-dataLAB/Grader-Service/actions/workflows/service-build.yml)
 
 Grader Labextension
 
@@ -41,7 +37,7 @@ Version](https://img.shields.io/pypi/pyversions/grader-labextension)](https://py
 
 [![npm](https://img.shields.io/npm/v/grader-labextension)](https://www.npmjs.com/package/grader-labextension)
 
-[![image](https://github.com/TU-Wien-dataLAB/Grader-Service/actions/workflows/labextension-build.yml/badge.svg?branch=main)](https://github.com/TU-Wien-dataLAB/Grader-Service/actions/workflows/labextension-build.yml)
+[![image](https://github.com/TU-Wien-dataLAB/Grader-Service/actions/workflows/build_labextension.yml/badge.svg?branch=main)](https://github.com/TU-Wien-dataLAB/Grader-Service/actions/workflows/labextension-build.yml)
 
 **Disclaimer**: *Grader Service is still in the early development
 stages. You may encounter issues while using the service.*
