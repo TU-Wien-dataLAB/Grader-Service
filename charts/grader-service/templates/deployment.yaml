@@ -59,6 +59,11 @@ spec:
               value: {{ .Values.db.dialect }}
             - name: GRADER_DB_HOST
               value: {{ .Values.db.host }}
+            - name: JUPYTERHUB_API_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: grader-service
+                  key: hub.services.grader.apiToken
           volumeMounts:
             - name: data
               mountPath: /var/lib/grader-service
