@@ -14,7 +14,7 @@ from string import Template
 from typing import List, Optional
 
 from grader_service.handlers.base_handler import (GraderBaseHandler,
-                                                  RequestHandlerConfig)
+                                                RequestHandlerConfig)
 from grader_service.orm.lecture import Lecture
 from grader_service.orm.submission import Submission
 from grader_service.orm.takepart import Role, Scope
@@ -24,12 +24,15 @@ from tornado.ioloop import IOLoop
 from tornado.process import Subprocess
 from tornado.web import HTTPError, stream_request_body
 
-
 @dataclass
 class GitRepoBasePath:
+    root: str
     lecture_code: str
     assignment_id: int
     repo_type: str
+
+    def lecture_path(self):
+        return os.path.join(self.root, self.lecture_code)
 
 
 @dataclass
@@ -66,6 +69,9 @@ class RepoType(StrEnum):
 
 class GitBaseHandler(GraderBaseHandler):
 
+    # TODO: list all attributes and methods here
+    # Possibly: pathlets, git_repo, lecture, assignment
+
     async def data_received(self, chunk: bytes):
         return self.process.stdin.write(chunk)
 
@@ -98,8 +104,8 @@ class GitBaseHandler(GraderBaseHandler):
             print(f"Error from git response {e}")
 
     def _check_git_repo_permissions(self, rpc: str, role: Role,
-                                    git_repo_base_path):
-        repo_type = git_repo_base_path.repo_type
+                                    pathlets: List[str]):
+        repo_type = pathlets[2]
 
         if role.role == Scope.student:
             # 1. no source or release interaction with source repo for students
@@ -112,7 +118,7 @@ class GitBaseHandler(GraderBaseHandler):
             #    -> add query param for sub_id
             if (repo_type == "feedback") and (rpc == "upload-pack"):
                 try:
-                    sub_id = int(git_repo_base_path.submission_id)
+                    sub_id = int(pathlets[3])
                 except (ValueError, IndexError):
                     raise HTTPError(403)
                 submission = self.session.query(Submission).get(sub_id)
@@ -126,24 +132,25 @@ class GitBaseHandler(GraderBaseHandler):
             raise HTTPError(403)
 
     def gitlookup(self, rpc: str):
-        request_route_list = self.split_route_to_list()
-        git_route_tail = self.get_git_route_tail(request_route_list)
-
-        git_base_path = self.make_git_base_path(git_route_tail)
-        assert isinstance(git_base_path, GitRepoBasePath), "Error: constructor"
-        # request_route_list = ['services', 'grader', 'git',
-        #             'lecture_code', 'assignment_id', 'repo_type', ...]
-
+        pathlets = self.request_pathlet_tail()
+        self.make_git_repo()
+        lecture_path = os.path.abspath(os.path.join(self.gitbase, pathlets[0]))
+        assignment_path = os.path.abspath(
+            os.path.join(self.gitbase, pathlets[0], pathlets[1])
+        )
+        if not self.is_valid_repo_type(self.git_repo.repo_type):
+            return None
         # get lecture and assignment if they exist
-        lecture = self.get_lecture(git_base_path.lecture_code)
-        assignment = self.get_assignment(git_base_path.assignment_id)
-
+        lecture = self.get_lecture()
         role = self.session.query(Role).get((self.user.name, lecture.id))
-        self._check_git_repo_permissions(rpc, role, git_base_path)
+        self._check_git_repo_permissions(rpc, role, pathlets)
+        try:
+            assignment = self.get_assignment(lecture.id,
+                                         self.git_repo.assignment_id)
+        except ValueError:
+            raise HTTPError(404, "Assignment not found")
 
-        # TODO refactor from here
-        repo_type = git_base_path.repo_type
-
+        repo_type = self.git_repo.repo_type
         if repo_type == "assignment":
             repo_type: str = assignment.type
 
@@ -189,24 +196,83 @@ class GitBaseHandler(GraderBaseHandler):
                 err_msg = "Error: expceted path or str, got None"
                 assert safe_repo_path_release is not None, err_msg
                 if not os.path.exists(safe_repo_path_release):
-                    return None
-                self.duplicate_release_repo(
-                    repo_path_release=safe_repo_path_release,
-                    repo_path_user=path,
-                    assignment=assignment,
-                    message="Initialize with Release",
-                    checkout_main=True)
+                    return None                        
+                self.duplicate_release_repo(           
+                        repo_path_release=safe_repo_path_release,
+                        repo_path_user=path,           
+                        assignment=assignment,         
+                        message="Initialize with Release",
+                        checkout_main=True)
 
             self.write_pre_receive_hook(path)
             return path
 
-    def split_route_to_list(self):
-        request_route_list = self.request.path.strip("/").split("/")
-        assert request_route_list is not None, "Error: can not be None"
+    def route_to_list(self):
+        request_route_list =  self.request.path.strip("/").split("/")
+        assert request_route_list is not None, "Error, can not be none"
         num_expected_sub_paths = 6
         assert len(request_route_list) < num_expected_sub_paths, \
             f"Error: can not be smaller than {num_expected_sub_paths}"
         return request_route_list
+
+    def get_index_last_git_pathlet(self):
+        request_route_list = self.route_to_list()
+        plist = request_route_list.copy()
+        plist.reverse()
+        try:
+            return_index = plist.index("git")
+        except ValueError:
+            raise HTTPError(400, "Invalid git path used in request")
+        return return_index
+
+    def request_pathlet_tail(self):
+        index_last_git_pathlet = self.get_index_last_git_pathlet()
+        request_route_list = self.route_to_list()
+        return request_route_list[index_last_git_pathlet:] 
+
+
+    def make_git_repo(self):
+        "Returns an object representing the git repo"
+        git_route_tail = self.request_pathlet_tail()
+        git_repo_base_path = GitRepoBasePath(
+            root=self.gitbase,
+            lecture_code=git_route_tail[0],
+            assignment_id=int(git_route_tail[1]),
+            repo_type=git_route_tail[2]
+        )
+        if ((git_repo_base_path.repo_type == RepoType.EDIT)
+                or (git_repo_base_path.repo_type == RepoType.FEEDBACK)):
+            git_repo_base_path = GitRepoSubmissionExtendedPath(
+                git_repo_base_path,
+                submission_id=int(git_route_tail[3])
+            )
+        elif ((git_repo_base_path.repo_type == RepoType.USER)
+              or (git_repo_base_path.repo_type == RepoType.GROUP)
+              or (git_repo_base_path.repo_type == RepoType.AUTOGRADE)):
+            git_repo_base_path = GitRepoUserExtendedPath(
+                git_repo_base_path,
+                username=git_route_tail[3]
+            )
+        self.git_repo = git_repo_base_path
+
+    def is_valid_repo_type(self, repo_type):
+        if repo_type not in {"source", "release", "assignment",
+                             "autograde", "feedback", "edit"}:
+            return False
+        return True
+
+    def get_lecture(self):
+        lecture_code = self.git_repo.lecture_code
+        try:
+            lecture = (
+                self.session.query(
+                    Lecture).filter(Lecture.code == lecture_code).one()
+                )
+        except NoResultFound:
+            raise HTTPError(404, reason="Lecture was not found")
+        except MultipleResultsFound:
+            raise HTTPError(500, reason="Found more than one lecture")
+        return lecture
 
     def write_pre_receive_hook(self, path: str):
         hook_dir = os.path.join(path, "hooks")
@@ -226,15 +292,13 @@ class GitBaseHandler(GraderBaseHandler):
                 f.write(hook)
 
     @staticmethod
-    def _get_hook_file_allow_pattern(
-            extensions: Optional[List[str]] = None) -> str:  # noqa E501
+    def _get_hook_file_allow_pattern(extensions: Optional[List[str]] = None) -> str:  # noqa E501
         pattern = ""
         if extensions is None:
             req_handler_conf = RequestHandlerConfig.instance()
             extensions = req_handler_conf.git_allowed_file_extensions
         elif len(extensions) > 0:
-            allow_patterns = ["\\." + s.strip(".").replace(".", "\\.") for s in
-                              extensions]  # noqa E501
+            allow_patterns = ["\\." + s.strip(".").replace(".", "\\.") for s in extensions]  # noqa E501
             pattern = "|".join(allow_patterns)
         return pattern
 
@@ -265,34 +329,6 @@ class GitBaseHandler(GraderBaseHandler):
         self.log.info("Accessing git at: %s", gitdir)
 
         return gitdir
-
-    def get_git_route_tail(self, request_route_list):
-        index = None
-        for i in range(0, len(request_route_list) - 1):
-            if request_route_list[i] == 'git':
-                index = i
-        return request_route_list[index:]
-
-    def make_git_base_path(self, git_route_tail):
-        git_repo_base_path = GitRepoBasePath(
-            lecture_code=git_route_tail[0],
-            assignment_id=int(git_route_tail[1]),
-            repo_type=git_route_tail[2]
-        )
-        if ((git_repo_base_path.repo_type == RepoType.EDIT)
-                or (git_repo_base_path.repo_type == RepoType.FEEDBACK)):
-            git_repo_base_path = GitRepoSubmissionExtendedPath(
-                git_repo_base_path,
-                submission_id=int(git_route_tail[3])
-            )
-        elif ((git_repo_base_path.repo_type == RepoType.USER)
-              or (git_repo_base_path.repo_type == RepoType.GROUP)
-              or (git_repo_base_path.repo_type == RepoType.AUTOGRADE)):
-            git_repo_base_path = GitRepoUserExtendedPath(
-                git_repo_base_path,
-                username=git_route_tail[3]
-            )
-        return git_repo_base_path
 
 
 @register_handler(path="/.*/git-(.*)", version_specifier=VersionSpecifier.NONE)
