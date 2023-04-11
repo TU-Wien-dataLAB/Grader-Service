@@ -9,6 +9,7 @@ import {
   InputLabel,
   MenuItem,
   Stack,
+  Select,
   TextField,
   TextFieldProps,
   Tooltip
@@ -25,7 +26,6 @@ import { enqueueSnackbar } from 'notistack';
 import { Lecture } from '../../../model/lecture';
 import * as yup from 'yup';
 import { ModalTitle } from '../../util/modal-title';
-import {autogradeSubmission} from "../../../services/grading.service";
 import {AgreeDialog} from "../../util/dialog";
 
 const gradingBehaviourHelp = `Specifies the behaviour when a students submits an assignment.\n
@@ -269,7 +269,6 @@ export const SettingsComponent = (props: ISettingsProps) => {
             label="Allow file upload by students"
           />
 
-          {/* Not included in release 0.1
               <InputLabel id="demo-simple-select-label">Type</InputLabel>
               <Select
                 labelId="assignment-type-select-label"
@@ -286,7 +285,7 @@ export const SettingsComponent = (props: ISettingsProps) => {
               >
                 <MenuItem value={'user'}>User</MenuItem>
                 <MenuItem value={'group'}>Group</MenuItem>
-              </Select>*/}
+              </Select>
         </Stack>
         <Stack spacing={2} direction={'row'}>
           <Button

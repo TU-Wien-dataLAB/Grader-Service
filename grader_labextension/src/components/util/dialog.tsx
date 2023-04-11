@@ -383,7 +383,6 @@ export const CreateDialog = (props: ICreateDialogProps) => {
                 label="Allow file upload by students"
               />
 
-              {/* Not included in release 1.0
                 <InputLabel id="demo-simple-select-label">Type</InputLabel>
                 <Select
                 labelId="assignment-type-select-label"
@@ -397,7 +396,7 @@ export const CreateDialog = (props: ICreateDialogProps) => {
                 <MenuItem value={'user'}>User</MenuItem>
                 <MenuItem value={'group'}>Group</MenuItem>
                 </Select>
-              */}
+
             </Stack>
           </DialogContent>
           <DialogActions>
