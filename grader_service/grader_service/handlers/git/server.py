@@ -7,6 +7,8 @@
 import os
 import shlex
 import subprocess
+from dataclasses import dataclass
+from enum import StrEnum, auto
 from pathlib import Path
 from string import Template
 from typing import List, Optional
@@ -21,6 +23,45 @@ from sqlalchemy.orm.exc import MultipleResultsFound, NoResultFound
 from tornado.ioloop import IOLoop
 from tornado.process import Subprocess
 from tornado.web import HTTPError, stream_request_body
+
+
+@dataclass
+class GitRepoBasePath:
+    lecture_code: str
+    assignment_id: int
+    repo_type: str
+
+
+@dataclass
+class GitRepoSubmissionExtendedPath(GitRepoBasePath):
+    submission_id: int
+
+    def __init__(self, git_repo_base_path, submission_id: int):
+        self.lecture_code = git_repo_base_path.lecture_code
+        self.assignment_id = git_repo_base_path.assignment_id
+        self.repo_type = git_repo_base_path.repo_type
+        self.submission_id = submission_id
+
+
+@dataclass
+class GitRepoUserExtendedPath(GitRepoBasePath):
+    username: str
+
+    def __init__(self, git_repo_base_path, username: str):
+        self.lecture_code = git_repo_base_path.lecture_code
+        self.assignment_id = git_repo_base_path.assignment_id
+        self.repo_type = git_repo_base_path.repo_type
+        self.username = username
+
+
+class RepoType(StrEnum):
+    SOURCE = auto()  # WE DO NOTHING
+    RELEASE = auto()  # WE DO NOTHING
+    EDIT = auto()  # + SUBMISSION ID
+    AUTOGRADE = auto()  # + USERNAME
+    FEEDBACK = auto()  # + SUBMISSION ID
+    USER = auto()  # + USERNAME
+    GROUP = auto()  # + USERNAME
 
 
 class GitBaseHandler(GraderBaseHandler):
@@ -57,8 +98,8 @@ class GitBaseHandler(GraderBaseHandler):
             print(f"Error from git response {e}")
 
     def _check_git_repo_permissions(self, rpc: str, role: Role,
-                                    pathlets: List[str]):
-        repo_type = pathlets[2]
+                                    git_repo_base_path):
+        repo_type = git_repo_base_path.repo_type
 
         if role.role == Scope.student:
             # 1. no source or release interaction with source repo for students
@@ -71,7 +112,7 @@ class GitBaseHandler(GraderBaseHandler):
             #    -> add query param for sub_id
             if (repo_type == "feedback") and (rpc == "upload-pack"):
                 try:
-                    sub_id = int(pathlets[3])
+                    sub_id = int(git_repo_base_path.submission_id)
                 except (ValueError, IndexError):
                     raise HTTPError(403)
                 submission = self.session.query(Submission).get(sub_id)
@@ -85,45 +126,23 @@ class GitBaseHandler(GraderBaseHandler):
             raise HTTPError(403)
 
     def gitlookup(self, rpc: str):
-        pathlets = self.request.path.strip("/").split("/")
-        # pathlets = ['services', 'grader', 'git',
-        #             'lecture_code', 'assignment_id', 'repo_type', ...]
-        if len(pathlets) < 6:
-            return None
-        pathlets = pathlets[3:]
-        lecture_path = os.path.abspath(os.path.join(self.gitbase, pathlets[0]))
-        assignment_path = os.path.abspath(
-            os.path.join(self.gitbase, pathlets[0], pathlets[1])
-        )
+        request_route_list = self.split_route_to_list()
+        git_route_tail = self.get_git_route_tail(request_route_list)
 
-        repo_type = pathlets[2]
-        if repo_type not in {
-            "source",
-            "release",
-            "assignment",
-            "autograde",
-            "feedback",
-            "edit"
-        }:
-            return None
+        git_base_path = self.make_git_base_path(git_route_tail)
+        assert isinstance(git_base_path, GitRepoBasePath), "Error: constructor"
+        # request_route_list = ['services', 'grader', 'git',
+        #             'lecture_code', 'assignment_id', 'repo_type', ...]
 
         # get lecture and assignment if they exist
-        try:
-            lecture = (
-                self.session.query(Lecture).filter(Lecture.code == pathlets[0]).one()  # noqa
-            )
-        except NoResultFound:
-            raise HTTPError(404, reason="Lecture was not found")
-        except MultipleResultsFound:
-            raise HTTPError(500, reason="Found more than one lecture")
+        lecture = self.get_lecture(git_base_path.lecture_code)
+        assignment = self.get_assignment(git_base_path.assignment_id)
 
         role = self.session.query(Role).get((self.user.name, lecture.id))
-        self._check_git_repo_permissions(rpc, role, pathlets)
+        self._check_git_repo_permissions(rpc, role, git_base_path)
 
-        try:
-            assignment = self.get_assignment(lecture.id, int(pathlets[1]))
-        except ValueError:
-            raise HTTPError(404, "Assignment not found")
+        # TODO refactor from here
+        repo_type = git_base_path.repo_type
 
         if repo_type == "assignment":
             repo_type: str = assignment.type
@@ -172,14 +191,22 @@ class GitBaseHandler(GraderBaseHandler):
                 if not os.path.exists(safe_repo_path_release):
                     return None
                 self.duplicate_release_repo(
-                        repo_path_release=safe_repo_path_release,
-                        repo_path_user=path,
-                        assignment=assignment,
-                        message="Initialize with Release",
-                        checkout_main=True)
+                    repo_path_release=safe_repo_path_release,
+                    repo_path_user=path,
+                    assignment=assignment,
+                    message="Initialize with Release",
+                    checkout_main=True)
 
             self.write_pre_receive_hook(path)
             return path
+
+    def split_route_to_list(self):
+        request_route_list = self.request.path.strip("/").split("/")
+        assert request_route_list is not None, "Error: can not be None"
+        num_expected_sub_paths = 6
+        assert len(request_route_list) < num_expected_sub_paths, \
+            f"Error: can not be smaller than {num_expected_sub_paths}"
+        return request_route_list
 
     def write_pre_receive_hook(self, path: str):
         hook_dir = os.path.join(path, "hooks")
@@ -199,13 +226,15 @@ class GitBaseHandler(GraderBaseHandler):
                 f.write(hook)
 
     @staticmethod
-    def _get_hook_file_allow_pattern(extensions: Optional[List[str]] = None) -> str:  # noqa E501
+    def _get_hook_file_allow_pattern(
+            extensions: Optional[List[str]] = None) -> str:  # noqa E501
         pattern = ""
         if extensions is None:
             req_handler_conf = RequestHandlerConfig.instance()
             extensions = req_handler_conf.git_allowed_file_extensions
         elif len(extensions) > 0:
-            allow_patterns = ["\\." + s.strip(".").replace(".", "\\.") for s in extensions]  # noqa E501
+            allow_patterns = ["\\." + s.strip(".").replace(".", "\\.") for s in
+                              extensions]  # noqa E501
             pattern = "|".join(allow_patterns)
         return pattern
 
@@ -236,6 +265,34 @@ class GitBaseHandler(GraderBaseHandler):
         self.log.info("Accessing git at: %s", gitdir)
 
         return gitdir
+
+    def get_git_route_tail(self, request_route_list):
+        index = None
+        for i in range(0, len(request_route_list) - 1):
+            if request_route_list[i] == 'git':
+                index = i
+        return request_route_list[index:]
+
+    def make_git_base_path(self, git_route_tail):
+        git_repo_base_path = GitRepoBasePath(
+            lecture_code=git_route_tail[0],
+            assignment_id=int(git_route_tail[1]),
+            repo_type=git_route_tail[2]
+        )
+        if ((git_repo_base_path.repo_type == RepoType.EDIT)
+                or (git_repo_base_path.repo_type == RepoType.FEEDBACK)):
+            git_repo_base_path = GitRepoSubmissionExtendedPath(
+                git_repo_base_path,
+                submission_id=int(git_route_tail[3])
+            )
+        elif ((git_repo_base_path.repo_type == RepoType.USER)
+              or (git_repo_base_path.repo_type == RepoType.GROUP)
+              or (git_repo_base_path.repo_type == RepoType.AUTOGRADE)):
+            git_repo_base_path = GitRepoUserExtendedPath(
+                git_repo_base_path,
+                username=git_route_tail[3]
+            )
+        return git_repo_base_path
 
 
 @register_handler(path="/.*/git-(.*)", version_specifier=VersionSpecifier.NONE)

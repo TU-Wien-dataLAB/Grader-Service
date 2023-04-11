@@ -138,14 +138,21 @@ class GraderBaseHandler(SessionMixin, web.RequestHandler):
             raise HTTPError(403)
         return role
 
+    def get_lecture(self, lecture_code: str):
+        lecture = self.session.query(Lecture).filter(
+            Lecture.code == lecture_code).one_or_none()
+        if (lecture is None) or (lecture.deleted == DeleteState.deleted):
+            msg = "Lecture with code " + lecture_code + " was not found"
+            raise HTTPError(HTTPStatus.NOT_FOUND, reason=msg)
+        return lecture
+
     def get_assignment(self, lecture_id: int,
                        assignment_id: int) -> Assignment:
         assignment = self.session.query(Assignment).get(assignment_id)
         if ((assignment is None) or (assignment.deleted == DeleteState.deleted)
                 or (int(assignment.lectid) != int(lecture_id))):
             msg = "Assignment with id " + str(assignment_id) + " was not found"
-            raise HTTPError(HTTPStatus.NOT_FOUND,
-                            reason=msg)
+            raise HTTPError(HTTPStatus.NOT_FOUND, reason=msg)
         return assignment
 
     def get_submission(self, lecture_id: int, assignment_id: int,
