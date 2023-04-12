@@ -256,6 +256,9 @@ class GraderService(config.Application):
             self.write_config_file()
             self.exit(0)
 
+        # triggering trait validator for config_file
+        self.config_file = self.config_file
+
         self.log.info("Starting Grader Service...")
         self.io_loop = tornado.ioloop.IOLoop.current()
 
