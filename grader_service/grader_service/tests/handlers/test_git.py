@@ -328,7 +328,7 @@ def feedback_handler_mock(feedback_repo):
     handler_mock.gitbase = feedback_repo["git_dir"]
     handler_mock.user.name = feedback_repo["username"]
     handler_mock.request_pathlet_tail.return_value = feedback_repo["pathlets"]
-    handler_mock.make_repo_base_path.return_value = feedback_repo["repo_path"]
+    handler_mock.git_repo.repo_type = feedback_repo["repo_path"].repo_type
     # orm mocks
     sf = get_query_side_effect(code="iv21s", a_type="user", scope=Scope.instructor)
     handler_mock.session.query = Mock(side_effect=sf)

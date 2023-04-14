@@ -7,14 +7,15 @@
 import os
 import shlex
 import subprocess
+from copy import deepcopy
 from dataclasses import dataclass
-from enum import StrEnum, auto
+from enum import Enum, auto
 from pathlib import Path
 from string import Template
 from typing import List, Optional
 
 from grader_service.handlers.base_handler import (GraderBaseHandler,
-                                                RequestHandlerConfig)
+                                                  RequestHandlerConfig)
 from grader_service.orm.lecture import Lecture
 from grader_service.orm.submission import Submission
 from grader_service.orm.takepart import Role, Scope
@@ -23,6 +24,7 @@ from sqlalchemy.orm.exc import MultipleResultsFound, NoResultFound
 from tornado.ioloop import IOLoop
 from tornado.process import Subprocess
 from tornado.web import HTTPError, stream_request_body
+
 
 @dataclass
 class GitRepoBasePath:
@@ -57,14 +59,37 @@ class GitRepoUserExtendedPath(GitRepoBasePath):
         self.username = username
 
 
-class RepoType(StrEnum):
+class RepoTypeToken(Enum):
     SOURCE = auto()  # WE DO NOTHING
     RELEASE = auto()  # WE DO NOTHING
+    ASSIGNMENT = auto()
     EDIT = auto()  # + SUBMISSION ID
     AUTOGRADE = auto()  # + USERNAME
     FEEDBACK = auto()  # + SUBMISSION ID
     USER = auto()  # + USERNAME
     GROUP = auto()  # + USERNAME
+    INVALID = auto()
+
+
+def str_to_repo_type_token(repo_type: str) -> RepoTypeToken:
+    if repo_type == "source":
+        return RepoTypeToken.SOURCE
+    elif repo_type == "release":
+        return RepoTypeToken.RELEASE
+    elif repo_type == "assignment":
+        return RepoTypeToken.ASSIGNMENT
+    elif repo_type == "edit":
+        return RepoTypeToken.EDIT
+    elif repo_type == "autograde":
+        return RepoTypeToken.AUTOGRADE
+    elif repo_type == "feedback":
+        return RepoTypeToken.FEEDBACK
+    elif repo_type == "user":
+        return RepoTypeToken.USER
+    elif repo_type == "group":
+        return RepoTypeToken.GROUP
+    else:
+        return RepoTypeToken.INVALID
 
 
 class GitBaseHandler(GraderBaseHandler):
@@ -132,83 +157,52 @@ class GitBaseHandler(GraderBaseHandler):
             raise HTTPError(403)
 
     def gitlookup(self, rpc: str):
-        pathlets = self.request_pathlet_tail()
-        self.make_git_repo()
-        lecture_path = os.path.abspath(os.path.join(self.gitbase, pathlets[0]))
-        assignment_path = os.path.abspath(
-            os.path.join(self.gitbase, pathlets[0], pathlets[1])
-        )
-        if not self.is_valid_repo_type(self.git_repo.repo_type):
+        self.set_git_repo()
+        self.set_repo_type_token()
+        if not self.is_valid_repo_type(self.repo_type_token):
             return None
-        # get lecture and assignment if they exist
-        lecture = self.get_lecture()
-        role = self.session.query(Role).get((self.user.name, lecture.id))
-        self._check_git_repo_permissions(rpc, role, pathlets)
-        try:
-            assignment = self.get_assignment(lecture.id,
-                                         self.git_repo.assignment_id)
-        except ValueError:
-            raise HTTPError(404, "Assignment not found")
-
-        repo_type = self.git_repo.repo_type
-        if repo_type == "assignment":
-            repo_type: str = assignment.type
-
-        # create directories once we know they exist in the database
-        if not os.path.exists(lecture_path):
-            os.mkdir(lecture_path)
-        if not os.path.exists(assignment_path):
-            os.mkdir(assignment_path)
-
-        submission = None
-        if repo_type in ["autograde", "feedback", "edit"]:
-            try:
-                sub_id = int(pathlets[3])
-            except (ValueError, IndexError):
-                raise HTTPError(403)
-            submission = self.session.query(Submission).get(sub_id)
-
-        path = self.construct_git_dir(repo_type, lecture, assignment,
-                                      submission=submission)
+        self.query_and_set_lecture()
+        self.mk_lecture_path()
+        self.query_and_set_assignment()
+        self.mk_assignment_path()
+        self.query_and_set_role()
+        pathlets = self.request_pathlet_tail()
+        self._check_git_repo_permissions(rpc, self.role, pathlets)
+        if self.repo_type_token is RepoTypeToken.ASSIGNMENT:
+            self.update_repo_type_assignment()
+        self.query_and_set_submission()
+        # Note: from this point on we seem to be calling out to the
+        #       base_handler module
+        path = self.construct_git_dir(self.git_repo.repo_type, self.lecture,
+                                      self.assignment,
+                                      submission=self.submission)
         if path is None:
             return None
-
         os.makedirs(os.path.dirname(path), exist_ok=True)
-        is_git = self.is_base_git_dir(path)
-        # return git repo
-        if os.path.exists(path) and is_git:
-            self.write_pre_receive_hook(path)
-            return path
-        else:
+        if not (os.path.exists(path)) or (self.is_base_git_dir(path)):
             os.mkdir(path)
-            # this path has to be a git dir -> call git init
             try:
                 self.log.info("Running: git init --bare")
                 subprocess.run(["git", "init", "--bare", path], check=True)
             except subprocess.CalledProcessError:
                 return None
-
-            if repo_type in ["user", "group"]:
-                repo_path_release = self.construct_git_dir('release',
-                                                           assignment.lecture,
-                                                           assignment)
-                safe_repo_path_release = repo_path_release
+            if (self.repo_type_token is RepoTypeToken.USER
+                    or self.repo_type_token is RepoTypeToken.GROUP):
+                repo_path_release = self.construct_git_dir(
+                        'release', self.assignment.lecture, self.assignment)
                 err_msg = "Error: expceted path or str, got None"
-                assert safe_repo_path_release is not None, err_msg
-                if not os.path.exists(safe_repo_path_release):
+                assert repo_path_release is not None, err_msg
+                if not os.path.exists(repo_path_release):
                     return None                        
                 self.duplicate_release_repo(           
-                        repo_path_release=safe_repo_path_release,
-                        repo_path_user=path,           
-                        assignment=assignment,         
-                        message="Initialize with Release",
-                        checkout_main=True)
-
-            self.write_pre_receive_hook(path)
-            return path
+                    repo_path_release=repo_path_release, repo_path_user=path,
+                    assignment=self.assignment, message="Init with Release",
+                    checkout_main=True)
+        self.write_pre_receive_hook(path)
+        return path
 
     def route_to_list(self):
-        request_route_list =  self.request.path.strip("/").split("/")
+        request_route_list = self.request.path.strip("/").split("/")
         assert request_route_list is not None, "Error, can not be none"
         num_expected_sub_paths = 6
         assert len(request_route_list) < num_expected_sub_paths, \
@@ -228,40 +222,35 @@ class GitBaseHandler(GraderBaseHandler):
     def request_pathlet_tail(self):
         index_last_git_pathlet = self.get_index_last_git_pathlet()
         request_route_list = self.route_to_list()
-        return request_route_list[index_last_git_pathlet:] 
+        return request_route_list[index_last_git_pathlet:]
 
-
-    def make_git_repo(self):
-        "Returns an object representing the git repo"
-        git_route_tail = self.request_pathlet_tail()
+    def set_git_repo(self):
+        "Set the git_repo attribute"
+        pathlets = self.request_pathlet_tail()
         git_repo_base_path = GitRepoBasePath(
-            root=self.gitbase,
-            lecture_code=git_route_tail[0],
-            assignment_id=int(git_route_tail[1]),
-            repo_type=git_route_tail[2]
-        )
-        if ((git_repo_base_path.repo_type == RepoType.EDIT)
-                or (git_repo_base_path.repo_type == RepoType.FEEDBACK)):
+                root=self.gitbase, lecture_code=pathlets[0],
+                assignment_id=int(pathlets[1]), repo_type=pathlets[2])
+        rt_tok = str_to_repo_type_token(git_repo_base_path.repo_type)
+        if rt_tok is RepoTypeToken.EDIT or rt_tok is RepoTypeToken.FEEDBACK:
             git_repo_base_path = GitRepoSubmissionExtendedPath(
-                git_repo_base_path,
-                submission_id=int(git_route_tail[3])
-            )
-        elif ((git_repo_base_path.repo_type == RepoType.USER)
-              or (git_repo_base_path.repo_type == RepoType.GROUP)
-              or (git_repo_base_path.repo_type == RepoType.AUTOGRADE)):
+                git_repo_base_path, submission_id=int(pathlets[3]))
+        elif ((rt_tok is RepoTypeToken.USER) or (rt_tok is RepoTypeToken.GROUP)
+              or (rt_tok is RepoTypeToken.AUTOGRADE)):
             git_repo_base_path = GitRepoUserExtendedPath(
-                git_repo_base_path,
-                username=git_route_tail[3]
-            )
+                git_repo_base_path, username=pathlets[3])
         self.git_repo = git_repo_base_path
 
-    def is_valid_repo_type(self, repo_type):
-        if repo_type not in {"source", "release", "assignment",
-                             "autograde", "feedback", "edit"}:
-            return False
-        return True
+    def set_repo_type_token(self):
+        "Set attribute"
+        self.repo_type_token = str_to_repo_type_token(self.git_repo.repo_type)
 
-    def get_lecture(self):
+    def update_repo_type_assignment(self):
+        new_git_repo = deepcopy(self.git_repo)
+        new_git_repo.repo_type = str(self.assignment.type)
+        self.git_repo = new_git_repo
+        self.set_repo_type_token()
+
+    def query_and_set_lecture(self):
         lecture_code = self.git_repo.lecture_code
         try:
             lecture = (
@@ -272,8 +261,56 @@ class GitBaseHandler(GraderBaseHandler):
             raise HTTPError(404, reason="Lecture was not found")
         except MultipleResultsFound:
             raise HTTPError(500, reason="Found more than one lecture")
-        return lecture
+        self.lecture = lecture
 
+    def mk_lecture_path(self):
+        pathlets = self.request_pathlet_tail()
+        lecture_path = os.path.abspath(os.path.join(self.gitbase, pathlets[0]))
+        if not os.path.exists(lecture_path):
+            os.mkdir(lecture_path)
+
+    def query_and_set_assignment(self):
+        try:
+            assignment = self.get_assignment(
+                    self.lecture.id, self.git_repo.assignment_id)
+        except ValueError:
+            raise HTTPError(404, "Assignment not found")
+        self.assignment = assignment
+
+    def mk_assignment_path(self):
+        pathlets = self.request_pathlet_tail()
+        assignment_path = os.path.abspath(
+            os.path.join(self.gitbase, pathlets[0], pathlets[1]))
+        if not os.path.exists(assignment_path):
+            os.mkdir(assignment_path)
+
+    def query_and_set_role(self):
+        # TODO: should we check and return errors here?
+        self.role = self.session.query(Role).get((self.user.name,
+                                                  self.lecture.id))
+
+    def query_and_set_submission(self):
+        submission = None
+        pathlets = self.request_pathlet_tail()
+        if ((self.repo_type_token is RepoTypeToken.AUTOGRADE)
+                or (self.repo_type_token is RepoTypeToken.FEEDBACK)
+                or (self.repo_type_token is RepoTypeToken.EDIT)):
+            try:
+                sub_id = int(pathlets[3])
+            except (ValueError, IndexError):
+                raise HTTPError(403)
+            submission = self.session.query(Submission).get(sub_id)
+        self.submission = submission
+
+    def is_valid_repo_type(self, repo_type_token: RepoTypeToken) -> bool:
+        if repo_type_token is RepoTypeToken.INVALID:
+            return False
+        return True
+
+    def mk_init_git_path(self, path):
+        pass
+        # this path has to be a git dir -> call git init
+        
     def write_pre_receive_hook(self, path: str):
         hook_dir = os.path.join(path, "hooks")
         if not os.path.exists(hook_dir):
