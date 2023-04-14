@@ -33,30 +33,35 @@ class GitRepoBasePath:
     assignment_id: int
     repo_type: str
 
-    def lecture_path(self):
-        return os.path.join(self.root, self.lecture_code)
+    def __repr__(self):
+        return f"""{self.root!r}/{self.lecture_code!r}/\
+                {self.assignment_id!r}/{self.repo_type!r}"""
 
 
-@dataclass
 class GitRepoSubmissionExtendedPath(GitRepoBasePath):
-    submission_id: int
 
-    def __init__(self, git_repo_base_path, submission_id: int):
-        self.lecture_code = git_repo_base_path.lecture_code
-        self.assignment_id = git_repo_base_path.assignment_id
-        self.repo_type = git_repo_base_path.repo_type
+    def __init__(self, root: str, lecture_code: str,
+                 assignment_id: int, repo_type: str,
+                 submission_id: int):
+        super().__init__(root, lecture_code, assignment_id, repo_type)
         self.submission_id = submission_id
 
+    def __repr__(self):
+        return f"""{self.root!r}/{self.lecture_code!r}/{self.assignment_id!r}/\
+                {self.repo_type!r}/{self.submission_id!r}"""
 
-@dataclass
+
 class GitRepoUserExtendedPath(GitRepoBasePath):
-    username: str
 
-    def __init__(self, git_repo_base_path, username: str):
-        self.lecture_code = git_repo_base_path.lecture_code
-        self.assignment_id = git_repo_base_path.assignment_id
-        self.repo_type = git_repo_base_path.repo_type
+    def __init__(self, root: str, lecture_code: str,
+                 assignment_id: int, repo_type: str,
+                 username: str):
+        super().__init__(root, lecture_code, assignment_id, repo_type)
         self.username = username
+
+    def __repr__(self):
+        return f"""{self.root!r}/{self.lecture_code!r}/{self.assignment_id!r}/\
+                {self.repo_type}/{self.username!r}"""
 
 
 class RepoTypeToken(Enum):
@@ -193,8 +198,8 @@ class GitBaseHandler(GraderBaseHandler):
                 err_msg = "Error: expceted path or str, got None"
                 assert repo_path_release is not None, err_msg
                 if not os.path.exists(repo_path_release):
-                    return None                        
-                self.duplicate_release_repo(           
+                    return None
+                self.duplicate_release_repo(
                     repo_path_release=repo_path_release, repo_path_user=path,
                     assignment=self.assignment, message="Init with Release",
                     checkout_main=True)
@@ -233,11 +238,19 @@ class GitBaseHandler(GraderBaseHandler):
         rt_tok = str_to_repo_type_token(git_repo_base_path.repo_type)
         if rt_tok is RepoTypeToken.EDIT or rt_tok is RepoTypeToken.FEEDBACK:
             git_repo_base_path = GitRepoSubmissionExtendedPath(
-                git_repo_base_path, submission_id=int(pathlets[3]))
+                root=git_repo_base_path.root,
+                lecture_code=git_repo_base_path.lecture_code,
+                assignment_id=git_repo_base_path.assignment_id,
+                repo_type=git_repo_base_path.repo_type,
+                submission_id=int(pathlets[3]))
         elif ((rt_tok is RepoTypeToken.USER) or (rt_tok is RepoTypeToken.GROUP)
               or (rt_tok is RepoTypeToken.AUTOGRADE)):
             git_repo_base_path = GitRepoUserExtendedPath(
-                git_repo_base_path, username=pathlets[3])
+                root=git_repo_base_path.root,
+                lecture_code=git_repo_base_path.lecture_code,
+                assignment_id=git_repo_base_path.assignment_id,
+                repo_type=git_repo_base_path.repo_type,
+                username=pathlets[3])
         self.git_repo = git_repo_base_path
 
     def set_repo_type_token(self):
@@ -307,10 +320,6 @@ class GitBaseHandler(GraderBaseHandler):
             return False
         return True
 
-    def mk_init_git_path(self, path):
-        pass
-        # this path has to be a git dir -> call git init
-        
     def write_pre_receive_hook(self, path: str):
         hook_dir = os.path.join(path, "hooks")
         if not os.path.exists(hook_dir):
