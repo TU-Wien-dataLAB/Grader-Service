@@ -34,12 +34,11 @@ class GitRepoBasePath:
     repo_type: str
 
     def __repr__(self):
-        return f"""{self.root!r}/{self.lecture_code!r}/\
-                {self.assignment_id!r}/{self.repo_type!r}"""
+        return f"{self.root}/{self.lecture_code}/{self.assignment_id}/{self.repo_type}" # noqa E501
 
 
 class GitRepoSubmissionExtendedPath(GitRepoBasePath):
-
+    # edit repo, feedback
     def __init__(self, root: str, lecture_code: str,
                  assignment_id: int, repo_type: str,
                  submission_id: int):
@@ -47,8 +46,7 @@ class GitRepoSubmissionExtendedPath(GitRepoBasePath):
         self.submission_id = submission_id
 
     def __repr__(self):
-        return f"""{self.root!r}/{self.lecture_code!r}/{self.assignment_id!r}/\
-                {self.repo_type!r}/{self.submission_id!r}"""
+        return f"{self.root}/{self.lecture_code}/{self.assignment_id}/{self.repo_type}/{self.submission_id}" # noqa E501
 
 
 class GitRepoUserExtendedPath(GitRepoBasePath):
@@ -60,8 +58,7 @@ class GitRepoUserExtendedPath(GitRepoBasePath):
         self.username = username
 
     def __repr__(self):
-        return f"""{self.root!r}/{self.lecture_code!r}/{self.assignment_id!r}/\
-                {self.repo_type}/{self.username!r}"""
+        return f"{self.root}/{self.lecture_code}/{self.assignment_id}/{self.repo_type}/{self.username}" # noqa E501
 
 
 class RepoTypeToken(Enum):
@@ -184,7 +181,7 @@ class GitBaseHandler(GraderBaseHandler):
         if path is None:
             return None
         os.makedirs(os.path.dirname(path), exist_ok=True)
-        if not (os.path.exists(path)) or (self.is_base_git_dir(path)):
+        if not ((os.path.exists(path)) and (self.is_base_git_dir(path))):
             os.mkdir(path)
             try:
                 self.log.info("Running: git init --bare")
@@ -209,9 +206,6 @@ class GitBaseHandler(GraderBaseHandler):
     def route_to_list(self):
         request_route_list = self.request.path.strip("/").split("/")
         assert request_route_list is not None, "Error, can not be none"
-        num_expected_sub_paths = 6
-        assert len(request_route_list) < num_expected_sub_paths, \
-            f"Error: can not be smaller than {num_expected_sub_paths}"
         return request_route_list
 
     def get_index_last_git_pathlet(self):
@@ -219,7 +213,7 @@ class GitBaseHandler(GraderBaseHandler):
         plist = request_route_list.copy()
         plist.reverse()
         try:
-            return_index = plist.index("git")
+            return_index = len(plist) - plist.index("git")
         except ValueError:
             raise HTTPError(400, "Invalid git path used in request")
         return return_index
@@ -227,6 +221,10 @@ class GitBaseHandler(GraderBaseHandler):
     def request_pathlet_tail(self):
         index_last_git_pathlet = self.get_index_last_git_pathlet()
         request_route_list = self.route_to_list()
+        trimmed_list = request_route_list[index_last_git_pathlet:]
+        num_expected_pathlets = 6
+        assert len(trimmed_list) < num_expected_pathlets, \
+            f"Error: expected {num_expected_pathlets} got {len(trimmed_list)}"
         return request_route_list[index_last_git_pathlet:]
 
     def set_git_repo(self):
