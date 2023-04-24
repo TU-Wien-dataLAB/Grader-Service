@@ -1,9 +1,11 @@
 import json
+import os
 import shutil
+
 from http import HTTPStatus
+from pathlib import Path
 
 import tornado
-import os
 from grader_convert.gradebook.models import GradeBookModel
 from grader_service.api.models.assignment import Assignment as AssignmentModel
 from grader_service.orm.assignment import Assignment, AutoGradingBehaviour
@@ -40,9 +42,8 @@ class AssignmentBaseHandler(GraderBaseHandler):
         if role.lecture.deleted == DeleteState.deleted:
             raise HTTPError(HTTPStatus.NOT_FOUND, reason="Lecture not found")
 
-        if (
-                role.role == Scope.student
-        ):  # students do not get assignments that are created
+        if (role.role == Scope.student):  
+            # students do not get assignments that are created
             assignments = (
                 self.session.query(Assignment)
                 .filter(
@@ -265,13 +266,11 @@ class AssignmentResetHandler(GraderBaseHandler):
         self.validate_parameters()
         lecture_id, assignment_id = parse_ids(lecture_id, assignment_id)
         assignment = self.get_assignment(lecture_id, assignment_id)
-
-        git_path_base = self.application.grader_service_dir.joinpath(
-                "tmp",
-                assignment.lecture.code,
-                assignment.name,
-                self.user.name)
-        assert git_path_base.exists(), "Error: git path base does not exist"
+        gs_path = Path(self.application.grader_service_dir)
+        git_path_base = gs_path.joinpath("tmp",
+                                         assignment.lecture.code,
+                                         str(assignment.name),
+                                         str(self.user.name))
         # Deleting dir
         if os.path.exists(git_path_base):
             shutil.rmtree(git_path_base)
@@ -279,7 +278,7 @@ class AssignmentResetHandler(GraderBaseHandler):
         self.log.info(f"DIR {git_path_base}")
         os.makedirs(git_path_base, exist_ok=True)
         git_path_release = os.path.join(git_path_base, "release")
-        git_path_user = os.path.join(git_path_base, self.user.name)
+        git_path_user = os.path.join(git_path_base, str(self.user.name))
         self.log.info(f"GIT BASE {git_path_base}")
         self.log.info(f"GIT RELEASE {git_path_release}")
         self.log.info(f"GIT USER {git_path_user}")
@@ -287,7 +286,7 @@ class AssignmentResetHandler(GraderBaseHandler):
         repo_path_release = self.construct_git_dir('release',
                                                    assignment.lecture,
                                                    assignment)
-        repo_path_user = self.construct_git_dir(assignment.type,
+        repo_path_user = self.construct_git_dir(str(assignment.type),
                                                 assignment.lecture,
                                                 assignment)
 

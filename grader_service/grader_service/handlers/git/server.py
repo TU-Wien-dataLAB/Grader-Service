@@ -190,6 +190,7 @@ class GitBaseHandler(GraderBaseHandler):
                 return None
             if (self.repo_type_token is RepoTypeToken.USER
                     or self.repo_type_token is RepoTypeToken.GROUP):
+                # We're dealing with a release
                 repo_path_release = self.construct_git_dir(
                         'release', self.assignment.lecture, self.assignment)
                 err_msg = "Error: expceted path or str, got None"
