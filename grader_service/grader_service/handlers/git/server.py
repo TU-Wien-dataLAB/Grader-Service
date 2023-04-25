@@ -368,6 +368,7 @@ class GitBaseHandler(GraderBaseHandler):
 
     def get_gitdir(self, rpc: str):
         """Determine the git repository for this request"""
+        # NOTE: this is likely where we want to set our boundary to git service
         gitdir = self.gitlookup(rpc)
         if gitdir is None:
             raise HTTPError(404, "unable to find repository")

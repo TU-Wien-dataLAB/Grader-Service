@@ -15,6 +15,7 @@ import sys
 import traceback
 from _decimal import Decimal
 from http import HTTPStatus
+from pathlib import Path
 from typing import Any, Awaitable, Callable, List, Optional
 
 from traitlets import Type, Integer, TraitType, Unicode, Union, Bool
@@ -238,18 +239,17 @@ class GraderBaseHandler(SessionMixin, web.RequestHandler):
                                repo_path_user: str,
                                assignment: Assignment, message: str,
                                checkout_main: bool = False):
-        tmp_path_base = os.path.join(
-                self.application.grader_service_dir,
+        tmp_path_base = Path(self.application.grader_service_dir).joinpath(
                 "tmp",
                 assignment.lecture.code,
                 str(assignment.id),
                 str(self.user.name))
 
         # Deleting dir
-        if os.path.exists(tmp_path_base):
+        if tmp_path_base.exists():
             shutil.rmtree(tmp_path_base)
 
-        os.makedirs(tmp_path_base, exist_ok=True)
+        tmp_path_base.mkdir(parents=True, exist_ok=True)
         tmp_path_release = tmp_path_base.joinpath("release")
         tmp_path_user = tmp_path_base.joinpath(self.user.name)
 
