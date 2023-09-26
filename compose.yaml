@@ -1,0 +1,30 @@
+# Copyright (c) 2022, TU Wien
+# All rights reserved.
+#
+# This source code is licensed under the BSD-style license found in the
+# LICENSE file in the root directory of this source tree.
+
+version: "2.2"
+services:
+
+  jupyterlab:
+    build:
+      context: .
+      dockerfile: Dockerfile_labextension
+    image: "grader-lab:latest"
+    ports:
+      - "8000:8000"
+    depends_on:
+      - grader_service
+    volumes:
+      - ./jupyterhub_config.py:/jupyterhub_config.py
+
+  grader_service:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: "grader_service:latest"
+    ports:
+      - "4010:4010"
+    volumes:
+      - ./grader_service_config.py:/grader_service_config.py
