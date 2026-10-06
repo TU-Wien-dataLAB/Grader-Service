@@ -6,6 +6,7 @@ import {
   filterFn_equalsString,
   filterFn_includesString,
   globalFilteringFeature,
+  Row,
   rowExpandingFeature,
   rowSelectionFeature,
   tableFeatures,
@@ -17,7 +18,7 @@ import type {
   OnChangeFn,
   RowSelectionState
 } from '@tanstack/react-table';
-import { ChevronDown, ChevronRight } from 'lucide-react';
+import { ChevronDown, ChevronUp } from 'lucide-react';
 import { Button } from '../../../shadcn-components/ui/button';
 import { Checkbox } from '../../../shadcn-components/ui/checkbox';
 import {
@@ -46,27 +47,53 @@ export const dataTableFeatures = tableFeatures({
 
 export type DataTableColumnDef<T> = ColumnDef<typeof dataTableFeatures, T>;
 
+export function RowCheckbox<T>({
+  row
+}: {
+  row: Row<typeof dataTableFeatures, T>;
+}) {
+  return (
+    <Checkbox
+      checked={
+        row.getIsSelected() ||
+        (row.getCanSelectSubRows() && row.getIsAllSubRowsSelected())
+          ? true
+          : row.getIsSomeSelected()
+            ? 'indeterminate'
+            : false
+      }
+      onCheckedChange={value => row.toggleSelected(!!value)}
+      aria-label="Select row"
+    />
+  );
+}
+
 export function expanderColumn<T>(): DataTableColumnDef<T> {
   return {
     id: 'expander',
     header: () => null,
     enableGlobalFilter: false,
-    cell: ({ row }) =>
-      row.getCanExpand() ? (
+    cell: ({ row }) => {
+      // children: nothing here, the connector lives in the select column
+      if (row.depth > 0 || !row.getCanExpand()) return null;
+      const expanded = row.getIsExpanded();
+      return (
         <Button
           variant="ghost"
           size="icon"
-          className="size-6"
+          className="size-6 text-primary hover:bg-transparent hover:text-primary"
           onClick={row.getToggleExpandedHandler()}
-          aria-label={row.getIsExpanded() ? 'Collapse row' : 'Expand row'}
+          aria-label={expanded ? 'Collapse row' : 'Expand row'}
+          aria-expanded={expanded}
         >
-          {row.getIsExpanded() ? (
-            <ChevronDown className="size-4" />
+          {expanded ? (
+            <ChevronUp className="size-4" strokeWidth={2.5} />
           ) : (
-            <ChevronRight className="size-4" />
+            <ChevronDown className="size-4" strokeWidth={2.5} />
           )}
         </Button>
-      ) : null
+      );
+    }
   };
 }
 
@@ -87,20 +114,17 @@ export function selectColumn<T>(): DataTableColumnDef<T> {
         aria-label="Select all"
       />
     ),
-    cell: ({ row }) => (
-      <Checkbox
-        checked={
-          row.getIsSelected() ||
-          (row.getCanSelectSubRows() && row.getIsAllSubRowsSelected())
-            ? true
-            : row.getIsSomeSelected()
-              ? 'indeterminate'
-              : false
-        }
-        onCheckedChange={value => row.toggleSelected(!!value)}
-        aria-label="Select row"
-      />
-    )
+    cell: ({ row }) =>
+      row.depth > 0 ? (
+        <span
+          aria-hidden="true"
+          className="ml-1 block h-2.5 w-3 border-b-2 border-l-2 border-muted-foreground/50"
+        >
+          ∟
+        </span>
+      ) : (
+        <RowCheckbox row={row} />
+      )
   };
 }
 

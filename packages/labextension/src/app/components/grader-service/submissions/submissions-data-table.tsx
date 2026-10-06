@@ -11,7 +11,8 @@ import {
   NestedTable,
   DataTableColumnDef,
   expanderColumn,
-  selectColumn
+  selectColumn,
+  RowCheckbox
 } from '../../ui/nested-table/nested-table';
 import {
   ColumnFiltersState,
@@ -35,17 +36,19 @@ export type SubmissionRow = {
 const gradingLabel: Record<Grading, React.ReactNode> = {
   graded: (
     <span className="flex items-center gap-2">
-      <CircleCheck className="size-4 text-green-600" /> Graded
+      <CircleCheck color="#6A9816" className="size-4 text-green-600" /> Graded
     </span>
   ),
   failed: (
     <span className="flex items-center gap-2">
-      <CircleAlert className="size-4 text-red-600" /> Grading failed
+      <CircleAlert color="#DC182C" className="size-4 text-red-600" /> Grading
+      failed
     </span>
   ),
   not_graded: (
     <span className="flex items-center gap-2">
-      <TriangleAlert className="size-4 text-amber-500" /> Not graded
+      <TriangleAlert color="#C77700" className="size-4 text-amber-500" /> Not
+      graded
     </span>
   )
 };
@@ -56,10 +59,11 @@ const columns: Array<DataTableColumnDef<SubmissionRow>> = [
   {
     accessorKey: 'student',
     header: 'Name',
-    cell: ({ row }) => (
-      <span style={{ paddingLeft: row.depth * 24 }}>
-        {row.original.label ?? row.original.student}
-      </span>
+    cell: ({ row, getValue }) => (
+      <div className={row.depth > 0 ? 'flex items-center gap-6' : ''}>
+        {row.depth > 0 && <RowCheckbox row={row} />}
+        <span className="truncate">{getValue<string>()}</span>
+      </div>
     )
   },
   {
@@ -89,12 +93,16 @@ const columns: Array<DataTableColumnDef<SubmissionRow>> = [
       if (row.original.grading === undefined) return null;
       return getValue<boolean>() ? (
         <span className="flex items-center gap-2">
-          <CircleCheck className="size-4 text-green-600 bg-red-500" /> Feedback
-          given
+          <CircleCheck
+            color="#6A9816"
+            className="size-4 text-green-600 bg-red-500"
+          />
+          Feedback given
         </span>
       ) : (
         <span className="flex items-center gap-2">
-          <CircleAlert className="size-4 text-red-600" /> No feedback
+          <CircleAlert color="#DC182C" className="size-4 text-red-600" /> No
+          feedback
         </span>
       );
     }
@@ -106,11 +114,21 @@ const columns: Array<DataTableColumnDef<SubmissionRow>> = [
     cell: ({ row }) =>
       row.original.grading === undefined ? null : (
         <div className="flex gap-1">
-          <Button variant="ghost" size="icon" title="View submission details">
-            <Eye className="size-4" />
+          <Button
+            className="cursor-pointer"
+            variant="ghost"
+            size="icon"
+            title="View submission details"
+          >
+            <Eye color="#006699" className="size-4" />
           </Button>
-          <Button variant="ghost" size="icon" title="View logs">
-            <History className="size-4" />
+          <Button
+            className="cursor-pointer"
+            variant="ghost"
+            size="icon"
+            title="View logs"
+          >
+            <History color="#006699" className="size-4" />
           </Button>
         </div>
       )
