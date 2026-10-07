@@ -18,7 +18,7 @@ import type {
   OnChangeFn,
   RowSelectionState
 } from '@tanstack/react-table';
-import { ChevronDown, ChevronUp } from 'lucide-react';
+import { ChevronDown, ChevronRight } from 'lucide-react';
 import { Button } from '../../../shadcn-components/ui/button';
 import { Checkbox } from '../../../shadcn-components/ui/checkbox';
 import {
@@ -47,6 +47,27 @@ export const dataTableFeatures = tableFeatures({
 
 export type DataTableColumnDef<T> = ColumnDef<typeof dataTableFeatures, T>;
 
+export const INDENT_STEP = 1;
+function ExpandButton<T>({ row }: { row: Row<typeof dataTableFeatures, T> }) {
+  return (
+    <div className="relative size-4">
+      <Button
+        variant="ghost"
+        size="icon"
+        className={`absolute -top-2 -left-2 size-8`}
+        onClick={row.getToggleExpandedHandler()}
+        aria-label={row.getIsExpanded() ? 'Collapse row' : 'Expand row'}
+      >
+        {row.getIsExpanded() ? (
+          <ChevronDown className={'text-primary'} />
+        ) : (
+          <ChevronRight className={'text-primary'} />
+        )}
+      </Button>
+    </div>
+  );
+}
+
 export function RowCheckbox<T>({
   row
 }: {
@@ -73,27 +94,8 @@ export function expanderColumn<T>(): DataTableColumnDef<T> {
     id: 'expander',
     header: () => null,
     enableGlobalFilter: false,
-    cell: ({ row }) => {
-      // children: nothing here, the connector lives in the select column
-      if (row.depth > 0 || !row.getCanExpand()) return null;
-      const expanded = row.getIsExpanded();
-      return (
-        <Button
-          variant="ghost"
-          size="icon"
-          className="size-6 text-primary hover:bg-transparent hover:text-primary"
-          onClick={row.getToggleExpandedHandler()}
-          aria-label={expanded ? 'Collapse row' : 'Expand row'}
-          aria-expanded={expanded}
-        >
-          {expanded ? (
-            <ChevronUp className="size-4" strokeWidth={2.5} />
-          ) : (
-            <ChevronDown className="size-4" strokeWidth={2.5} />
-          )}
-        </Button>
-      );
-    }
+    cell: ({ row }) =>
+      row.depth === 0 && row.getCanExpand() ? <ExpandButton row={row} /> : null
   };
 }
 
@@ -115,15 +117,25 @@ export function selectColumn<T>(): DataTableColumnDef<T> {
       />
     ),
     cell: ({ row }) =>
-      row.depth > 0 ? (
-        <span
-          aria-hidden="true"
-          className="ml-1 block h-2.5 w-3 border-b-2 border-l-2 border-muted-foreground/50"
-        >
-          ∟
-        </span>
-      ) : (
+      row.depth === 0 ? (
         <RowCheckbox row={row} />
+      ) : (
+        // expandable successors have expand button instead of the icon
+        <div className="relative size-4">
+          {row.getCanExpand() ? (
+            <div
+              className="absolute top-0"
+              style={{ left: (row.depth - 1) * INDENT_STEP }}
+            >
+              <ExpandButton row={row} />
+            </div>
+          ) : (
+            <span
+              aria-hidden="true"
+              className="ml-1 block h-2.5 w-3 border-b-[1.5px] border-l-[1.5px] border-[#8D8D8D]"
+            />
+          )}
+        </div>
       )
   };
 }

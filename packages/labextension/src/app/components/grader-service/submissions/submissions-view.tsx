@@ -24,6 +24,7 @@ import {
   SelectTrigger,
   SelectValue
 } from '../../../shadcn-components/ui/select';
+import { mockSubmissionsData } from './table-mock-data';
 
 type TProps = {
   setShowNewSubmissionForm: (val: boolean) => void;
@@ -95,6 +96,7 @@ export const SubmissionsView = (props: TProps) => {
       </div>
       <div className="w-full">
         <SubmissionsDataTable
+          submissions={mockSubmissionsData}
           grading={grading}
           columnFilters={activeFilters}
           rowSelection={rowSelection}

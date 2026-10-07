@@ -86,3 +86,43 @@ export const CompletedAssignmentBadge = ({
     </Badge>
   );
 };
+
+export const EditedBadge = ({ className = '' }: { className?: string }) => {
+  return (
+    <Badge
+      className={`${className} ${commonStyle} bg-[#FFEB99] border-[#F5C918]`}
+    >
+      Edited
+    </Badge>
+  );
+};
+
+// Need to reuse components below so the text only changes
+
+export const AutomaticallyGradedBadge = ({
+  className = ''
+}: {
+  className?: string;
+}) => {
+  return (
+    <Badge
+      className={`${className} ${commonStyle} bg-[#FFC89E] border-[#FF9D52]`}
+    >
+      Automatically graded
+    </Badge>
+  );
+};
+
+export const ManuallyGradedBadge = ({
+  className = ''
+}: {
+  className?: string;
+}) => {
+  return (
+    <Badge
+      className={`${className} ${commonStyle} bg-[#AEDCE5] border-[#8CB0B8]`}
+    >
+      Manually graded
+    </Badge>
+  );
+};

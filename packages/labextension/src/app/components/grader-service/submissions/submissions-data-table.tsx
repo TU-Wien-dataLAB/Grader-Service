@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useState } from 'react';
 import {
   CircleAlert,
   CircleCheck,
@@ -6,54 +6,65 @@ import {
   History,
   TriangleAlert
 } from 'lucide-react';
-import { Button } from '../../../shadcn-components/ui/button';
-import {
-  NestedTable,
-  DataTableColumnDef,
-  expanderColumn,
-  selectColumn,
-  RowCheckbox
-} from '../../ui/nested-table/nested-table';
-import {
+import type {
   ColumnFiltersState,
   OnChangeFn,
   RowSelectionState
 } from '@tanstack/react-table';
-import { tableMockData } from './table-mock-data';
+import { Button } from '../../../shadcn-components/ui/button';
+import {
+  NestedTable,
+  RowCheckbox,
+  expanderColumn,
+  selectColumn
+} from '../../ui/nested-table/nested-table';
+import type { DataTableColumnDef } from '../../ui/nested-table/nested-table';
+import { Submission } from '../../../../model/submission';
+import { SubmissionDetailsDialog } from './submission-details-dialog';
+import { toSubmissionRows } from './utils';
 
-type Grading = 'graded' | 'failed' | 'not_graded';
+/* row  */
+
+export type Grading = 'graded' | 'failed' | 'not_graded';
 
 export type SubmissionRow = {
   id: string;
-  student: string; // should be presented on parents and children so search matches every row
-  label?: string; // "Submission 2" (children only)
+  student: string;
+  label?: string;
   score?: number;
   grading?: Grading;
   feedback?: boolean;
+  submission?: Submission;
   subRows?: Array<SubmissionRow>;
 };
 
 const gradingLabel: Record<Grading, React.ReactNode> = {
   graded: (
     <span className="flex items-center gap-2">
-      <CircleCheck color="#6A9816" className="size-4 text-green-600" /> Graded
+      <CircleCheck color="#6A9816" className="size-4" /> Graded
     </span>
   ),
   failed: (
     <span className="flex items-center gap-2">
-      <CircleAlert color="#DC182C" className="size-4 text-red-600" /> Grading
-      failed
+      <CircleAlert color="#DC182C" className="size-4" /> Grading failed
     </span>
   ),
   not_graded: (
     <span className="flex items-center gap-2">
-      <TriangleAlert color="#C77700" className="size-4 text-amber-500" /> Not
-      graded
+      <TriangleAlert color="#C77700" className="size-4" /> Not graded
     </span>
   )
 };
 
-const columns: Array<DataTableColumnDef<SubmissionRow>> = [
+type ColumnHandlers = {
+  onViewDetails: (row: SubmissionRow) => void;
+  onViewLogs?: (row: SubmissionRow) => void;
+};
+
+const getColumns = ({
+  onViewDetails,
+  onViewLogs
+}: ColumnHandlers): Array<DataTableColumnDef<SubmissionRow>> => [
   expanderColumn<SubmissionRow>(),
   selectColumn<SubmissionRow>(),
   {
@@ -62,7 +73,9 @@ const columns: Array<DataTableColumnDef<SubmissionRow>> = [
     cell: ({ row, getValue }) => (
       <div className={row.depth > 0 ? 'flex items-center gap-6' : ''}>
         {row.depth > 0 && <RowCheckbox row={row} />}
-        <span className="truncate">{getValue<string>()}</span>
+        <span className="truncate">
+          {row.depth > 0 ? row.original.label : getValue<string>()}
+        </span>
       </div>
     )
   },
@@ -93,16 +106,11 @@ const columns: Array<DataTableColumnDef<SubmissionRow>> = [
       if (row.original.grading === undefined) return null;
       return getValue<boolean>() ? (
         <span className="flex items-center gap-2">
-          <CircleCheck
-            color="#6A9816"
-            className="size-4 text-green-600 bg-red-500"
-          />
-          Feedback given
+          <CircleCheck color="#6A9816" className="size-4" /> Feedback given
         </span>
       ) : (
         <span className="flex items-center gap-2">
-          <CircleAlert color="#DC182C" className="size-4 text-red-600" /> No
-          feedback
+          <CircleAlert color="#DC182C" className="size-4" /> No feedback
         </span>
       );
     }
@@ -112,21 +120,26 @@ const columns: Array<DataTableColumnDef<SubmissionRow>> = [
     header: 'Actions',
     enableGlobalFilter: false,
     cell: ({ row }) =>
-      row.original.grading === undefined ? null : (
+      row.original.submission === undefined ? null : (
         <div className="flex gap-1">
           <Button
-            className="cursor-pointer"
             variant="ghost"
             size="icon"
+            className="cursor-pointer"
             title="View submission details"
+            aria-label="View submission details"
+            onClick={() => onViewDetails(row.original)}
+            ml-1
           >
             <Eye color="#006699" className="size-4" />
           </Button>
           <Button
-            className="cursor-pointer"
             variant="ghost"
             size="icon"
+            className="cursor-pointer"
             title="View logs"
+            aria-label="View logs"
+            onClick={() => onViewLogs?.(row.original)}
           >
             <History color="#006699" className="size-4" />
           </Button>
@@ -135,29 +148,46 @@ const columns: Array<DataTableColumnDef<SubmissionRow>> = [
   }
 ];
 
+// table
+
 type TTableProps = {
+  submissions: Array<Submission>;
   grading: string;
   search?: string;
   setSearch: (val: string) => void;
-  columnFilters: Set<string>;
   rowSelection: RowSelectionState;
   onRowSelectionChange: OnChangeFn<RowSelectionState>;
+  columnFilters: Set<string>;
 };
 
-const SubmissionsDataTable = (props: TTableProps) => {
-  const { grading, search, rowSelection, onRowSelectionChange, setSearch } =
-    props;
+const SubmissionsDataTable = ({
+  submissions,
+  grading,
+  search,
+  setSearch,
+  rowSelection,
+  onRowSelectionChange
+}: TTableProps) => {
+  const [selected, setSelected] = useState<Submission | null>(null);
+
+  const data = useMemo(() => toSubmissionRows(submissions), [submissions]);
+
+  const columns = useMemo(
+    () =>
+      getColumns({ onViewDetails: row => setSelected(row.submission ?? null) }),
+    []
+  );
 
   const columnFilters = useMemo<ColumnFiltersState>(
     () => (grading === 'all' ? [] : [{ id: 'grading', value: grading }]),
     [grading]
-  ); // TODO: finish filter logic
+  );
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-4 relative">
       <NestedTable
         columns={columns}
-        data={tableMockData}
+        data={data}
         getSubRows={row => row.subRows}
         getRowId={row => row.id}
         globalFilter={search}
@@ -166,6 +196,11 @@ const SubmissionsDataTable = (props: TTableProps) => {
         rowSelection={rowSelection}
         onRowSelectionChange={onRowSelectionChange}
         emptyMessage="No submissions match your filters."
+      />
+
+      <SubmissionDetailsDialog
+        submission={selected}
+        onClose={() => setSelected(null)}
       />
     </div>
   );
