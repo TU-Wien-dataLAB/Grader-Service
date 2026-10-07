@@ -37,7 +37,7 @@ COPY ./grader_service ./grader_service
 COPY pyproject.toml MANIFEST.in ./
 COPY ./grader_service.sh /usr/local/bin/grader_service.sh
 
-ENV PATH /var/lib/grader-service/.local/bin:$PATH
+ENV PATH=/var/lib/grader-service/.local/bin:$PATH
 RUN python3 -m pip install .
 
 USER grader-service

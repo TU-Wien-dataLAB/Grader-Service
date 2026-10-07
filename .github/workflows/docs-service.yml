@@ -21,7 +21,7 @@ jobs:
         run: uv python install
 
       - name: Install the project
-        run: uv sync --locked --dev
+        run: uv sync --locked --package grader-service --no-dev --group docs
 
       - name: Build documentation
         run: uv run --package grader-service sphinx-build -b html docs/source docs/build/html
