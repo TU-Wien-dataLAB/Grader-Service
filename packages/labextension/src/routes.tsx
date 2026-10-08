@@ -15,6 +15,7 @@ import {
 } from './services/queries/assignments.queries';
 import { Assignment } from './app/pages/instructor-view/assignment';
 import { selectedDirQuery } from '../lib/services/queries/files.queries';
+import EditSubmission from './app/components/grader-service/submissions/edit-submission';
 
 export const getRoutes = () => {
   return createRoutesFromElements(
@@ -48,6 +49,17 @@ export const getRoutes = () => {
       <Route
         path={'lectures/:id/assignments/:aid'}
         element={<Assignment />}
+        loader={async ({ params }) => {
+          await queryClient.ensureQueryData(selectedDirQuery());
+          await queryClient.ensureQueryData(
+            assignmentQuery(Number(params.id), Number(params.aid))
+          );
+          return null;
+        }}
+      />
+      <Route
+        path={'lectures/:id/assignments/:aid/submissions/:sid/edit'}
+        element={<EditSubmission />}
         loader={async ({ params }) => {
           await queryClient.ensureQueryData(selectedDirQuery());
           await queryClient.ensureQueryData(

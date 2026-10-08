@@ -19,7 +19,7 @@ import { useFiles } from '../../../hooks/submissions/get-uploaded-files-hook';
 import { createSubmissionFiles } from '../../../../services/git.service';
 
 type TProps = {
-  setShowNewSubmissionForm: (val: boolean) => void;
+  setOpenNewSubmission: (val: boolean) => void;
   currentPath: string;
 };
 
@@ -140,7 +140,7 @@ const NewSubmission = (props: TProps) => {
             <Button
               type="button"
               variant="outline"
-              onClick={() => props.setShowNewSubmissionForm(false)}
+              onClick={() => props.setOpenNewSubmission(false)}
             >
               Cancel
             </Button>

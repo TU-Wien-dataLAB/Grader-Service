@@ -132,7 +132,7 @@ export function selectColumn<T>(): DataTableColumnDef<T> {
           ) : (
             <span
               aria-hidden="true"
-              className="ml-1 block h-2.5 w-3 border-b-[1.5px] border-l-[1.5px] border-[#8D8D8D]"
+              className="ml-1 block h-2.5 w-2.5 border-b-[1.5px] border-l-[1.5px] border-[#8D8D8D]"
             />
           )}
         </div>

@@ -27,7 +27,7 @@ import {
 import { mockSubmissionsData } from './table-mock-data';
 
 type TProps = {
-  setShowNewSubmissionForm: (val: boolean) => void;
+  setOpenNewSubmission: (val: boolean) => void;
 };
 
 export const SubmissionsView = (props: TProps) => {
@@ -78,7 +78,7 @@ export const SubmissionsView = (props: TProps) => {
         <div className="flex gap-3">
           <Button variant={'outline'}>Reload</Button>
           <SubmissionsActions
-            setShowNewSubmissionForm={props.setShowNewSubmissionForm}
+            setOpenNewSubmission={props.setOpenNewSubmission}
           />
         </div>
       </div>

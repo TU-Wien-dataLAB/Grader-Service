@@ -20,8 +20,7 @@ import {
   openInFileBrowser
 } from '../../../services/local-file.service';
 import { selectedDirQuery } from '../../../services/queries/file.queries';
-import NewSubmission from '../../components/grader-service/submissions/new-submission';
-import { SubmissionsView } from '../../components/grader-service/submissions/submissions-view';
+import Submissions from '../../components/grader-service/submissions/submissions';
 
 export const Assignment = () => {
   const params = useParams();
@@ -41,8 +40,6 @@ export const Assignment = () => {
   const [currentTab, setCurrentTab] = useState(
     activeTab ?? 'notebooks-and-files'
   );
-  const [showNewSubmissionForm, setShowNewSubmissionForm] =
-    useState<boolean>(false);
 
   useEffect(() => {
     openInFileBrowser(
@@ -89,16 +86,7 @@ export const Assignment = () => {
           Notebooks and files
         </TabsContent>
         <TabsContent value="submissions">
-          {showNewSubmissionForm ? (
-            <NewSubmission
-              currentPath={currentPath}
-              setShowNewSubmissionForm={setShowNewSubmissionForm}
-            />
-          ) : (
-            <SubmissionsView
-              setShowNewSubmissionForm={setShowNewSubmissionForm}
-            />
-          )}
+          <Submissions currentPath={currentPath} />
         </TabsContent>
         <TabsContent value="statistics">Statistics</TabsContent>
       </Tabs>

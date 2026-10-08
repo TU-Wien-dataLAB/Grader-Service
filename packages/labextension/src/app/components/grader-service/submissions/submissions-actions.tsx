@@ -13,7 +13,7 @@ import {
 } from '../../../shadcn-components/ui/tooltip';
 
 type TProps = {
-  setShowNewSubmissionForm: (val: boolean) => void;
+  setOpenNewSubmission: (val: boolean) => void;
 };
 
 export const SubmissionsActions = (props: TProps) => {
@@ -36,9 +36,7 @@ export const SubmissionsActions = (props: TProps) => {
           </TooltipContent>
         </Tooltip>
         <DropdownMenuContent className={'rounded-xs'}>
-          <DropdownMenuItem
-            onClick={() => props.setShowNewSubmissionForm(true)}
-          >
+          <DropdownMenuItem onClick={() => props.setOpenNewSubmission(true)}>
             New submission
           </DropdownMenuItem>
           <DropdownMenuItem onClick={() => setOpenExportSubmissionDialog(true)}>

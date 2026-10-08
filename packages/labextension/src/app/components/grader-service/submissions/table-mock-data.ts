@@ -55,6 +55,19 @@ export const mockSubmissionsData: Array<Submission> = [
   }
 ];
 
+export const mockSubmission: Submission = {
+  id: 1,
+  assignid: 10,
+  user_id: 1,
+  user_display_name: 'Lina Hoffmann',
+  submitted_at: '2025-11-10T21:30:00Z',
+  auto_status: status<AutoStatus>('graded'),
+  feedback_status: status<FeedbackStatus>('given'),
+  grading_score: 750,
+  score: 750,
+  commit_hash: 'a1b2c3d'
+};
+
 export type SubmissionItem =
   ({ kind: 'file' } & SubmissionFile) | ({ kind: 'folder' } & SubmissionFolder);
 
