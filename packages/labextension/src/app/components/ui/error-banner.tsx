@@ -2,6 +2,7 @@ import React from 'react';
 import { OctagonAlert } from 'lucide-react';
 
 interface IErrorBannerProps {
+  title?: string;
   message: string;
 }
 
@@ -13,7 +14,7 @@ export const ErrorBanner = (props: IErrorBannerProps) => {
     >
       <OctagonAlert className={'text-[#DC182C] size-6'} />
       <div>
-        <p className="font-medium">Error</p>
+        <p className="font-medium">{props.title || 'Error'}</p>
         <p className={'text-secondary-background'}>
           {props.message || 'Something went wrong. Please tyr again.'}
         </p>
