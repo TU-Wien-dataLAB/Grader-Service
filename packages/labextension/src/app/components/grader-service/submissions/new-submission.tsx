@@ -201,6 +201,7 @@ const NewSubmission = (props: TProps) => {
                                       )
                                 );
                               }}
+                              className={`${!field.state.meta.isValid && 'border border-[#DC182C]'}`}
                             />
                             <Label className="font-normal" htmlFor={id}>
                               {opt.label}
