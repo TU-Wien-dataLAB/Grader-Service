@@ -8,7 +8,7 @@ const assignment: AssignmentDetail = {
   id: 1,
   name: 'Assignment1',
   settings: { autograde_type: 'unassisted' },
-  status: 'created',
+  status: 'released',
   points: 3,
   submissions: []
 };
