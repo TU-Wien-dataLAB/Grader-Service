@@ -79,13 +79,7 @@ export const SaveFilesDialog = (props: ISaveFilesDialogProps) => {
             value.comment,
             relativePaths
           ),
-          pushAssignment(
-            props.lecture.id,
-            props.assignmentId,
-            RepoType.RELEASE,
-            value.comment,
-            relativePaths
-          )
+          pushAssignment(props.lecture.id, props.assignmentId, RepoType.RELEASE)
         ])
           .then(async () => {
             await Promise.all([
