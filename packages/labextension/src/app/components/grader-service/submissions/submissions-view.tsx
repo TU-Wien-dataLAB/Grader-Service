@@ -25,6 +25,8 @@ import {
   SelectValue
 } from '../../../shadcn-components/ui/select';
 import { mockSubmissionsData } from './table-mock-data';
+import { Badge } from '../../../shadcn-components/ui/badge';
+import { X } from 'lucide-react';
 
 type TProps = {
   setOpenNewSubmission: (val: boolean) => void;
@@ -94,6 +96,37 @@ export const SubmissionsView = (props: TProps) => {
           toggle={toggle}
         />
       </div>
+      {activeFilters.size > 0 && (
+        <div className={'flex flex-row gap-4 items-start'}>
+          {Array.from(activeFilters).map(id => {
+            const [key, value, label] = id.split(':');
+            return (
+              <div
+                className={
+                  'flex items-center gap-0.5 rounded-xs border border-muted-foreground'
+                }
+              >
+                <Badge variant={'secondary'} className={'p-0 pl-2'}>
+                  <span className={'font-bold'}>{key}</span>: {label}
+                  <Button
+                    variant={'link'}
+                    onClick={() => toggle(key, value, label)}
+                  >
+                    <X className={'size-4'} aria-label={'Remove filter'} />
+                  </Button>
+                </Badge>
+              </div>
+            );
+          })}
+          <Button
+            variant={'link'}
+            aria-label={'Reset filters'}
+            onClick={() => setActiveFilters(new Set())}
+          >
+            Reset filter
+          </Button>
+        </div>
+      )}
       <div className="w-full">
         <SubmissionsDataTable
           submissions={mockSubmissionsData}

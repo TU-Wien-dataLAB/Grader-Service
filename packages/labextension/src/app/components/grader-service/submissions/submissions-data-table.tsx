@@ -125,7 +125,6 @@ const getColumns = ({
           <Button
             variant="ghost"
             size="icon"
-            className="cursor-pointer"
             title="View submission details"
             aria-label="View submission details"
             onClick={() => onViewDetails(row.original)}
@@ -136,7 +135,6 @@ const getColumns = ({
           <Button
             variant="ghost"
             size="icon"
-            className="cursor-pointer"
             title="View logs"
             aria-label="View logs"
             onClick={() => onViewLogs?.(row.original)}

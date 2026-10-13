@@ -47,9 +47,7 @@ export const Assignment = () => {
     );
   }, [assignmentId, lecture?.code, selectedDir]);
 
-  const currentPath = buildFileBasePath(lecture.code, 'source', assignmentId);
-
-  console.log('ggg: ', currentPath);
+  const currentPath = buildFileBasePath(lecture?.code, 'source', assignmentId);
 
   return (
     <div className={'flex p-6 flex-col items-start gap-6 w-full bg-background'}>

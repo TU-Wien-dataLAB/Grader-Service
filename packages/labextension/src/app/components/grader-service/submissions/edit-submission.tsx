@@ -27,7 +27,11 @@ const EditSubmission = () => {
   };
 
   return (
-    <div className={'flex flex-col items-start gap-4 self-stretch p-6 w-full'}>
+    <div
+      className={
+        'flex flex-col items-start gap-4 self-stretch p-6 w-full overflow-auto'
+      }
+    >
       <div className="flex gap-4 items-center w-full">
         <ArrowLeft
           onClick={goToViewSubmissions}

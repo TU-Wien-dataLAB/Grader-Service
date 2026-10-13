@@ -438,7 +438,7 @@ export const Lecture = () => {
                     render={
                       <span className="inline-block">
                         <Button
-                          className={'ml-auto cursor-pointer'}
+                          className={'ml-auto'}
                           disabled={!isAnyAssignmentChecked}
                           onClick={() => setOpenReleaseDialog(true)}
                         >
