@@ -101,6 +101,7 @@ export const FilesDataTable = (props: TTableProps) => {
               <Button
                 variant={'link'}
                 onClick={() => handleOpenFile(row.original.path)}
+                className={'p-0'}
               >
                 {selectedDir === 'source' ? (
                   <Pencil className={'size-5 fill-primary text-card!'} />
