@@ -6,7 +6,7 @@ import {
   NestedTable,
   selectColumn
 } from '../../ui/nested-table/nested-table';
-import { getDate } from '../../utils/utils';
+import { determineFileSize, getDate } from '../../utils/utils';
 import {
   ColumnFiltersState,
   OnChangeFn,
@@ -89,7 +89,7 @@ export const FilesDataTable = (props: TTableProps) => {
         accessorKey: 'size',
         header: 'File size',
         enableGlobalFilter: false,
-        cell: ({ row }) => <span>{row.original.size?.toFixed(2)} B</span>
+        cell: ({ row }) => <span>{determineFileSize(row.original)}</span>
       },
       {
         id: 'actions',
