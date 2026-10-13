@@ -22,7 +22,7 @@ export const getRoutes = () => {
       element={<Root />}
       path={'/*'}
       loader={async () => {
-        await queryClient.ensureQueryData(activeInstructorLecturesQuery());
+        await queryClient.query(activeInstructorLecturesQuery());
         return null;
       }}
     >
@@ -30,7 +30,7 @@ export const getRoutes = () => {
         index
         element={<Dashboard />}
         loader={async () => {
-          await queryClient.ensureQueryData(getCurrentUserQuery());
+          await queryClient.query(getCurrentUserQuery());
           return null;
         }}
       ></Route>
@@ -38,10 +38,8 @@ export const getRoutes = () => {
         path={'lectures/:id'}
         element={<Lecture />}
         loader={async ({ params }) => {
-          await queryClient.ensureQueryData(lectureQuery(Number(params.id)));
-          await queryClient.ensureQueryData(
-            assignmentsQuery(Number(params.id))
-          );
+          await queryClient.query(lectureQuery(Number(params.id)));
+          await queryClient.query(assignmentsQuery(Number(params.id)));
           return null;
         }}
       ></Route>
@@ -50,10 +48,10 @@ export const getRoutes = () => {
         element={<Assignment />}
         loader={async ({ params }) => {
           await Promise.all([
-            queryClient.ensureQueryData(
+            queryClient.query(
               selectedDirQuery(Number(params.lid), Number(params.aid))
             ),
-            queryClient.ensureQueryData(
+            queryClient.query(
               assignmentQuery(Number(params.lid), Number(params.aid))
             )
           ]);
