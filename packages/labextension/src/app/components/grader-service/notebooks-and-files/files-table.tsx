@@ -46,7 +46,6 @@ export const FilesDataTable = (props: TTableProps) => {
   );
 
   const handleOpenFile = async (filePath: string) => {
-    // TODO: open file in read-only mode when in release dir
     await openInNewTab(filePath);
   };
 

@@ -48,7 +48,6 @@ interface IFilesViewProps {
 
 export const FilesView = (props: IFilesViewProps) => {
   const { status, setStatus } = useMutationStatus();
-  // fetch required data
   const { data: selectedDir } = useQuery(
     selectedDirQuery(props.lectureId, props.assignmentId)
   );
