@@ -32,10 +32,14 @@ import { EmptyDirIcon } from '../../../../assets/empty-dir-icon';
 import { FilesDataTable } from './files-table';
 import { ColumnFiltersState, RowSelectionState } from '@tanstack/react-table';
 import { Button } from '../../../shadcn-components/ui/button';
-import { pullAssignment } from '../../../../services/git.service';
+import {
+  getRemoteStatus,
+  pullAssignment
+} from '../../../../services/git.service';
 import { RepoType } from '../../utils/repo-type';
 import { HTTPError } from '../../../../services/request.service';
 import { SaveFilesDialog } from './save-files-dialog';
+import { Badge } from '../../../shadcn-components/ui/badge';
 
 interface IFilesViewProps {
   lectureId: number;
@@ -54,6 +58,22 @@ export const FilesView = (props: IFilesViewProps) => {
     queryFn: async () => {
       return await getFiles(srcPath);
     }
+  });
+  const { data: remoteRepoStatus } = useQuery({
+    queryKey: [
+      'remote-repo-status',
+      lecture.code,
+      props.assignmentId,
+      selectedDir
+    ],
+    queryFn: async () => {
+      return await getRemoteStatus(
+        props.lectureId,
+        props.assignmentId,
+        selectedDir === 'source' ? RepoType.SOURCE : RepoType.RELEASE
+      );
+    },
+    enabled: !!files
   });
   const handlePullAssignment = async () => {
     try {
@@ -115,6 +135,12 @@ export const FilesView = (props: IFilesViewProps) => {
   const fileTypes = useMemo(() => {
     return [...new Set(files?.map(file => file.type))];
   }, [files]);
+  const { handleGenerateAssignmentReleaseVer } =
+    useAssignmentGenerateReleaseVer();
+  const [searchQuery, setSearchQuery] = React.useState('');
+  const [checkedFileTypes, setCheckedFileTypes] = React.useState<string[]>([]);
+  const [rowSelection, setRowSelection] = useState<RowSelectionState>({});
+  const [openSaveFilesDialog, setOpenSaveFilesDialog] = useState(false);
   const columnFilters = useMemo<ColumnFiltersState>(
     () => [
       ...(searchQuery ? [{ id: 'name', value: searchQuery }] : []),
@@ -124,10 +150,20 @@ export const FilesView = (props: IFilesViewProps) => {
     ],
     [searchQuery, checkedFileTypes]
   );
-  const { handleGenerateAssignmentReleaseVer } =
-    useAssignmentGenerateReleaseVer();
-  const [rowSelection, setRowSelection] = useState<RowSelectionState>({});
-  const [openSaveFilesDialog, setOpenSaveFilesDialog] = useState(false);
+  const remoteStatusBadge = () => {
+    switch (remoteRepoStatus?.status) {
+      case 'UP_TO_DATE':
+        return <Badge className={'bg-lime-600'}>No updates available</Badge>;
+      case 'PULL_NEEDED':
+        return <Badge className={'bg-red-400'}>Updates available</Badge>;
+      case 'PUSH_NEEDED':
+        return <Badge className={'bg-yellow-600'}>Unsaved changes</Badge>;
+      case 'DIVERGENT':
+        return <Badge className={'bg-red-700'}>Out of sync</Badge>;
+      case 'NO_REMOTE_REPO':
+        return <Badge className={'bg-gray-400'}>Not backed up</Badge>;
+    }
+  };
   return (
     <div className={'flex flex-col items-start gap-4 self-stretch h-full'}>
       {files?.length <= 0 ? (
@@ -146,8 +182,11 @@ export const FilesView = (props: IFilesViewProps) => {
         </div>
       ) : (
         <>
-          <div className={'flex justify-between items-center self-stretch'}>
+          <div
+            className={'flex justify-between items-center self-stretch gap-2'}
+          >
             <h2 className={'text-xl font-bold'}>Notebooks & files</h2>
+            {remoteStatusBadge() ?? null}
             <NewNotebookDialog
               assignmentId={props.assignmentId}
               lectureCode={lecture.code}
@@ -225,6 +264,8 @@ export const FilesView = (props: IFilesViewProps) => {
             rowSelection={rowSelection}
             onRowSelectionChange={setRowSelection}
             columnFilters={columnFilters}
+            lectureId={props.lectureId}
+            assignmentId={props.assignmentId}
           />
           <div className={'flex items-center gap-4 self-stretch'}>
             <Button onClick={() => setOpenSaveFilesDialog(true)}>Save</Button>
