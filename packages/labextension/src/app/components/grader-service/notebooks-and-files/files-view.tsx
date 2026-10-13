@@ -24,7 +24,7 @@ import {
 } from '../../../shadcn-components/ui/tooltip';
 import { useAssignmentGenerateReleaseVer } from '../../../hooks/assignment/assignment-generate-release-ver';
 import { storeString } from '../../../../services/storage.service';
-import { useMutationStatus } from '../../../../widget';
+import { queryClient, useMutationStatus } from '../../../../widget';
 import { SuccessBanner } from '../../ui/success-banner';
 import { ErrorBanner } from '../../ui/error-banner';
 import { EmptyState } from '../../utils/empty-state';
@@ -53,7 +53,7 @@ export const FilesView = (props: IFilesViewProps) => {
     selectedDirQuery(props.lectureId, props.assignmentId)
   );
   const { data: lecture } = useQuery(lectureQuery(props.lectureId));
-  const { data: files = [], refetch: refetchFiles } = useQuery({
+  const { data: files = [] } = useQuery({
     queryKey: ['files', lecture.code, props.assignmentId, selectedDir],
     queryFn: async () => {
       return await getFiles(srcPath);
@@ -77,12 +77,35 @@ export const FilesView = (props: IFilesViewProps) => {
   });
   const handlePullAssignment = async () => {
     try {
-      await Promise.all([
-        pullAssignment(lecture.id, props.assignmentId, RepoType.SOURCE),
-        refetchFiles()
-      ]).catch((err: HTTPError) =>
-        setStatus({ message: err.message, status: 'error' })
-      );
+      await pullAssignment(
+        lecture.id,
+        props.assignmentId,
+        selectedDir === 'source' ? RepoType.SOURCE : RepoType.RELEASE
+      )
+        .then(
+          async () =>
+            await Promise.all([
+              queryClient.invalidateQueries({
+                queryKey: [
+                  'files',
+                  lecture.code,
+                  props.assignmentId,
+                  selectedDir
+                ]
+              }),
+              queryClient.invalidateQueries({
+                queryKey: [
+                  'remote-repo-status',
+                  lecture.code,
+                  props.assignmentId,
+                  selectedDir
+                ]
+              })
+            ])
+        )
+        .catch((err: HTTPError) =>
+          setStatus({ message: err.message, status: 'error' })
+        );
     } catch (err) {
       setStatus({ message: 'Failed to update assignment!', status: 'error' });
     }
@@ -95,9 +118,16 @@ export const FilesView = (props: IFilesViewProps) => {
       handleGenerateAssignmentReleaseVer(lecture.id, props.assignmentId);
     }
     // set new dir
-    storeString('files-selected-dir', dir);
+    storeString(
+      `${props.lectureId}:${props.assignmentId}:files-selected-dir`,
+      dir
+    );
     const newSrcPath = `${lectureBasePath}${lecture.code}/${dir}/${props.assignmentId}`;
-    refetchSelectedDir().then(() => openInFileBrowser(newSrcPath));
+    await queryClient
+      .invalidateQueries({
+        queryKey: ['selectedDir', props.lectureId, props.assignmentId]
+      })
+      .then(() => openInFileBrowser(newSrcPath));
   };
 
   const srcPath = useMemo(
@@ -106,6 +136,7 @@ export const FilesView = (props: IFilesViewProps) => {
     [lecture.code, selectedDir, props.assignmentId]
   );
 
+  // synchronize files shown in app with jupyterlab's file browser
   useEffect(() => {
     const handler = async (
       sender: Contents.IManager,
@@ -118,7 +149,19 @@ export const FilesView = (props: IFilesViewProps) => {
       ) {
         return;
       }
-      await refetchFiles();
+      await Promise.all([
+        queryClient.invalidateQueries({
+          queryKey: ['files', lecture.code, props.assignmentId, selectedDir]
+        }),
+        queryClient.invalidateQueries({
+          queryKey: [
+            'remote-repo-status',
+            lecture.code,
+            props.assignmentId,
+            selectedDir
+          ]
+        })
+      ]);
     };
 
     GlobalObjects.docManager.services.contents.fileChanged.connect(handler);
@@ -127,10 +170,7 @@ export const FilesView = (props: IFilesViewProps) => {
         handler
       );
     };
-  }, [srcPath, refetchFiles]);
-  const [searchQuery, setSearchQuery] = React.useState('');
-
-  const [checkedFileTypes, setCheckedFileTypes] = React.useState<string[]>([]);
+  }, [srcPath, files]);
 
   const fileTypes = useMemo(() => {
     return [...new Set(files?.map(file => file.type))];
@@ -283,7 +323,7 @@ export const FilesView = (props: IFilesViewProps) => {
           selectedRows={rowSelection}
           lecture={lecture}
           assignmentId={props.assignmentId}
-          refetchFiles={refetchFiles}
+          selectedDir={selectedDir}
         />
       )}
     </div>

@@ -26,11 +26,10 @@ import { Checkbox } from '../../../shadcn-components/ui/checkbox';
 import { pushAssignment } from '../../../../services/git.service';
 import { RepoType } from '../../utils/repo-type';
 import { useForm } from '@tanstack/react-form';
-import { useMutationStatus } from '../../../../widget';
+import { queryClient, useMutationStatus } from '../../../../widget';
 import { HTTPError } from '../../../../services/request.service';
 import { Lecture } from '../../../../model/lecture';
 import { CornerDownRight } from 'lucide-react';
-import { RefetchOptions } from '@tanstack/react-query';
 
 interface ISaveFilesDialogProps {
   isOpen: boolean;
@@ -39,7 +38,7 @@ interface ISaveFilesDialogProps {
   files: IFile[];
   lecture: Lecture;
   assignmentId: number;
-  refetchFiles: (options?: RefetchOptions) => void;
+  selectedDir: string;
 }
 // non-recursive version of IFile, just for the form
 type SelectedFile = Omit<IFile, 'content'> & { content?: unknown };
@@ -88,18 +87,35 @@ export const SaveFilesDialog = (props: ISaveFilesDialogProps) => {
             relativePaths
           )
         ])
-          .then(() => {
+          .then(async () => {
+            await Promise.all([
+              queryClient.invalidateQueries({
+                queryKey: [
+                  'files',
+                  props.lecture.code,
+                  props.assignmentId,
+                  props.selectedDir
+                ]
+              }),
+              queryClient.invalidateQueries({
+                queryKey: [
+                  'remote-repo-status',
+                  props.lecture.code,
+                  props.assignmentId,
+                  props.selectedDir
+                ]
+              })
+            ]);
+            props.setIsOpen(false);
             setStatus({
               message:
                 'Your changes have been saved successfully. The notebooks & files will now be pushed to the repository, and the updates will be visible to your students.',
               status: 'success'
             });
-            props.setIsOpen(false);
           })
           .catch((err: HTTPError) => {
             setStatus({ message: err.message, status: 'error' });
           });
-        props.refetchFiles();
       } catch (err) {
         setStatus({ message: 'Error saving assignment', status: 'error' });
       }
