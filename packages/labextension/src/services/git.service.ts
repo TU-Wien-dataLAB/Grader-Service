@@ -2,8 +2,6 @@ import { RepoType } from '../app/components/utils/repo-type';
 import { request } from './request.service';
 import { HTTPMethod } from './enums/http-methods.enum';
 import { Submission } from '../model/submission';
-import { Lecture } from '../model/lecture';
-import { Assignment } from '../model/assignment';
 import { RemoteFileStatus } from '../model/remoteFileStatus';
 
 interface IGitLogObject {
@@ -159,14 +157,14 @@ export function restoreSubmission(
  * Returns the last n commits of the given repo
  */
 export function getGitLog(
-  lecture: Lecture,
-  assignment: Assignment,
+  lectureId: number,
+  assignmentId: number,
   repo: RepoType,
   nCommits: number
 ): Promise<IGitLogObject[]> {
   let url = `${baseUrl({
-    lectureId: lecture.id,
-    assignmentId: assignment.id
+    lectureId: lectureId,
+    assignmentId: assignmentId
   })}log/${repo}/`;
   const searchParams = new URLSearchParams({
     n: String(nCommits)
@@ -179,14 +177,14 @@ export function getGitLog(
  * Returns the status of the given repo
  */
 export function getRemoteStatus(
-  lecture: Lecture,
-  assignment: Assignment,
+  lectureId: number,
+  assignmentId: number,
   repo: RepoType,
   reload = false
 ): Promise<RemoteFileStatus> {
   const url = `${baseUrl({
-    lectureId: lecture.id,
-    assignmentId: assignment.id
+    lectureId: lectureId,
+    assignmentId: assignmentId
   })}remote-status/${repo}/`;
   return request<RemoteFileStatus>(HTTPMethod.GET, url, null, reload);
 }
@@ -195,15 +193,15 @@ export function getRemoteStatus(
  * Returns the status of the given file in the given repo
  */
 export function getRemoteFileStatus(
-  lecture: Lecture,
-  assignment: Assignment,
+  lectureId: number,
+  assignmentId: number,
   repo: RepoType,
   filePath: string,
   reload = false
 ): Promise<RemoteFileStatus> {
   const url = `${baseUrl({
-    lectureId: lecture.id,
-    assignmentId: assignment.id
+    lectureId: lectureId,
+    assignmentId: assignmentId
   })}/remote-file-status/${repo}/?file=${encodeURIComponent(filePath)}`;
   return request<RemoteFileStatus>(HTTPMethod.GET, url, null, reload);
 }
