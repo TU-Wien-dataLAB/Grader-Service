@@ -34,12 +34,16 @@ type TTableProps = {
   rowSelection: RowSelectionState;
   onRowSelectionChange: OnChangeFn<RowSelectionState>;
   columnFilters: ColumnFiltersState;
+  lectureId: number;
+  assignmentId: number;
 };
 
 export const FilesDataTable = (props: TTableProps) => {
   const { files, rowSelection, onRowSelectionChange, columnFilters } = props;
 
-  const { data: selectedDir } = useQuery(selectedDirQuery());
+  const { data: selectedDir } = useQuery(
+    selectedDirQuery(props.lectureId, props.assignmentId)
+  );
 
   const handleOpenFile = async (filePath: string) => {
     // TODO: open file in read-only mode when in release dir
