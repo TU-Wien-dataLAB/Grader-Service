@@ -25,10 +25,12 @@ import { selectedDirQuery } from '../../../services/queries/files.queries';
 export const Assignment = () => {
   const params = useParams();
 
-  const lectureId = Number(params.id);
+  const lectureId = Number(params.lid);
   const assignmentId = Number(params.aid);
 
-  const { data: selectedDir } = useQuery(selectedDirQuery());
+  const { data: selectedDir } = useQuery(
+    selectedDirQuery(lectureId, assignmentId)
+  );
   const { data: lecture } = useQuery(lectureQuery(lectureId));
   const { data: assignment } = useQuery(
     assignmentQuery(lectureId, assignmentId)

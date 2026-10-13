@@ -46,13 +46,15 @@ export const getRoutes = () => {
         }}
       ></Route>
       <Route
-        path={'lectures/:id/assignments/:aid'}
+        path={'lectures/:lid/assignments/:aid'}
         element={<Assignment />}
         loader={async ({ params }) => {
           await Promise.all([
-            queryClient.ensureQueryData(selectedDirQuery()),
             queryClient.ensureQueryData(
-              assignmentQuery(Number(params.id), Number(params.aid))
+              selectedDirQuery(Number(params.lid), Number(params.aid))
+            ),
+            queryClient.ensureQueryData(
+              assignmentQuery(Number(params.lid), Number(params.aid))
             )
           ]);
           return null;
