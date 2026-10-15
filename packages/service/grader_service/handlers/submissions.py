@@ -27,7 +27,7 @@ from grader_service.autograding.celery.tasks import (
 from grader_service.convert.gradebook.gradebook import Gradebook
 from grader_service.convert.gradebook.models import GradeBookModel
 from grader_service.errors import APIError
-from grader_service.file_services import FileServiceError
+from grader_service.services.file_services import FileServiceError
 from grader_service.handlers.base_handler import GraderBaseHandler, authorize
 from grader_service.handlers.handler_utils import parse_ids
 from grader_service.orm.assignment import Assignment

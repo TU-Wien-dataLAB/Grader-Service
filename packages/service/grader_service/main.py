@@ -43,8 +43,8 @@ from grader_service.auth.auth import Authenticator
 from grader_service.auth.dummy import DummyAuthenticator
 from grader_service.autograding.celery.app import CeleryApp
 from grader_service.autograding.local_grader import LocalAutogradeExecutor
-from grader_service.file_services import GitFileService
-from grader_service.file_services.base_file_service import FileService
+from grader_service.services.file_services import GitFileService
+from grader_service.services.file_services.base_file_service import FileService
 from grader_service.handlers.static import CacheControlStaticFilesHandler
 from grader_service.oauth2 import handlers as oauth_handlers
 from grader_service.oauth2.provider import make_provider, GraderOAuthServer

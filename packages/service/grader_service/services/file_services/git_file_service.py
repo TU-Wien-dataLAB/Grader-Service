@@ -6,7 +6,7 @@ from pathlib import Path
 from traitlets import Unicode, observe, validate, default
 
 from grader_service.artifact_types import ArtifactType
-from grader_service.file_services.base_file_service import FileService, FileServiceError
+from grader_service.services.file_services.base_file_service import FileService, FileServiceError
 from grader_service.orm import Assignment, Lecture, Submission
 from grader_service.utils import executable_validator
 

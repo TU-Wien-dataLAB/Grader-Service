@@ -17,7 +17,7 @@ from sqlalchemy.orm import Session, sessionmaker
 from tornado.httpclient import HTTPClientError
 
 from grader_service.api.models import AssignmentSettings, Submission
-from grader_service.file_services import GitFileService
+from grader_service.services.file_services import GitFileService
 from grader_service.artifact_types import ArtifactType
 from grader_service.handlers.submissions import INSTRUCTOR_SUBMISSION_HASH, SubmissionHandler
 from grader_service.orm import Assignment as AssignmentORM

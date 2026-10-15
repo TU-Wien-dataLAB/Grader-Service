@@ -15,7 +15,7 @@ from sqlalchemy.orm import Session, scoped_session, sessionmaker
 
 from grader_service import GraderService, handlers
 from grader_service.auth.dummy import DummyAuthenticator
-from grader_service.file_services import GitFileService
+from grader_service.services.file_services import GitFileService
 from grader_service.main import get_session_maker
 from grader_service.orm import User, Submission, Assignment, Lecture, SubmissionProperties
 from grader_service.orm.base import set_sqlite_pragma
