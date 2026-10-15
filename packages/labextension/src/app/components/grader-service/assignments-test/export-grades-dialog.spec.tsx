@@ -1,8 +1,8 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
 import '@testing-library/jest-dom';
-import { ExportGradesDialog } from '../export-grades-dialog';
-import { useMutationStatus } from '../../../../../widget';
+import { ExportGradesDialog } from '../assignments/export-grades-dialog';
+import { useMutationStatus } from '../../../../widget';
 
 jest.mock('../../../../widget', () => ({
   useMutationStatus: jest.fn()

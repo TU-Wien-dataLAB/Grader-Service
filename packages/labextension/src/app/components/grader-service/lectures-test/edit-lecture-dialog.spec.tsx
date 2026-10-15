@@ -1,8 +1,8 @@
 import React from 'react';
 import { fireEvent, render, screen } from '@testing-library/react';
-import { EditLectureDialog } from '../edit-lecture-dialog';
-import { createAllProvidersWrapper } from '../../../../../test/utils';
-import { useUpdateLecture } from '../../../../hooks/lecture/update-lecture-hook';
+import { EditLectureDialog } from '../lectures/edit-lecture-dialog';
+import { createAllProvidersWrapper } from '../../../../test/utils';
+import { useUpdateLecture } from '../../../hooks/lecture/update-lecture-hook';
 import { userEvent } from '@testing-library/user-event';
 
 jest.mock('../../../hooks/lecture/update-lecture-hook');

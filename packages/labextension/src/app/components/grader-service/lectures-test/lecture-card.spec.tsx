@@ -1,10 +1,10 @@
 import { render, screen } from '@testing-library/react';
-import { LectureCard } from '../lecture-card';
-import { createAllProvidersWrapper } from '../../../../../test/utils';
-import { getLectureUsers } from '../../../../../services/lectures.service';
-import { getAllAssignments } from '../../../../../services/assignments.service';
+import { LectureCard } from '../lectures/lecture-card';
+import { createAllProvidersWrapper } from '../../../../test/utils';
+import { getLectureUsers } from '../../../../services/lectures.service';
+import { getAllAssignments } from '../../../../services/assignments.service';
 import React from 'react';
-import { Lecture } from '../../../../../model/lecture';
+import { Lecture } from '../../../../model/lecture';
 import { userEvent } from '@testing-library/user-event';
 
 jest.mock('../../../../services/lectures.service');

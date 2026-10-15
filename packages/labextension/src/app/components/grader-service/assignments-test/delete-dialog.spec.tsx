@@ -1,8 +1,8 @@
 import { render, screen } from '@testing-library/react';
-import { AssignmentDetail } from '../../../../../model/assignmentDetail';
+import { AssignmentDetail } from '../../../../model/assignmentDetail';
 import React from 'react';
-import { createAllProvidersWrapper } from '../../../../../test/utils';
-import { DeleteDialog } from '../delete-dialog';
+import { createAllProvidersWrapper } from '../../../../test/utils';
+import { DeleteDialog } from '../assignments/delete-dialog';
 
 const assignment: AssignmentDetail = {
   id: 1,

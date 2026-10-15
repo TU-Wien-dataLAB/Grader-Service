@@ -1,7 +1,7 @@
-import { createAllProvidersWrapper } from '../../../../../test/utils';
+import { createAllProvidersWrapper } from '../../../../test/utils';
 import { render, screen } from '@testing-library/react';
-import { AssignmentCard } from '../assignment-card';
-import { AssignmentDetail } from '../../../../../model/assignmentDetail';
+import { AssignmentCard } from '../assignments/assignment-card';
+import { AssignmentDetail } from '../../../../model/assignmentDetail';
 import React, { useState } from 'react';
 import { DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';

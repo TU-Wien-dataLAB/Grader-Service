@@ -1,8 +1,8 @@
 import { userEvent } from '@testing-library/user-event';
 import { render, screen } from '@testing-library/react';
-import { AssignmentActions } from '../assignment-actions';
+import { AssignmentActions } from '../assignments/assignment-actions';
 import React from 'react';
-import { createAllProvidersWrapper } from '../../../../../test/utils';
+import { createAllProvidersWrapper } from '../../../../test/utils';
 
 describe('AssignmentActions', () => {
   it('shows the correct actions for a created assignment', async () => {
