@@ -12,7 +12,8 @@ export const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
       staleTime: 10 * 60 * 1000,
-      cacheTime: 15 * 60 * 1000
+      cacheTime: 15 * 60 * 1000,
+      refetchOnReconnect: true
     } as any
   }
 });
@@ -74,26 +75,25 @@ function GraderServiceViewComponent({
   );
 }
 
-export class GraderServiceView extends ReactWidget {
+export class GraderServiceWidget extends ReactWidget {
   theme: 'dark' | 'light';
   router: DataRouter;
 
-  constructor(options: CourseManageView.IOptions = {}) {
+  constructor(options: GraderServiceView.IOptions = {}) {
     super();
-    this.id = options.id || 'course-manage-view';
+    this.id = options.id || 'grader-service-view';
     this.addClass('GradingWidget');
     this.router = createMemoryRouter(getRoutes(), { initialEntries: ['/'] });
 
     const themeManager = GlobalObjects.themeManager;
-    this.theme = themeManager.isLight(themeManager.theme ?? 'light')
-      ? 'light'
-      : 'dark';
+    const resolveTheme = () =>
+      themeManager.isLight(themeManager.theme ?? 'light') ? 'light' : 'dark';
+
+    this.theme = resolveTheme();
 
     themeManager.themeChanged.connect(() => {
-      this.theme = themeManager.isLight(themeManager.theme ?? 'light')
-        ? 'light'
-        : 'dark';
-      this.update(); // <- tells Lumino to re-invoke render()
+      this.theme = resolveTheme();
+      this.update();
     }, this);
   }
 
@@ -108,7 +108,7 @@ export class GraderServiceView extends ReactWidget {
   }
 }
 
-export namespace CourseManageView {
+export namespace GraderServiceView {
   export interface IOptions {
     id?: string;
   }
