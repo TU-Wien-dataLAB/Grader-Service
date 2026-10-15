@@ -28,9 +28,9 @@ type MutationStatusContextType = {
   setStatus: (status: StatusState) => void;
 };
 
-const MutationContext = React.createContext<MutationStatusContextType | null>(
-  null
-);
+const defaultStatus: StatusState = { status: null, message: null };
+export const MutationContext =
+  React.createContext<MutationStatusContextType | null>(null);
 
 export function useMutationStatus() {
   const ctx = React.useContext(MutationContext);
@@ -51,10 +51,7 @@ function GraderServiceViewComponent({
   router: DataRouter;
   parentNode: HTMLElement | null;
 }) {
-  const [status, setStatus] = useState<StatusState>({
-    status: null,
-    message: null
-  });
+  const [status, setStatus] = useState<StatusState>(defaultStatus);
 
   useEffect(() => {
     if (status.status !== null) {

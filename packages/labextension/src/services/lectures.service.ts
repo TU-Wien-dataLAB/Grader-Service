@@ -59,5 +59,14 @@ export function getLectureUsers(
     instructors: User[];
     tutors: User[];
     students: User[];
-  }>(HTTPMethod.GET, `${baseUrl}/${lectureId}/users`, null, reload);
+  }>(HTTPMethod.GET, `/api/lectures/${lectureId}/users`, null, reload);
+}
+
+export async function exportGrades(
+  lectureId: number,
+  filter: 'latest' | 'best' = 'best',
+  format: 'json' | 'csv' = 'csv'
+): Promise<any> {
+  const url = `/api/lectures/${lectureId}/submissions?filter=${filter}&format=${format}`;
+  return request<any>(HTTPMethod.GET, url, null);
 }

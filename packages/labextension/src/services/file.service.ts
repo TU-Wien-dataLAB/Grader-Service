@@ -4,6 +4,7 @@ import { RepoType } from '../app/components/utils/repo-type';
 import { request } from './request.service';
 import { HTTPMethod } from './enums/http-methods.enum';
 import { RemoteFileStatus } from '../model/remoteFileStatus';
+import { GlobalObjects } from '../index';
 
 export const baseUrl = (props: { lectureId: number; assignmentId: number }) => {
   return `/api/lectures/${props.lectureId}/assignments/${props.assignmentId}/`;
@@ -70,3 +71,12 @@ export function getRemoteFileStatus(
   })}remote-file-status/${repo}/?file=${encodeURIComponent(filePath)}`;
   return request<RemoteFileStatus>(HTTPMethod.GET, url, null, reload);
 }
+
+export const openFile = async (path: string) => {
+  await GlobalObjects.commands.execute('docmanager:open', {
+    path: path,
+    options: {
+      mode: 'tab-after' // tab-after tab-before split-bottom split-right split-left split-top
+    }
+  });
+};
