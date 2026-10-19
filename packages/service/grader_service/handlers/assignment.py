@@ -229,7 +229,7 @@ class AssignmentObjectHandler(GraderBaseHandler):
 
         assignment.name = assignment_model.name
         assignment.status = assignment_model.status
-        if (assignment_model.settings.autograde_type == "full_auto") and (
+        if (assignment_model.settings.grading_method == "full_auto") and (
             assignment.properties is not None
         ):
             model = GradeBookModel.from_dict(json.loads(assignment.properties))
@@ -428,7 +428,7 @@ class AssignmentPropertiesHandler(GraderBaseHandler):
         model = GradeBookModel.from_dict(json.loads(properties_string))
         # Check if assignment contains no cells that
         # need manual grading if assignment is fully auto grade
-        if assignment.settings.autograde_type == "full_auto":
+        if assignment.settings.grading_method == "full_auto":
             _check_full_auto_grading(self, model)
 
         assignment.properties = properties_string

@@ -401,5 +401,5 @@ components:
       enum: [ "created", "saved", "released", "complete" ]
     GradingMethod:
       type: string
-      enum: [ "auto", "full_auto", "unassisted"]
+      enum: [ "auto", "full_auto", "manual"]
       default: "auto"

@@ -419,7 +419,7 @@ class SubmissionHandler(GraderBaseHandler):
         submission.manual_status = ManualStatus.NOT_GRADED
         submission.feedback_status = FeedbackStatus.NOT_GENERATED
 
-        automatic_grading = assignment.settings.autograde_type
+        grading_method = assignment.settings.grading_method
 
         self.session.add(submission)
         self.session.commit()
@@ -443,14 +443,14 @@ class SubmissionHandler(GraderBaseHandler):
         # Note: A specific commit hash is used to differentiate between submissions created by
         # instructors for students and normal submissions by any user.
         if (
-            automatic_grading in ["auto", "full_auto"]
+            grading_method in ["auto", "full_auto"]
             and submission_hash != INSTRUCTOR_SUBMISSION_HASH
         ):
             submission.auto_status = AutoStatus.PENDING
             self.session.commit()
             self.set_status(HTTPStatus.ACCEPTED)
 
-            if automatic_grading == "full_auto":
+            if grading_method == "full_auto":
                 submission.feedback_status = FeedbackStatus.GENERATING
                 self.session.commit()
 

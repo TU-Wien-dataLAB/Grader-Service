@@ -1430,7 +1430,7 @@ async def test_post_submission_max_submissions_assignment(
     assignment_orm.settings = AssignmentSettings(
         deadline=datetime.now(tz=timezone.utc) + timedelta(weeks=2),
         max_submissions=1,
-        autograde_type="unassisted",
+        grading_method="manual",
     )
     assignment_orm.properties = json.dumps({"notebooks": {}})
     session.add(assignment_orm)

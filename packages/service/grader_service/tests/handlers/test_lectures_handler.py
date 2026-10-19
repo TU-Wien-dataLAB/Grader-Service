@@ -777,7 +777,7 @@ async def test_delete_lecture_assignment_complete(
         id=-1,
         name="pytest",
         status="complete",
-        settings=AssignmentSettings(autograde_type="unassisted"),
+        settings=AssignmentSettings(grading_method="manual"),
     )
     post_response = await http_server_client.fetch(
         url,
