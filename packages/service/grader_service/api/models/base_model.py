@@ -1,7 +1,7 @@
 import pprint
 
 import typing
-
+from datetime import datetime
 from grader_service.api import util
 
 T = typing.TypeVar('T')
@@ -43,6 +43,8 @@ class Model:
                     if hasattr(item[1], "to_dict") else item,
                     value.items()
                 ))
+            elif isinstance(value, datetime):  # Convert datetime to ISO format
+                result[attr] = value.isoformat()
             else:
                 result[attr] = value
 
