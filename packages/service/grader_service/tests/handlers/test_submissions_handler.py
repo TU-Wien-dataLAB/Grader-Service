@@ -1590,15 +1590,16 @@ async def test_submission_properties_student(
         status="released",
         deleted=DeleteState.active,
     )
-    sql_alchemy_sessionmaker.add(assignment)
-    sql_alchemy_sessionmaker.commit()
+    with sql_alchemy_sessionmaker() as session:
+        session.add(assignment)
+        session.commit()
 
     insert_submission(sql_alchemy_engine, a_id, default_user.name, default_user.id)
 
-    submission = sql_alchemy_sessionmaker().query(SubmissionORM).filter_by(id=s_id).first()
-    submission.properties.properties = json.dumps(props)
-
-    sql_alchemy_sessionmaker().merge(submission)
+    with sql_alchemy_sessionmaker() as session:
+        submission = session.query(SubmissionORM).filter_by(id=s_id).first()
+        submission.properties.properties = json.dumps(props)
+        session.commit()
 
     url = service_base_url + f"lectures/{l_id}/assignments/{a_id}/submissions/{s_id}/properties"
 

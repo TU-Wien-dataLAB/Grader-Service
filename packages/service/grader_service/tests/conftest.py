@@ -11,12 +11,12 @@ import pytest
 from alembic import config
 from alembic.command import upgrade
 from sqlalchemy import Engine, event
-from sqlalchemy.orm import Session, scoped_session, sessionmaker
+from sqlalchemy.orm import Session, sessionmaker
 
 from grader_service import GraderService, handlers
 from grader_service.auth.dummy import DummyAuthenticator
+from grader_service.db import create_sync_session_maker
 from grader_service.services.file_services import GitFileService
-from grader_service.main import get_session_maker
 from grader_service.orm import User, Submission, Assignment, Lecture, SubmissionProperties
 from grader_service.orm.base import set_sqlite_pragma
 from grader_service.registry import HandlerPathRegistry
@@ -114,9 +114,8 @@ def db_test_config():
 
 @pytest.fixture(scope="function")
 def sql_alchemy_sessionmaker(db_test_config):
-    session_maker: scoped_session = get_session_maker(url="sqlite:///:memory:")
-    session = session_maker()
-    engine = session.get_bind()
+    session_maker = create_sync_session_maker(url="sqlite:///:memory:")
+    engine = session_maker.kw["bind"]
     with engine.begin() as connection:
         db_test_config.attributes["connection"] = connection
         # downgrade(cfg, "base")
@@ -125,6 +124,7 @@ def sql_alchemy_sessionmaker(db_test_config):
     insert_assignments(engine)
     insert_default_user(engine)
     yield session_maker
+    engine.dispose()
 
 
 @pytest.fixture(scope="function")
