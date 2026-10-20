@@ -820,6 +820,7 @@ class GraderBaseHandler(GraderErrorMixin, BaseHandler):
     ) -> None:
         super().__init__(application, request, **kwargs)
         self.file_service = self.application.file_service
+        self.services = self.application.services
 
     def validate_parameters(self, *args):
         if len(self.request.arguments) == 0:

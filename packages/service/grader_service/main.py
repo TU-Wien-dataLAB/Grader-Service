@@ -54,7 +54,7 @@ from grader_service.orm.base import DeleteState
 from grader_service.orm.lecture import LectureState
 from grader_service.orm.takepart import Scope
 from grader_service.plugins import create_plugin_manager, PluginManager
-from grader_service.registry import HandlerPathRegistry
+from grader_service.registry import HandlerPathRegistry, ServiceRegistry
 from grader_service.server import GraderServer
 from grader_service.utils import url_path_join
 
@@ -443,6 +443,9 @@ class GraderService(config.Application):
         # pass config
         self.set_config()
 
+        # register services
+        services = ServiceRegistry(self.session_maker, self.file_service)
+
         handlers = HandlerPathRegistry.handler_list(self.base_url_path)
         self.log.debug("Registered handlers: %s", handlers)
         # Add the handlers of the authenticator
@@ -462,6 +465,7 @@ class GraderService(config.Application):
             GraderServer(
                 grader_service_dir=self.grader_service_dir,
                 file_service=self.file_service,
+                services=services,
                 base_url=self.base_url_path,
                 authenticator=self.authenticator,
                 handlers=handlers,
