@@ -29,6 +29,7 @@ from .db_util import (
     insert_student,
     insert_submission,
 )
+from ...api.models import LectureListItemDto
 
 
 async def test_get_lectures(
@@ -48,7 +49,7 @@ async def test_get_lectures(
     lectures = json.loads(response.body.decode())
     assert isinstance(lectures, list)
     assert lectures
-    [Lecture.from_dict(lec) for lec in lectures]  # assert no errors
+    [LectureListItemDto.from_dict(lec) for lec in lectures]  # assert no errors
     assert len(lectures) == 3
 
 
