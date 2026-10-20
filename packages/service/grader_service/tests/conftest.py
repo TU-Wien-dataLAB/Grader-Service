@@ -19,7 +19,7 @@ from grader_service.db import create_sync_session_maker
 from grader_service.services.file_services import GitFileService
 from grader_service.orm import User, Submission, Assignment, Lecture, SubmissionProperties
 from grader_service.orm.base import set_sqlite_pragma
-from grader_service.registry import HandlerPathRegistry
+from grader_service.registry import HandlerPathRegistry, ServiceRegistry
 from grader_service.server import GraderServer
 from grader_service.tests.handlers.db_util import (
     insert_assignments,
@@ -134,10 +134,11 @@ def app(tmpdir, sql_alchemy_sessionmaker, default_admin):
 
     authenticator = DummyAuthenticator()
     authenticator.admin_users = [default_admin.name]
-
+    file_service = GitFileService(service_dir)
     application = GraderServer(
         grader_service_dir=str(service_dir),
-        file_service=GitFileService(service_dir),
+        file_service=file_service,
+        services=ServiceRegistry(sql_alchemy_sessionmaker, file_service),
         base_url="/",
         authenticator=authenticator,
         handlers=handlers,

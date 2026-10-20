@@ -90,4 +90,4 @@ def register_handler(path: str, version_specifier: VersionSpecifier = VersionSpe
 
 class ServiceRegistry:
     def __init__(self, session_maker, file_service: FileService):
-        self.lectures_service = LecturesService(session_maker, file_service)
+        self.lectures = LecturesService(session_maker, file_service)
