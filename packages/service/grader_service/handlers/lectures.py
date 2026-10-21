@@ -8,8 +8,6 @@ from http import HTTPStatus
 
 import tornado
 from sqlalchemy.orm import joinedload
-from sqlalchemy.orm.exc import ObjectDeletedError
-from tornado.web import HTTPError
 
 from grader_service.api.models import LectureUpdateDto
 from grader_service.api.models.lecture import Lecture as LectureModel
@@ -115,7 +113,7 @@ class LectureObjectHandler(GraderBaseHandler):
     async def delete(self, lecture_id: int):
         """
         Soft or Hard-Deletes a specific lecture.
-        Soft deleting: lecture is still saved in the datastore
+        Soft deleting: lecture is still saved in the datastore,
         but the users have no access to it.
         Hard deleting: removes lecture from the datastore and all associated directories/files.
 
@@ -125,61 +123,17 @@ class LectureObjectHandler(GraderBaseHandler):
 
         :param lecture_id: id of the lecture
         :type lecture_id: int
-        :raises HTTPError: throws err if lecture was already deleted
+        :raises HTTPError: throws an error if the lecture was already deleted
         or was not found
 
         """
         self.validate_parameters("hard_delete")
         hard_delete = self.get_argument("hard_delete", "false") == "true"
 
-        try:
-            lecture = self.get_lecture(lecture_id)
-            if lecture is None:
-                raise HTTPError(HTTPStatus.NOT_FOUND, reason="Lecture was not found")
-
-            if hard_delete:
-                if not self.user.is_admin:
-                    raise HTTPError(
-                        HTTPStatus.FORBIDDEN, reason="Only Admins can hard-delete lecture."
-                    )
-
-                self.session.delete(lecture)
-                self.session.commit()
-                await self.file_service.delete_lecture_files(lecture)
-            else:
-                if lecture.deleted == DeleteState.deleted:
-                    raise HTTPError(HTTPStatus.NOT_FOUND, reason="Lecture was deleted.")
-
-                # Collect previous duplicates and delete them before commit
-                # to prevent UNIQUE constraint violations when soft-deleting current assignments
-                previously_deleted_assignments = []
-                for assignment in lecture.assignments:
-                    self.validate_assignment_for_soft_delete(assignment=assignment)
-                    previously_deleted = self.delete_previous_assignment(
-                        assignment=assignment, lecture_id=lecture_id
-                    )
-                    if previously_deleted is not None:
-                        previously_deleted_assignments.append(previously_deleted)
-                self.session.commit()
-
-                for assignment in previously_deleted_assignments:
-                    await self.file_service.delete_assignment_files(
-                        assignment=assignment, lecture=lecture
-                    )
-
-                for assignment in lecture.assignments:
-                    assignment.deleted = DeleteState.deleted
-
-                lecture.deleted = DeleteState.deleted
-                self.session.commit()
-
-            self.write("OK")
-        except ObjectDeletedError:
-            self.session.rollback()
-            raise HTTPError(HTTPStatus.NOT_FOUND, reason="Assignment was not found")
-        except Exception:
-            self.session.rollback()
-            raise
+        await self.services.lectures.delete_lecture(
+            lecture_id, hard_delete=hard_delete, user=self.user
+        )
+        self.write("OK")
 
 
 @register_handler(

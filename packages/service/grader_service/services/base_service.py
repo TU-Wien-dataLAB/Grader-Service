@@ -55,3 +55,48 @@ class BaseService:
         if lecture is None:
             raise HTTPError(HTTPStatus.NOT_FOUND, "Lecture not found")
         return lecture
+
+    def validate_assignment_for_soft_delete(self, assignment: Assignment):
+        """Validates that an assignment can be soft-deleted.
+
+        Raises an HTTPError if the assignment has submissions or is released/completed,
+        preventing a soft-delete.
+
+        :param assignment: the Assignment object to validate
+        :type assignment: Assignment
+        :raises HTTPError: if the assignment has submissions or is released/completed
+        """
+        if assignment.submissions:
+            raise HTTPError(
+                HTTPStatus.CONFLICT, reason="Cannot delete assignments with submissions!"
+            )
+        if assignment.status in {"released", "complete"}:
+            raise HTTPError(
+                HTTPStatus.CONFLICT, reason="Cannot delete released or completed assignments!"
+            )
+
+    def delete_previous_assignment(
+        self, assignment: Assignment, lecture_id: int, session
+    ) -> Optional[Assignment]:
+        """Deletes a previously soft-deleted assignment with the same name in the lecture, if it exists.
+
+        When performing a soft-delete, a previously soft-deleted assignment with the same
+        name in the same lecture must be permanently removed (hard-deleted) first to avoid
+        UNIQUE constraint violations before marking the current assignment as deleted.
+
+        :param assignment: the Assignment object for which a previous duplicate may exist
+        :type assignment: Assignment
+        :param lecture_id: id of the lecture to which the assignment belongs
+        :type lecture_id: int
+        :return: the previously deleted Assignment if one existed, else None
+        :rtype: Optional[Assignment]
+        """
+        stmt = select(Assignment).where(
+            Assignment.lectid == lecture_id,
+            Assignment.name == assignment.name,
+            Assignment.deleted == DeleteState.deleted,
+        )
+        previously_deleted = session.execute(stmt).scalar_one_or_none()
+        if previously_deleted is not None:
+            session.delete(previously_deleted)
+        return previously_deleted

@@ -66,3 +66,51 @@ class LecturesService(BaseService):
 
             session.commit()
             return to_lecture_detail_dto(lecture)
+
+    async def delete_lecture(self, lecture_id: int, hard_delete: bool, user: User) -> None:
+        with self.session_maker() as session:
+            try:
+                lecture = self.get_lecture(session, lecture_id)
+                if hard_delete:
+                    if not user.is_admin:
+                        raise HTTPError(
+                            HTTPStatus.FORBIDDEN, reason="Only Admins can hard-delete lecture."
+                        )
+
+                    session.delete(lecture)
+                    session.commit()
+                    await self.file_service.delete_lecture_files(lecture)
+                else:
+                    if lecture.deleted == DeleteState.deleted:
+                        raise HTTPError(HTTPStatus.NOT_FOUND, reason="Lecture was deleted.")
+
+                    # Hard-delete previously soft-deleted assignments with the same name
+                    # within the same transaction to prevent UNIQUE constraint violations
+                    # (u_name_in_lect) when the current assignments are soft-deleted.
+                    previously_deleted_assignments = []
+                    for assignment in lecture.assignments:
+                        self.validate_assignment_for_soft_delete(assignment=assignment)
+                        previously_deleted = self.delete_previous_assignment(
+                            assignment=assignment, lecture_id=lecture_id, session=session
+                        )
+                        if previously_deleted is not None:
+                            previously_deleted_assignments.append(previously_deleted)
+
+                    # Flush so the duplicate DELETEs are executed before the UPDATEs
+                    # that mark the current assignments as deleted.
+                    session.flush()
+
+                    for assignment in lecture.assignments:
+                        assignment.deleted = DeleteState.deleted
+
+                    lecture.deleted = DeleteState.deleted
+                    session.commit()
+
+                    for assignment in previously_deleted_assignments:
+                        await self.file_service.delete_assignment_files(
+                            assignment=assignment, lecture=lecture
+                        )
+            except Exception:
+                if session.in_transaction():
+                    session.rollback()
+                raise
