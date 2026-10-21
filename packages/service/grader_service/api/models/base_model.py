@@ -50,6 +50,14 @@ class Model:
 
         return result
 
+    def dto_to_dict(self, omit_if_none=()):
+        """Serialize a generated DTO, dropping the given optional fields when they are None."""
+        return {
+            k: v
+            for k, v in self.to_dict().items()
+            if not (k in omit_if_none and v is None)
+        }
+
     def to_str(self):
         """Returns the string representation of the model
 

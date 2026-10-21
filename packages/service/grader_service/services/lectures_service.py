@@ -1,5 +1,6 @@
 from sqlalchemy import select
 
+from grader_service.api.models import LectureListItemDto
 from grader_service.orm.base import DeleteState
 from grader_service.orm.lecture import LectureState
 from grader_service.orm.takepart import Scope
@@ -10,7 +11,9 @@ from grader_service.services.mappers.lectures_mapper import to_lecture_list_item
 
 class LecturesService(BaseService):
     # TODO: add filtering, sorting and pagination params
-    def get_all_lectures(self, complete: str, instructor_view: str, user: User):
+    def get_all_lectures(
+        self, complete: str, instructor_view: str, user: User
+    ) -> list[LectureListItemDto]:
         with self.session_maker() as session:
             stmt = select(Lecture)
             if complete is not None:
@@ -31,6 +34,10 @@ class LecturesService(BaseService):
             s_counts = self.get_student_counts(session, ids)
 
             return [
-                to_lecture_list_item_dto(lec, a_counts.get(lec.id, 0), s_counts.get(lec.id, 0))
+                to_lecture_list_item_dto(
+                    lec,
+                    a_counts.get(lec.id, 0),
+                    s_counts.get(lec.id, 0) if instructor_view == "true" else None,
+                )
                 for lec in lectures
             ]

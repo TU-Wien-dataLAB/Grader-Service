@@ -43,7 +43,7 @@ class LectureBaseHandler(GraderBaseHandler):
             complete=complete, instructor_view=instructor, user=self.user
         )
 
-        self.write_json(lectures)
+        self.write_json([lec.dto_to_dict(omit_if_none={"student_count"}) for lec in lectures])
 
     @authorize([Scope.instructor, Scope.admin])
     async def post(self):
