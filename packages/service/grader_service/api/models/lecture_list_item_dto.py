@@ -82,6 +82,8 @@ class LectureListItemDto(Model):
         :param id: The id of this LectureListItemDto.
         :type id: int
         """
+        if id is None:
+            raise ValueError("Invalid value for `id`, must not be `None`")  # noqa: E501
 
         self._id = id
 
@@ -103,6 +105,8 @@ class LectureListItemDto(Model):
         :param name: The name of this LectureListItemDto.
         :type name: str
         """
+        if name is None:
+            raise ValueError("Invalid value for `name`, must not be `None`")  # noqa: E501
 
         self._name = name
 
@@ -124,6 +128,8 @@ class LectureListItemDto(Model):
         :param code: The code of this LectureListItemDto.
         :type code: str
         """
+        if code is None:
+            raise ValueError("Invalid value for `code`, must not be `None`")  # noqa: E501
 
         self._code = code
 
@@ -145,6 +151,8 @@ class LectureListItemDto(Model):
         :param complete: The complete of this LectureListItemDto.
         :type complete: bool
         """
+        if complete is None:
+            raise ValueError("Invalid value for `complete`, must not be `None`")  # noqa: E501
 
         self._complete = complete
 
@@ -166,6 +174,8 @@ class LectureListItemDto(Model):
         :param assignment_count: The assignment_count of this LectureListItemDto.
         :type assignment_count: int
         """
+        if assignment_count is None:
+            raise ValueError("Invalid value for `assignment_count`, must not be `None`")  # noqa: E501
 
         self._assignment_count = assignment_count
 

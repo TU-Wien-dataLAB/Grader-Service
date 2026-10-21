@@ -91,6 +91,8 @@ class AssignmentSettings(Model):
         :param deadline: The deadline of this AssignmentSettings.
         :type deadline: datetime
         """
+        if deadline is None:
+            raise ValueError("Invalid value for `deadline`, must not be `None`")  # noqa: E501
 
         self._deadline = deadline
 
@@ -112,6 +114,8 @@ class AssignmentSettings(Model):
         :param max_submissions: The max_submissions of this AssignmentSettings.
         :type max_submissions: int
         """
+        if max_submissions is None:
+            raise ValueError("Invalid value for `max_submissions`, must not be `None`")  # noqa: E501
 
         self._max_submissions = max_submissions
 
@@ -133,6 +137,8 @@ class AssignmentSettings(Model):
         :param allowed_files: The allowed_files of this AssignmentSettings.
         :type allowed_files: List[str]
         """
+        if allowed_files is None:
+            raise ValueError("Invalid value for `allowed_files`, must not be `None`")  # noqa: E501
 
         self._allowed_files = allowed_files
 
@@ -154,6 +160,8 @@ class AssignmentSettings(Model):
         :param late_submission: The late_submission of this AssignmentSettings.
         :type late_submission: List[SubmissionPeriod]
         """
+        if late_submission is None:
+            raise ValueError("Invalid value for `late_submission`, must not be `None`")  # noqa: E501
 
         self._late_submission = late_submission
 
@@ -175,6 +183,8 @@ class AssignmentSettings(Model):
         :param grading_method: The grading_method of this AssignmentSettings.
         :type grading_method: GradingMethod
         """
+        if grading_method is None:
+            raise ValueError("Invalid value for `grading_method`, must not be `None`")  # noqa: E501
 
         self._grading_method = grading_method
 
@@ -196,6 +206,8 @@ class AssignmentSettings(Model):
         :param group: The group of this AssignmentSettings.
         :type group: str
         """
+        if group is None:
+            raise ValueError("Invalid value for `group`, must not be `None`")  # noqa: E501
 
         self._group = group
 
@@ -217,5 +229,7 @@ class AssignmentSettings(Model):
         :param cell_timeout: The cell_timeout of this AssignmentSettings.
         :type cell_timeout: int
         """
+        if cell_timeout is None:
+            raise ValueError("Invalid value for `cell_timeout`, must not be `None`")  # noqa: E501
 
         self._cell_timeout = cell_timeout

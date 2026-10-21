@@ -67,6 +67,8 @@ class LectureUpdateDto(Model):
         :param id: The id of this LectureUpdateDto.
         :type id: int
         """
+        if id is None:
+            raise ValueError("Invalid value for `id`, must not be `None`")  # noqa: E501
 
         self._id = id
 
@@ -88,6 +90,8 @@ class LectureUpdateDto(Model):
         :param name: The name of this LectureUpdateDto.
         :type name: str
         """
+        if name is None:
+            raise ValueError("Invalid value for `name`, must not be `None`")  # noqa: E501
 
         self._name = name
 
@@ -109,5 +113,7 @@ class LectureUpdateDto(Model):
         :param complete: The complete of this LectureUpdateDto.
         :type complete: bool
         """
+        if complete is None:
+            raise ValueError("Invalid value for `complete`, must not be `None`")  # noqa: E501
 
         self._complete = complete

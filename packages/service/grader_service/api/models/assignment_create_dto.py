@@ -64,6 +64,8 @@ class AssignmentCreateDto(Model):
         :param name: The name of this AssignmentCreateDto.
         :type name: str
         """
+        if name is None:
+            raise ValueError("Invalid value for `name`, must not be `None`")  # noqa: E501
 
         self._name = name
 
@@ -85,5 +87,7 @@ class AssignmentCreateDto(Model):
         :param settings: The settings of this AssignmentCreateDto.
         :type settings: AssignmentSettings
         """
+        if settings is None:
+            raise ValueError("Invalid value for `settings`, must not be `None`")  # noqa: E501
 
         self._settings = settings

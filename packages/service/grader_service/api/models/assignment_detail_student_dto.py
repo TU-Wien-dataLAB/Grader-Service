@@ -141,5 +141,7 @@ class AssignmentDetailStudentDto(Model):
         :param deadline: The deadline of this AssignmentDetailStudentDto.
         :type deadline: datetime
         """
+        if deadline is None:
+            raise ValueError("Invalid value for `deadline`, must not be `None`")  # noqa: E501
 
         self._deadline = deadline

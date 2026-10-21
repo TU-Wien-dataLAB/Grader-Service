@@ -18,25 +18,29 @@ class SubmissionDetailInstructorDto(Model):
     Do not edit the class manually.
     """
 
-    def __init__(self, submitted_at=None, grading_score=None, score=None, commit_hash=None, feedback_status=None, auto_status=None, manual_status=None, user_display_name=None, score_scaling=None, edited=None, extra_credit=None):  # noqa: E501
+    def __init__(self, id=None, auto_status=None, manual_status=None, feedback_status=None, user_id=None, user_display_name=None, grading_score=None, score=None, submitted_at=None, commit_hash=None, score_scaling=None, edited=None, extra_credit=None):  # noqa: E501
         """SubmissionDetailInstructorDto - a model defined in OpenAPI
 
-        :param submitted_at: The submitted_at of this SubmissionDetailInstructorDto.  # noqa: E501
-        :type submitted_at: datetime
-        :param grading_score: The grading_score of this SubmissionDetailInstructorDto.  # noqa: E501
-        :type grading_score: float
-        :param score: The score of this SubmissionDetailInstructorDto.  # noqa: E501
-        :type score: float
-        :param commit_hash: The commit_hash of this SubmissionDetailInstructorDto.  # noqa: E501
-        :type commit_hash: str
-        :param feedback_status: The feedback_status of this SubmissionDetailInstructorDto.  # noqa: E501
-        :type feedback_status: FeedbackStatus
+        :param id: The id of this SubmissionDetailInstructorDto.  # noqa: E501
+        :type id: int
         :param auto_status: The auto_status of this SubmissionDetailInstructorDto.  # noqa: E501
         :type auto_status: AutoStatus
         :param manual_status: The manual_status of this SubmissionDetailInstructorDto.  # noqa: E501
         :type manual_status: ManualStatus
+        :param feedback_status: The feedback_status of this SubmissionDetailInstructorDto.  # noqa: E501
+        :type feedback_status: FeedbackStatus
+        :param user_id: The user_id of this SubmissionDetailInstructorDto.  # noqa: E501
+        :type user_id: int
         :param user_display_name: The user_display_name of this SubmissionDetailInstructorDto.  # noqa: E501
         :type user_display_name: str
+        :param grading_score: The grading_score of this SubmissionDetailInstructorDto.  # noqa: E501
+        :type grading_score: float
+        :param score: The score of this SubmissionDetailInstructorDto.  # noqa: E501
+        :type score: float
+        :param submitted_at: The submitted_at of this SubmissionDetailInstructorDto.  # noqa: E501
+        :type submitted_at: datetime
+        :param commit_hash: The commit_hash of this SubmissionDetailInstructorDto.  # noqa: E501
+        :type commit_hash: str
         :param score_scaling: The score_scaling of this SubmissionDetailInstructorDto.  # noqa: E501
         :type score_scaling: float
         :param edited: The edited of this SubmissionDetailInstructorDto.  # noqa: E501
@@ -45,41 +49,47 @@ class SubmissionDetailInstructorDto(Model):
         :type extra_credit: float
         """
         self.openapi_types = {
-            'submitted_at': datetime,
-            'grading_score': float,
-            'score': float,
-            'commit_hash': str,
-            'feedback_status': FeedbackStatus,
+            'id': int,
             'auto_status': AutoStatus,
             'manual_status': ManualStatus,
+            'feedback_status': FeedbackStatus,
+            'user_id': int,
             'user_display_name': str,
+            'grading_score': float,
+            'score': float,
+            'submitted_at': datetime,
+            'commit_hash': str,
             'score_scaling': float,
             'edited': bool,
             'extra_credit': float
         }
 
         self.attribute_map = {
-            'submitted_at': 'submitted_at',
-            'grading_score': 'grading_score',
-            'score': 'score',
-            'commit_hash': 'commit_hash',
-            'feedback_status': 'feedback_status',
+            'id': 'id',
             'auto_status': 'auto_status',
             'manual_status': 'manual_status',
+            'feedback_status': 'feedback_status',
+            'user_id': 'user_id',
             'user_display_name': 'user_display_name',
+            'grading_score': 'grading_score',
+            'score': 'score',
+            'submitted_at': 'submitted_at',
+            'commit_hash': 'commit_hash',
             'score_scaling': 'score_scaling',
             'edited': 'edited',
             'extra_credit': 'extra_credit'
         }
 
-        self._submitted_at = submitted_at
-        self._grading_score = grading_score
-        self._score = score
-        self._commit_hash = commit_hash
-        self._feedback_status = feedback_status
+        self._id = id
         self._auto_status = auto_status
         self._manual_status = manual_status
+        self._feedback_status = feedback_status
+        self._user_id = user_id
         self._user_display_name = user_display_name
+        self._grading_score = grading_score
+        self._score = score
+        self._submitted_at = submitted_at
+        self._commit_hash = commit_hash
         self._score_scaling = score_scaling
         self._edited = edited
         self._extra_credit = extra_credit
@@ -96,109 +106,27 @@ class SubmissionDetailInstructorDto(Model):
         return util.deserialize_model(dikt, cls)
 
     @property
-    def submitted_at(self) -> datetime:
-        """Gets the submitted_at of this SubmissionDetailInstructorDto.
+    def id(self) -> int:
+        """Gets the id of this SubmissionDetailInstructorDto.
 
 
-        :return: The submitted_at of this SubmissionDetailInstructorDto.
-        :rtype: datetime
+        :return: The id of this SubmissionDetailInstructorDto.
+        :rtype: int
         """
-        return self._submitted_at
+        return self._id
 
-    @submitted_at.setter
-    def submitted_at(self, submitted_at: datetime):
-        """Sets the submitted_at of this SubmissionDetailInstructorDto.
+    @id.setter
+    def id(self, id: int):
+        """Sets the id of this SubmissionDetailInstructorDto.
 
 
-        :param submitted_at: The submitted_at of this SubmissionDetailInstructorDto.
-        :type submitted_at: datetime
+        :param id: The id of this SubmissionDetailInstructorDto.
+        :type id: int
         """
+        if id is None:
+            raise ValueError("Invalid value for `id`, must not be `None`")  # noqa: E501
 
-        self._submitted_at = submitted_at
-
-    @property
-    def grading_score(self) -> float:
-        """Gets the grading_score of this SubmissionDetailInstructorDto.
-
-
-        :return: The grading_score of this SubmissionDetailInstructorDto.
-        :rtype: float
-        """
-        return self._grading_score
-
-    @grading_score.setter
-    def grading_score(self, grading_score: float):
-        """Sets the grading_score of this SubmissionDetailInstructorDto.
-
-
-        :param grading_score: The grading_score of this SubmissionDetailInstructorDto.
-        :type grading_score: float
-        """
-
-        self._grading_score = grading_score
-
-    @property
-    def score(self) -> float:
-        """Gets the score of this SubmissionDetailInstructorDto.
-
-
-        :return: The score of this SubmissionDetailInstructorDto.
-        :rtype: float
-        """
-        return self._score
-
-    @score.setter
-    def score(self, score: float):
-        """Sets the score of this SubmissionDetailInstructorDto.
-
-
-        :param score: The score of this SubmissionDetailInstructorDto.
-        :type score: float
-        """
-
-        self._score = score
-
-    @property
-    def commit_hash(self) -> str:
-        """Gets the commit_hash of this SubmissionDetailInstructorDto.
-
-
-        :return: The commit_hash of this SubmissionDetailInstructorDto.
-        :rtype: str
-        """
-        return self._commit_hash
-
-    @commit_hash.setter
-    def commit_hash(self, commit_hash: str):
-        """Sets the commit_hash of this SubmissionDetailInstructorDto.
-
-
-        :param commit_hash: The commit_hash of this SubmissionDetailInstructorDto.
-        :type commit_hash: str
-        """
-
-        self._commit_hash = commit_hash
-
-    @property
-    def feedback_status(self) -> FeedbackStatus:
-        """Gets the feedback_status of this SubmissionDetailInstructorDto.
-
-
-        :return: The feedback_status of this SubmissionDetailInstructorDto.
-        :rtype: FeedbackStatus
-        """
-        return self._feedback_status
-
-    @feedback_status.setter
-    def feedback_status(self, feedback_status: FeedbackStatus):
-        """Sets the feedback_status of this SubmissionDetailInstructorDto.
-
-
-        :param feedback_status: The feedback_status of this SubmissionDetailInstructorDto.
-        :type feedback_status: FeedbackStatus
-        """
-
-        self._feedback_status = feedback_status
+        self._id = id
 
     @property
     def auto_status(self) -> AutoStatus:
@@ -243,6 +171,50 @@ class SubmissionDetailInstructorDto(Model):
         self._manual_status = manual_status
 
     @property
+    def feedback_status(self) -> FeedbackStatus:
+        """Gets the feedback_status of this SubmissionDetailInstructorDto.
+
+
+        :return: The feedback_status of this SubmissionDetailInstructorDto.
+        :rtype: FeedbackStatus
+        """
+        return self._feedback_status
+
+    @feedback_status.setter
+    def feedback_status(self, feedback_status: FeedbackStatus):
+        """Sets the feedback_status of this SubmissionDetailInstructorDto.
+
+
+        :param feedback_status: The feedback_status of this SubmissionDetailInstructorDto.
+        :type feedback_status: FeedbackStatus
+        """
+        if feedback_status is None:
+            raise ValueError("Invalid value for `feedback_status`, must not be `None`")  # noqa: E501
+
+        self._feedback_status = feedback_status
+
+    @property
+    def user_id(self) -> int:
+        """Gets the user_id of this SubmissionDetailInstructorDto.
+
+
+        :return: The user_id of this SubmissionDetailInstructorDto.
+        :rtype: int
+        """
+        return self._user_id
+
+    @user_id.setter
+    def user_id(self, user_id: int):
+        """Sets the user_id of this SubmissionDetailInstructorDto.
+
+
+        :param user_id: The user_id of this SubmissionDetailInstructorDto.
+        :type user_id: int
+        """
+
+        self._user_id = user_id
+
+    @property
     def user_display_name(self) -> str:
         """Gets the user_display_name of this SubmissionDetailInstructorDto.
 
@@ -264,6 +236,94 @@ class SubmissionDetailInstructorDto(Model):
         self._user_display_name = user_display_name
 
     @property
+    def grading_score(self) -> float:
+        """Gets the grading_score of this SubmissionDetailInstructorDto.
+
+
+        :return: The grading_score of this SubmissionDetailInstructorDto.
+        :rtype: float
+        """
+        return self._grading_score
+
+    @grading_score.setter
+    def grading_score(self, grading_score: float):
+        """Sets the grading_score of this SubmissionDetailInstructorDto.
+
+
+        :param grading_score: The grading_score of this SubmissionDetailInstructorDto.
+        :type grading_score: float
+        """
+        if grading_score is None:
+            raise ValueError("Invalid value for `grading_score`, must not be `None`")  # noqa: E501
+
+        self._grading_score = grading_score
+
+    @property
+    def score(self) -> float:
+        """Gets the score of this SubmissionDetailInstructorDto.
+
+
+        :return: The score of this SubmissionDetailInstructorDto.
+        :rtype: float
+        """
+        return self._score
+
+    @score.setter
+    def score(self, score: float):
+        """Sets the score of this SubmissionDetailInstructorDto.
+
+
+        :param score: The score of this SubmissionDetailInstructorDto.
+        :type score: float
+        """
+        if score is None:
+            raise ValueError("Invalid value for `score`, must not be `None`")  # noqa: E501
+
+        self._score = score
+
+    @property
+    def submitted_at(self) -> datetime:
+        """Gets the submitted_at of this SubmissionDetailInstructorDto.
+
+
+        :return: The submitted_at of this SubmissionDetailInstructorDto.
+        :rtype: datetime
+        """
+        return self._submitted_at
+
+    @submitted_at.setter
+    def submitted_at(self, submitted_at: datetime):
+        """Sets the submitted_at of this SubmissionDetailInstructorDto.
+
+
+        :param submitted_at: The submitted_at of this SubmissionDetailInstructorDto.
+        :type submitted_at: datetime
+        """
+
+        self._submitted_at = submitted_at
+
+    @property
+    def commit_hash(self) -> str:
+        """Gets the commit_hash of this SubmissionDetailInstructorDto.
+
+
+        :return: The commit_hash of this SubmissionDetailInstructorDto.
+        :rtype: str
+        """
+        return self._commit_hash
+
+    @commit_hash.setter
+    def commit_hash(self, commit_hash: str):
+        """Sets the commit_hash of this SubmissionDetailInstructorDto.
+
+
+        :param commit_hash: The commit_hash of this SubmissionDetailInstructorDto.
+        :type commit_hash: str
+        """
+
+        self._commit_hash = commit_hash
+
+    @property
     def score_scaling(self) -> float:
         """Gets the score_scaling of this SubmissionDetailInstructorDto.
 
@@ -281,6 +341,8 @@ class SubmissionDetailInstructorDto(Model):
         :param score_scaling: The score_scaling of this SubmissionDetailInstructorDto.
         :type score_scaling: float
         """
+        if score_scaling is None:
+            raise ValueError("Invalid value for `score_scaling`, must not be `None`")  # noqa: E501
         if score_scaling is not None and score_scaling > 1.0:  # noqa: E501
             raise ValueError("Invalid value for `score_scaling`, must be a value less than or equal to `1.0`")  # noqa: E501
         if score_scaling is not None and score_scaling < 0.0:  # noqa: E501
@@ -306,6 +368,8 @@ class SubmissionDetailInstructorDto(Model):
         :param edited: The edited of this SubmissionDetailInstructorDto.
         :type edited: bool
         """
+        if edited is None:
+            raise ValueError("Invalid value for `edited`, must not be `None`")  # noqa: E501
 
         self._edited = edited
 
@@ -327,5 +391,7 @@ class SubmissionDetailInstructorDto(Model):
         :param extra_credit: The extra_credit of this SubmissionDetailInstructorDto.
         :type extra_credit: float
         """
+        if extra_credit is None:
+            raise ValueError("Invalid value for `extra_credit`, must not be `None`")  # noqa: E501
 
         self._extra_credit = extra_credit
