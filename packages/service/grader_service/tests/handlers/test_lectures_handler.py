@@ -260,7 +260,7 @@ async def test_get_lectures_with_some_parameter(
     assert e.code == HTTPStatus.BAD_REQUEST
 
 
-async def test_post_lectures_update(
+async def test_post_lecture_existing_code(
     app: GraderServer,
     service_base_url,
     http_server_client,
@@ -278,29 +278,27 @@ async def test_post_lectures_update(
     lectures = json.loads(get_response.body.decode())
     assert isinstance(lectures, list)
     assert len(lectures) == 3
-    orig_len = len(lectures)
+    name_before = next(lec["name"] for lec in lectures if lec["code"] == "20wle2")
 
-    # update lecture based on existing lecture code
+    # creating a lecture with an already existing lecture code is rejected
     pre_lecture = Lecture(id=-1, name="pytest_lecture", code="20wle2", complete=False)
-    post_response = await http_server_client.fetch(
-        url,
-        method="POST",
-        headers={"Authorization": f"Token {default_token}"},
-        body=json.dumps(pre_lecture.to_dict()),
-    )
-    assert post_response.code == HTTPStatus.CREATED
-    post_lecture = Lecture.from_dict(json.loads(post_response.body.decode()))
-    assert post_lecture.id != pre_lecture.id
-    assert post_lecture.name == pre_lecture.name
-    assert post_lecture.code == pre_lecture.code
-    assert not post_lecture.complete
+    with pytest.raises(HTTPClientError) as exc_info:
+        await http_server_client.fetch(
+            url,
+            method="POST",
+            headers={"Authorization": f"Token {default_token}"},
+            body=json.dumps(pre_lecture.to_dict()),
+        )
+    e = exc_info.value
+    assert e.code == HTTPStatus.CONFLICT
 
     get_response = await http_server_client.fetch(
         url, method="GET", headers={"Authorization": f"Token {default_token}"}
     )
     assert get_response.code == HTTPStatus.OK
     lectures = json.loads(get_response.body.decode())
-    assert len(lectures) == orig_len
+    assert len(lectures) == 3
+    assert next(lec["name"] for lec in lectures if lec["code"] == "20wle2") == name_before
 
 
 async def test_post_lectures_update_unauthorized(
@@ -327,7 +325,7 @@ async def test_post_lectures_update_unauthorized(
     assert e.code == HTTPStatus.FORBIDDEN
 
 
-async def test_post_lectures_update_admin(
+async def test_post_lecture_existing_code_admin(
     app: GraderServer,
     service_base_url,
     http_server_client,
@@ -345,29 +343,27 @@ async def test_post_lectures_update_admin(
     lectures = json.loads(get_response.body.decode())
     assert isinstance(lectures, list)
     assert len(lectures) == 4
-    orig_len = len(lectures)
+    name_before = next(lec["name"] for lec in lectures if lec["code"] == "21wle1")
 
-    # update lecture based on existing lecture code
+    # creating a lecture with an already existing lecture code is rejected
     pre_lecture = Lecture(id=-1, name="pytest_lecture", code="21wle1", complete=False)
-    post_response = await http_server_client.fetch(
-        url,
-        method="POST",
-        headers={"Authorization": f"Token {default_token}"},
-        body=json.dumps(pre_lecture.to_dict()),
-    )
-    assert post_response.code == HTTPStatus.CREATED
-    post_lecture = Lecture.from_dict(json.loads(post_response.body.decode()))
-    assert post_lecture.id != pre_lecture.id
-    assert post_lecture.name == pre_lecture.name
-    assert post_lecture.code == pre_lecture.code
-    assert not post_lecture.complete
+    with pytest.raises(HTTPClientError) as exc_info:
+        await http_server_client.fetch(
+            url,
+            method="POST",
+            headers={"Authorization": f"Token {default_token}"},
+            body=json.dumps(pre_lecture.to_dict()),
+        )
+    e = exc_info.value
+    assert e.code == HTTPStatus.CONFLICT
 
     get_response = await http_server_client.fetch(
         url, method="GET", headers={"Authorization": f"Token {default_token}"}
     )
     assert get_response.code == HTTPStatus.OK
     lectures = json.loads(get_response.body.decode())
-    assert len(lectures) == orig_len
+    assert len(lectures) == 4
+    assert next(lec["name"] for lec in lectures if lec["code"] == "21wle1") == name_before
 
 
 async def test_post_lectures_new_unauthorized(
@@ -423,8 +419,7 @@ async def test_post_lectures_new_admin(
         body=json.dumps(pre_lecture.to_dict()),
     )
     assert post_response.code == HTTPStatus.CREATED
-    post_lecture = Lecture.from_dict(json.loads(post_response.body.decode()))
-    assert post_lecture.id != pre_lecture.id
+    post_lecture = LectureDetailDto.from_dict(json.loads(post_response.body.decode()))
     assert post_lecture.name == pre_lecture.name
     assert post_lecture.code == pre_lecture.code
     assert not post_lecture.complete

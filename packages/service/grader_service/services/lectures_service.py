@@ -1,11 +1,17 @@
+import re
 from http import HTTPStatus
 
 from sqlalchemy import select
 from sqlalchemy.orm import joinedload
-from tornado.web import HTTPError
 
-from grader_service.api.models import LectureListItemDto, LectureDetailDto, LectureUpdateDto
+from grader_service.api.models import (
+    LectureListItemDto,
+    LectureDetailDto,
+    LectureUpdateDto,
+    LectureCreateDto,
+)
 from grader_service.api.models.user import User as UserDto
+from grader_service.errors import APIError
 from grader_service.orm.base import DeleteState
 from grader_service.orm.lecture import LectureState
 from grader_service.orm.takepart import Scope
@@ -16,6 +22,8 @@ from grader_service.services.mappers.lectures_mapper import (
     to_lecture_detail_dto,
 )
 from grader_service.services.mappers.users_mapper import to_user_dto
+
+lecture_code_pattern = re.compile(r"^[A-Za-z0-9_-]+$")
 
 
 class LecturesService(BaseService):
@@ -57,8 +65,39 @@ class LecturesService(BaseService):
 
             if not user.is_admin:
                 if lecture.deleted == DeleteState.deleted:
-                    raise HTTPError(HTTPStatus.NOT_FOUND, reason="Lecture not found")
+                    raise APIError(HTTPStatus.NOT_FOUND, message="Lecture not found")
             return to_lecture_detail_dto(lecture)
+
+    def create_lecture(self, lecture_dto: LectureCreateDto) -> LectureDetailDto:
+        with self.session_maker() as session:
+            try:
+                if not lecture_code_pattern.fullmatch(lecture_dto.code or ""):
+                    raise APIError(
+                        HTTPStatus.BAD_REQUEST,
+                        message="Invalid lecture code: only alphanumeric characters, '-' and '_' are allowed.",
+                    )
+                lecture = session.scalars(
+                    select(Lecture).where(Lecture.code == lecture_dto.code)
+                ).first()
+                if lecture is not None:
+                    raise APIError(HTTPStatus.CONFLICT, message="Lecture code already in use")
+
+                lecture = Lecture()
+                lecture.name = lecture_dto.name
+                lecture.code = lecture_dto.code
+                lecture.state = (
+                    LectureState.complete if lecture_dto.complete else LectureState.active
+                )
+                lecture.deleted = DeleteState.active
+
+                session.add(lecture)
+                session.commit()
+
+                return to_lecture_detail_dto(lecture)
+            except Exception:
+                if session.in_transaction():
+                    session.rollback()
+                raise
 
     def update_lecture(self, lecture_id: int, lecture_dto: LectureUpdateDto):
         with self.session_maker() as session:
@@ -76,8 +115,8 @@ class LecturesService(BaseService):
                 lecture = self.get_lecture(session, lecture_id)
                 if hard_delete:
                     if not user.is_admin:
-                        raise HTTPError(
-                            HTTPStatus.FORBIDDEN, reason="Only Admins can hard-delete lecture."
+                        raise APIError(
+                            HTTPStatus.FORBIDDEN, message="Only Admins can hard-delete lecture."
                         )
 
                     session.delete(lecture)
@@ -85,7 +124,7 @@ class LecturesService(BaseService):
                     await self.file_service.delete_lecture_files(lecture)
                 else:
                     if lecture.deleted == DeleteState.deleted:
-                        raise HTTPError(HTTPStatus.NOT_FOUND, reason="Lecture was deleted.")
+                        raise APIError(HTTPStatus.NOT_FOUND, message="Lecture was deleted.")
 
                     # Hard-delete previously soft-deleted assignments with the same name
                     # within the same transaction to prevent UNIQUE constraint violations

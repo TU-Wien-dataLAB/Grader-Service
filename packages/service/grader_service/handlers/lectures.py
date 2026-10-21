@@ -7,12 +7,8 @@ import re
 from http import HTTPStatus
 
 import tornado
-from grader_service.api.models import LectureUpdateDto
-from grader_service.api.models.lecture import Lecture as LectureModel
-from grader_service.errors import APIError
+from grader_service.api.models import LectureUpdateDto, LectureCreateDto
 from grader_service.handlers.base_handler import GraderBaseHandler, authorize
-from grader_service.orm.base import DeleteState
-from grader_service.orm.lecture import Lecture, LectureState
 from grader_service.orm.takepart import Scope
 from grader_service.registry import VersionSpecifier, register_handler
 
@@ -45,33 +41,17 @@ class LectureBaseHandler(GraderBaseHandler):
     @authorize([Scope.instructor, Scope.admin])
     async def post(self):
         """
-        Creates a new lecture or updates an existing one.
+        Creates a new lecture.
+        :return: the created lecture
+        :raises APIError: throws an error if the lecture code contains invalid characters or is already taken
         """
         self.validate_parameters()
         body = tornado.escape.json_decode(self.request.body)
-        lecture_model = LectureModel.from_dict(body)
 
-        if not lecture_code_pattern.fullmatch(lecture_model.code or ""):
-            raise APIError(
-                HTTPStatus.BAD_REQUEST,
-                message="Invalid lecture code: only alphanumeric characters, '-' and '_' are allowed.",
-            )
+        lecture = self.services.lectures.create_lecture(LectureCreateDto.from_dict(body))
 
-        lecture = (
-            self.session.query(Lecture).filter(Lecture.code == lecture_model.code).one_or_none()
-        )
-        if lecture is None:
-            lecture = Lecture()
-
-        lecture.name = lecture_model.name
-        lecture.code = lecture_model.code
-        lecture.state = LectureState.complete if lecture_model.complete else LectureState.active
-        lecture.deleted = DeleteState.active
-
-        self.session.add(lecture)
-        self.session.commit()
         self.set_status(HTTPStatus.CREATED)
-        self.write_json(lecture)
+        self.write_json(lecture.dto_to_dict())
 
 
 @register_handler(r"\/api\/lectures\/(?P<lecture_id>\d*)\/?", VersionSpecifier.ALL)

@@ -9,4 +9,4 @@ def to_lecture_list_item_dto(lecture: Lecture, assignment_count, student_count=N
 
 
 def to_lecture_detail_dto(lecture: Lecture):
-    return LectureDetailDto(lecture.name, lecture.code, lecture.state)
+    return LectureDetailDto(lecture.id, lecture.name, lecture.code, lecture.state)
