@@ -30,6 +30,7 @@ components:
   schemas:
     User:
       type: object
+      required: [ "id", "username", "display_name" ]
       properties:
         id:
           type: integer
@@ -47,6 +48,7 @@ components:
         display_name: "Baz Bar"
     LectureDetailDto:
       type: object
+      required: [ "name", "code", "complete" ]
       properties:
         name:
           type: string
@@ -63,6 +65,7 @@ components:
         complete: false
     LectureUpdateDto:
       type: object
+      required: [ "id", "name", "complete" ]
       properties:
         id:
           type: integer
@@ -80,6 +83,7 @@ components:
         complete: false
     LectureListItemDto:
       type: object
+      required: [ "id", "name", "code", "complete", "assignment_count" ]
       properties:
         id:
           type: integer
@@ -118,6 +122,7 @@ components:
       allOf:
         - $ref: "#/components/schemas/AssignmentDetailBaseDto"
         - type: object
+          required: [ "deadline" ]
           properties:
             deadline:
               type: string
@@ -134,6 +139,7 @@ components:
               $ref: "#/components/schemas/GradingMethod"
     AssignmentCreateDto:
       type: object
+      required: [ "name", "settings" ]
       properties:
         name:
           type: string
@@ -142,6 +148,7 @@ components:
           $ref: "#/components/schemas/AssignmentSettings"
     AssignmentUpdateDto:
       type: object
+      required: [ "id", "name", "settings" ]
       properties:
         id:
           type: integer
@@ -153,6 +160,7 @@ components:
           $ref: "#/components/schemas/AssignmentSettings"
     AssignmentListItemBaseDto:
       type: object
+      required: [ "id", "name", "deadline", "submission_count" ]
       properties:
         id:
           type: integer
@@ -170,6 +178,7 @@ components:
       allOf:
         - $ref: "#/components/schemas/AssignmentListItemBaseDto"
         - type: object
+          required: [ "status", "points", "grading_method" ]
           properties:
             status:
               $ref: "#/components/schemas/AssignmentStatus"
@@ -180,6 +189,7 @@ components:
               $ref: "#/components/schemas/GradingMethod"
     AssignmentListItemUpcomingDto:
       type: object
+      required: [ "name", "lecture_code", "lecture_name", "deadline", "late_submissions_allowed" ]
       properties:
         name:
           type: string
@@ -198,6 +208,7 @@ components:
           default: false
     AssignmentSettings:
       type: object
+      required: [ "deadline", "max_submissions", "allowed_files", "late_submission", "grading_method", "cell_timeout", "group" ]
       properties:
         deadline:
           type: string
@@ -230,6 +241,7 @@ components:
             scaling: 0.2
     SubmissionListItemDto:
       type: object
+      required: [ "id", "grading_score", "score", "feedback_status" ]
       properties:
         id:
           type: integer
@@ -266,12 +278,11 @@ components:
           format: float
         commit_hash:
           type: string
-        feedback_status:
-          $ref: "#/components/schemas/FeedbackStatus"
     SubmissionDetailInstructorDto:
       allOf:
         - $ref: "#/components/schemas/SubmissionDetailBaseDto"
         - type: object
+          required: [ "score_scaling", "edited", "extra_credit" ]
           properties:
             auto_status:
               $ref: "#/components/schemas/AutoStatus"
@@ -320,6 +331,7 @@ components:
       type: array
       items:
         type: object
+        required: ["user", "submissions"]
         properties:
           user:
             $ref: "#/components/schemas/User"
