@@ -263,35 +263,17 @@ components:
         score:
           type: number
           format: float
-    SubmissionDetailBaseDto:
-      type: object
-      properties:
         submitted_at:
           type: string
           format: date-time
-          example: "2023-07-21T11:53:07Z"
-        grading_score:
-          type: number
-          format: float
-        score:
-          type: number
-          format: float
         commit_hash:
           type: string
     SubmissionDetailInstructorDto:
       allOf:
-        - $ref: "#/components/schemas/SubmissionDetailBaseDto"
+        - $ref: "#/components/schemas/SubmissionListItemDto"
         - type: object
           required: [ "score_scaling", "edited", "extra_credit" ]
           properties:
-            auto_status:
-              $ref: "#/components/schemas/AutoStatus"
-            manual_status:
-              $ref: "#/components/schemas/ManualStatus"
-            feedback_status:
-              $ref: "#/components/schemas/FeedbackStatus"
-            user_display_name:
-              type: string
             score_scaling:
               type: number
               format: float
