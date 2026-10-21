@@ -66,6 +66,8 @@ class UserSubmissionsInner(Model):
         :param user: The user of this UserSubmissionsInner.
         :type user: User
         """
+        if user is None:
+            raise ValueError("Invalid value for `user`, must not be `None`")  # noqa: E501
 
         self._user = user
 
@@ -87,5 +89,7 @@ class UserSubmissionsInner(Model):
         :param submissions: The submissions of this UserSubmissionsInner.
         :type submissions: List[SubmissionListItemDto]
         """
+        if submissions is None:
+            raise ValueError("Invalid value for `submissions`, must not be `None`")  # noqa: E501
 
         self._submissions = submissions

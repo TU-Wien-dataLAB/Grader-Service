@@ -72,6 +72,8 @@ class AssignmentListItemBaseDto(Model):
         :param id: The id of this AssignmentListItemBaseDto.
         :type id: int
         """
+        if id is None:
+            raise ValueError("Invalid value for `id`, must not be `None`")  # noqa: E501
 
         self._id = id
 
@@ -93,6 +95,8 @@ class AssignmentListItemBaseDto(Model):
         :param name: The name of this AssignmentListItemBaseDto.
         :type name: str
         """
+        if name is None:
+            raise ValueError("Invalid value for `name`, must not be `None`")  # noqa: E501
 
         self._name = name
 
@@ -114,6 +118,8 @@ class AssignmentListItemBaseDto(Model):
         :param deadline: The deadline of this AssignmentListItemBaseDto.
         :type deadline: datetime
         """
+        if deadline is None:
+            raise ValueError("Invalid value for `deadline`, must not be `None`")  # noqa: E501
 
         self._deadline = deadline
 
@@ -135,5 +141,7 @@ class AssignmentListItemBaseDto(Model):
         :param submission_count: The submission_count of this AssignmentListItemBaseDto.
         :type submission_count: int
         """
+        if submission_count is None:
+            raise ValueError("Invalid value for `submission_count`, must not be `None`")  # noqa: E501
 
         self._submission_count = submission_count

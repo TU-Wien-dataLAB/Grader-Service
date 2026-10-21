@@ -11,7 +11,6 @@ from grader_service.api.models.assignment_settings import AssignmentSettings
 from grader_service.api.models.assignment_status import AssignmentStatus
 from grader_service.api.models.assignment_update_dto import AssignmentUpdateDto
 from grader_service.api.models.auto_status import AutoStatus
-from grader_service.api.models.error_message import ErrorMessage
 from grader_service.api.models.feedback_status import FeedbackStatus
 from grader_service.api.models.grading_method import GradingMethod
 from grader_service.api.models.lecture_detail_dto import LectureDetailDto
@@ -19,8 +18,6 @@ from grader_service.api.models.lecture_list_item_dto import LectureListItemDto
 from grader_service.api.models.lecture_update_dto import LectureUpdateDto
 from grader_service.api.models.manual_status import ManualStatus
 from grader_service.api.models.remote_file_status import RemoteFileStatus
-from grader_service.api.models.submission import Submission
-from grader_service.api.models.submission_detail_base_dto import SubmissionDetailBaseDto
 from grader_service.api.models.submission_detail_instructor_dto import SubmissionDetailInstructorDto
 from grader_service.api.models.submission_list_item_dto import SubmissionListItemDto
 from grader_service.api.models.submission_period import SubmissionPeriod

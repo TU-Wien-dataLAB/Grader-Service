@@ -77,6 +77,8 @@ class AssignmentListItemUpcomingDto(Model):
         :param name: The name of this AssignmentListItemUpcomingDto.
         :type name: str
         """
+        if name is None:
+            raise ValueError("Invalid value for `name`, must not be `None`")  # noqa: E501
 
         self._name = name
 
@@ -98,6 +100,8 @@ class AssignmentListItemUpcomingDto(Model):
         :param lecture_code: The lecture_code of this AssignmentListItemUpcomingDto.
         :type lecture_code: str
         """
+        if lecture_code is None:
+            raise ValueError("Invalid value for `lecture_code`, must not be `None`")  # noqa: E501
 
         self._lecture_code = lecture_code
 
@@ -119,6 +123,8 @@ class AssignmentListItemUpcomingDto(Model):
         :param lecture_name: The lecture_name of this AssignmentListItemUpcomingDto.
         :type lecture_name: str
         """
+        if lecture_name is None:
+            raise ValueError("Invalid value for `lecture_name`, must not be `None`")  # noqa: E501
 
         self._lecture_name = lecture_name
 
@@ -140,6 +146,8 @@ class AssignmentListItemUpcomingDto(Model):
         :param deadline: The deadline of this AssignmentListItemUpcomingDto.
         :type deadline: datetime
         """
+        if deadline is None:
+            raise ValueError("Invalid value for `deadline`, must not be `None`")  # noqa: E501
 
         self._deadline = deadline
 
@@ -161,5 +169,7 @@ class AssignmentListItemUpcomingDto(Model):
         :param late_submissions_allowed: The late_submissions_allowed of this AssignmentListItemUpcomingDto.
         :type late_submissions_allowed: bool
         """
+        if late_submissions_allowed is None:
+            raise ValueError("Invalid value for `late_submissions_allowed`, must not be `None`")  # noqa: E501
 
         self._late_submissions_allowed = late_submissions_allowed

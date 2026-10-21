@@ -18,7 +18,7 @@ class SubmissionListItemDto(Model):
     Do not edit the class manually.
     """
 
-    def __init__(self, id=None, auto_status=None, manual_status=None, feedback_status=None, user_id=None, user_display_name=None, grading_score=None, score=None):  # noqa: E501
+    def __init__(self, id=None, auto_status=None, manual_status=None, feedback_status=None, user_id=None, user_display_name=None, grading_score=None, score=None, submitted_at=None, commit_hash=None):  # noqa: E501
         """SubmissionListItemDto - a model defined in OpenAPI
 
         :param id: The id of this SubmissionListItemDto.  # noqa: E501
@@ -37,6 +37,10 @@ class SubmissionListItemDto(Model):
         :type grading_score: float
         :param score: The score of this SubmissionListItemDto.  # noqa: E501
         :type score: float
+        :param submitted_at: The submitted_at of this SubmissionListItemDto.  # noqa: E501
+        :type submitted_at: datetime
+        :param commit_hash: The commit_hash of this SubmissionListItemDto.  # noqa: E501
+        :type commit_hash: str
         """
         self.openapi_types = {
             'id': int,
@@ -46,7 +50,9 @@ class SubmissionListItemDto(Model):
             'user_id': int,
             'user_display_name': str,
             'grading_score': float,
-            'score': float
+            'score': float,
+            'submitted_at': datetime,
+            'commit_hash': str
         }
 
         self.attribute_map = {
@@ -57,7 +63,9 @@ class SubmissionListItemDto(Model):
             'user_id': 'user_id',
             'user_display_name': 'user_display_name',
             'grading_score': 'grading_score',
-            'score': 'score'
+            'score': 'score',
+            'submitted_at': 'submitted_at',
+            'commit_hash': 'commit_hash'
         }
 
         self._id = id
@@ -68,6 +76,8 @@ class SubmissionListItemDto(Model):
         self._user_display_name = user_display_name
         self._grading_score = grading_score
         self._score = score
+        self._submitted_at = submitted_at
+        self._commit_hash = commit_hash
 
     @classmethod
     def from_dict(cls, dikt) -> 'SubmissionListItemDto':
@@ -98,6 +108,8 @@ class SubmissionListItemDto(Model):
         :param id: The id of this SubmissionListItemDto.
         :type id: int
         """
+        if id is None:
+            raise ValueError("Invalid value for `id`, must not be `None`")  # noqa: E501
 
         self._id = id
 
@@ -161,6 +173,8 @@ class SubmissionListItemDto(Model):
         :param feedback_status: The feedback_status of this SubmissionListItemDto.
         :type feedback_status: FeedbackStatus
         """
+        if feedback_status is None:
+            raise ValueError("Invalid value for `feedback_status`, must not be `None`")  # noqa: E501
 
         self._feedback_status = feedback_status
 
@@ -224,6 +238,8 @@ class SubmissionListItemDto(Model):
         :param grading_score: The grading_score of this SubmissionListItemDto.
         :type grading_score: float
         """
+        if grading_score is None:
+            raise ValueError("Invalid value for `grading_score`, must not be `None`")  # noqa: E501
 
         self._grading_score = grading_score
 
@@ -245,5 +261,49 @@ class SubmissionListItemDto(Model):
         :param score: The score of this SubmissionListItemDto.
         :type score: float
         """
+        if score is None:
+            raise ValueError("Invalid value for `score`, must not be `None`")  # noqa: E501
 
         self._score = score
+
+    @property
+    def submitted_at(self) -> datetime:
+        """Gets the submitted_at of this SubmissionListItemDto.
+
+
+        :return: The submitted_at of this SubmissionListItemDto.
+        :rtype: datetime
+        """
+        return self._submitted_at
+
+    @submitted_at.setter
+    def submitted_at(self, submitted_at: datetime):
+        """Sets the submitted_at of this SubmissionListItemDto.
+
+
+        :param submitted_at: The submitted_at of this SubmissionListItemDto.
+        :type submitted_at: datetime
+        """
+
+        self._submitted_at = submitted_at
+
+    @property
+    def commit_hash(self) -> str:
+        """Gets the commit_hash of this SubmissionListItemDto.
+
+
+        :return: The commit_hash of this SubmissionListItemDto.
+        :rtype: str
+        """
+        return self._commit_hash
+
+    @commit_hash.setter
+    def commit_hash(self, commit_hash: str):
+        """Sets the commit_hash of this SubmissionListItemDto.
+
+
+        :param commit_hash: The commit_hash of this SubmissionListItemDto.
+        :type commit_hash: str
+        """
+
+        self._commit_hash = commit_hash

@@ -91,6 +91,8 @@ class AssignmentListItemInstructorDto(Model):
         :param id: The id of this AssignmentListItemInstructorDto.
         :type id: int
         """
+        if id is None:
+            raise ValueError("Invalid value for `id`, must not be `None`")  # noqa: E501
 
         self._id = id
 
@@ -112,6 +114,8 @@ class AssignmentListItemInstructorDto(Model):
         :param name: The name of this AssignmentListItemInstructorDto.
         :type name: str
         """
+        if name is None:
+            raise ValueError("Invalid value for `name`, must not be `None`")  # noqa: E501
 
         self._name = name
 
@@ -133,6 +137,8 @@ class AssignmentListItemInstructorDto(Model):
         :param deadline: The deadline of this AssignmentListItemInstructorDto.
         :type deadline: datetime
         """
+        if deadline is None:
+            raise ValueError("Invalid value for `deadline`, must not be `None`")  # noqa: E501
 
         self._deadline = deadline
 
@@ -154,6 +160,8 @@ class AssignmentListItemInstructorDto(Model):
         :param submission_count: The submission_count of this AssignmentListItemInstructorDto.
         :type submission_count: int
         """
+        if submission_count is None:
+            raise ValueError("Invalid value for `submission_count`, must not be `None`")  # noqa: E501
 
         self._submission_count = submission_count
 
@@ -175,6 +183,8 @@ class AssignmentListItemInstructorDto(Model):
         :param status: The status of this AssignmentListItemInstructorDto.
         :type status: AssignmentStatus
         """
+        if status is None:
+            raise ValueError("Invalid value for `status`, must not be `None`")  # noqa: E501
 
         self._status = status
 
@@ -196,6 +206,8 @@ class AssignmentListItemInstructorDto(Model):
         :param points: The points of this AssignmentListItemInstructorDto.
         :type points: float
         """
+        if points is None:
+            raise ValueError("Invalid value for `points`, must not be `None`")  # noqa: E501
 
         self._points = points
 
@@ -217,5 +229,7 @@ class AssignmentListItemInstructorDto(Model):
         :param grading_method: The grading_method of this AssignmentListItemInstructorDto.
         :type grading_method: GradingMethod
         """
+        if grading_method is None:
+            raise ValueError("Invalid value for `grading_method`, must not be `None`")  # noqa: E501
 
         self._grading_method = grading_method
