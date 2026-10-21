@@ -106,20 +106,12 @@ class LectureObjectHandler(GraderBaseHandler):
     async def get(self, lecture_id: int):
         """
         Finds lecture with the given lecture id.
-        :param lecture_id: id of lecture
+        :param lecture_id: id of the lecture
         :return: lecture with given id
         """
         self.validate_parameters()
-        if self.user.is_admin:
-            lecture = self.get_lecture(lecture_id)
-            if lecture is None:
-                raise HTTPError(HTTPStatus.NOT_FOUND, reason="Lecture was not found")
-        else:
-            role = self.get_role(lecture_id)
-            lecture = role.lecture
-            if lecture.deleted == DeleteState.deleted:
-                raise HTTPError(HTTPStatus.NOT_FOUND, reason="Lecture was not found")
-        self.write_json(lecture)
+        lecture = self.services.lectures.get_lecture_by_id(lecture_id, user=self.user)
+        self.write_json(lecture.dto_to_dict())
 
     @authorize([Scope.instructor, Scope.admin])
     async def delete(self, lecture_id: int):

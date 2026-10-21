@@ -1,5 +1,6 @@
 from http import HTTPStatus
 from typing import Optional
+from tornado.web import HTTPError
 
 from sqlalchemy import select, func
 
@@ -48,3 +49,9 @@ class BaseService:
             .group_by(Role.lectid)
         )
         return dict(session.execute(stmt).all())
+
+    def get_lecture(self, session, lecture_id: int) -> Lecture | None:
+        lecture: Optional[Lecture] = session.get(Lecture, lecture_id)
+        if lecture is None:
+            raise HTTPError(HTTPStatus.NOT_FOUND, "Lecture not found")
+        return lecture

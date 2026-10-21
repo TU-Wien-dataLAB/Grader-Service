@@ -1,12 +1,18 @@
-from sqlalchemy import select
+from http import HTTPStatus
 
-from grader_service.api.models import LectureListItemDto
+from sqlalchemy import select
+from tornado.web import HTTPError
+
+from grader_service.api.models import LectureListItemDto, LectureDetailDto
 from grader_service.orm.base import DeleteState
 from grader_service.orm.lecture import LectureState
 from grader_service.orm.takepart import Scope
 from grader_service.services.base_service import BaseService
 from grader_service.orm import User, Lecture, Role
-from grader_service.services.mappers.lectures_mapper import to_lecture_list_item_dto
+from grader_service.services.mappers.lectures_mapper import (
+    to_lecture_list_item_dto,
+    to_lecture_detail_dto,
+)
 
 
 class LecturesService(BaseService):
@@ -41,3 +47,12 @@ class LecturesService(BaseService):
                 )
                 for lec in lectures
             ]
+
+    def get_lecture_by_id(self, lecture_id: int, user: User) -> LectureDetailDto:
+        with self.session_maker() as session:
+            lecture = self.get_lecture(session, lecture_id)
+
+            if not user.is_admin:
+                if lecture.deleted == DeleteState.deleted:
+                    raise HTTPError(HTTPStatus.NOT_FOUND, reason="Lecture not found")
+            return to_lecture_detail_dto(lecture)
