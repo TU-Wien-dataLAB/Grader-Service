@@ -295,20 +295,6 @@ components:
       example:
         period: "P1W1D"
         scaling: 0.5
-    ErrorMessage:
-      type: object
-      required: [ "code", "error", "path" ]
-      properties:
-        code:
-          type: integer
-        error:
-          type: string
-        path:
-          type: string
-        message:
-          type: string
-        traceback:
-          type: string
     UserSubmissions:
       type: array
       items:
