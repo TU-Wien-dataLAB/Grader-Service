@@ -3,7 +3,7 @@ from http import HTTPStatus
 from sqlalchemy import select
 from tornado.web import HTTPError
 
-from grader_service.api.models import LectureListItemDto, LectureDetailDto
+from grader_service.api.models import LectureListItemDto, LectureDetailDto, LectureUpdateDto
 from grader_service.orm.base import DeleteState
 from grader_service.orm.lecture import LectureState
 from grader_service.orm.takepart import Scope
@@ -55,4 +55,14 @@ class LecturesService(BaseService):
             if not user.is_admin:
                 if lecture.deleted == DeleteState.deleted:
                     raise HTTPError(HTTPStatus.NOT_FOUND, reason="Lecture not found")
+            return to_lecture_detail_dto(lecture)
+
+    def update_lecture(self, lecture_id: int, lecture_dto: LectureUpdateDto):
+        with self.session_maker() as session:
+            lecture = self.get_lecture(session, lecture_id)
+
+            lecture.name = lecture_dto.name
+            lecture.state = LectureState.complete if lecture_dto.complete else LectureState.active
+
+            session.commit()
             return to_lecture_detail_dto(lecture)

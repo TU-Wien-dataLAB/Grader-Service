@@ -11,6 +11,7 @@ from sqlalchemy.orm import joinedload
 from sqlalchemy.orm.exc import ObjectDeletedError
 from tornado.web import HTTPError
 
+from grader_service.api.models import LectureUpdateDto
 from grader_service.api.models.lecture import Lecture as LectureModel
 from grader_service.errors import APIError
 from grader_service.handlers.base_handler import GraderBaseHandler, authorize
@@ -93,14 +94,11 @@ class LectureObjectHandler(GraderBaseHandler):
         """
         self.validate_parameters()
         body = tornado.escape.json_decode(self.request.body)
-        lecture_model = LectureModel.from_dict(body)
-        lecture = self.session.get(Lecture, lecture_id)
+        lecture = self.services.lectures.update_lecture(
+            lecture_id, LectureUpdateDto.from_dict(body)
+        )
 
-        lecture.name = lecture_model.name
-        lecture.state = LectureState.complete if lecture_model.complete else LectureState.active
-
-        self.session.commit()
-        self.write_json(lecture)
+        self.write_json(lecture.dto_to_dict())
 
     @authorize([Scope.student, Scope.tutor, Scope.instructor, Scope.admin])
     async def get(self, lecture_id: int):

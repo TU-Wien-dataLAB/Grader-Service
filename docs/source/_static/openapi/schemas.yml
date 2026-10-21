@@ -65,12 +65,8 @@ components:
         complete: false
     LectureUpdateDto:
       type: object
-      required: [ "id", "name", "complete" ]
+      required: [ "name", "complete" ]
       properties:
-        id:
-          type: integer
-          format: int64
-          example: 1
         name:
           type: string
           example: "Informationsvisualisierung"

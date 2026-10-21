@@ -29,7 +29,7 @@ from .db_util import (
     insert_student,
     insert_submission,
 )
-from ...api.models import LectureListItemDto
+from ...api.models import LectureListItemDto, LectureDetailDto
 
 
 async def test_get_lectures(
@@ -475,7 +475,7 @@ async def test_put_lecture(
         url, method="GET", headers={"Authorization": f"Token {default_token}"}
     )
     assert get_response.code == HTTPStatus.OK
-    lecture = Lecture.from_dict(json.loads(get_response.body.decode()))
+    lecture = LectureDetailDto.from_dict(json.loads(get_response.body.decode()))
     lecture.name = "new name"
     lecture.complete = not lecture.complete
     # lecture code will not be updated
@@ -510,7 +510,7 @@ async def test_put_lecture_unauthorized(
         url, method="GET", headers={"Authorization": f"Token {default_token}"}
     )
     assert get_response.code == HTTPStatus.OK
-    lecture = Lecture.from_dict(json.loads(get_response.body.decode()))
+    lecture = LectureDetailDto.from_dict(json.loads(get_response.body.decode()))
     lecture.name = "new name"
 
     with pytest.raises(HTTPClientError) as exc_info:
