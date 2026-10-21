@@ -7,15 +7,13 @@ import re
 from http import HTTPStatus
 
 import tornado
-from sqlalchemy.orm import joinedload
-
 from grader_service.api.models import LectureUpdateDto
 from grader_service.api.models.lecture import Lecture as LectureModel
 from grader_service.errors import APIError
 from grader_service.handlers.base_handler import GraderBaseHandler, authorize
 from grader_service.orm.base import DeleteState
 from grader_service.orm.lecture import Lecture, LectureState
-from grader_service.orm.takepart import Role, Scope
+from grader_service.orm.takepart import Scope
 from grader_service.registry import VersionSpecifier, register_handler
 
 lecture_code_pattern = re.compile(r"^[A-Za-z0-9_-]+$")
@@ -152,37 +150,11 @@ class LectureStudentsHandler(GraderBaseHandler):
         :param lecture_id: id of the lecture
         :return: a dictionary of user, tutor and instructor names lists
         """
-        students = (
-            self.session.query(Role)
-            .options(joinedload(Role.user))
-            .filter(Role.lectid == lecture_id)
-            .filter(Role.role == Scope.student)
-        )
-        tutors = (
-            self.session.query(Role)
-            .options(joinedload(Role.user))
-            .filter(Role.lectid == lecture_id)
-            .filter(Role.role == Scope.tutor)
-        )
-        instructors = (
-            self.session.query(Role)
-            .options(joinedload(Role.user))
-            .filter(Role.lectid == lecture_id)
-            .filter(Role.role == Scope.instructor)
-        )
+        students, tutors, instructors = self.services.lectures.get_lecture_users(lecture_id)
 
-        students = [
-            {"id": s.user.id, "name": s.user.name, "display_name": s.user.display_name}
-            for s in students
-        ]
-        tutors = [
-            {"id": t.user.id, "name": t.user.name, "display_name": t.user.display_name}
-            for t in tutors
-        ]
-        instructors = [
-            {"id": i.user.id, "name": i.user.name, "display_name": i.user.display_name}
-            for i in instructors
-        ]
-
-        counts = {"instructors": instructors, "tutors": tutors, "students": students}
-        self.write_json(counts)
+        lecture_users = {
+            "instructors": [i.dto_to_dict() for i in instructors],
+            "tutors": [t.dto_to_dict() for t in tutors],
+            "students": [s.dto_to_dict() for s in students],
+        }
+        self.write_json(lecture_users)
