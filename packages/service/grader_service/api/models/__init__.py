@@ -18,6 +18,7 @@ from grader_service.api.models.lecture_list_item_dto import LectureListItemDto
 from grader_service.api.models.lecture_update_dto import LectureUpdateDto
 from grader_service.api.models.manual_status import ManualStatus
 from grader_service.api.models.remote_file_status import RemoteFileStatus
+from grader_service.api.models.submission import Submission
 from grader_service.api.models.submission_detail_instructor_dto import SubmissionDetailInstructorDto
 from grader_service.api.models.submission_list_item_dto import SubmissionListItemDto
 from grader_service.api.models.submission_period import SubmissionPeriod

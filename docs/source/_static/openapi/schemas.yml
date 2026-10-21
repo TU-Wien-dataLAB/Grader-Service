@@ -139,7 +139,7 @@ components:
               $ref: "#/components/schemas/GradingMethod"
     AssignmentCreateDto:
       type: object
-      required: [ "name", "settings" ]
+      required: [ "name" ]
       properties:
         name:
           type: string
@@ -148,7 +148,7 @@ components:
           $ref: "#/components/schemas/AssignmentSettings"
     AssignmentUpdateDto:
       type: object
-      required: [ "id", "name", "settings" ]
+      required: [ "id", "name" ]
       properties:
         id:
           type: integer
@@ -208,7 +208,7 @@ components:
           default: false
     AssignmentSettings:
       type: object
-      required: [ "deadline", "max_submissions", "allowed_files", "late_submission", "grading_method", "cell_timeout", "group" ]
+      required: [ "grading_method" ]
       properties:
         deadline:
           type: string
