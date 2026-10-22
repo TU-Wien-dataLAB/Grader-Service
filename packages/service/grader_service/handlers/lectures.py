@@ -57,7 +57,7 @@ class LectureBaseHandler(GraderBaseHandler):
             self, "per_page", default=DEFAULT_PER_PAGE, minimum=1, maximum=MAX_PER_PAGE
         )
 
-        sort_by = self.get_argument("sort_by", "id")
+        sort_by = self.get_argument("sort_by", "created_at")
         if sort_by not in LECTURE_SORTABLE_COLUMNS:
             raise HTTPError(
                 400, reason=f"Invalid sort_by: must be one of {sorted(LECTURE_SORTABLE_COLUMNS)}"
