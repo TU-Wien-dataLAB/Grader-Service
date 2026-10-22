@@ -24,3 +24,30 @@ def parse_ids(*args) -> Union[int, tuple[int, ...]]:
     if len(ids) == 1:
         return ids[0]
     return ids
+
+
+def get_int_argument(
+    handler, name: str, default: int, minimum: int = None, maximum: int = None
+) -> int:
+    """
+    Parses an integer query argument from a request handler,
+    raising HTTPError 400 for invalid or out-of-range values.
+
+    :param handler: the request handler owning the query arguments
+    :param name: name of the query argument
+    :param default: default value if the argument is absent
+    :param minimum: lower bound (inclusive)
+    :param maximum: upper bound (inclusive)
+    :return: the parsed integer value
+    :raises HTTPError: if the value is not an integer or out of range
+    """
+    raw = handler.get_argument(name, default)
+    try:
+        value = int(raw)
+    except (TypeError, ValueError):
+        raise HTTPError(HTTPStatus.BAD_REQUEST, reason=f"Invalid {name}: must be an integer")
+    if minimum is not None and value < minimum:
+        raise HTTPError(HTTPStatus.BAD_REQUEST, reason=f"Invalid {name}: must be >= {minimum}")
+    if maximum is not None and value > maximum:
+        raise HTTPError(HTTPStatus.BAD_REQUEST, reason=f"Invalid {name}: must be <= {maximum}")
+    return value

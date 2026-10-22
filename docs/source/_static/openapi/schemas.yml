@@ -116,6 +116,45 @@ components:
         student_count:
           type: integer
           format: int64
+    LectureListDto:
+      type: object
+      required: [ "lectures", "page", "per_page", "total_items", "total_pages" ]
+      properties:
+        lectures:
+          type: array
+          items:
+            $ref: "#/components/schemas/LectureListItemDto"
+        page:
+          type: integer
+          format: int64
+          description: Current page number (1-based)
+          example: 1
+        per_page:
+          type: integer
+          format: int64
+          description: Number of lectures per page
+          example: 20
+        total_items:
+          type: integer
+          format: int64
+          description: Total number of lectures matching the filters
+          example: 15
+        total_pages:
+          type: integer
+          format: int64
+          description: Total number of pages
+          example: 1
+      example:
+        lectures:
+          - id: 1
+            name: "Informationsvisualisierung"
+            code: "ivs21"
+            complete: false
+            assignment_count: 3
+        page: 1
+        per_page: 20
+        total_items: 1
+        total_pages: 1
     AssignmentDetailBaseDto:
       type: object
       required: [ "name", "points" ]

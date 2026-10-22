@@ -7,10 +7,18 @@ import re
 from http import HTTPStatus
 
 import tornado
+from tornado.web import HTTPError
+
 from grader_service.api.models import LectureUpdateDto, LectureCreateDto
 from grader_service.handlers.base_handler import GraderBaseHandler, authorize
+from grader_service.handlers.handler_utils import get_int_argument
 from grader_service.orm.takepart import Scope
 from grader_service.registry import VersionSpecifier, register_handler
+from grader_service.services.lectures_service import (
+    DEFAULT_PER_PAGE,
+    MAX_PER_PAGE,
+    LECTURE_SORTABLE_COLUMNS,
+)
 
 lecture_code_pattern = re.compile(r"^[A-Za-z0-9_-]+$")
 
@@ -24,19 +32,52 @@ class LectureBaseHandler(GraderBaseHandler):
     @authorize([Scope.student, Scope.tutor, Scope.instructor, Scope.admin])
     async def get(self):
         """
-        Returns all lectures the user can access.
+        Returns a paginated list of lectures the user can access.
         - For regular users: only lectures they have a role in, which match the requested states and are not deleted.
         - For admins: all lectures, regardless of the deletion state.
+
+        Query parameters:
+        - complete: filter by lecture state ("true" -> complete, otherwise active)
+        - instructor: "true" -> only lectures where the user has an elevated role (if eligible)
+        - page: 1-based page number (default 1)
+        - per_page: items per page, 1-100 (default 20)
+        - sort_by: "id" | "name" | "created_at" (default "id")
+        - order: "asc" | "desc" (default "asc")
+        - search: case-insensitive substring filter on lecture name and code
         """
-        self.validate_parameters("complete", "instructor")
+        self.validate_parameters(
+            "complete", "instructor", "page", "per_page", "sort_by", "order", "search"
+        )
         complete = self.get_argument("complete", None)
         instructor = self.get_argument("instructor", None)
+        search = self.get_argument("search", None)
 
-        lectures = self.services.lectures.get_all_lectures(
-            complete=complete, instructor_view=instructor, user=self.user
+        page = get_int_argument(self, "page", default=1, minimum=1)
+        per_page = get_int_argument(
+            self, "per_page", default=DEFAULT_PER_PAGE, minimum=1, maximum=MAX_PER_PAGE
         )
 
-        self.write_json([lec.dto_to_dict(omit_if_none={"student_count"}) for lec in lectures])
+        sort_by = self.get_argument("sort_by", "id")
+        if sort_by not in LECTURE_SORTABLE_COLUMNS:
+            raise HTTPError(
+                400, reason=f"Invalid sort_by: must be one of {sorted(LECTURE_SORTABLE_COLUMNS)}"
+            )
+
+        order = self.get_argument("order", "asc")
+        if order not in ("asc", "desc"):
+            raise HTTPError(400, reason="Invalid order: must be 'asc' or 'desc'")
+
+        response = self.services.lectures.get_all_lectures(
+            complete=complete,
+            instructor_view=instructor,
+            user=self.user,
+            page=page,
+            per_page=per_page,
+            sort_by=sort_by,
+            order=order,
+            search=search,
+        )
+        self.write_json(response)
 
     @authorize([Scope.instructor, Scope.admin])
     async def post(self):

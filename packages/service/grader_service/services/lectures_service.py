@@ -1,15 +1,11 @@
+import math
 import re
 from http import HTTPStatus
 
-from sqlalchemy import select
+from sqlalchemy import func, select
 from sqlalchemy.orm import joinedload
 
-from grader_service.api.models import (
-    LectureListItemDto,
-    LectureDetailDto,
-    LectureUpdateDto,
-    LectureCreateDto,
-)
+from grader_service.api.models import LectureDetailDto, LectureUpdateDto, LectureCreateDto
 from grader_service.api.models.user import User as UserDto
 from grader_service.errors import APIError
 from grader_service.orm.base import DeleteState
@@ -25,17 +21,42 @@ from grader_service.services.mappers.users_mapper import to_user_dto
 
 lecture_code_pattern = re.compile(r"^[A-Za-z0-9_-]+$")
 
+# Allow-list of sortable lecture columns
+LECTURE_SORTABLE_COLUMNS = {
+    "id": Lecture.id,
+    "name": Lecture.name,
+    "created_at": Lecture.created_at,
+}
+
+DEFAULT_PER_PAGE = 10
+MAX_PER_PAGE = 100
+
 
 class LecturesService(BaseService):
-    # TODO: add filtering, sorting and pagination params
     def get_all_lectures(
-        self, complete: str, instructor_view: str, user: User
-    ) -> list[LectureListItemDto]:
+        self,
+        complete: str | None,
+        instructor_view: str | None,
+        user: User,
+        page: int = 1,
+        per_page: int = DEFAULT_PER_PAGE,
+        sort_by: str = "id",
+        order: str = "asc",
+        search: str | None = None,
+    ) -> dict:
         with self.session_maker() as session:
             stmt = select(Lecture)
             if complete is not None:
                 state = LectureState.complete if complete == "true" else LectureState.active
                 stmt = stmt.where(Lecture.state == state)
+
+            if search:
+                # escape LIKE wildcards so user input matches literally
+                escaped = search.replace("\\", "\\\\").replace("%", "\\%").replace("_", "\\_")
+                term = f"%{escaped}%"
+                stmt = stmt.where(
+                    Lecture.name.ilike(term, escape="\\") | Lecture.code.ilike(term, escape="\\")
+                )
 
             if not user.is_admin:
                 stmt = stmt.join(Role).where(
@@ -45,12 +66,26 @@ class LecturesService(BaseService):
                 if instructor_view == "true" and self.has_elevated_permissions(session, user):
                     stmt = stmt.where(Role.role.in_([Scope.instructor, Scope.tutor]))
 
+            # total count under the same filters the user can see,
+            # so pagination metadata is consistent with the page contents
+            total_items = session.execute(
+                select(func.count()).select_from(stmt.subquery())
+            ).scalar_one()
+
+            sort_column = LECTURE_SORTABLE_COLUMNS[sort_by]
+            is_ascending = order == "asc"
+            ordering = [sort_column.asc() if is_ascending else sort_column.desc()]
+            if sort_by != "id":
+                # deterministic tiebreaker so pages are stable when sort values repeat
+                ordering.append(Lecture.id.asc() if is_ascending else Lecture.id.desc())
+
+            stmt = stmt.order_by(*ordering).offset((page - 1) * per_page).limit(per_page)
             lectures = session.scalars(stmt).all()
             ids = [lec.id for lec in lectures]
             a_counts = self.get_assignment_counts(session, ids)
             s_counts = self.get_student_counts(session, ids)
 
-            return [
+            lecture_dtos = [
                 to_lecture_list_item_dto(
                     lec,
                     a_counts.get(lec.id, 0),
@@ -58,6 +93,17 @@ class LecturesService(BaseService):
                 )
                 for lec in lectures
             ]
+
+            total_pages = math.ceil(total_items / per_page) if total_items > 0 else 0
+            return {
+                "lectures": [
+                    lec.dto_to_dict(omit_if_none={"student_count"}) for lec in lecture_dtos
+                ],
+                "page": page,
+                "per_page": per_page,
+                "total_items": total_items,
+                "total_pages": total_pages,
+            }
 
     def get_lecture_by_id(self, lecture_id: int, user: User) -> LectureDetailDto:
         with self.session_maker() as session:

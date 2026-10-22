@@ -15,6 +15,7 @@ from grader_service.api.models.feedback_status import FeedbackStatus
 from grader_service.api.models.grading_method import GradingMethod
 from grader_service.api.models.lecture_create_dto import LectureCreateDto
 from grader_service.api.models.lecture_detail_dto import LectureDetailDto
+from grader_service.api.models.lecture_list_dto import LectureListDto
 from grader_service.api.models.lecture_list_item_dto import LectureListItemDto
 from grader_service.api.models.lecture_update_dto import LectureUpdateDto
 from grader_service.api.models.manual_status import ManualStatus
